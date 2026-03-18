@@ -11,7 +11,6 @@
     font-family: 'DM Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    cursor: none;
   }
 
   body {
@@ -21,8 +20,14 @@
     padding: 0;
   }
 
-  /* Cursor oculta nativo */
-  a, button, [role="button"] { cursor: none; }
+  /* Cursor oculto APENAS dentro do app autenticado */
+  .app-active,
+  .app-active a,
+  .app-active button,
+  .app-active [role="button"],
+  .app-active input,
+  .app-active select,
+  .app-active textarea { cursor: none; }
 
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: #0e0e0e; }
@@ -33,7 +38,6 @@
 }
 
 @layer components {
-  /* ── Cursor custom ─────────────────────────── */
   .cursor-dot {
     @apply fixed top-0 left-0 z-[9999] w-2 h-2 bg-brand-acid rounded-full pointer-events-none;
     transform: translate(-50%, -50%);
@@ -50,7 +54,6 @@
   .cursor-dot.hovered  { @apply w-3 h-3; }
   .cursor-ring.hovered { @apply w-14 h-14 border-brand-acid; }
 
-  /* ── Page transition ───────────────────────── */
   .page-transition {
     @apply fixed inset-0 z-[200] bg-brand-acid pointer-events-none;
     transform: scaleY(0);
@@ -67,55 +70,37 @@
     transition: transform 0.45s cubic-bezier(0.16,1,0.3,1) 0.05s;
   }
 
-  /* ── Cards ─────────────────────────────────── */
-  .card {
-    @apply bg-bg-card border border-bg-border rounded-2xl;
-  }
-  .card-hover {
-    @apply card transition-all duration-200 hover:border-brand-acid/20 hover:shadow-glow-acid;
-    cursor: none;
-  }
+  .card { @apply bg-bg-card border border-bg-border rounded-2xl; }
+  .card-hover { @apply card transition-all duration-200 hover:border-brand-acid/20 hover:shadow-glow-acid; }
 
-  /* ── Buttons ───────────────────────────────── */
   .btn-primary {
     @apply bg-brand-acid text-bg-primary font-semibold px-4 py-2.5 rounded-sm
            hover:shadow-glow-acid active:scale-95 transition-all duration-150
            disabled:opacity-40 disabled:cursor-not-allowed text-sm tracking-wide;
-    cursor: none;
   }
   .btn-secondary {
     @apply bg-bg-card border border-bg-border text-text-primary font-medium px-4 py-2.5 rounded-sm
            hover:border-brand-acid/30 active:scale-95 transition-all duration-150
            disabled:opacity-40 text-sm;
-    cursor: none;
   }
   .btn-ghost {
     @apply text-text-secondary font-medium px-4 py-2.5 rounded-sm
            hover:text-text-primary hover:bg-bg-card active:scale-95 transition-all duration-150 text-sm;
-    cursor: none;
   }
   .btn-danger {
     @apply bg-status-error/10 border border-status-error/30 text-status-error font-medium px-4 py-2.5 rounded-sm
            hover:bg-status-error/20 active:scale-95 transition-all duration-150 text-sm;
-    cursor: none;
   }
 
-  /* ── Inputs ────────────────────────────────── */
   .input {
     @apply w-full bg-bg-surface border border-bg-border text-text-primary placeholder-text-muted
            rounded-sm px-4 py-2.5 text-sm
            focus:outline-none focus:border-brand-acid/40 focus:ring-1 focus:ring-brand-acid/15
            transition-colors duration-150;
-    cursor: none;
   }
-  .input-label {
-    @apply block text-xs font-medium text-text-secondary mb-1.5 tracking-wider uppercase;
-  }
+  .input-label { @apply block text-xs font-medium text-text-secondary mb-1.5 tracking-wider uppercase; }
 
-  /* ── Badges ────────────────────────────────── */
-  .badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-medium tracking-wide;
-  }
+  .badge { @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-medium tracking-wide; }
   .badge-success { @apply badge bg-status-success/10 text-status-success; }
   .badge-warning { @apply badge bg-status-warning/10 text-status-warning; }
   .badge-error   { @apply badge bg-status-error/10 text-status-error; }
@@ -125,44 +110,34 @@
   .badge-acid    { @apply badge bg-brand-acid/10 text-brand-acid; }
   .badge-muted   { @apply badge bg-bg-border text-text-secondary; }
 
-  /* ── Stat card ─────────────────────────────── */
   .stat-card   { @apply card p-5 flex flex-col gap-2; }
   .stat-value  { @apply text-2xl font-semibold text-text-primary; }
   .stat-label  { @apply text-xs text-text-secondary uppercase tracking-wider; }
   .stat-change-up   { @apply text-xs text-status-success font-medium; }
   .stat-change-down { @apply text-xs text-status-error font-medium; }
 
-  /* ── Nav ───────────────────────────────────── */
   .nav-item {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium text-text-muted
            hover:text-text-primary hover:bg-bg-surface transition-all duration-150;
-    cursor: none;
   }
-  .nav-item-active {
-    @apply nav-item text-brand-acid bg-brand-acid/8 hover:bg-brand-acid/10;
-  }
+  .nav-item-active { @apply nav-item text-brand-acid bg-brand-acid/8 hover:bg-brand-acid/10; }
 
-  /* ── Table ─────────────────────────────────── */
   .table-header { @apply text-xs font-medium text-text-muted uppercase tracking-widest px-4 py-3 text-left; }
   .table-cell   { @apply px-4 py-3.5 text-sm text-text-primary; }
   .table-row    { @apply border-t border-bg-border hover:bg-bg-surface/60 transition-colors duration-100; }
 
-  /* ── Typography ────────────────────────────── */
   .page-title    { @apply text-2xl font-semibold text-text-primary; }
   .page-subtitle { @apply text-sm text-text-secondary mt-1; }
   .section-title { @apply text-lg font-semibold text-text-primary; }
   .display-title { @apply font-display text-text-primary leading-none; }
 
-  /* ── Empty state ───────────────────────────── */
   .empty-state       { @apply flex flex-col items-center justify-center py-16 px-8 text-center; }
   .empty-state-icon  { @apply w-12 h-12 text-text-muted mb-4; }
   .empty-state-title { @apply text-base font-medium text-text-primary mb-2; }
   .empty-state-desc  { @apply text-sm text-text-secondary max-w-xs; }
 
-  /* ── Skeleton ──────────────────────────────── */
   .skeleton { @apply bg-bg-surface rounded-sm animate-pulse; }
 
-  /* ── Misc ──────────────────────────────────── */
   .divider       { @apply border-t border-bg-border; }
   .gradient-text { @apply bg-gradient-acid bg-clip-text text-transparent; }
   .alert-success { @apply flex gap-3 p-4 rounded-sm bg-status-success/10 border border-status-success/20 text-status-success text-sm; }
@@ -170,11 +145,9 @@
   .alert-error   { @apply flex gap-3 p-4 rounded-sm bg-status-error/10 border border-status-error/20 text-status-error text-sm; }
   .alert-info    { @apply flex gap-3 p-4 rounded-sm bg-status-info/10 border border-status-info/20 text-status-info text-sm; }
 
-  /* ── Marquee strip ─────────────────────────── */
   .marquee-track { @apply flex gap-16 w-max animate-marquee; }
   .marquee-track:hover { animation-play-state: paused; }
 
-  /* ── Scroll-reveal ─────────────────────────── */
   .reveal {
     opacity: 0;
     transform: translateY(20px);

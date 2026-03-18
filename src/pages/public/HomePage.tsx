@@ -112,7 +112,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
   }, [])
 
   return (
-    <div className="bg-[#080808] text-[#f5f5f0] overflow-x-hidden" style={{ cursor: 'none' }}>
+    <div className="bg-[#080808] text-[#f5f5f0] overflow-x-hidden">
 
       {/* ── NAV ─────────────────────────────────────────────── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5"

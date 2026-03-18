@@ -86,12 +86,12 @@ const STATS = [
   { value: 3,    suffix: 'x', label: 'Mais rápido que concorrentes' },
 ]
 
-/* ── Video sources — Mixkit & Pexels free license ────────────── */
+/* ── Video sources — Mixkit CDN (free, embed ok) ─────────────── */
 const HERO_VIDEOS = [
-  'https://videos.pexels.com/video-files/2795405/2795405-uhd_2560_1440_25fps.mp4',
-  'https://videos.pexels.com/video-files/1387537/1387537-uhd_2560_1440_24fps.mp4',
-  'https://videos.pexels.com/video-files/2499611/2499611-uhd_2560_1440_25fps.mp4',
-  'https://videos.pexels.com/video-files/3045163/3045163-uhd_2560_1440_25fps.mp4',
+  'https://assets.mixkit.co/videos/preview/mixkit-crowd-at-a-concert-in-the-night-4164-large.mp4',
+  'https://assets.mixkit.co/videos/preview/mixkit-group-of-people-at-a-music-festival-4152-large.mp4',
+  'https://assets.mixkit.co/videos/preview/mixkit-night-time-festival-crowd-4159-large.mp4',
+  'https://assets.mixkit.co/videos/preview/mixkit-dj-in-a-concert-with-colorful-lights-4170-large.mp4',
 ]
 
 /* ── Main ───────────────────────────────────────────────────── */
@@ -169,7 +169,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
       </nav>
 
       {/* ── HERO COM VÍDEO ──────────────────────────────────── */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-32">
 
         {/* Vídeos em crossfade */}
         {HERO_VIDEOS.map((src, i) => (

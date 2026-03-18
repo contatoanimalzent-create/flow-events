@@ -145,7 +145,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
       </nav>
 
       {/* ── HERO ────────────────────────────────────────────── */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24">
 
         {/* Background grid */}
         <div className="absolute inset-0 opacity-[0.04]"
@@ -198,25 +198,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
             EVENTS<span style={{ color: '#d4ff00' }}>.</span>
           </span>
         </h1>
-
-        {/* Subtitle */}
-        <p className="relative z-10 text-center text-[#9a9a9a] text-base max-w-md mt-8 leading-relaxed animate-fade-in"
-          style={{ animationDelay: '0.3s', transform: `translateY(${scrollY * 0.1}px)` }}>
-          A plataforma operacional mais completa do Brasil para produtores que querem
-          criar, vender e operar eventos de alto nível.
-        </p>
-
-        {/* CTAs */}
-        <div className="relative z-10 flex items-center gap-4 mt-10 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <button onClick={onLogin}
-            className="flex items-center gap-2 bg-[#d4ff00] text-[#080808] px-8 py-4 text-sm font-bold tracking-wider rounded-sm hover:shadow-[0_0_50px_rgba(212,255,0,0.4)] transition-all duration-300 hover:scale-105">
-            COMEÇAR AGORA <ArrowRight className="w-4 h-4" />
-          </button>
-          <button
-            className="flex items-center gap-2 border border-[#242424] text-[#9a9a9a] px-8 py-4 text-sm font-medium tracking-wider rounded-sm hover:border-[#d4ff00]/30 hover:text-[#f5f5f0] transition-all duration-300">
-            VER DEMO
-          </button>
-        </div>
 
         {/* Scroll indicator */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">

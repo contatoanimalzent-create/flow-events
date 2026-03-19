@@ -7,7 +7,7 @@ const sectionTitles: Record<NavSection, string> = {
   events:        'Eventos',
   tickets:       'Ingressos & Lotes',
   sales:         'Vendas',
-  checkin:       'Check-in',
+  checkin:       'Check-in Operacional',
   credentialing: 'Credenciamento',
   staff:         'Staff',
   suppliers:     'Fornecedores',
@@ -43,7 +43,6 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
       <div className="flex-1" />
 
-      {/* Search */}
       <button className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-bg-card border border-bg-border
                          rounded-lg text-sm text-text-muted hover:border-brand-acid/30 transition-all">
         <Search className="w-4 h-4" />
@@ -51,13 +50,11 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
         <span className="text-xs bg-bg-border px-1.5 py-0.5 rounded">⌘K</span>
       </button>
 
-      {/* Notifications */}
       <button className="relative p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-card transition-all">
         <Bell className="w-5 h-5" />
         <span className="absolute top-1 right-1 w-2 h-2 bg-status-error rounded-full" />
       </button>
 
-      {/* Sign out */}
       <button
         onClick={signOut}
         className="p-1.5 rounded-lg text-text-muted hover:text-status-error hover:bg-status-error/10 transition-all"

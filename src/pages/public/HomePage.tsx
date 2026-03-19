@@ -86,31 +86,18 @@ const STATS = [
   { value: 3,    suffix: 'x', label: 'Mais rápido que concorrentes' },
 ]
 
-/* ── Video sources — Mixkit CDN (free, embed ok) ─────────────── */
-const HERO_VIDEOS = [
-  'https://assets.mixkit.co/videos/preview/mixkit-crowd-at-a-concert-in-the-night-4164-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-group-of-people-at-a-music-festival-4152-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-night-time-festival-crowd-4159-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-dj-in-a-concert-with-colorful-lights-4170-large.mp4',
-]
-
 /* ── Main ───────────────────────────────────────────────────── */
 export function HomePage({ onLogin }: { onLogin: () => void }) {
   const heroRef = useRef<HTMLDivElement>(null)
   const [scrollY, setScrollY] = useState(0)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [activeVideo, setActiveVideo] = useState(0)
-  const [nextVideo, setNextVideo] = useState(1)
-  const [transitioning, setTransitioning] = useState(false)
 
-  /* Parallax scroll */
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  /* Mouse parallax */
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       setMousePos({
@@ -122,25 +109,12 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
     return () => window.removeEventListener('mousemove', onMove)
   }, [])
 
-  /* Video crossfade a cada 8s */
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTransitioning(true)
-      setTimeout(() => {
-        setActiveVideo(prev => (prev + 1) % HERO_VIDEOS.length)
-        setNextVideo(prev => (prev + 1) % HERO_VIDEOS.length)
-        setTransitioning(false)
-      }, 1000)
-    }, 8000)
-    return () => clearInterval(interval)
-  }, [])
-
   return (
     <div className="bg-[#080808] text-[#f5f5f0] overflow-x-hidden">
 
       {/* ── NAV ─────────────────────────────────────────────── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5"
-        style={{ background: 'linear-gradient(to bottom, rgba(8,8,8,0.9) 0%, transparent 100%)', backdropFilter: 'blur(12px)' }}>
+        style={{ background: 'linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%)', backdropFilter: 'blur(12px)' }}>
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 bg-[#d4ff00] flex items-center justify-center rounded-sm">
             <span style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#080808', fontSize: 14 }}>A</span>
@@ -153,14 +127,9 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           </span>
         </div>
         <div className="flex items-center gap-6">
-          <a href="#features" className="text-xs text-[#9a9a9a] hover:text-[#f5f5f0] transition-colors font-mono tracking-wider hidden md:block">
-            FEATURES
-          </a>
-          <a href="#stats" className="text-xs text-[#9a9a9a] hover:text-[#f5f5f0] transition-colors font-mono tracking-wider hidden md:block">
-            NÚMEROS
-          </a>
-          <button
-            onClick={onLogin}
+          <a href="#features" className="text-xs text-[#9a9a9a] hover:text-[#f5f5f0] transition-colors font-mono tracking-wider hidden md:block">FEATURES</a>
+          <a href="#stats" className="text-xs text-[#9a9a9a] hover:text-[#f5f5f0] transition-colors font-mono tracking-wider hidden md:block">NÚMEROS</a>
+          <button onClick={onLogin}
             className="flex items-center gap-2 bg-[#d4ff00] text-[#080808] px-5 py-2 text-xs font-semibold tracking-wider rounded-sm hover:shadow-[0_0_30px_rgba(212,255,0,0.3)] transition-all duration-300"
             style={{ fontFamily: 'inherit' }}>
             ACESSAR PLATAFORMA <ArrowRight className="w-3.5 h-3.5" />
@@ -168,38 +137,37 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
         </div>
       </nav>
 
-      {/* ── HERO COM VÍDEO ──────────────────────────────────── */}
+      {/* ── HERO ────────────────────────────────────────────── */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-32">
 
-        {/* Vídeos em crossfade */}
-        {HERO_VIDEOS.map((src, i) => (
-          <video
-            key={src}
-            src={src}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-            style={{
-              opacity: i === activeVideo ? (transitioning ? 0 : 1) : 0,
-              transition: 'opacity 1s ease-in-out',
-              transform: `scale(1.05) translate(${mousePos.x * 0.01}px, ${mousePos.y * 0.01}px)`,
-            }}
-          />
-        ))}
+        {/* Grid background com parallax */}
+        <div className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: 'linear-gradient(#d4ff00 1px, transparent 1px), linear-gradient(90deg, #d4ff00 1px, transparent 1px)',
+            backgroundSize: '80px 80px',
+            transform: `translate(${mousePos.x * 0.3}px, ${mousePos.y * 0.3}px)`,
+            transition: 'transform 0.1s ease-out',
+          }} />
 
-        {/* Overlay escuro gradiente — dá profundidade e faz o texto respirar */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'linear-gradient(to bottom, rgba(8,8,8,0.55) 0%, rgba(8,8,8,0.35) 40%, rgba(8,8,8,0.65) 100%)',
-        }} />
+        {/* Orb principal */}
+        <div className="absolute w-[700px] h-[700px] rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, rgba(212,255,0,0.07) 0%, transparent 70%)',
+            top: '50%', left: '50%',
+            transform: `translate(-50%, -50%) translate(${mousePos.x * 0.8}px, ${mousePos.y * 0.8}px)`,
+            transition: 'transform 0.15s ease-out',
+          }} />
 
-        {/* Vinheta nas bordas */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse at center, transparent 50%, rgba(8,8,8,0.8) 100%)',
-        }} />
+        {/* Orb secundário */}
+        <div className="absolute w-[400px] h-[400px] rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, rgba(212,255,0,0.04) 0%, transparent 70%)',
+            bottom: '15%', right: '10%',
+            transform: `translate(${-mousePos.x * 0.5}px, ${-mousePos.y * 0.5}px)`,
+            transition: 'transform 0.2s ease-out',
+          }} />
 
-        {/* Linha acid no topo do hero */}
+        {/* Linha acid no topo */}
         <div className="absolute top-0 left-0 right-0 h-px bg-[#d4ff00]/20 pointer-events-none" />
 
         {/* Tag */}
@@ -210,45 +178,25 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           </span>
         </div>
 
-        {/* Main title — parallax no scroll */}
+        {/* Título principal */}
         <h1 className="relative z-10 text-center leading-none animate-slide-up"
           style={{
             fontFamily: 'Bebas Neue, sans-serif',
             fontSize: 'clamp(64px, 12vw, 160px)',
             letterSpacing: '-0.02em',
             transform: `translateY(${scrollY * 0.15}px)`,
-            textShadow: '0 4px 40px rgba(0,0,0,0.5)',
           }}>
           <span className="block">CREATE,</span>
           <span className="block">SELL,</span>
           <span className="block" style={{ color: '#d4ff00' }}>OPERATE</span>
           <span className="block">AND SCALE</span>
-          <span className="block">
-            EVENTS<span style={{ color: '#d4ff00' }}>.</span>
-          </span>
+          <span className="block">EVENTS<span style={{ color: '#d4ff00' }}>.</span></span>
         </h1>
 
-        {/* Indicadores de vídeo */}
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-          {HERO_VIDEOS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setActiveVideo(i); setNextVideo((i + 1) % HERO_VIDEOS.length) }}
-              className="transition-all duration-300"
-              style={{
-                width: i === activeVideo ? 24 : 6,
-                height: 2,
-                background: i === activeVideo ? '#d4ff00' : 'rgba(255,255,255,0.3)',
-                borderRadius: 2,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 animate-bounce z-10">
+        {/* Scroll indicator — fora do fluxo, no rodapé da viewport */}
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 z-20 pointer-events-none">
           <span className="text-[9px] font-mono tracking-widest text-[#6b6b6b]">SCROLL</span>
-          <ChevronDown className="w-3.5 h-3.5 text-[#6b6b6b]" />
+          <ChevronDown className="w-3.5 h-3.5 text-[#6b6b6b] animate-bounce" />
         </div>
       </section>
 

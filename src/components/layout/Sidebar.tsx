@@ -19,6 +19,7 @@ interface SidebarProps {
 const navItems: { id: NavSection; label: string; icon: React.ElementType; badge?: string }[] = [
   { id: 'dashboard',     label: 'Dashboard',       icon: LayoutDashboard },
   { id: 'events',        label: 'Eventos',          icon: CalendarDays },
+  { id: 'tickets',       label: 'Ingressos',        icon: Ticket },
   { id: 'sales',         label: 'Vendas',           icon: TrendingUp },
   { id: 'checkin',       label: 'Check-in',         icon: ScanLine },
   { id: 'credentialing', label: 'Credenciamento',   icon: UserCheck },

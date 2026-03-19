@@ -5,6 +5,7 @@ import { DashboardPage } from '@/pages/DashboardPage'
 import { EventsPage } from '@/pages/EventsPage'
 import { CheckinPage } from '@/pages/CheckinPage'
 import { TicketsPage } from '@/pages/TicketsPage'
+import { SalesPage } from '@/pages/SalesPage'
 import { StaffPage } from '@/pages/StaffPage'
 import { SuppliersPage } from '@/pages/SuppliersPage'
 import { ProductsPage } from '@/pages/ProductsPage'
@@ -40,6 +41,7 @@ export function AppShell() {
       case 'dashboard':    return <DashboardPage />
       case 'events':       return <EventsPage />
       case 'tickets':      return <TicketsPage />
+      case 'sales':        return <SalesPage />
       case 'checkin':      return <CheckinPage />
       case 'staff':        return <StaffPage />
       case 'suppliers':    return <SuppliersPage />

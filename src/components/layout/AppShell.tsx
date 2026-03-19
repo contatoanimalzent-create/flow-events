@@ -17,6 +17,7 @@ import { SettingsPage } from '@/pages/SettingsPage'
 export type NavSection =
   | 'dashboard'
   | 'events'
+  | 'tickets'
   | 'sales'
   | 'checkin'
   | 'credentialing'
@@ -38,6 +39,7 @@ export function AppShell() {
     switch (activeSection) {
       case 'dashboard':    return <DashboardPage />
       case 'events':       return <EventsPage />
+      case 'tickets':      return <TicketsPage />
       case 'checkin':      return <CheckinPage />
       case 'staff':        return <StaffPage />
       case 'suppliers':    return <SuppliersPage />

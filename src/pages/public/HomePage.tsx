@@ -358,6 +358,110 @@ function LangSwitcher({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => voi
   )
 }
 
+/* ── StatementText — sem duplicação ─────────────────────────── */
+function StatementText({ lang, isRtl, t }: { lang: Lang; isRtl: boolean; t: Record<string, string | string[]> }) {
+  const style: React.CSSProperties = {
+    fontFamily: 'Bebas Neue,sans-serif',
+    fontSize: 'clamp(28px,4.5vw,60px)',
+    letterSpacing: '-0.01em',
+    lineHeight: 1.15,
+    color: '#f5f5f0',
+    textAlign: isRtl ? 'right' : 'left',
+  }
+  const acid  = { color: '#d4ff00' }
+  const outline: React.CSSProperties = { WebkitTextStroke: '1px #d4ff00', color: 'transparent' }
+
+  if (lang === 'en') return (
+    <p style={style}>
+      WHILE OTHERS GIVE YOU A <span style={acid}>SELLING TOOL</span>, WE GIVE YOU A{' '}
+      <span style={outline}>COMPLETE OPERATIONAL SYSTEM</span> FOR YOUR EVENT.
+    </p>
+  )
+  if (lang === 'pt') return (
+    <p style={style}>
+      ENQUANTO OS OUTROS TE DÃO UMA <span style={acid}>FERRAMENTA DE VENDA</span>, NÓS TE ENTREGAMOS UM{' '}
+      <span style={outline}>SISTEMA OPERACIONAL COMPLETO</span> PARA SEU EVENTO.
+    </p>
+  )
+  if (lang === 'es') return (
+    <p style={style}>
+      MIENTRAS OTROS TE DAN UNA <span style={acid}>HERRAMIENTA DE VENTA</span>, NOSOTROS TE ENTREGAMOS UN{' '}
+      <span style={outline}>SISTEMA OPERACIONAL COMPLETO</span> PARA TU EVENTO.
+    </p>
+  )
+  return <p style={style}>{t.statement as string}</p>
+}
+
+/* ── TitleWithClipEffect — efeito estilo Lando Norris ───────── */
+function TitleWithClipEffect({ t, scrollY, mounted }: { t: Record<string, string | string[]>; scrollY: number; mounted: boolean }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [clipX, setClipX] = useState(0)
+  const [clipY, setClipY] = useState(0)
+  const [inside, setInside] = useState(false)
+  const size = 280
+
+  const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = ref.current?.getBoundingClientRect()
+    if (!rect) return
+    setClipX(e.clientX - rect.left)
+    setClipY(e.clientY - rect.top)
+  }, [])
+
+  const baseStyle: React.CSSProperties = {
+    fontFamily: 'Bebas Neue,sans-serif',
+    fontSize: 'clamp(72px,13vw,180px)',
+    letterSpacing: '-0.02em',
+    lineHeight: 0.92,
+    textAlign: 'center',
+    userSelect: 'none',
+  }
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseEnter={() => setInside(true)}
+      onMouseLeave={() => setInside(false)}
+      style={{
+        position: 'relative',
+        zIndex: 10,
+        transform: `translateY(${scrollY * -0.12}px)`,
+        opacity: mounted ? 1 : 0,
+        transition: 'opacity 0.8s 0.3s',
+      }}
+    >
+      {/* Camada base — branco normal */}
+      <h1 style={{ ...baseStyle, color: '#f5f5f0', margin: 0 }}>
+        <span style={{ display:'block' }}>{t.line1 as string}</span>
+        <span style={{ display:'block' }}>{t.line2 as string}</span>
+        <span style={{ display:'block', color:'#d4ff00' }}>{t.line3 as string}</span>
+        <span style={{ display:'block' }}>{t.line4 as string}</span>
+        <span style={{ display:'block' }}>{t.line5 as string}<span style={{ color:'#d4ff00' }}>.</span></span>
+      </h1>
+
+      {/* Camada revelada pelo cursor — acid glow + outline */}
+      <h1 style={{
+        ...baseStyle, margin: 0,
+        position: 'absolute', inset: 0,
+        color: '#d4ff00',
+        WebkitTextStroke: '1px #d4ff00',
+        textShadow: '0 0 40px rgba(212,255,0,0.8), 0 0 80px rgba(212,255,0,0.4)',
+        clipPath: inside
+          ? `circle(${size / 2}px at ${clipX}px ${clipY}px)`
+          : 'circle(0px at 50% 50%)',
+        transition: inside ? 'clip-path 0.1s ease-out' : 'clip-path 0.5s ease-in',
+        pointerEvents: 'none',
+      }}>
+        <span style={{ display:'block' }}>{t.line1 as string}</span>
+        <span style={{ display:'block' }}>{t.line2 as string}</span>
+        <span style={{ display:'block' }}>{t.line3 as string}</span>
+        <span style={{ display:'block' }}>{t.line4 as string}</span>
+        <span style={{ display:'block' }}>{t.line5 as string}<span>.</span></span>
+      </h1>
+    </div>
+  )
+}
+
 /* ── StatItem ────────────────────────────────────────────────── */
 function StatItem({ value, suffix, label, index }: { value: number; suffix: string; label: string; index: number }) {
   const { ref, inView } = useInView()
@@ -475,25 +579,8 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           </span>
         </div>
 
-        {/* TITLE — epic Bebas Neue */}
-        <h1 style={{
-          position:'relative',zIndex:10,textAlign:'center',lineHeight:0.92,
-          fontFamily:'Bebas Neue,sans-serif',
-          fontSize:'clamp(72px,13vw,180px)',
-          letterSpacing:'-0.02em',
-          transform:`translateY(${scrollY*-0.12}px) perspective(1000px) rotateX(${mouse.y*-2}deg) rotateY(${mouse.x*2}deg)`,
-          transition:'transform 0.12s ease-out',
-          opacity:mounted?1:0,
-          textShadow:'0 0 80px rgba(212,255,0,0.08)',
-        }}>
-          <span style={{ display:'block',color:'#f5f5f0',transition:'color 0.3s' }}>{t.line1}</span>
-          <span style={{ display:'block',color:'#f5f5f0',transition:'color 0.3s' }}>{t.line2}</span>
-          <span style={{ display:'block',color:'#d4ff00' }}>{t.line3}</span>
-          <span style={{ display:'block',color:'#f5f5f0' }}>{t.line4}</span>
-          <span style={{ display:'block',color:'#f5f5f0' }}>
-            {t.line5}<span style={{ color:'#d4ff00' }}>.</span>
-          </span>
-        </h1>
+        {/* TITLE — clip-path effect estilo Lando Norris */}
+        <TitleWithClipEffect t={t} scrollY={scrollY} mounted={mounted} />
 
         {/* Scroll line */}
         <div style={{ position:'absolute',bottom:40,left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:8,opacity:mounted?0.4:0,transition:'opacity 1s 1.5s',pointerEvents:'none' }}>
@@ -530,25 +617,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
       <section style={{ padding:'80px 64px',borderTop:'1px solid #1a1a1a',borderBottom:'1px solid #1a1a1a' }}>
         <div style={{ maxWidth:1100,margin:'0 auto' }}>
           <RevealText>
-            <p style={{ fontFamily:'Bebas Neue,sans-serif',fontSize:'clamp(28px,4.5vw,60px)',letterSpacing:'-0.01em',lineHeight:1.15,color:'#f5f5f0',textAlign: isRtl ? 'right' : 'left' }}>
-              {(t.statement as string).split('SELLING TOOL')[0]}
-              {lang === 'en' && <><span style={{ color:'#d4ff00' }}>SELLING TOOL</span>{', WE GIVE YOU A '}<span style={{ WebkitTextStroke:'1px #d4ff00',color:'transparent' }}>COMPLETE OPERATIONAL SYSTEM</span>{' FOR YOUR EVENT.'}</>}
-              {lang === 'pt' && <>
-                {(t.statement as string).split('FERRAMENTA DE VENDA')[0]}
-                <span style={{ color:'#d4ff00' }}>FERRAMENTA DE VENDA</span>
-                {', NÓS TE ENTREGAMOS UM '}
-                <span style={{ WebkitTextStroke:'1px #d4ff00',color:'transparent' }}>SISTEMA OPERACIONAL COMPLETO</span>
-                {' PARA SEU EVENTO.'}
-              </>}
-              {lang === 'es' && <>
-                {(t.statement as string).split('HERRAMIENTA DE VENTA')[0]}
-                <span style={{ color:'#d4ff00' }}>HERRAMIENTA DE VENTA</span>
-                {', NOSOTROS TE ENTREGAMOS UN '}
-                <span style={{ WebkitTextStroke:'1px #d4ff00',color:'transparent' }}>SISTEMA OPERACIONAL COMPLETO</span>
-                {' PARA TU EVENTO.'}
-              </>}
-              {lang === 'ar' && <span style={{ color:'#f5f5f0' }}>{t.statement}</span>}
-            </p>
+            <StatementText lang={lang} isRtl={isRtl} t={t} />
             <div style={{ marginTop:32,display:'flex',alignItems:'center',gap:16,flexDirection: isRtl ? 'row-reverse' : 'row' }}>
               <div style={{ width:40,height:1,background:'#d4ff00' }} />
               <span style={{ fontSize:10,fontFamily:'DM Mono,monospace',letterSpacing:'0.2em',color:'#6b6b6b' }}>ANIMALZ EVENTS — PART OF ANIMALZ GROUP</span>

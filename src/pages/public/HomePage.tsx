@@ -206,56 +206,85 @@ function RevealText({ children, delay = 0 }: { children: React.ReactNode; delay?
   )
 }
 
-/* ── Magnetic Cursor ─────────────────────────────────────────── */
+/* ── Cursor com trail estilo Lando Norris ────────────────────── */
 function MagneticCursor() {
-  const dotRef  = useRef<HTMLDivElement>(null)
-  const ringRef = useRef<HTMLDivElement>(null)
-  const pos     = useRef({ x: 0, y: 0, rx: 0, ry: 0 })
-  const hovered = useRef(false)
+  const dotRef   = useRef<HTMLDivElement>(null)
+  const ringRef  = useRef<HTMLDivElement>(null)
+  const trailRef = useRef<HTMLDivElement[]>([])
+  const TRAIL_LEN = 12
+  const positions = useRef<{x:number;y:number}[]>(Array(TRAIL_LEN).fill({x:0,y:0}))
+  const cur = useRef({x:0,y:0,rx:0,ry:0})
 
   useEffect(() => {
+    // Cria elementos de trail
+    const container = document.createElement('div')
+    container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9997;'
+    document.body.appendChild(container)
+
+    const trails: HTMLDivElement[] = []
+    for (let i = 0; i < TRAIL_LEN; i++) {
+      const el = document.createElement('div')
+      const size = 4 - (i * 0.25)
+      el.style.cssText = `position:absolute;border-radius:50%;background:#d4ff00;pointer-events:none;transform:translate(-50%,-50%);transition:none;`
+      el.style.width  = size + 'px'
+      el.style.height = size + 'px'
+      el.style.opacity = String(0.6 - i * 0.05)
+      container.appendChild(el)
+      trails.push(el)
+    }
+    trailRef.current = trails
+
     let raf: number
     const tick = () => {
-      pos.current.rx += (pos.current.x - pos.current.rx) * 0.1
-      pos.current.ry += (pos.current.y - pos.current.ry) * 0.1
+      // Dot segue diretamente
       if (dotRef.current) {
-        dotRef.current.style.left = pos.current.x + 'px'
-        dotRef.current.style.top  = pos.current.y + 'px'
+        dotRef.current.style.left = cur.current.x + 'px'
+        dotRef.current.style.top  = cur.current.y + 'px'
       }
+      // Ring com lerp
+      cur.current.rx += (cur.current.x - cur.current.rx) * 0.1
+      cur.current.ry += (cur.current.y - cur.current.ry) * 0.1
       if (ringRef.current) {
-        ringRef.current.style.left = pos.current.rx + 'px'
-        ringRef.current.style.top  = pos.current.ry + 'px'
+        ringRef.current.style.left = cur.current.rx + 'px'
+        ringRef.current.style.top  = cur.current.ry + 'px'
       }
+      // Trail — cada posição segue a anterior com delay
+      positions.current.unshift({x: cur.current.x, y: cur.current.y})
+      positions.current = positions.current.slice(0, TRAIL_LEN)
+      trails.forEach((el, i) => {
+        const p = positions.current[i] ?? positions.current[positions.current.length - 1]
+        el.style.left = p.x + 'px'
+        el.style.top  = p.y + 'px'
+      })
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
 
-    const onMove  = (e: MouseEvent) => { pos.current.x = e.clientX; pos.current.y = e.clientY }
+    const onMove = (e: MouseEvent) => { cur.current.x = e.clientX; cur.current.y = e.clientY }
     const onEnter = () => {
-      hovered.current = true
-      if (dotRef.current)  dotRef.current.style.transform  = 'translate(-50%,-50%) scale(1.8)'
-      if (ringRef.current) ringRef.current.style.transform = 'translate(-50%,-50%) scale(1.6)'
-      if (ringRef.current) ringRef.current.style.borderColor = 'rgba(212,255,0,0.8)'
+      if (dotRef.current)  { dotRef.current.style.transform  = 'translate(-50%,-50%) scale(2)'; dotRef.current.style.background = '#d4ff00' }
+      if (ringRef.current) { ringRef.current.style.transform = 'translate(-50%,-50%) scale(1.8)'; ringRef.current.style.borderColor = 'rgba(212,255,0,0.9)' }
     }
     const onLeave = () => {
-      hovered.current = false
-      if (dotRef.current)  dotRef.current.style.transform  = 'translate(-50%,-50%) scale(1)'
-      if (ringRef.current) ringRef.current.style.transform = 'translate(-50%,-50%) scale(1)'
-      if (ringRef.current) ringRef.current.style.borderColor = 'rgba(212,255,0,0.35)'
+      if (dotRef.current)  { dotRef.current.style.transform  = 'translate(-50%,-50%) scale(1)' }
+      if (ringRef.current) { ringRef.current.style.transform = 'translate(-50%,-50%) scale(1)'; ringRef.current.style.borderColor = 'rgba(212,255,0,0.35)' }
     }
-
     document.addEventListener('mousemove', onMove)
     document.querySelectorAll('a,button,[data-hover]').forEach(el => {
       el.addEventListener('mouseenter', onEnter)
       el.addEventListener('mouseleave', onLeave)
     })
-    return () => { cancelAnimationFrame(raf); document.removeEventListener('mousemove', onMove) }
+    return () => {
+      cancelAnimationFrame(raf)
+      document.removeEventListener('mousemove', onMove)
+      document.body.removeChild(container)
+    }
   }, [])
 
   return (
     <>
-      <div ref={dotRef} style={{ position:'fixed',top:0,left:0,zIndex:9999,width:8,height:8,background:'#d4ff00',borderRadius:'50%',transform:'translate(-50%,-50%)',pointerEvents:'none',transition:'transform 0.2s' }} />
-      <div ref={ringRef} style={{ position:'fixed',top:0,left:0,zIndex:9998,width:36,height:36,border:'1px solid rgba(212,255,0,0.35)',borderRadius:'50%',transform:'translate(-50%,-50%)',pointerEvents:'none',transition:'transform 0.4s cubic-bezier(0.16,1,0.3,1),border-color 0.3s' }} />
+      <div ref={dotRef} style={{ position:'fixed',top:0,left:0,zIndex:9999,width:8,height:8,background:'#d4ff00',borderRadius:'50%',transform:'translate(-50%,-50%)',pointerEvents:'none',transition:'transform 0.2s,background 0.2s' }} />
+      <div ref={ringRef} style={{ position:'fixed',top:0,left:0,zIndex:9998,width:38,height:38,border:'1px solid rgba(212,255,0,0.35)',borderRadius:'50%',transform:'translate(-50%,-50%)',pointerEvents:'none',transition:'transform 0.4s cubic-bezier(0.16,1,0.3,1),border-color 0.3s' }} />
     </>
   )
 }
@@ -465,19 +494,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
             {t.line5}<span style={{ color:'#d4ff00' }}>.</span>
           </span>
         </h1>
-
-        {/* Tagline */}
-        <p style={{ position:'relative',zIndex:10,textAlign:'center',color:'#9a9a9a',fontSize:'clamp(14px,1.5vw,18px)',maxWidth:520,lineHeight:1.7,marginTop:40,marginBottom:48,opacity:mounted?1:0,transform:mounted?'translateY(0)':'translateY(20px)',transition:'opacity 0.8s 0.5s,transform 0.8s 0.5s' }}>
-          {t.tagline}
-        </p>
-
-        {/* CTA */}
-        <button onClick={onLogin} data-hover
-          style={{ position:'relative',zIndex:10,display:'flex',alignItems:'center',gap:12,background:'#d4ff00',color:'#080808',padding:'18px 48px',borderRadius:2,border:'none',fontSize:13,fontWeight:700,letterSpacing:'0.15em',cursor:'none',opacity:mounted?1:0,transition:'opacity 0.8s 0.7s,box-shadow 0.3s,transform 0.15s' }}
-          onMouseEnter={e=>{ (e.currentTarget as HTMLElement).style.boxShadow='0 0 60px rgba(212,255,0,0.6)';(e.currentTarget as HTMLElement).style.transform='scale(1.05)' }}
-          onMouseLeave={e=>{ (e.currentTarget as HTMLElement).style.boxShadow='none';(e.currentTarget as HTMLElement).style.transform='scale(1)' }}>
-          {t.cta} <ArrowRight size={16} />
-        </button>
 
         {/* Scroll line */}
         <div style={{ position:'absolute',bottom:40,left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:8,opacity:mounted?0.4:0,transition:'opacity 1s 1.5s',pointerEvents:'none' }}>

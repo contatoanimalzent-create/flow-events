@@ -10,6 +10,7 @@ import {
 /* ── Types ──────────────────────────────────────────────────── */
 interface EventData {
   id: string
+  slug: string
   name: string
   subtitle: string
   short_description: string

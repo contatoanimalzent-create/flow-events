@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, Zap, Shield, Globe, BarChart3, Users, ScanLine } from 'lucide-react'
 
-const LOGO_URL = 'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/public-assets/animalz-logo.jpg'
+const LOGO_URL = '/animalz-logo.png'
 
 /* ── useInView ───────────────────────────────────────────────── */
 function useInView(threshold = 0.15) {

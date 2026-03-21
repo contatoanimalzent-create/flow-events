@@ -9,7 +9,7 @@ const sectionTitles: Record<NavSection, string> = {
   sales:         'Vendas',
   checkin:       'Check-in Operacional',
   credentialing: 'Credenciamento',
-  staff:         'Staff',
+  staff:         'Staff & Equipe',
   suppliers:     'Fornecedores',
   products:      'Produtos & PDV',
   inventory:     'Estoque & Insumos',

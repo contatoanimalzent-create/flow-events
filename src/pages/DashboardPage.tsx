@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
 import { formatCurrency, formatNumber, formatDate, formatDaysUntil } from '@/lib/utils'
 import { cn } from '@/lib/utils'
-import type { Event } from '@/lib/supabase'
+import type { Event as AppEvent } from '@/lib/supabase'
 import {
   Ticket, DollarSign, Users, ScanLine, TrendingUp,
   AlertTriangle, CalendarDays, Zap, ArrowUpRight,
@@ -63,7 +63,7 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 
 export function DashboardPage() {
   const { organization } = useAuthStore()
-  const [mainEvent, setMainEvent] = useState<Event | null>(null)
+  const [mainEvent, setMainEvent] = useState<AppEvent | null>(null)
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [insights, setInsights] = useState<GrowthInsight[]>([])

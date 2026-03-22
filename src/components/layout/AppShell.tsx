@@ -56,7 +56,7 @@ export function AppShell() {
   }
 
   return (
-    <div className="app-active flex h-screen bg-bg-primary overflow-hidden">
+    <div className="flex h-screen bg-bg-primary overflow-hidden">
       <Sidebar
         activeSection={activeSection}
         onNavigate={setActiveSection}

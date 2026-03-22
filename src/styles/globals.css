@@ -20,14 +20,7 @@
     padding: 0;
   }
 
-  /* Cursor oculto APENAS dentro do app autenticado */
-  .app-active,
-  .app-active a,
-  .app-active button,
-  .app-active [role="button"],
-  .app-active input,
-  .app-active select,
-  .app-active textarea { cursor: none; }
+  /* Cursor normal no app — apenas a home pública usa cursor custom */
 
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: #0e0e0e; }

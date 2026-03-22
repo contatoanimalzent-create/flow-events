@@ -27,6 +27,8 @@ export type Database = {
       staff_members: { Row: StaffMember; Insert: Partial<StaffMember>; Update: Partial<StaffMember> }
       suppliers: { Row: Supplier; Insert: Partial<Supplier>; Update: Partial<Supplier> }
       products: { Row: Product; Insert: Partial<Product>; Update: Partial<Product> }
+      cost_entries: { Row: CostEntry; Insert: Partial<CostEntry>; Update: Partial<CostEntry> }
+      campaigns: { Row: Campaign; Insert: Partial<Campaign>; Update: Partial<Campaign> }
     }
   }
 }
@@ -178,8 +180,44 @@ export interface Product {
   event_id?: string
   name: string
   sku?: string
+  description?: string
+  category: string
   price: number
+  cost_price?: number
   stock_quantity: number
+  stock_alert_threshold?: number
   is_active: boolean
+  image_url?: string
+  created_at: string
+}
+
+export interface CostEntry {
+  id: string
+  organization_id: string
+  event_id?: string
+  description: string
+  category: string
+  amount: number
+  due_date?: string
+  paid_date?: string
+  status: string
+  notes?: string
+  created_at: string
+}
+
+export interface Campaign {
+  id: string
+  organization_id: string
+  event_id?: string
+  name: string
+  type: string
+  status: string
+  subject?: string
+  body: string
+  audience_filter?: Record<string, unknown>
+  send_at?: string
+  sent_count?: number
+  opened_count?: number
+  clicked_count?: number
   created_at: string
 }

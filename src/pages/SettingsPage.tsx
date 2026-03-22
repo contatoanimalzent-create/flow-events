@@ -24,48 +24,57 @@ interface OrgForm {
   description: string
 }
 
+// Taxa de serviço: cobrada do COMPRADOR (não do produtor)
+// Taxa de processamento: cobrada do PRODUTOR (custo de gateway)
+// Modelos baseados em: Sympla (10%+2.5%), Eventbrite (3.7%+$1.79), Ingresse (5-10%)
 const PLANS = {
-  free: {
-    label: 'Gratuito',
-    price: 'R$ 0',
-    priceNote: '+ 5% por ingresso',
+  starter: {
+    label: 'Starter',
+    price: 'Grátis',
+    priceNote: 'sem mensalidade',
     color: 'text-text-secondary',
+    ticketFee: '10% do comprador',
+    processingFee: '2,5% do produtor',
     features: [
       'Eventos ilimitados',
       'Ingressos ilimitados',
       'Check-in por QR Code',
-      'PDV básico',
+      'PDV básico integrado',
       'Gestão de Staff',
-      '5% de comissão/ingresso',
-      '3% comissão produtos',
+      'Vendas públicas (/e/slug)',
+      'Suporte por e-mail',
     ],
   },
-  growth: {
-    label: 'Growth',
+  pro: {
+    label: 'Pro',
     price: 'R$ 149',
-    priceNote: '/mês + 2% por ingresso',
+    priceNote: '/mês',
     color: 'text-brand-acid',
+    ticketFee: '7% do comprador',
+    processingFee: '1,5% do produtor',
     features: [
-      'Tudo do Gratuito',
-      '2% de comissão/ingresso',
+      'Tudo do Starter',
+      'Taxa de serviço reduzida',
       'WhatsApp automático',
       'Campanhas de e-mail',
       'Growth AI insights',
       'Relatórios avançados',
-      'Suporte prioritário',
+      'Suporte prioritário (chat)',
     ],
   },
   business: {
     label: 'Business',
-    price: 'R$ 349',
-    priceNote: '/mês + 0,5% por ingresso',
+    price: 'R$ 499',
+    priceNote: '/mês',
     color: 'text-brand-blue',
+    ticketFee: '5% do comprador',
+    processingFee: '1% do produtor',
     features: [
-      'Tudo do Growth',
+      'Tudo do Pro',
       'White-label completo',
       'Domínio personalizado',
-      'Gestão de tráfego',
-      'Analytics avançado',
+      'Gestão de tráfego pago',
+      'Analytics white-label',
       'Ticket Social (Stories)',
       'API access completo',
     ],
@@ -73,11 +82,13 @@ const PLANS = {
   enterprise: {
     label: 'Enterprise',
     price: 'Sob consulta',
-    priceNote: '0% de comissão',
+    priceNote: 'contrato anual',
     color: 'text-brand-purple',
+    ticketFee: 'Negociável',
+    processingFee: 'Negociável',
     features: [
       'Tudo do Business',
-      '0% de comissão',
+      'Taxa negociada por volume',
       'Totem facial (hardware)',
       'Offline sync',
       'Reconhecimento facial',
@@ -215,8 +226,8 @@ export function SettingsPage() {
 
   const mockApiKey = `ak_live_${organization?.id?.slice(0, 8) ?? 'xxxxxxxx'}xxxxxxxxxxxxxxxxxxxxxxxx`
   const mockWebhookSecret = `whsec_${organization?.id?.slice(0, 8) ?? 'xxxxxxxx'}xxxxxxxxxxxxxxxx`
-  const planKey = (organization?.plan ?? 'free') as keyof typeof PLANS
-  const currentPlan = PLANS[planKey] ?? PLANS.free
+  const planKey = (organization?.plan ?? 'starter') as keyof typeof PLANS
+  const currentPlan = PLANS[planKey] ?? PLANS.starter
 
   const roleLabels: Record<string, string> = {
     org_admin: 'Administrador', org_manager: 'Gerente',
@@ -384,7 +395,7 @@ export function SettingsPage() {
                       Com o plano Business ou Enterprise, seu comprador nunca vê a marca Flow Events — vê apenas a sua.
                       Domínio próprio, e-mail próprio, cores e logo personalizados.
                     </p>
-                    {(planKey === 'free' || planKey === 'growth') && (
+                    {(planKey === 'starter' || planKey === 'pro') && (
                       <button className="mt-3 btn-primary text-xs">Fazer upgrade para Business →</button>
                     )}
                   </div>
@@ -420,7 +431,7 @@ export function SettingsPage() {
                     <div className="relative">
                       <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
                       <input className="input pl-9" placeholder="eventos.suaempresa.com"
-                        disabled={planKey === 'free' || planKey === 'growth'} />
+                        disabled={planKey === 'starter' || planKey === 'pro'} />
                     </div>
                   </div>
                   <div className="p-3 bg-bg-surface rounded-sm border border-bg-border text-xs font-mono text-text-muted space-y-1">
@@ -431,7 +442,7 @@ export function SettingsPage() {
               </div>
 
               <div className="flex justify-end">
-                <button className="btn-primary flex items-center gap-2" disabled={planKey === 'free' || planKey === 'growth'}>
+                <button className="btn-primary flex items-center gap-2" disabled={planKey === 'starter' || planKey === 'pro'}>
                   <Save className="w-4 h-4" /> Salvar configurações
                 </button>
               </div>
@@ -542,17 +553,35 @@ export function SettingsPage() {
           {/* ── BILLING TAB ─────────────────────────────────────── */}
           {tab === 'billing' && (
             <div className="space-y-5 reveal">
-              {/* How it works */}
+
+              {/* How it works — two fee types explained */}
               <div className="card p-5 border-brand-acid/15 bg-brand-acid/3">
                 <div className="flex items-start gap-3">
                   <Percent className="w-5 h-5 text-brand-acid shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-text-primary mb-1">Como funciona o modelo Flow Events</h3>
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold text-text-primary">Modelo de taxas Flow Events</h3>
                     <p className="text-xs text-text-secondary leading-relaxed">
-                      <strong className="text-text-primary">100% gratuito para criar e vender.</strong>{' '}
-                      Qualquer produtor pode criar eventos ilimitados e vender qualquer quantidade de ingressos.
-                      Ganhamos uma <span className="text-brand-acid">comissão sobre cada venda</span> (ingressos e produtos no evento).
-                      Planos pagos reduzem essa comissão e desbloqueiam funcionalidades premium.
+                      Usamos <strong className="text-text-primary">dois tipos de taxa</strong> por transação — igual ao padrão do mercado (Sympla, Ingresse):
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 mt-2">
+                      <div className="bg-bg-card rounded-sm p-3 border border-bg-border">
+                        <div className="text-[10px] font-mono tracking-widest text-brand-acid uppercase mb-1">Taxa de Serviço</div>
+                        <div className="text-xs text-text-secondary">
+                          Cobrada do <strong className="text-text-primary">comprador</strong> do ingresso.
+                          Aparece no checkout. O produtor não paga e não absorve.
+                        </div>
+                      </div>
+                      <div className="bg-bg-card rounded-sm p-3 border border-bg-border">
+                        <div className="text-[10px] font-mono tracking-widest text-brand-blue uppercase mb-1">Taxa de Processamento</div>
+                        <div className="text-xs text-text-secondary">
+                          Cobrada do <strong className="text-text-primary">produtor</strong> sobre o repasse.
+                          Cobre o custo do gateway de pagamento (PIX/cartão).
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-text-muted pt-1">
+                      Planos pagos reduzem ambas as taxas e desbloqueiam recursos premium.
+                      Comparable: Sympla cobra 10% + 2,5% · Ingresse cobra 5–10% · Ticket360 cobra até 18%.
                     </p>
                   </div>
                 </div>
@@ -563,8 +592,20 @@ export function SettingsPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold text-text-primary">Seu plano atual</h3>
                   <div className="text-right">
-                    <div className={cn('font-display text-xl leading-none', currentPlan.color)}>{currentPlan.label}</div>
-                    <div className="text-xs text-text-muted font-mono mt-0.5">{currentPlan.priceNote}</div>
+                    <div className={cn('font-display text-2xl leading-none', currentPlan.color)}>{currentPlan.label}</div>
+                    <div className="text-xs text-text-muted font-mono mt-0.5">{currentPlan.price} {currentPlan.priceNote}</div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-bg-surface rounded-sm p-3 border border-bg-border text-center">
+                    <div className="text-[10px] font-mono tracking-widest text-brand-acid uppercase mb-1">Taxa de Serviço</div>
+                    <div className="text-lg font-bold text-text-primary">{currentPlan.ticketFee}</div>
+                    <div className="text-[10px] text-text-muted">cobrada do comprador</div>
+                  </div>
+                  <div className="bg-bg-surface rounded-sm p-3 border border-bg-border text-center">
+                    <div className="text-[10px] font-mono tracking-widest text-brand-blue uppercase mb-1">Taxa de Processamento</div>
+                    <div className="text-lg font-bold text-text-primary">{currentPlan.processingFee}</div>
+                    <div className="text-[10px] text-text-muted">cobrada do produtor</div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -585,14 +626,27 @@ export function SettingsPage() {
                     return (
                       <div key={key} className={cn(
                         'card p-4 transition-all flex flex-col',
-                        isCurrent && 'border-brand-acid/30 bg-brand-acid/3'
+                        isCurrent ? 'border-brand-acid/30 bg-brand-acid/3' : 'hover:border-bg-border/80'
                       )}>
                         <div className="flex items-start justify-between mb-1">
                           <span className={cn('font-display text-lg leading-none', plan.color)}>{plan.label}</span>
                           {isCurrent && <span className="text-[9px] font-mono bg-brand-acid/15 text-brand-acid px-1.5 py-0.5 rounded-sm">ATUAL</span>}
                         </div>
-                        <div className="font-semibold text-text-primary mb-0.5">{plan.price}</div>
-                        <div className="text-[10px] text-text-muted font-mono mb-3">{plan.priceNote}</div>
+                        <div className="font-bold text-text-primary">{plan.price}</div>
+                        <div className="text-[10px] text-text-muted font-mono mb-2">{plan.priceNote}</div>
+
+                        {/* Fee highlights */}
+                        <div className="bg-bg-surface rounded-sm p-2 mb-3 border border-bg-border space-y-1">
+                          <div className="flex justify-between text-[10px]">
+                            <span className="text-text-muted">Serviço:</span>
+                            <span className="font-mono text-brand-acid font-semibold">{plan.ticketFee}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px]">
+                            <span className="text-text-muted">Processamento:</span>
+                            <span className="font-mono text-brand-blue">{plan.processingFee}</span>
+                          </div>
+                        </div>
+
                         <div className="space-y-1.5 flex-1">
                           {plan.features.map((f, i) => (
                             <div key={i} className="flex items-start gap-1.5 text-[11px] text-text-secondary">
@@ -612,16 +666,18 @@ export function SettingsPage() {
                 </div>
               </div>
 
-              {/* Commission summary */}
+              {/* Fee comparison table */}
               <div className="card p-5">
-                <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-brand-acid" /> Comissões por tipo de transação
+                <h3 className="text-sm font-semibold text-text-primary mb-1 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-brand-acid" /> Tabela de taxas por plano
                 </h3>
+                <p className="text-xs text-text-muted mb-4">Referência de mercado: Sympla 10%+2,5% · Ingresse 5–10% · Ticket360 até 18%</p>
                 <div className="overflow-hidden rounded-sm border border-bg-border">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-bg-border">
-                        <th className="table-header">Tipo</th>
+                      <tr className="border-b border-bg-border bg-bg-surface/50">
+                        <th className="table-header">Taxa</th>
+                        <th className="table-header text-center">Quem paga</th>
                         {Object.values(PLANS).map(p => (
                           <th key={p.label} className="table-header text-center">{p.label}</th>
                         ))}
@@ -629,15 +685,24 @@ export function SettingsPage() {
                     </thead>
                     <tbody>
                       {[
-                        { label: 'Ingressos', values: ['5%', '2%', '0.5%', '0%'] },
-                        { label: 'Produtos PDV', values: ['3%', '1.5%', '0.5%', '0%'] },
-                        { label: 'Taxa PIX', values: ['0%', '0%', '0%', '0%'] },
+                        { label: 'Serviço (ingressos)',  who: 'Comprador', values: ['10%', '7%', '5%', 'Neg.'], highlight: true },
+                        { label: 'Processamento',        who: 'Produtor',  values: ['2,5%', '1,5%', '1%', 'Neg.'], highlight: false },
+                        { label: 'Serviço (PDV)',        who: 'Produtor',  values: ['3%', '2%', '1%', 'Neg.'], highlight: false },
+                        { label: 'Eventos gratuitos',    who: '—',         values: ['Grátis', 'Grátis', 'Grátis', 'Grátis'], highlight: false },
                       ].map((row, i) => (
                         <tr key={i} className="table-row">
                           <td className="table-cell font-medium text-xs">{row.label}</td>
+                          <td className="table-cell text-center">
+                            <span className={cn('text-[10px] font-mono px-1.5 py-0.5 rounded-sm',
+                              row.who === 'Comprador' ? 'bg-brand-acid/10 text-brand-acid' :
+                              row.who === 'Produtor' ? 'bg-brand-blue/10 text-brand-blue' : 'text-text-muted')}>
+                              {row.who}
+                            </span>
+                          </td>
                           {row.values.map((v, j) => (
-                            <td key={j} className={cn('table-cell text-center font-mono text-sm',
-                              v === '0%' ? 'text-status-success' : 'text-text-primary')}>
+                            <td key={j} className={cn('table-cell text-center font-mono text-sm font-medium',
+                              v === 'Grátis' ? 'text-status-success' :
+                              v === 'Neg.' ? 'text-brand-purple' : 'text-text-primary')}>
                               {v}
                             </td>
                           ))}

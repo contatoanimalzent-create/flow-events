@@ -35,7 +35,7 @@ export function ChangePasswordPage() {
           <div className="w-10 h-10 rounded-2xl bg-gradient-teal flex items-center justify-center">
             <Ticket className="w-5 h-5 text-bg-primary" />
           </div>
-          <div className="font-bold text-text-primary text-lg">Flow Events</div>
+          <div className="font-bold text-text-primary text-lg">Animalz Events</div>
         </div>
 
         <div className="card p-8">

@@ -8,8 +8,8 @@
 import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const ADMIN_FEE_RATE  = 0.05    // 5% do comprador → Flow Events
-const PROCESSING_RATE = 0.018   // 1.8% do produtor → Flow Events
+const ADMIN_FEE_RATE  = 0.05    // 5% do comprador → Animalz Events
+const PROCESSING_RATE = 0.018   // 1.8% do produtor → Animalz Events
 
 const CARD_RATES: Record<number, number> = {
   1: 0.0299, 2: 0.0520, 3: 0.0620, 4: 0.0720, 5: 0.0820,
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     const unitAmount    = faceValue + adminFee + cardFee              // o que o comprador paga
     const processingFee = Math.round(faceValue * PROCESSING_RATE)
     const producerNet   = faceValue - processingFee
-    const flowFee       = adminFee + processingFee                    // receita total Flow Events
+    const flowFee       = adminFee + processingFee                    // receita total Animalz Events
 
     const totalAmount = unitAmount * quantity
 
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
     // ── Split: if producer has Stripe Connect account ──────────
     if (org?.stripe_account_id) {
       sessionParams.payment_intent_data = {
-        application_fee_amount: flowFee * quantity,  // Flow Events retém
+        application_fee_amount: flowFee * quantity,  // Animalz Events retém
         transfer_data: {
           destination: org.stripe_account_id,         // produtor recebe o restante
         },

@@ -175,7 +175,7 @@ export function DashboardPage() {
             </span>
           </div>
           <div className="text-[10px] font-mono text-text-muted tracking-widest uppercase mt-0.5">
-            {organization?.name ?? 'Flow Events'}
+            {organization?.name ?? 'Animalz Events'}
           </div>
         </div>
       </div>

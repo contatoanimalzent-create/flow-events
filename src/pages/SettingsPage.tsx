@@ -308,7 +308,7 @@ export function SettingsPage() {
                       <div>
                         <label className="input-label">Slug (URL)</label>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-xs font-mono">flow.app/</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-xs font-mono">animalz.app/</span>
                           <input className="input pl-20" value={form.slug} readOnly />
                         </div>
                       </div>
@@ -392,7 +392,7 @@ export function SettingsPage() {
                   <div>
                     <h3 className="text-sm font-semibold text-text-primary">White-label completo</h3>
                     <p className="text-xs text-text-secondary mt-1">
-                      Com o plano Business ou Enterprise, seu comprador nunca vê a marca Flow Events — vê apenas a sua.
+                      Com o plano Business ou Enterprise, seu comprador nunca vê a marca Animalz Events — vê apenas a sua.
                       Domínio próprio, e-mail próprio, cores e logo personalizados.
                     </p>
                     {(planKey === 'starter' || planKey === 'pro') && (
@@ -436,7 +436,7 @@ export function SettingsPage() {
                   </div>
                   <div className="p-3 bg-bg-surface rounded-sm border border-bg-border text-xs font-mono text-text-muted space-y-1">
                     <div className="text-[10px] uppercase tracking-widest mb-2">Configuração DNS necessária:</div>
-                    <div>CNAME <span className="text-brand-acid">eventos</span> → <span className="text-text-secondary">cname.flowevents.app</span></div>
+                    <div>CNAME <span className="text-brand-acid">eventos</span> → <span className="text-text-secondary">cname.animalzevents.app</span></div>
                   </div>
                 </div>
               </div>
@@ -559,7 +559,7 @@ export function SettingsPage() {
                 <div className="flex items-start gap-3">
                   <Percent className="w-5 h-5 text-brand-acid shrink-0 mt-0.5" />
                   <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-text-primary">Modelo de taxas Flow Events</h3>
+                    <h3 className="text-sm font-semibold text-text-primary">Modelo de taxas Animalz Events</h3>
                     <p className="text-xs text-text-secondary leading-relaxed">
                       Usamos <strong className="text-text-primary">dois tipos de taxa</strong> por transação — igual ao padrão do mercado (Sympla, Ingresse):
                     </p>

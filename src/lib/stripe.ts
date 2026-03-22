@@ -15,12 +15,12 @@ export const stripePromise = STRIPE_PK ? loadStripe(STRIPE_PK) : null
 
 export interface FeeBreakdown {
   faceValue: number         // what producer wants to receive
-  adminFee: number          // 5% — Flow Events revenue
-  processingFee: number     // 1.8% — Flow Events revenue (from producer's net)
+  adminFee: number          // 5% — Animalz Events revenue
+  processingFee: number     // 1.8% — Animalz Events revenue (from producer's net)
   cardFee: number           // 0% PIX | card % — passed to buyer
   totalBuyer: number        // what buyer pays
   producerNet: number       // what producer receives after processing fee
-  flowRevenue: number       // total Flow Events earns
+  flowRevenue: number       // total Animalz Events earns
 }
 
 // Pagar.me/Stripe card rates by installments

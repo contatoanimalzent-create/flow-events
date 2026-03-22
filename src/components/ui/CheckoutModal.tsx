@@ -1,16 +1,18 @@
-import { useState } from 'react'
-import { X, CreditCard, Zap, Loader2, ShieldCheck, Lock, ChevronDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useState, useCallback } from 'react'
 import {
-  calculateFees,
-  createCheckoutSession,
-  CARD_RATES,
-} from '@/lib/stripe'
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js'
+import { X, Loader2, ShieldCheck, Lock, Zap, ChevronDown, CheckCircle2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { stripePromise, calculateFees, CARD_RATES } from '@/lib/stripe'
 
 interface TicketType {
   id: string
   name: string
-  price: number          // in cents (BRL)
+  price: number      // centavos BRL
   description?: string
 }
 
@@ -22,268 +24,384 @@ interface CheckoutModalProps {
 }
 
 const INSTALLMENT_OPTIONS = [
-  { value: 0,  label: 'PIX', icon: '⚡', badge: 'Menor preço' },
+  { value: 0,  label: 'PIX',       icon: '⚡', badge: 'Menor preço' },
   { value: 1,  label: 'Cartão 1x', icon: '💳', badge: null },
   { value: 2,  label: 'Cartão 2x', icon: '💳', badge: null },
   { value: 3,  label: 'Cartão 3x', icon: '💳', badge: null },
   { value: 6,  label: 'Cartão 6x', icon: '💳', badge: null },
-  { value: 12, label: 'Cartão 12x', icon: '💳', badge: 'Mais parcelas' },
+  { value: 12, label: 'Cartão 12x', icon: '💳', badge: 'Máx. parcelas' },
 ]
 
 function formatBRL(cents: number) {
   return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-export function CheckoutModal({ eventId, eventName, ticketType, onClose }: CheckoutModalProps) {
-  const [installments, setInstallments]   = useState(0)
-  const [quantity, setQuantity]           = useState(1)
-  const [email, setEmail]                 = useState('')
-  const [name, setName]                   = useState('')
-  const [loading, setLoading]             = useState(false)
-  const [error, setError]                 = useState('')
-  const [showInstallments, setShowInstallments] = useState(false)
+// ── Inner form (inside Elements provider) ──────────────────────
+function PaymentForm({
+  eventId, ticketType, quantity, installments,
+  buyerName, buyerEmail, totalCents, onSuccess,
+}: {
+  eventId: string
+  ticketType: TicketType
+  quantity: number
+  installments: number
+  buyerName: string
+  buyerEmail: string
+  totalCents: number
+  onSuccess: () => void
+}) {
+  const stripe   = useStripe()
+  const elements = useElements()
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState('')
 
-  const fees    = calculateFees(ticketType.price, installments)
-  const total   = fees.totalBuyer * quantity
-  const parcel  = installments > 1 ? total / installments : null
-
-  const selectedOption = INSTALLMENT_OPTIONS.find(o => o.value === installments)
-    ?? INSTALLMENT_OPTIONS[0]
-
-  async function handlePay() {
-    if (!email.trim()) { setError('Informe seu e-mail'); return }
-    if (!name.trim())  { setError('Informe seu nome'); return }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!stripe || !elements) return
     setLoading(true); setError('')
 
-    const result = await createCheckoutSession(
+    const { error: submitErr } = await elements.submit()
+    if (submitErr) { setError(submitErr.message ?? 'Erro'); setLoading(false); return }
+
+    // Get client_secret from edge function
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-payment-intent`,
       {
-        eventId,
-        ticketTypeId: ticketType.id,
-        quantity,
-        installments,
-        buyerEmail: email,
-        successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl:  `${window.location.href}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          eventId,
+          ticketTypeId: ticketType.id,
+          quantity,
+          installments,
+          buyerEmail,
+          buyerName,
+        }),
       },
-      import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY,
     )
 
-    if (result.error) {
-      setError(result.error)
-      setLoading(false)
-      return
-    }
+    const data = await res.json()
+    if (data.error) { setError(data.error); setLoading(false); return }
 
-    if (result.url) {
-      window.location.href = result.url
+    const { error: confirmErr } = await stripe.confirmPayment({
+      elements,
+      clientSecret: data.clientSecret,
+      confirmParams: {
+        return_url:     `${window.location.origin}/checkout/success`,
+        payment_method_data: {
+          billing_details: { name: buyerName, email: buyerEmail },
+        },
+      },
+      redirect: 'if_required',  // ← só redireciona se necessário (ex: 3DS)
+    })
+
+    if (confirmErr) {
+      setError(confirmErr.message ?? 'Erro no pagamento')
+      setLoading(false)
+    } else {
+      onSuccess()
     }
   }
 
   return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Stripe Payment Element — parece campo nativo */}
+      <div>
+        <div className="text-[10px] font-mono tracking-widest text-text-muted uppercase mb-2">
+          Dados do pagamento
+        </div>
+        <PaymentElement
+          options={{
+            layout: 'tabs',
+            paymentMethodOrder: ['card', 'pix'],
+            fields: { billingDetails: 'never' },  // já coletamos no form
+            terms: { card: 'never' },
+          }}
+        />
+      </div>
+
+      {error && (
+        <div className="text-xs text-status-error bg-status-error/8 border border-status-error/20 rounded-sm px-3 py-2.5 flex items-center gap-2">
+          <X className="w-3.5 h-3.5 shrink-0" />{error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading || !stripe}
+        className="w-full btn-primary py-4 text-base flex items-center justify-center gap-2 rounded-xl disabled:opacity-50"
+      >
+        {loading
+          ? <><Loader2 className="w-5 h-5 animate-spin" /> Processando...</>
+          : <><Lock className="w-4 h-4" /> Pagar {formatBRL(totalCents)}</>
+        }
+      </button>
+
+      <div className="flex items-center justify-center gap-5 text-[10px] text-text-muted">
+        <span className="flex items-center gap-1">
+          <ShieldCheck className="w-3 h-3 text-status-success" /> Dados criptografados
+        </span>
+        <span className="flex items-center gap-1">
+          <Lock className="w-3 h-3 text-brand-blue" /> Pagamento seguro
+        </span>
+        <span className="flex items-center gap-1">
+          <Zap className="w-3 h-3 text-brand-acid" /> Ingresso imediato
+        </span>
+      </div>
+    </form>
+  )
+}
+
+// ── Main modal ────────────────────────────────────────────────
+export function CheckoutModal({ eventId, eventName, ticketType, onClose }: CheckoutModalProps) {
+  const [step,         setStep]         = useState<'config' | 'payment' | 'success'>('config')
+  const [installments, setInstallments] = useState(0)
+  const [quantity,     setQuantity]     = useState(1)
+  const [buyerEmail,   setBuyerEmail]   = useState('')
+  const [buyerName,    setBuyerName]    = useState('')
+  const [showOptions,  setShowOptions]  = useState(false)
+  const [formError,    setFormError]    = useState('')
+
+  const fees  = calculateFees(ticketType.price, installments)
+  const total = fees.totalBuyer * quantity
+  const selected = INSTALLMENT_OPTIONS.find(o => o.value === installments) ?? INSTALLMENT_OPTIONS[0]
+
+  function handleContinue() {
+    if (!buyerName.trim()) { setFormError('Informe seu nome'); return }
+    if (!buyerEmail.trim() || !buyerEmail.includes('@')) { setFormError('Informe um e-mail válido'); return }
+    setFormError('')
+    setStep('payment')
+  }
+
+  // Stripe Elements appearance — matches app dark theme
+  const appearance: Parameters<typeof Elements>[0]['options'] = {
+    appearance: {
+      theme: 'night',
+      variables: {
+        colorPrimary:          '#d4ff00',
+        colorBackground:       '#1a1a1a',
+
+        colorText:             '#f5f5f0',
+        colorTextSecondary:    '#6b6b6b',
+        colorTextPlaceholder:  '#4a4a4a',
+        colorDanger:           '#FF5A6B',
+        borderRadius:          '2px',
+        fontFamily:            'DM Sans, system-ui, sans-serif',
+        fontSizeBase:          '14px',
+        spacingUnit:           '4px',
+        colorIconTab:          '#6b6b6b',
+        colorIconTabSelected:  '#d4ff00',
+      },
+      rules: {
+        '.Input': {
+          border:          '1px solid #242424',
+          backgroundColor: '#1a1a1a',
+          boxShadow:       'none',
+          padding:         '10px 14px',
+        },
+        '.Input:focus': {
+          border:    '1px solid rgba(212,255,0,0.4)',
+          boxShadow: '0 0 0 1px rgba(212,255,0,0.15)',
+        },
+        '.Label': {
+          fontSize:      '10px',
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          color:         '#6b6b6b',
+          marginBottom:  '6px',
+        },
+        '.Tab': {
+          border:          '1px solid #242424',
+          backgroundColor: '#141414',
+        },
+        '.Tab--selected': {
+          border:          '1px solid rgba(212,255,0,0.4)',
+          backgroundColor: 'rgba(212,255,0,0.05)',
+        },
+        '.Tab:hover': { border: '1px solid rgba(212,255,0,0.2)' },
+      },
+    },
+  }
+
+  return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={step === 'config' ? onClose : undefined} />
 
-      <div className="relative bg-bg-card border border-bg-border rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md shadow-card animate-slide-up overflow-hidden">
+      <div className="relative bg-bg-card border border-bg-border rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md shadow-card overflow-hidden"
+        style={{ animation: 'slideUp 0.3s ease-out' }}>
 
-        {/* Top accent */}
         <div className="h-px bg-gradient-to-r from-transparent via-brand-acid/50 to-transparent" />
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-bg-border">
-          <div>
-            <div className="text-[10px] font-mono tracking-widest text-text-muted uppercase mb-0.5">
-              {eventName}
+        {/* ── Success state ── */}
+        {step === 'success' && (
+          <div className="p-8 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-status-success/10 border border-status-success/20 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-status-success" />
             </div>
-            <div className="font-semibold text-text-primary text-sm">{ticketType.name}</div>
+            <div className="font-display text-2xl text-text-primary mb-1">PAGAMENTO CONFIRMADO</div>
+            <p className="text-sm text-text-muted mb-1">Seu ingresso foi gerado com sucesso!</p>
+            <p className="text-xs text-text-muted mb-6">Enviamos para <span className="text-brand-acid">{buyerEmail}</span></p>
+            <button onClick={onClose} className="btn-primary w-full">Ver meu ingresso</button>
           </div>
-          <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        )}
 
-        <div className="p-5 space-y-4">
-
-          {/* All-in price display */}
-          <div className="bg-bg-surface border border-bg-border rounded-xl p-4 text-center">
-            <div className="text-[10px] font-mono tracking-widest text-text-muted uppercase mb-1">
-              Você paga
-            </div>
-            <div className="font-display text-4xl text-text-primary leading-none">
-              {formatBRL(fees.totalBuyer * quantity)}
-            </div>
-            {parcel && (
-              <div className="text-sm text-brand-acid mt-1 font-mono">
-                {installments}x de {formatBRL(parcel)} sem juros*
+        {step !== 'success' && (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-bg-border">
+              <div>
+                <div className="text-[10px] font-mono tracking-widest text-text-muted uppercase mb-0.5">{eventName}</div>
+                <div className="font-semibold text-text-primary text-sm">{ticketType.name}</div>
               </div>
-            )}
-            <div className="text-[10px] text-text-muted mt-2">
-              Preço total · sem surpresas no checkout
-            </div>
-
-            {/* Fee breakdown toggle */}
-            <div className="mt-3 pt-3 border-t border-bg-border space-y-1 text-left">
-              <div className="flex justify-between text-[11px]">
-                <span className="text-text-muted">
-                  {ticketType.name} × {quantity}
-                </span>
-                <span className="text-text-secondary font-mono">
-                  {formatBRL(ticketType.price * quantity)}
-                </span>
-              </div>
-              <div className="flex justify-between text-[11px]">
-                <span className="text-text-muted">Taxa de serviço (5%)</span>
-                <span className="text-text-secondary font-mono">
-                  {formatBRL(fees.adminFee * quantity)}
-                </span>
-              </div>
-              {fees.cardFee > 0 && (
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-text-muted">
-                    Parcelamento {installments}x ({(CARD_RATES[installments] * 100).toFixed(1)}%)
-                  </span>
-                  <span className="text-text-secondary font-mono">
-                    {formatBRL(fees.cardFee * quantity)}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Quantity */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-text-secondary">Quantidade</span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                className="w-8 h-8 rounded-sm bg-bg-surface border border-bg-border flex items-center justify-center text-text-primary hover:border-brand-acid/30 transition-all text-lg leading-none"
-              >−</button>
-              <span className="font-mono font-semibold text-text-primary w-4 text-center">{quantity}</span>
-              <button
-                onClick={() => setQuantity(q => Math.min(10, q + 1))}
-                className="w-8 h-8 rounded-sm bg-bg-surface border border-bg-border flex items-center justify-center text-text-primary hover:border-brand-acid/30 transition-all text-lg leading-none"
-              >+</button>
-            </div>
-          </div>
-
-          {/* Payment method */}
-          <div>
-            <div className="text-[10px] font-mono tracking-widest text-text-muted uppercase mb-2">
-              Forma de pagamento
-            </div>
-            <div className="relative">
-              <button
-                onClick={() => setShowInstallments(!showInstallments)}
-                className="w-full flex items-center justify-between px-4 py-3 bg-bg-surface border border-bg-border rounded-xl hover:border-brand-acid/30 transition-all text-sm"
-              >
-                <span className="flex items-center gap-2 text-text-primary">
-                  <span>{selectedOption.icon}</span>
-                  <span>{selectedOption.label}</span>
-                  {selectedOption.badge && (
-                    <span className="text-[10px] bg-brand-acid/10 text-brand-acid px-1.5 py-0.5 rounded-sm font-mono">
-                      {selectedOption.badge}
-                    </span>
-                  )}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-brand-acid font-semibold text-sm">
-                    {formatBRL(fees.totalBuyer * quantity)}
-                  </span>
-                  <ChevronDown className={cn('w-4 h-4 text-text-muted transition-transform', showInstallments && 'rotate-180')} />
-                </div>
+              <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
+                <X className="w-5 h-5" />
               </button>
+            </div>
 
-              {showInstallments && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-bg-card border border-bg-border rounded-xl overflow-hidden shadow-card z-10">
-                  {INSTALLMENT_OPTIONS.map(opt => {
-                    const f     = calculateFees(ticketType.price, opt.value)
-                    const tot   = f.totalBuyer * quantity
-                    const parc  = opt.value > 1 ? tot / opt.value : null
-                    const isSelected = opt.value === installments
-                    return (
-                      <button
-                        key={opt.value}
-                        onClick={() => { setInstallments(opt.value); setShowInstallments(false) }}
-                        className={cn(
-                          'w-full flex items-center justify-between px-4 py-3 text-sm transition-all border-b border-bg-border last:border-0',
-                          isSelected
-                            ? 'bg-brand-acid/8 text-brand-acid'
-                            : 'hover:bg-bg-surface text-text-secondary'
+            <div className="p-5 space-y-4">
+
+              {/* Price display */}
+              <div className="bg-bg-surface border border-bg-border rounded-xl p-4">
+                <div className="flex items-end justify-between mb-3">
+                  <div>
+                    <div className="text-[10px] font-mono text-text-muted uppercase tracking-widest mb-1">Total</div>
+                    <div className="font-display text-3xl text-text-primary leading-none">{formatBRL(total)}</div>
+                    {installments > 1 && (
+                      <div className="text-xs text-brand-acid mt-1 font-mono">
+                        {installments}x de {formatBRL(total / installments)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right text-[10px] text-text-muted space-y-0.5">
+                    <div>{formatBRL(ticketType.price * quantity)} ingresso</div>
+                    <div>{formatBRL(fees.adminFee * quantity)} serviço</div>
+                    {fees.cardFee > 0 && <div>{formatBRL(fees.cardFee * quantity)} parcelamento</div>}
+                  </div>
+                </div>
+
+                {/* Quantity */}
+                <div className="flex items-center justify-between pt-3 border-t border-bg-border">
+                  <span className="text-xs text-text-muted">Quantidade</span>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                      className="w-7 h-7 rounded-sm bg-bg-card border border-bg-border text-text-primary hover:border-brand-acid/30 transition-all flex items-center justify-center text-base leading-none">
+                      −
+                    </button>
+                    <span className="font-mono font-semibold text-text-primary w-4 text-center">{quantity}</span>
+                    <button onClick={() => setQuantity(q => Math.min(10, q + 1))}
+                      className="w-7 h-7 rounded-sm bg-bg-card border border-bg-border text-text-primary hover:border-brand-acid/30 transition-all flex items-center justify-center text-base leading-none">
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 1: Config */}
+              {step === 'config' && (
+                <>
+                  {/* Payment method selector */}
+                  <div className="relative">
+                    <button onClick={() => setShowOptions(!showOptions)}
+                      className="w-full flex items-center justify-between px-4 py-3 bg-bg-surface border border-bg-border rounded-xl hover:border-brand-acid/30 transition-all text-sm">
+                      <span className="flex items-center gap-2 text-text-primary">
+                        <span>{selected.icon}</span>
+                        <span>{selected.label}</span>
+                        {selected.badge && (
+                          <span className="text-[9px] bg-brand-acid/10 text-brand-acid px-1.5 py-0.5 rounded-sm font-mono">
+                            {selected.badge}
+                          </span>
                         )}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>{opt.icon}</span>
-                          <span>{opt.label}</span>
-                          {opt.badge && (
-                            <span className="text-[9px] bg-brand-acid/10 text-brand-acid px-1 py-0.5 rounded-sm font-mono">
-                              {opt.badge}
-                            </span>
-                          )}
-                        </span>
-                        <div className="text-right">
-                          <div className="font-mono font-semibold">{formatBRL(tot)}</div>
-                          {parc && (
-                            <div className="text-[10px] text-text-muted">
-                              {opt.value}x {formatBRL(parc)}
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    )
-                  })}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-brand-acid font-semibold">{formatBRL(total)}</span>
+                        <ChevronDown className={cn('w-4 h-4 text-text-muted transition-transform', showOptions && 'rotate-180')} />
+                      </div>
+                    </button>
+
+                    {showOptions && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-bg-card border border-bg-border rounded-xl overflow-hidden shadow-card z-10">
+                        {INSTALLMENT_OPTIONS.map(opt => {
+                          const f   = calculateFees(ticketType.price, opt.value)
+                          const tot = f.totalBuyer * quantity
+                          const isSelected = opt.value === installments
+                          return (
+                            <button key={opt.value}
+                              onClick={() => { setInstallments(opt.value); setShowOptions(false) }}
+                              className={cn(
+                                'w-full flex items-center justify-between px-4 py-3 text-sm transition-all border-b border-bg-border last:border-0',
+                                isSelected ? 'bg-brand-acid/8 text-brand-acid' : 'hover:bg-bg-surface text-text-secondary'
+                              )}>
+                              <span className="flex items-center gap-2">
+                                <span>{opt.icon}</span><span>{opt.label}</span>
+                                {opt.badge && (
+                                  <span className="text-[9px] bg-brand-acid/10 text-brand-acid px-1 py-0.5 rounded-sm font-mono">
+                                    {opt.badge}
+                                  </span>
+                                )}
+                              </span>
+                              <div className="text-right">
+                                <div className="font-mono font-semibold">{formatBRL(tot)}</div>
+                                {opt.value > 1 && (
+                                  <div className="text-[10px] text-text-muted">
+                                    {opt.value}x {formatBRL(tot / opt.value)}
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Buyer info */}
+                  <div className="space-y-2">
+                    <input className="input" placeholder="Seu nome completo"
+                      value={buyerName} onChange={e => setBuyerName(e.target.value)} />
+                    <input type="email" className="input" placeholder="E-mail (ingresso será enviado aqui)"
+                      value={buyerEmail} onChange={e => setBuyerEmail(e.target.value)} />
+                  </div>
+
+                  {formError && (
+                    <div className="text-xs text-status-error bg-status-error/8 border border-status-error/20 rounded-sm px-3 py-2">
+                      {formError}
+                    </div>
+                  )}
+
+                  <button onClick={handleContinue}
+                    className="w-full btn-primary py-4 text-base rounded-xl flex items-center justify-center gap-2">
+                    Continuar para pagamento →
+                  </button>
+                </>
+              )}
+
+              {/* Step 2: Payment (Stripe Elements) */}
+              {step === 'payment' && stripePromise && (
+                <Elements stripe={stripePromise} options={{ mode: 'payment' as any, amount: total, currency: 'brl', ...appearance }}>
+                  <PaymentForm
+                    eventId={eventId}
+                    ticketType={ticketType}
+                    quantity={quantity}
+                    installments={installments}
+                    buyerName={buyerName}
+                    buyerEmail={buyerEmail}
+                    totalCents={total}
+                    onSuccess={() => setStep('success')}
+                  />
+                </Elements>
+              )}
+
+              {step === 'payment' && !stripePromise && (
+                <div className="text-center py-6 text-sm text-status-warning">
+                  Stripe não configurado. Adicione VITE_STRIPE_PUBLISHABLE_KEY no .env
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Buyer info */}
-          <div className="space-y-2">
-            <input
-              className="input"
-              placeholder="Seu nome completo"
-              value={name}
-              onChange={e => setName(e.target.value)}
-            />
-            <input
-              type="email"
-              className="input"
-              placeholder="Seu e-mail (ingresso será enviado aqui)"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-          </div>
-
-          {error && (
-            <div className="text-xs text-status-error bg-status-error/8 border border-status-error/20 rounded-sm px-3 py-2">
-              {error}
-            </div>
-          )}
-
-          {/* CTA */}
-          <button
-            onClick={handlePay}
-            disabled={loading}
-            className="w-full btn-primary py-4 text-base flex items-center justify-center gap-2 rounded-xl"
-          >
-            {loading
-              ? <><Loader2 className="w-5 h-5 animate-spin" /> Redirecionando...</>
-              : <><Lock className="w-4 h-4" /> Pagar {formatBRL(fees.totalBuyer * quantity)}</>
-            }
-          </button>
-
-          {/* Trust badges */}
-          <div className="flex items-center justify-center gap-4 text-[10px] text-text-muted">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-status-success" /> Pagamento seguro
-            </span>
-            <span className="flex items-center gap-1">
-              <Lock className="w-3 h-3 text-brand-blue" /> Stripe SSL
-            </span>
-            <span className="flex items-center gap-1">
-              <Zap className="w-3 h-3 text-brand-acid" /> Ingresso imediato
-            </span>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   )

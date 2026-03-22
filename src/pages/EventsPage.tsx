@@ -557,44 +557,47 @@ function EventFormModal({ eventId, organizationId, onClose, onSaved }: {
     setSaving(true)
     setError('')
 
-    const payload = {
-      name:              form.name.trim(),
-      slug:              slugify(form.name),
-      subtitle:          form.subtitle || null,
-      category:          form.category || null,
-      short_description: form.short_description || null,
-      starts_at:         form.starts_at,
-      ends_at:           form.ends_at || null,
-      doors_open_at:     form.doors_open_at || null,
-      venue_name:        form.venue_name || null,
-      venue_address:     (form.venue_city || form.venue_street) ? {
-        street: form.venue_street,
-        city:   form.venue_city,
-        state:  form.venue_state,
-        country: 'Brasil',
-      } : null,
-      total_capacity:    form.total_capacity ? parseInt(form.total_capacity) : null,
-      age_rating:        form.age_rating,
-      dress_code:        form.dress_code || null,
-      is_online:         form.is_online,
-      online_url:        form.is_online ? form.online_url : null,
-      cover_url:         form.cover_url || null,
-      settings:          form.video_url ? { video_url: form.video_url } : null,
-    }
+    try {
+      const basePayload = {
+        name:              form.name.trim(),
+        subtitle:          form.subtitle || null,
+        category:          form.category || null,
+        short_description: form.short_description || null,
+        starts_at:         form.starts_at,
+        ends_at:           form.ends_at || null,
+        doors_open_at:     form.doors_open_at || null,
+        venue_name:        form.venue_name || null,
+        venue_address:     (form.venue_city || form.venue_street) ? {
+          street: form.venue_street, city: form.venue_city,
+          state: form.venue_state, country: 'Brasil',
+        } : null,
+        total_capacity:    form.total_capacity ? parseInt(form.total_capacity) : null,
+        age_rating:        form.age_rating,
+        dress_code:        form.dress_code || null,
+        is_online:         form.is_online,
+        online_url:        form.is_online ? form.online_url : null,
+        cover_url:         form.cover_url || null,
+        settings:          form.video_url ? { video_url: form.video_url } : {},
+      }
 
-    if (eventId) {
-      const { error: err } = await supabase.from('events').update(payload).eq('id', eventId)
-      if (err) { setError(err.message); setSaving(false); return }
-    } else {
-      const { error: err } = await supabase.from('events').insert({
-        ...payload,
-        organization_id: organizationId,
-        status: 'draft',
-      })
-      if (err) { setError(err.message); setSaving(false); return }
+      if (eventId) {
+        const { error: err } = await supabase.from('events').update(basePayload).eq('id', eventId)
+        if (err) throw new Error(err.message)
+      } else {
+        const { error: err } = await supabase.from('events').insert({
+          ...basePayload,
+          slug: slugify(form.name),
+          organization_id: organizationId,
+          status: 'draft',
+        })
+        if (err) throw new Error(err.message)
+      }
+
+      onSaved()
+    } catch (err: any) {
+      setError(err.message ?? 'Erro ao salvar')
+      setSaving(false)
     }
-    setSaving(false)
-    onSaved()
   }
 
   return (
@@ -849,6 +852,15 @@ function EventFormModal({ eventId, organizationId, onClose, onSaved }: {
                 {error}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Error — always visible above footer */}
+        {error && (
+          <div className="px-6 pb-2">
+            <div className="flex items-center gap-2 text-xs text-status-error bg-status-error/8 border border-status-error/20 rounded-sm px-3 py-2.5">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />{error}
+            </div>
           </div>
         )}
 

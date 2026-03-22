@@ -73,6 +73,24 @@ function copy(isFree: boolean, paid: string, free: string) {
   return isFree ? free : paid
 }
 
+/* ── Category fallback image ────────────────────────────────── */
+function getCategoryImage(category: string): string {
+  const c = (category || '').toLowerCase()
+  const map: [string[], string][] = [
+    [['festival','show','música','musica','concert','balada'], 'photo-1459749411175-04bf5292ceea'],
+    [['congresso','conferência','conferencia','summit','palestra'], 'photo-1540575467063-178a50c2df87'],
+    [['esporte','corrida','sport','futebol'], 'photo-1461896836934-ffe607ba8211'],
+    [['tech','tecnologia','startup','inovação','inovacao'], 'photo-1518770660439-4636190af475'],
+    [['gastronomia','culinária','culinaria','food','chef'], 'photo-1414235077428-338989a2e8c0'],
+    [['negócios','negocios','business','corporativo','corporate'], 'photo-1556761175-4b46a572b786'],
+    [['arte','cultura','teatro','theater','exposição'], 'photo-1478720568477-152d9b164e26'],
+  ]
+  for (const [keys, id] of map) {
+    if (keys.some(k => c.includes(k))) return `https://images.unsplash.com/photo-${id}?w=1920&q=85&fit=crop`
+  }
+  return 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1920&q=85&fit=crop'
+}
+
 /* ── Main ───────────────────────────────────────────────────── */
 export function EventPage({ slug }: { slug: string }) {
   const [event, setEvent] = useState<EventData | null>(null)
@@ -80,7 +98,6 @@ export function EventPage({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true)
   const [cart, setCart] = useState<CartItem[]>([])
   const [step, setStep] = useState<'landing' | 'checkout' | 'success'>('landing')
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [scrollY, setScrollY] = useState(0)
   const [liked, setLiked] = useState(false)
   const ticketsRef = useRef<HTMLDivElement>(null)
@@ -89,15 +106,9 @@ export function EventPage({ slug }: { slug: string }) {
     fetchEvent()
     trackEvent('PageView', { slug })
     const onScroll = () => setScrollY(window.scrollY)
-    const onMove = (e: MouseEvent) => setMousePos({
-      x: (e.clientX / window.innerWidth - 0.5) * 20,
-      y: (e.clientY / window.innerHeight - 0.5) * 20,
-    })
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('mousemove', onMove)
     return () => {
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('mousemove', onMove)
     }
   }, [slug])
 
@@ -220,21 +231,28 @@ export function EventPage({ slug }: { slug: string }) {
 
       {/* HERO */}
       <div className="relative min-h-[100svh] flex flex-col overflow-hidden">
-        {event.cover_url ? (
+        {event.settings?.video_url ? (
+          <video
+            src={event.settings.video_url}
+            autoPlay muted loop playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ transform: `scale(1.05)` }}
+          />
+        ) : event.cover_url ? (
           <img src={event.cover_url} alt={event.name}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ transform: `scale(1.1) translateY(${scrollY * 0.15}px)`, transition: 'transform 0.1s ease-out' }} />
         ) : (
-          <div className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(ellipse 80% 60% at 50% 30%, rgba(212,255,0,0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 80%, rgba(139,124,255,0.06) 0%, transparent 60%), #080808',
-              transform: `translate(${mousePos.x * 0.3}px, ${mousePos.y * 0.3}px)`,
-              transition: 'transform 0.15s ease-out',
-            }} />
+          <img
+            src={getCategoryImage(event.category)}
+            alt={event.name}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ transform: `scale(1.1) translateY(${scrollY * 0.15}px)`, transition: 'transform 0.1s ease-out' }}
+          />
         )}
         <div className="absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: 'linear-gradient(#d4ff00 1px, transparent 1px), linear-gradient(90deg, #d4ff00 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(8,8,8,0.4) 0%, rgba(8,8,8,0.2) 40%, rgba(8,8,8,0.9) 85%, #080808 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(8,8,8,0.3) 0%, rgba(8,8,8,0.1) 30%, rgba(8,8,8,0.75) 70%, #080808 100%)' }} />
 
         <div className="relative z-10 flex flex-col justify-end flex-1 px-6 md:px-16 pb-16 pt-28 max-w-5xl">
           <div className="flex items-center gap-3 mb-6">
@@ -254,7 +272,7 @@ export function EventPage({ slug }: { slug: string }) {
           </div>
 
           <h1 className="leading-none mb-4"
-            style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(52px, 9vw, 120px)', letterSpacing: '-0.02em', transform: `translateY(${scrollY * 0.08}px)` }}>
+            style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(52px, 9vw, 120px)', letterSpacing: '-0.02em', transform: `translateY(${scrollY * 0.08}px)`, textShadow: '0 2px 40px rgba(0,0,0,0.8)' }}>
             {event.name}<span style={{ color: '#d4ff00' }}>.</span>
           </h1>
 
@@ -295,6 +313,7 @@ export function EventPage({ slug }: { slug: string }) {
           </div>
         </div>
 
+        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #d4ff00, transparent)' }} />
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce">
           <ChevronDown className="w-5 h-5 text-[#6b6b6b]" />
         </div>

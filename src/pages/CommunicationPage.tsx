@@ -558,7 +558,7 @@ function CampaignFormModal({ organizationId, campaign, onClose, onSaved }: {
   onSaved: () => void
 }) {
   const [name, setName] = useState(campaign?.name ?? '')
-  const [type, setType] = useState<CampaignType>(campaign?.type ?? 'email')
+  const [type, setType] = useState<CampaignType>(campaign?.channel ?? 'email')
   const [subject, setSubject] = useState(campaign?.subject ?? '')
   const [body, setBody] = useState(campaign?.body ?? '')
   const [sendAt, setSendAt] = useState(campaign?.scheduled_at ? campaign.scheduled_at.slice(0, 16) : '')

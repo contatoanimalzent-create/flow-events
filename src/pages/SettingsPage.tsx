@@ -54,13 +54,13 @@ export function SettingsPage() {
         slug: organization.slug ?? '',
         email: organization.email ?? '',
         phone: organization.phone ?? '',
-        website: (organization as Record<string, unknown>).website as string ?? '',
+        website: (organization as unknown as Record<string, string>).website ?? '',
         address_city: '',
         address_state: '',
         address_country: 'Brasil',
-        primary_color: (organization as Record<string, unknown>).primary_color as string ?? '#d4ff00',
+        primary_color: (organization as unknown as Record<string, string>).primary_color ?? '#d4ff00',
         logo_url: organization.logo_url ?? '',
-        description: (organization as Record<string, unknown>).description as string ?? '',
+        description: (organization as unknown as Record<string, string>).description ?? '',
       })
       setLoading(false)
     }
@@ -96,7 +96,7 @@ export function SettingsPage() {
   const mockApiKey = `ak_live_${organization?.id?.slice(0, 8) ?? 'xxxxxxxx'}xxxxxxxxxxxxxxxxxxxxxxxx`
   const mockWebhookSecret = `whsec_${organization?.id?.slice(0, 8) ?? 'xxxxxxxx'}xxxxxxxxxxxxxxxx`
 
-  const planKey = (organization as Record<string, unknown>)?.plan as string ?? 'starter'
+  const planKey = organization?.plan ?? 'starter'
   const currentPlan = PLANS[planKey as keyof typeof PLANS] ?? PLANS.starter
 
   return (

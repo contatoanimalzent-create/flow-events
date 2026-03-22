@@ -1,13 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
 import { slugify, formatDate, formatNumber, formatCurrency, cn } from '@/lib/utils'
 import {
   Plus, Search, MoreHorizontal, CalendarDays, MapPin, Users,
-  Eye, Edit2, Copy, Archive, Trash2, Globe, ExternalLink,
-  X, Loader2, ChevronRight, AlertCircle,
+  Edit2, Copy, Trash2, Globe, ExternalLink,
+  X, Loader2, ChevronRight, AlertCircle, Upload, ImageIcon, Video, Check,
 } from 'lucide-react'
 import { PageHeader, Badge } from '@/components/ui/index'
+
+/* ── Unsplash curated image bank by category ────────────────── */
+const UNSPLASH_BANK: Record<string, string[]> = {
+  'Música':      ['1459749411175-04bf5292ceea','1501386761578-eac5c94b800a','1506157786151-b8491531f063','1429962714451-bb934ecdc4ec','1493225457124-a3eb161ffa5f'],
+  'Festival':    ['1459749411175-04bf5292ceea','1492684223066-81342ee5ff30','1506157786151-b8491531f063','1429962714451-bb934ecdc4ec','1533174072545-7a4b6ad7a6c3'],
+  'Tech':        ['1518770660439-4636190af475','1488590528505-98d2b5aba04b','1451187580459-43490279c0fa','1526374965328-7f61d4dc18c5','1504384308090-c894fdcc538d'],
+  'Negócios':    ['1556761175-4b46a572b786','1515187029135-18ee286d815b','1542744173-8e7e53415bb0','1521737711867-e3b97375f902','1552664730-d307ca884978'],
+  'Business':    ['1556761175-4b46a572b786','1515187029135-18ee286d815b','1542744173-8e7e53415bb0','1521737711867-e3b97375f902','1552664730-d307ca884978'],
+  'Esportes':    ['1461896836934-ffe607ba8211','1541534741688-7078b3a9f92a','1517649763962-0c623066013b','1571019613454-1cb2f99b2d8b','1576458088116-29cbb4ba0e04'],
+  'Gastronomia': ['1414235077428-338989a2e8c0','1504674900247-0877df9cc836','1482049016688-2d3e1b311543','1567620905732-2d1ec7ab7445','1540189549336-e8d99a6b7f47'],
+  'Arte':        ['1478720568477-152d9b164e26','1513475382585-d06e58bcb0e0','1460661419201-fd4cecdf8a8b','1541961017774-22349e4a1262','1531913764164-f85c52e6e654'],
+  'Educação':    ['1524178232363-1fb2b075b655','1503676260728-1c00da094a0b','1522202176988-66273c2fd55f','1434030216411-0b793f4b6173','1509062522246-3755977927d7'],
+  'Congresso':   ['1540575467063-178a50c2df87','1515187029135-18ee286d815b','1511578314322-c7e1f6f7e8b6','1505373877841-8d25f7d46678','1552664730-d307ca884978'],
+  'default':     ['1492684223066-81342ee5ff30','1459749411175-04bf5292ceea','1540575467063-178a50c2df87','1518770660439-4636190af475','1556761175-4b46a572b786'],
+}
+
+function getUnsplashImages(category: string): string[] {
+  const imgs = UNSPLASH_BANK[category] ?? UNSPLASH_BANK['default']
+  return imgs.map(id => `https://images.unsplash.com/photo-${id}?w=600&q=80&fit=crop`)
+}
 
 /* ── Types ──────────────────────────────────────────────────── */
 type EventStatus = 'draft' | 'review' | 'published' | 'ongoing' | 'finished' | 'archived' | 'cancelled'
@@ -46,6 +66,8 @@ interface EventFormData {
   dress_code: string
   is_online: boolean
   online_url: string
+  cover_url: string
+  video_url: string
 }
 
 const EMPTY_FORM: EventFormData = {
@@ -53,6 +75,7 @@ const EMPTY_FORM: EventFormData = {
   starts_at: '', ends_at: '', doors_open_at: '',
   venue_name: '', venue_street: '', venue_city: '', venue_state: '',
   total_capacity: '', age_rating: 'livre', dress_code: '', is_online: false, online_url: '',
+  cover_url: '', video_url: '',
 }
 
 const CATEGORIES = ['Música', 'Tech', 'Arte', 'Esportes', 'Business', 'Gastronomia', 'Moda', 'Educação', 'Outro']
@@ -478,7 +501,9 @@ function EventFormModal({ eventId, organizationId, onClose, onSaved }: {
   const [saving, setSaving]   = useState(false)
   const [error, setError]     = useState('')
 
-  const TOTAL_STEPS = 3
+  const TOTAL_STEPS = 4
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (eventId) {
@@ -502,6 +527,8 @@ function EventFormModal({ eventId, organizationId, onClose, onSaved }: {
             dress_code:        data.dress_code ?? '',
             is_online:         data.is_online ?? false,
             online_url:        data.online_url ?? '',
+            cover_url:         data.cover_url ?? '',
+            video_url:         data.settings?.video_url ?? '',
           })
         }
         setLoading(false)
@@ -511,6 +538,18 @@ function EventFormModal({ eventId, organizationId, onClose, onSaved }: {
 
   const set = (k: keyof EventFormData, v: string | boolean) =>
     setForm(f => ({ ...f, [k]: v }))
+
+  async function handleUpload(file: File) {
+    setUploading(true)
+    const ext  = file.name.split('.').pop()
+    const path = `${organizationId}/${Date.now()}.${ext}`
+    const { data, error } = await supabase.storage.from('event-covers').upload(path, file, { upsert: true })
+    if (!error && data) {
+      const { data: { publicUrl } } = supabase.storage.from('event-covers').getPublicUrl(data.path)
+      set('cover_url', publicUrl)
+    }
+    setUploading(false)
+  }
 
   async function handleSave() {
     if (!form.name.trim()) { setError('Nome do evento é obrigatório'); return }
@@ -539,6 +578,8 @@ function EventFormModal({ eventId, organizationId, onClose, onSaved }: {
       dress_code:        form.dress_code || null,
       is_online:         form.is_online,
       online_url:        form.is_online ? form.online_url : null,
+      cover_url:         form.cover_url || null,
+      settings:          form.video_url ? { video_url: form.video_url } : null,
     }
 
     if (eventId) {
@@ -730,6 +771,74 @@ function EventFormModal({ eventId, organizationId, onClose, onSaved }: {
                       <span className="text-text-primary">{form.total_capacity ? formatNumber(parseInt(form.total_capacity)) : '—'}</span>
                     </div>
                   </div>
+                </div>
+              </>
+            )}
+
+            {/* Step 4: Mídia */}
+            {step === 4 && (
+              <>
+                {/* Current cover preview */}
+                {form.cover_url && (
+                  <div className="relative rounded-sm overflow-hidden h-36">
+                    <img src={form.cover_url} alt="cover" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-bg-primary/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-all">
+                      <button onClick={() => set('cover_url', '')}
+                        className="bg-status-error/90 text-white px-3 py-1.5 rounded-sm text-xs font-medium">
+                        Remover
+                      </button>
+                    </div>
+                    <span className="absolute top-2 left-2 text-[10px] font-mono bg-bg-primary/80 text-brand-acid px-2 py-1 rounded-sm">
+                      CAPA ATUAL
+                    </span>
+                  </div>
+                )}
+
+                {/* Upload button */}
+                <div>
+                  <label className="input-label flex items-center gap-1.5"><ImageIcon className="w-3 h-3" /> Foto de capa</label>
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden"
+                    onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload(f) }} />
+                  <button onClick={() => fileRef.current?.click()} disabled={uploading}
+                    className="w-full border-2 border-dashed border-bg-border hover:border-brand-acid/40 rounded-sm p-6 flex flex-col items-center gap-2 transition-all group">
+                    {uploading
+                      ? <Loader2 className="w-6 h-6 text-brand-acid animate-spin" />
+                      : <Upload className="w-6 h-6 text-text-muted group-hover:text-brand-acid transition-colors" />}
+                    <span className="text-xs text-text-muted group-hover:text-text-primary transition-colors">
+                      {uploading ? 'Enviando...' : 'Clique para enviar uma imagem (JPG, PNG, WebP)'}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Unsplash image bank */}
+                <div>
+                  <label className="input-label flex items-center gap-1.5">
+                    <ImageIcon className="w-3 h-3" /> Ou escolha do banco de imagens
+                    <span className="text-text-muted font-normal normal-case">— categoria: {form.category || 'geral'}</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {getUnsplashImages(form.category).map((url, i) => (
+                      <button key={i} onClick={() => set('cover_url', url)}
+                        className={cn('relative aspect-video rounded-sm overflow-hidden border-2 transition-all',
+                          form.cover_url === url ? 'border-brand-acid' : 'border-transparent hover:border-brand-acid/40')}>
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        {form.cover_url === url && (
+                          <div className="absolute inset-0 bg-brand-acid/20 flex items-center justify-center">
+                            <Check className="w-5 h-5 text-brand-acid" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-text-muted mt-1.5 font-mono">Imagens via Unsplash · uso gratuito</p>
+                </div>
+
+                {/* Video URL */}
+                <div>
+                  <label className="input-label flex items-center gap-1.5"><Video className="w-3 h-3" /> Vídeo de fundo (opcional)</label>
+                  <input className="input" placeholder="URL do vídeo (MP4, WebM ou YouTube embed)"
+                    value={form.video_url} onChange={e => set('video_url', e.target.value)} />
+                  <p className="text-[10px] text-text-muted mt-1 font-mono">O vídeo toca em loop no hero da página pública do evento</p>
                 </div>
               </>
             )}

@@ -20,6 +20,11 @@ export function AppRouter() {
   const { user, profile, initialized } = useAuthStore()
   const [publicRoute, setPublicRoute] = useState<PublicRoute>(getInitialRoute)
 
+  // Public event pages load immediately — no auth needed
+  if (typeof publicRoute === 'object' && publicRoute.type === 'event') {
+    return <EventPage slug={publicRoute.slug} />
+  }
+
   if (!initialized) return <LoadingScreen />
 
   if (user) {
@@ -29,10 +34,6 @@ export function AppRouter() {
 
   if (publicRoute === 'login') {
     return <LoginPage onBack={() => setPublicRoute('home')} />
-  }
-
-  if (typeof publicRoute === 'object' && publicRoute.type === 'event') {
-    return <EventPage slug={publicRoute.slug} />
   }
 
   return <HomePage onLogin={() => setPublicRoute('login')} />

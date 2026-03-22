@@ -1,2 +1,9 @@
-import { PageHeader } from '@/components/ui/index'
-export function ProductsPage() { return (<div className='p-6'><PageHeader title='ProductsPage' subtitle='Módulo em desenvolvimento.' /><div className='card p-12 flex items-center justify-center text-text-muted text-sm'>🚧 Em breve disponível</div></div>) }
+export function ProductsPage() {
+  return (
+    <div className="p-6">
+      <h1 className="font-display text-4xl text-text-primary leading-none mb-1">PRODUTOS & PDV<span className="text-brand-acid">.</span></h1>
+      <p className="text-text-muted text-xs font-mono tracking-wider mb-6">Caixa touch e estoque</p>
+      <div className="card p-16 flex items-center justify-center text-text-muted text-sm">🚧 Em breve disponível</div>
+    </div>
+  )
+}

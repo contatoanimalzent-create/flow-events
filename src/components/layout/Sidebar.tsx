@@ -2,7 +2,7 @@ import {
   LayoutDashboard, CalendarDays, Ticket, ScanLine, Users,
   Truck, ShoppingBag, Package, MessageSquare, DollarSign,
   Zap, HelpCircle, Settings, ChevronLeft, ChevronRight,
-  TrendingUp, UserCheck,
+  TrendingUp,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store/auth'
@@ -37,10 +37,9 @@ const navGroups: NavGroup[] = [
   {
     label: 'Operações',
     items: [
-      { id: 'checkin',       label: 'Check-in',       icon: ScanLine },
-      { id: 'credentialing', label: 'Credenciamento', icon: UserCheck },
-      { id: 'staff',         label: 'Staff',          icon: Users },
-      { id: 'suppliers',     label: 'Fornecedores',   icon: Truck },
+      { id: 'checkin',   label: 'Check-in',     icon: ScanLine },
+      { id: 'staff',     label: 'Staff',         icon: Users },
+      { id: 'suppliers', label: 'Fornecedores',  icon: Truck },
     ],
   },
   {

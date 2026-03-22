@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
+import { CustomCursor } from '@/components/ui/CustomCursor'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { EventsPage } from '@/pages/EventsPage'
 import { CheckinPage } from '@/pages/CheckinPage'
@@ -21,7 +22,6 @@ export type NavSection =
   | 'tickets'
   | 'sales'
   | 'checkin'
-  | 'credentialing'
   | 'staff'
   | 'suppliers'
   | 'products'
@@ -51,14 +51,14 @@ export function AppShell() {
       case 'growth':        return <GrowthPage />
       case 'help':          return <HelpPage />
       case 'settings':      return <SettingsPage />
-      case 'credentialing': return <CheckinPage />
       case 'inventory':     return <ProductsPage />
       default:              return <DashboardPage />
     }
   }
 
   return (
-    <div className="flex h-screen bg-bg-primary overflow-hidden">
+    <div className="flex h-screen bg-bg-primary overflow-hidden" style={{ cursor: 'none' }}>
+      <CustomCursor />
       <Sidebar
         activeSection={activeSection}
         onNavigate={setActiveSection}
@@ -70,7 +70,7 @@ export function AppShell() {
           onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
           activeSection={activeSection}
         />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto main-grid-bg">
           <div className="animate-fade-in">
             {renderContent()}
           </div>

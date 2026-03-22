@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { supabase } from '@/lib/supabase'
+import { stripePromise, calculateFees } from '@/lib/stripe'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
 import {
   MapPin, Calendar, Clock, Users, ChevronDown, ChevronRight,
   Check, Shield, Zap, Star, ArrowRight, Share2, Heart,
-  Ticket, Info, Lock, CreditCard, Smartphone, FileText,
+  Ticket, Info, Lock, CreditCard, Smartphone,
 } from 'lucide-react'
 
 /* ── Types ──────────────────────────────────────────────────── */
@@ -540,6 +542,75 @@ export function EventPage({ slug }: { slug: string }) {
   )
 }
 
+/* ── Stripe appearance for dark theme ──────────────────────── */
+const stripeAppearance = {
+  theme: 'night' as const,
+  variables: {
+    colorPrimary:         '#d4ff00',
+    colorBackground:      '#1a1a1a',
+    colorText:            '#f5f5f0',
+    colorTextSecondary:   '#6b6b6b',
+    colorTextPlaceholder: '#4a4a4a',
+    colorDanger:          '#FF5A6B',
+    borderRadius:         '2px',
+    fontFamily:           'DM Sans, system-ui, sans-serif',
+    fontSizeBase:         '14px',
+    spacingUnit:          '4px',
+  },
+  rules: {
+    '.Input': { border: '1px solid #242424', backgroundColor: '#0e0e0e', color: '#f5f5f0' },
+    '.Input:focus': { border: '1px solid rgba(212,255,0,0.4)', boxShadow: '0 0 0 1px rgba(212,255,0,0.15)' },
+    '.Label': { color: '#6b6b6b', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase' as const },
+    '.Tab': { border: '1px solid #242424', backgroundColor: '#0e0e0e' },
+    '.Tab:hover': { border: '1px solid rgba(212,255,0,0.2)' },
+    '.Tab--selected': { border: '1px solid rgba(212,255,0,0.4)', backgroundColor: 'rgba(212,255,0,0.05)' },
+  },
+}
+
+/* ── Stripe inner form ──────────────────────────────────────── */
+function StripePaymentForm({ clientSecret, onSuccess, onBack, buyerName, total }: {
+  clientSecret: string; onSuccess: () => void; onBack: () => void
+  buyerName: string; total: number
+}) {
+  const stripe   = useStripe()
+  const elements = useElements()
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState('')
+
+  async function handlePay(e: React.FormEvent) {
+    e.preventDefault()
+    if (!stripe || !elements) return
+    setLoading(true); setError('')
+    const { error: err } = await stripe.confirmPayment({
+      elements,
+      confirmParams: { payment_method_data: { billing_details: { name: buyerName } } },
+      redirect: 'if_required',
+    })
+    if (err) { setError(err.message ?? 'Erro no pagamento'); setLoading(false) }
+    else { onSuccess() }
+  }
+
+  return (
+    <form onSubmit={handlePay} className="space-y-6">
+      <PaymentElement options={{ layout: 'tabs' }} />
+      {error && (
+        <div className="flex items-center gap-2 text-xs text-[#FF5A6B] bg-[#FF5A6B]/8 border border-[#FF5A6B]/20 rounded-sm px-4 py-3">
+          <Info className="w-3.5 h-3.5 shrink-0" /> {error}
+        </div>
+      )}
+      <button type="submit" disabled={loading || !stripe}
+        className="w-full flex items-center justify-center gap-3 bg-[#d4ff00] text-[#080808] py-5 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] transition-all disabled:opacity-50 active:scale-95">
+        {loading ? <span className="font-mono">PROCESSANDO...</span> : (
+          <><Lock className="w-4 h-4" /> PAGAR · {formatCurrency(total)}</>
+        )}
+      </button>
+      <button type="button" onClick={onBack} className="w-full text-center text-xs text-[#6b6b6b] hover:text-[#f5f5f0] transition-colors font-mono py-2">
+        ← VOLTAR AOS DADOS
+      </button>
+    </form>
+  )
+}
+
 /* ── Checkout ───────────────────────────────────────────────── */
 function CheckoutScreen({ event, cart, total, isFree, onBack, onSuccess, onAdd, onRemove, ticketTypes }: {
   event: EventData; cart: CartItem[]; total: number; isFree: boolean
@@ -547,60 +618,86 @@ function CheckoutScreen({ event, cart, total, isFree, onBack, onSuccess, onAdd, 
   onAdd: (type: any, batch: any) => void; onRemove: (id: string) => void
   ticketTypes: TicketType[]
 }) {
-  const [form, setForm] = useState({ name: '', email: '', cpf: '', phone: '' })
-  const [method, setMethod] = useState<'pix' | 'credit_card' | 'boleto' | 'free'>('pix')
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
+  const [phase, setPhase]             = useState<'form' | 'payment'>('form')
+  const [form, setForm]               = useState({ name: '', email: '', cpf: '', phone: '' })
+  const [installments, setInstallments] = useState(0)
+  const [clientSecret, setClientSecret] = useState('')
+  const [loading, setLoading]         = useState(false)
+  const [error, setError]             = useState('')
 
-  useEffect(() => {
-    if (isFree) setMethod('free')
-  }, [isFree])
+  const fees        = calculateFees(cart[0]?.price ?? 0, installments)
+  const allInTotal  = isFree ? 0 : fees.totalBuyer * cart.reduce((s, c) => s + c.qty, 0)
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
-  async function handleSubmit() {
+  /* Free events — direct DB insert */
+  async function handleFreeSubmit() {
     if (!form.name.trim() || !form.email.trim()) { setError('Preencha nome e e-mail'); return }
-    setSaving(true); setError('')
-
+    setLoading(true); setError('')
     const { data: order, error: err } = await supabase.from('orders').insert({
       event_id: event.id,
       organization_id: '00000000-0000-0000-0000-000000000001',
-      buyer_name: form.name,
-      buyer_email: form.email,
-      buyer_cpf: form.cpf,
-      buyer_phone: form.phone,
-      subtotal: total,
-      discount_amount: 0,
-      fee_amount: 0,
-      total_amount: total,
-      status: isFree ? 'paid' : 'pending',
-      payment_method: method,
+      buyer_name: form.name, buyer_email: form.email,
+      buyer_cpf: form.cpf, buyer_phone: form.phone,
+      subtotal: 0, discount_amount: 0, fee_amount: 0, total_amount: 0,
+      status: 'paid', payment_method: 'free',
     }).select().single()
-
-    if (err || !order) { setError('Erro ao processar. Tente novamente.'); setSaving(false); return }
-
+    if (err || !order) { setError('Erro ao processar. Tente novamente.'); setLoading(false); return }
     for (const item of cart) {
       await supabase.from('order_items').insert({
-        order_id: order.id,
-        ticket_type_id: item.ticketTypeId,
-        batch_id: item.batchId,
-        holder_name: form.name,
-        holder_email: form.email,
-        unit_price: item.price,
-        quantity: item.qty,
-        total_price: item.price * item.qty,
+        order_id: order.id, ticket_type_id: item.ticketTypeId, batch_id: item.batchId,
+        holder_name: form.name, holder_email: form.email,
+        unit_price: 0, quantity: item.qty, total_price: 0,
       })
     }
-
-    trackEvent(isFree ? 'CompleteRegistration' : 'Purchase', { value: total, currency: 'BRL' })
-    setSaving(false)
-    onSuccess()
+    trackEvent('CompleteRegistration', { currency: 'BRL' })
+    setLoading(false); onSuccess()
   }
+
+  /* Paid events — create PaymentIntent then show Stripe Elements */
+  async function handleProceedToPayment() {
+    if (!form.name.trim() || !form.email.trim()) { setError('Preencha nome e e-mail'); return }
+    setLoading(true); setError('')
+    const primaryItem = cart[0]
+    const qty = cart.reduce((s, c) => s + c.qty, 0)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-payment-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_ANON_KEY}` },
+        body: JSON.stringify({
+          eventId: event.id,
+          ticketTypeId: primaryItem.ticketTypeId,
+          quantity: qty,
+          installments,
+          buyerEmail: form.email,
+          buyerName: form.name,
+        }),
+      })
+      const json = await res.json()
+      if (json.error) throw new Error(json.error)
+      setClientSecret(json.clientSecret)
+      setPhase('payment')
+    } catch (err: any) {
+      setError(err.message ?? 'Erro ao iniciar pagamento')
+    }
+    setLoading(false)
+  }
+
+  const INSTALLMENT_OPTS = [
+    { value: 0,  label: 'PIX',        icon: <Smartphone className="w-4 h-4" />, badge: 'Menor preço' },
+    { value: 1,  label: 'Cartão 1x',  icon: <CreditCard className="w-4 h-4" />, badge: null },
+    { value: 2,  label: 'Cartão 2x',  icon: <CreditCard className="w-4 h-4" />, badge: null },
+    { value: 3,  label: 'Cartão 3x',  icon: <CreditCard className="w-4 h-4" />, badge: null },
+    { value: 6,  label: 'Cartão 6x',  icon: <CreditCard className="w-4 h-4" />, badge: null },
+    { value: 12, label: 'Cartão 12x', icon: <CreditCard className="w-4 h-4" />, badge: 'Máx parcelas' },
+  ]
 
   return (
     <div className="min-h-screen bg-[#080808] text-[#f5f5f0]">
       <nav className="sticky top-0 z-50 flex items-center gap-4 px-6 py-4 bg-[#080808]/95 border-b border-[#1a1a1a] backdrop-blur-sm">
-        <button onClick={onBack} className="text-[#6b6b6b] hover:text-[#f5f5f0] text-xs font-mono transition-colors">← VOLTAR</button>
+        <button onClick={phase === 'payment' ? () => setPhase('form') : onBack}
+          className="text-[#6b6b6b] hover:text-[#f5f5f0] text-xs font-mono transition-colors">← VOLTAR</button>
         <div className="flex-1" />
         <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 16, letterSpacing: 2 }}>
           ANIMALZ<span style={{ color: '#d4ff00' }}>.</span>
@@ -610,18 +707,19 @@ function CheckoutScreen({ event, cart, total, isFree, onBack, onSuccess, onAdd, 
       <div className="max-w-2xl mx-auto px-6 py-12 space-y-8">
         <div>
           <div className="text-[10px] font-mono tracking-[0.3em] text-[#d4ff00] mb-2">
-            {copy(isFree, 'CHECKOUT', 'INSCRIÇÃO')}
+            {copy(isFree, 'CHECKOUT', 'INSCRIÇÃO')} · {phase === 'payment' ? 'PAGAMENTO' : 'SEUS DADOS'}
           </div>
           <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 40, letterSpacing: '-0.01em', lineHeight: 1 }}>
-            {copy(isFree, 'FINALIZE SEU', 'CONFIRME SUA')}<br />
-            {copy(isFree, 'PEDIDO', 'INSCRIÇÃO')}<span style={{ color: '#d4ff00' }}>.</span>
+            {phase === 'payment' ? 'FORMA DE' : copy(isFree, 'FINALIZE SEU', 'CONFIRME SUA')}<br />
+            {phase === 'payment' ? <span>PAGAMENTO<span style={{ color: '#d4ff00' }}>.</span></span>
+              : <span>{copy(isFree, 'PEDIDO', 'INSCRIÇÃO')}<span style={{ color: '#d4ff00' }}>.</span></span>}
           </h1>
         </div>
 
-        {/* Resumo */}
+        {/* Cart summary */}
         <div className="border border-[#1a1a1a] rounded-sm overflow-hidden">
           <div className="px-5 py-3 bg-[#0e0e0e] border-b border-[#1a1a1a]">
-            <span className="text-[10px] font-mono tracking-widest text-[#6b6b6b] uppercase">Resumo</span>
+            <span className="text-[10px] font-mono tracking-widest text-[#6b6b6b] uppercase">Resumo do pedido</span>
           </div>
           {cart.map(item => (
             <div key={item.batchId} className="flex items-center justify-between px-5 py-3.5 border-b border-[#1a1a1a] last:border-0">
@@ -636,109 +734,149 @@ function CheckoutScreen({ event, cart, total, isFree, onBack, onSuccess, onAdd, 
                 <span className="font-mono text-[#d4ff00]">
                   {item.price === 0 ? 'Gratuito' : formatCurrency(item.price * item.qty)}
                 </span>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => onRemove(item.batchId)}
-                    className="w-6 h-6 border border-[#242424] rounded-sm text-[#9a9a9a] hover:text-[#f5f5f0] flex items-center justify-center text-sm">−</button>
-                  <span className="w-5 text-center text-xs font-mono">{item.qty}</span>
-                  <button onClick={() => {
-                    const type = ticketTypes.find(t => t.id === item.ticketTypeId)
-                    const batch = type?.batches.find(b => b.id === item.batchId)
-                    if (type && batch) onAdd(type, batch)
-                  }} className="w-6 h-6 border border-[#242424] rounded-sm text-[#9a9a9a] hover:text-[#f5f5f0] flex items-center justify-center text-sm">+</button>
-                </div>
+                {phase === 'form' && (
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => onRemove(item.batchId)}
+                      className="w-6 h-6 border border-[#242424] rounded-sm text-[#9a9a9a] hover:text-[#f5f5f0] flex items-center justify-center text-sm">−</button>
+                    <span className="w-5 text-center text-xs font-mono">{item.qty}</span>
+                    <button onClick={() => {
+                      const type = ticketTypes.find(t => t.id === item.ticketTypeId)
+                      const batch = type?.batches.find(b => b.id === item.batchId)
+                      if (type && batch) onAdd(type, batch)
+                    }} className="w-6 h-6 border border-[#242424] rounded-sm text-[#9a9a9a] hover:text-[#f5f5f0] flex items-center justify-center text-sm">+</button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
           <div className="flex justify-between items-center px-5 py-4 bg-[#0e0e0e]">
-            <span className="text-sm font-semibold">Total</span>
+            <span className="text-sm font-semibold">Total{!isFree && installments > 0 ? ` (${installments}x)` : ''}</span>
             <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 24, color: '#d4ff00' }}>
-              {isFree ? 'GRATUITO' : formatCurrency(total)}
+              {isFree ? 'GRATUITO' : formatCurrency(allInTotal)}
             </span>
           </div>
         </div>
 
-        {/* Dados */}
-        <div className="space-y-3">
-          <div className="text-[10px] font-mono tracking-[0.3em] text-[#6b6b6b] uppercase">Seus dados</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {[
-              { label: 'Nome completo *', key: 'name',  type: 'text',  placeholder: 'Seu nome' },
-              { label: 'E-mail *',        key: 'email', type: 'email', placeholder: 'seu@email.com' },
-              { label: 'CPF',             key: 'cpf',   type: 'text',  placeholder: '000.000.000-00' },
-              { label: 'WhatsApp',        key: 'phone', type: 'tel',   placeholder: '(00) 00000-0000' },
-            ].map(f => (
-              <div key={f.key}>
-                <label className="block text-[10px] font-mono tracking-wider text-[#6b6b6b] uppercase mb-1.5">{f.label}</label>
-                <input type={f.type} placeholder={f.placeholder}
-                  value={(form as any)[f.key]} onChange={e => set(f.key, e.target.value)}
-                  className="w-full bg-[#0e0e0e] border border-[#242424] text-[#f5f5f0] placeholder-[#4b4b4b] rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-[#d4ff00]/40 transition-colors" />
+        {/* Phase 1: Form */}
+        {phase === 'form' && (
+          <>
+            {/* Buyer data */}
+            <div className="space-y-3">
+              <div className="text-[10px] font-mono tracking-[0.3em] text-[#6b6b6b] uppercase">Seus dados</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[
+                  { label: 'Nome completo *', key: 'name',  type: 'text',  placeholder: 'Seu nome' },
+                  { label: 'E-mail *',        key: 'email', type: 'email', placeholder: 'seu@email.com' },
+                  { label: 'CPF',             key: 'cpf',   type: 'text',  placeholder: '000.000.000-00' },
+                  { label: 'WhatsApp',        key: 'phone', type: 'tel',   placeholder: '(00) 00000-0000' },
+                ].map(f => (
+                  <div key={f.key}>
+                    <label className="block text-[10px] font-mono tracking-wider text-[#6b6b6b] uppercase mb-1.5">{f.label}</label>
+                    <input type={f.type} placeholder={f.placeholder}
+                      value={(form as any)[f.key]} onChange={e => set(f.key, e.target.value)}
+                      className="w-full bg-[#0e0e0e] border border-[#242424] text-[#f5f5f0] placeholder-[#4b4b4b] rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-[#d4ff00]/40 transition-colors" />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Pagamento — só mostra se não for gratuito */}
-        {!isFree && (
-          <div className="space-y-3">
-            <div className="text-[10px] font-mono tracking-[0.3em] text-[#6b6b6b] uppercase">Forma de pagamento</div>
-            <div className="grid grid-cols-3 gap-3">
-              {([
-                { id: 'pix', icon: Smartphone, label: 'PIX' },
-                { id: 'credit_card', icon: CreditCard, label: 'Cartão' },
-                { id: 'boleto', icon: FileText, label: 'Boleto' },
-              ] as const).map(m => {
-                const Icon = m.icon
-                return (
-                  <button key={m.id} onClick={() => setMethod(m.id)}
-                    className={cn('flex flex-col items-center gap-2 p-4 rounded-sm border transition-all',
-                      method === m.id ? 'border-[#d4ff00]/40 bg-[#d4ff00]/5 text-[#d4ff00]' : 'border-[#242424] text-[#9a9a9a] hover:border-[#d4ff00]/20')}>
-                    <Icon className="w-5 h-5" />
-                    <span className="text-xs font-mono">{m.label}</span>
-                  </button>
-                )
-              })}
             </div>
-            {method === 'pix' && (
-              <div className="p-3 bg-[#d4ff00]/5 border border-[#d4ff00]/15 rounded-sm text-xs text-[#9a9a9a]">
-                ✓ Aprovação instantânea · Sem taxa adicional
+
+            {/* Payment method / installments — paid only */}
+            {!isFree && (
+              <div className="space-y-3">
+                <div className="text-[10px] font-mono tracking-[0.3em] text-[#6b6b6b] uppercase">Forma de pagamento</div>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                  {INSTALLMENT_OPTS.map(opt => {
+                    const f = calculateFees(cart[0]?.price ?? 0, opt.value)
+                    return (
+                      <button key={opt.value} onClick={() => setInstallments(opt.value)}
+                        className={cn('relative flex flex-col items-center gap-1.5 p-3 rounded-sm border text-center transition-all',
+                          installments === opt.value
+                            ? 'border-[#d4ff00]/40 bg-[#d4ff00]/5 text-[#d4ff00]'
+                            : 'border-[#242424] text-[#9a9a9a] hover:border-[#d4ff00]/20')}>
+                        {opt.badge && (
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] font-mono bg-[#d4ff00] text-[#080808] px-1.5 py-0.5 rounded-sm whitespace-nowrap">
+                            {opt.badge}
+                          </span>
+                        )}
+                        {opt.icon}
+                        <span className="text-[10px] font-mono">{opt.label}</span>
+                        <span className="text-[9px] text-[#6b6b6b] font-mono">{formatCurrency(f.totalBuyer)}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+                {installments === 0 && (
+                  <div className="p-3 bg-[#d4ff00]/5 border border-[#d4ff00]/15 rounded-sm text-xs text-[#9a9a9a]">
+                    ⚡ PIX tem aprovação instantânea. Preço final: {formatCurrency(calculateFees(cart[0]?.price ?? 0, 0).totalBuyer)}
+                  </div>
+                )}
               </div>
             )}
-          </div>
+
+            {/* Free banner */}
+            {isFree && (
+              <div className="p-4 bg-[#5BE7C4]/8 border border-[#5BE7C4]/20 rounded-sm flex items-center gap-3">
+                <Check className="w-5 h-5 text-[#5BE7C4] shrink-0" />
+                <div>
+                  <div className="text-sm font-semibold text-[#5BE7C4]">Inscrição gratuita</div>
+                  <div className="text-xs text-[#9a9a9a] mt-0.5">Nenhum pagamento será cobrado. Você receberá o QR code por e-mail.</div>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="flex items-center gap-2 text-xs text-[#FF5A6B] bg-[#FF5A6B]/8 border border-[#FF5A6B]/20 rounded-sm px-4 py-3">
+                <Info className="w-3.5 h-3.5 shrink-0" /> {error}
+              </div>
+            )}
+
+            <button onClick={isFree ? handleFreeSubmit : handleProceedToPayment} disabled={loading}
+              className="w-full flex items-center justify-center gap-3 bg-[#d4ff00] text-[#080808] py-5 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] transition-all disabled:opacity-50 active:scale-95">
+              {loading ? <span className="font-mono">AGUARDE...</span> : (
+                <>
+                  {isFree ? 'CONFIRMAR INSCRIÇÃO' : `CONTINUAR PARA PAGAMENTO · ${formatCurrency(allInTotal)}`}
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+
+            <p className="text-center text-[11px] text-[#6b6b6b]">
+              {copy(isFree,
+                'Ao confirmar você concorda com os termos de uso. QR code enviado por e-mail.',
+                'Taxa de serviço já inclusa no preço. Ao pagar você concorda com os termos de uso.'
+              )}
+            </p>
+          </>
         )}
 
-        {/* Banner gratuito */}
-        {isFree && (
-          <div className="p-4 bg-[#5BE7C4]/8 border border-[#5BE7C4]/20 rounded-sm flex items-center gap-3">
-            <Check className="w-5 h-5 text-[#5BE7C4] shrink-0" />
-            <div>
-              <div className="text-sm font-semibold text-[#5BE7C4]">Inscrição gratuita</div>
-              <div className="text-xs text-[#9a9a9a] mt-0.5">Nenhum pagamento será cobrado. Você receberá o QR code por e-mail.</div>
-            </div>
-          </div>
+        {/* Phase 2: Stripe Elements */}
+        {phase === 'payment' && clientSecret && stripePromise && (
+          <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
+            <StripePaymentForm
+              clientSecret={clientSecret}
+              buyerName={form.name}
+              total={allInTotal}
+              onSuccess={onSuccess}
+              onBack={() => setPhase('form')}
+            />
+          </Elements>
         )}
 
-        {error && (
-          <div className="flex items-center gap-2 text-xs text-[#FF5A6B] bg-[#FF5A6B]/8 border border-[#FF5A6B]/20 rounded-sm px-4 py-3">
-            <Info className="w-3.5 h-3.5 shrink-0" /> {error}
-          </div>
-        )}
-
-        <button onClick={handleSubmit} disabled={saving}
-          className="w-full flex items-center justify-center gap-3 bg-[#d4ff00] text-[#080808] py-5 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] transition-all disabled:opacity-50 active:scale-95">
-          {saving ? <span className="font-mono">PROCESSANDO...</span> : (
-            <>
-              {copy(isFree, `FINALIZAR COMPRA · ${formatCurrency(total)}`, 'CONFIRMAR INSCRIÇÃO')}
-              <ArrowRight className="w-4 h-4" />
-            </>
-          )}
-        </button>
-
-        <p className="text-center text-[11px] text-[#6b6b6b]">
-          {copy(isFree,
-            'Ao finalizar você concorda com os termos de uso. Ingressos enviados por e-mail.',
-            'Ao confirmar você concorda com os termos de uso. QR code enviado por e-mail.'
-          )}
-        </p>
+        {/* Security row */}
+        <div className="flex items-center justify-center gap-6 flex-wrap pt-2">
+          {[
+            { icon: Shield,  text: 'Compra 100% segura' },
+            { icon: Lock,    text: 'Dados criptografados' },
+            { icon: Ticket,  text: 'QR code antifraude' },
+          ].map((g, i) => {
+            const Icon = g.icon
+            return (
+              <span key={i} className="flex items-center gap-1.5 text-[11px] text-[#6b6b6b]">
+                <Icon className="w-3.5 h-3.5 text-[#d4ff00]" />{g.text}
+              </span>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

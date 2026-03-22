@@ -48,10 +48,12 @@ export function AppShell() {
       case 'products':     return <ProductsPage />
       case 'financial':    return <FinancialPage />
       case 'communication': return <CommunicationPage />
-      case 'growth':       return <GrowthPage />
-      case 'help':         return <HelpPage />
-      case 'settings':     return <SettingsPage />
-      default:             return <DashboardPage />
+      case 'growth':        return <GrowthPage />
+      case 'help':          return <HelpPage />
+      case 'settings':      return <SettingsPage />
+      case 'credentialing': return <CheckinPage />
+      case 'inventory':     return <ProductsPage />
+      default:              return <DashboardPage />
     }
   }
 

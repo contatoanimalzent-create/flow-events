@@ -160,7 +160,7 @@ export function EventsPage() {
       </div>
 
       {/* Stats strip */}
-      <div className="grid grid-cols-4 gap-3 reveal" style={{ transitionDelay: '40ms' }}>
+      <div className="grid grid-cols-4 gap-3 reveal" style={{ animationDelay: '40ms' }}>
         {statsBar.map((s, i) => (
           <div key={i} className="card p-4">
             <div className="text-[10px] font-mono tracking-widest uppercase text-text-muted">{s.label}</div>
@@ -170,7 +170,7 @@ export function EventsPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-3 reveal" style={{ transitionDelay: '80ms' }}>
+      <div className="flex items-center gap-3 reveal" style={{ animationDelay: '80ms' }}>
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
           <input className="input pl-9 h-9 text-sm" placeholder="Buscar evento..."
@@ -351,7 +351,7 @@ function EventCard({ event, index, menuOpen, onMenu, onEdit, onPublish, onDuplic
   const gradient = COVER_GRADIENTS[index % COVER_GRADIENTS.length]
 
   return (
-    <div className="card overflow-hidden group reveal" style={{ transitionDelay: `${index * 60}ms` }}>
+    <div className="card overflow-hidden group reveal" style={{ animationDelay: `${index * 60}ms` }}>
       {/* Cover */}
       <div className={cn('h-36 bg-gradient-to-br relative overflow-hidden', gradient)}>
         {event.cover_url && (

@@ -202,7 +202,7 @@ export function ProductsPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 reveal" style={{ transitionDelay: '40ms' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 reveal" style={{ animationDelay: '40ms' }}>
         {[
           { label: 'Produtos', value: products.length, icon: Package, color: 'text-text-primary' },
           { label: 'Estoque baixo', value: lowStockCount, icon: AlertTriangle, color: 'text-status-warning' },
@@ -226,7 +226,7 @@ export function ProductsPage() {
       {tab === 'catalog' && (
         <>
           {/* Toolbar */}
-          <div className="flex items-center gap-3 flex-wrap reveal" style={{ transitionDelay: '60ms' }}>
+          <div className="flex items-center gap-3 flex-wrap reveal" style={{ animationDelay: '60ms' }}>
             <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
               <input className="input pl-9 h-9 text-sm" placeholder="Buscar produto ou SKU..."
@@ -289,7 +289,7 @@ export function ProductsPage() {
                 const isOutOfStock = p.stock_quantity === 0
                 return (
                   <div key={p.id} className={cn('card overflow-hidden group reveal transition-all',
-                    !p.is_active && 'opacity-50')} style={{ transitionDelay: `${i * 30}ms` }}>
+                    !p.is_active && 'opacity-50')} style={{ animationDelay: `${i * 30}ms` }}>
                     <div className="h-28 bg-bg-surface flex items-center justify-center relative overflow-hidden">
                       {p.image_url ? (
                         <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />

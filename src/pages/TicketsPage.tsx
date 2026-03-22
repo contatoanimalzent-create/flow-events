@@ -290,7 +290,7 @@ function TicketTypeCard({ type, index, expanded, onToggleExpand, onEdit, onDelet
   return (
     <div className={cn('card overflow-hidden reveal transition-all duration-200',
       !type.is_active && 'opacity-60')}
-      style={{ transitionDelay: `${index * 50}ms` }}>
+      style={{ animationDelay: `${index * 50}ms` }}>
 
       {/* Header */}
       <div className="flex items-center gap-4 p-4">

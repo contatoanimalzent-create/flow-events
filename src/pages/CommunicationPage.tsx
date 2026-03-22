@@ -163,7 +163,7 @@ export function CommunicationPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 reveal" style={{ transitionDelay: '30ms' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 reveal" style={{ animationDelay: '30ms' }}>
         {[
           { label: 'Campanhas', value: campaigns.length, icon: Megaphone, color: 'text-brand-acid' },
           { label: 'Msgs enviadas', value: totalSent.toLocaleString('pt-BR'), icon: Send, color: 'text-brand-blue' },
@@ -184,7 +184,7 @@ export function CommunicationPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-bg-border reveal" style={{ transitionDelay: '40ms' }}>
+      <div className="flex items-center gap-1 border-b border-bg-border reveal" style={{ animationDelay: '40ms' }}>
         {([
           { key: 'campaigns', label: 'Campanhas', icon: Megaphone },
           { key: 'templates', label: 'Templates', icon: FileText },
@@ -251,7 +251,7 @@ export function CommunicationPage() {
                 const Icon = chCfg.icon
                 const openRate = c.sent_count && c.opened_count ? Math.round((c.opened_count / c.sent_count) * 100) : null
                 return (
-                  <div key={c.id} className="card p-4 reveal flex items-center gap-4" style={{ transitionDelay: `${i * 40}ms` }}>
+                  <div key={c.id} className="card p-4 reveal flex items-center gap-4" style={{ animationDelay: `${i * 40}ms` }}>
                     <div className={cn('w-10 h-10 rounded-sm flex items-center justify-center shrink-0', chCfg.bg)}>
                       <Icon className={cn('w-4 h-4', chCfg.color)} />
                     </div>
@@ -306,7 +306,7 @@ export function CommunicationPage() {
               const TypeIcon = typeCfg.icon
               const ChIcon = chCfg.icon
               return (
-                <div key={i} className="card p-5 reveal group" style={{ transitionDelay: `${i * 40}ms` }}>
+                <div key={i} className="card p-5 reveal group" style={{ animationDelay: `${i * 40}ms` }}>
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-sm bg-brand-acid/10 flex items-center justify-center">
@@ -492,7 +492,7 @@ export function CommunicationPage() {
             ].map((auto, i) => {
               const AIcon = auto.icon
               return (
-                <div key={i} className="card p-4 reveal flex items-center gap-4" style={{ transitionDelay: `${i * 40}ms` }}>
+                <div key={i} className="card p-4 reveal flex items-center gap-4" style={{ animationDelay: `${i * 40}ms` }}>
                   <div className={cn('w-10 h-10 rounded-sm flex items-center justify-center shrink-0',
                     auto.active ? 'bg-brand-acid/10' : 'bg-bg-surface')}>
                     <AIcon className={cn('w-4 h-4', auto.active ? 'text-brand-acid' : 'text-text-muted')} />

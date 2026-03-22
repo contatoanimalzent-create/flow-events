@@ -113,7 +113,7 @@ export function SettingsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-bg-border reveal" style={{ transitionDelay: '20ms' }}>
+      <div className="flex items-center gap-1 border-b border-bg-border reveal" style={{ animationDelay: '20ms' }}>
         {([
           { key: 'org', label: 'Organização', icon: Building2 },
           { key: 'whitelabel', label: 'White-label', icon: Palette },

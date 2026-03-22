@@ -320,7 +320,7 @@ export function GrowthPage() {
 
           {/* Insights IA */}
           {visibleInsights.length > 0 && (
-            <div className="space-y-3 reveal" style={{ transitionDelay: '50ms' }}>
+            <div className="space-y-3 reveal" style={{ animationDelay: '50ms' }}>
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4 text-brand-acid" />
                 <h2 className="text-sm font-medium text-text-primary">Insights com IA</h2>
@@ -334,7 +334,7 @@ export function GrowthPage() {
                 return (
                   <div key={insight.id}
                     className={cn('card p-4 border reveal', cfg.border, cfg.bg)}
-                    style={{ transitionDelay: `${i * 60}ms` }}>
+                    style={{ animationDelay: `${i * 60}ms` }}>
                     <div className="flex items-start gap-3">
                       <InsightIcon className={cn('w-4 h-4 shrink-0 mt-0.5', cfg.color)} />
                       <div className="flex-1 min-w-0">
@@ -371,7 +371,7 @@ export function GrowthPage() {
 
           {/* Charts */}
           {chartData.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 reveal" style={{ transitionDelay: '80ms' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 reveal" style={{ animationDelay: '80ms' }}>
               <div className="card p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-medium text-text-primary">Conversão & Comparecimento por Evento</h3>
@@ -433,7 +433,7 @@ export function GrowthPage() {
           )}
 
           {/* Benchmark cards */}
-          <div className="reveal" style={{ transitionDelay: '100ms' }}>
+          <div className="reveal" style={{ animationDelay: '100ms' }}>
             <h3 className="text-sm font-medium text-text-primary mb-3 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-brand-acid" />
               Benchmarks do mercado de eventos
@@ -491,7 +491,7 @@ export function GrowthPage() {
           </div>
 
           {/* Competitive advantages */}
-          <div className="card p-5 border-brand-acid/15 reveal" style={{ transitionDelay: '120ms' }}>
+          <div className="card p-5 border-brand-acid/15 reveal" style={{ animationDelay: '120ms' }}>
             <div className="flex items-center gap-2 mb-4">
               <Star className="w-4 h-4 text-brand-acid" />
               <h3 className="text-sm font-medium text-text-primary">Diferenciais que você já tem</h3>

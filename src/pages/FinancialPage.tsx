@@ -230,7 +230,7 @@ export function FinancialPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-bg-border reveal" style={{ transitionDelay: '20ms' }}>
+      <div className="flex items-center gap-1 border-b border-bg-border reveal" style={{ animationDelay: '20ms' }}>
         {([
           { key: 'overview', label: 'Visão Geral', icon: BarChart3 },
           { key: 'costs', label: 'Lançamentos', icon: Receipt },
@@ -304,7 +304,7 @@ export function FinancialPage() {
 
               {/* Chart */}
               {monthlyData.length > 0 && (
-                <div className="card p-5 reveal" style={{ transitionDelay: '60ms' }}>
+                <div className="card p-5 reveal" style={{ animationDelay: '60ms' }}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-medium text-text-primary">Resultado por Evento</h3>
                     <div className="flex items-center gap-3 text-[10px] font-mono text-text-muted">
@@ -330,7 +330,7 @@ export function FinancialPage() {
 
               {/* Revenue by source */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="card p-5 reveal" style={{ transitionDelay: '80ms' }}>
+                <div className="card p-5 reveal" style={{ animationDelay: '80ms' }}>
                   <h3 className="text-sm font-medium text-text-primary mb-4">Receita por Fonte</h3>
                   <div className="space-y-3">
                     {revenueBySource.map((r, i) => {
@@ -352,7 +352,7 @@ export function FinancialPage() {
                   </div>
                 </div>
 
-                <div className="card p-5 reveal" style={{ transitionDelay: '100ms' }}>
+                <div className="card p-5 reveal" style={{ animationDelay: '100ms' }}>
                   <h3 className="text-sm font-medium text-text-primary mb-4">Custos por Categoria</h3>
                   {costByCategory.length === 0 ? (
                     <p className="text-xs text-text-muted text-center py-8">Nenhum custo lançado ainda</p>
@@ -519,7 +519,7 @@ export function FinancialPage() {
                   const isProfit = ev.result >= 0
                   const margin = ev.totalRevenue > 0 ? Math.round((ev.result / ev.totalRevenue) * 100) : 0
                   return (
-                    <div key={ev.id} className="card overflow-hidden reveal" style={{ transitionDelay: `${i * 40}ms` }}>
+                    <div key={ev.id} className="card overflow-hidden reveal" style={{ animationDelay: `${i * 40}ms` }}>
                       {/* Event header */}
                       <button
                         onClick={() => setExpandedEvent(isExpanded ? null : ev.id)}

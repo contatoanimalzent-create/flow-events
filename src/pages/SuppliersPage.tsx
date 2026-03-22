@@ -168,7 +168,7 @@ export function SuppliersPage() {
       </div>
 
       {/* Event filter */}
-      <div className="flex items-center gap-3 flex-wrap reveal" style={{ transitionDelay: '30ms' }}>
+      <div className="flex items-center gap-3 flex-wrap reveal" style={{ animationDelay: '30ms' }}>
         <span className="text-xs text-text-muted font-mono">EVENTO:</span>
         <button onClick={() => setSelectedEventId('all')}
           className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all',
@@ -185,7 +185,7 @@ export function SuppliersPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 reveal" style={{ transitionDelay: '50ms' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 reveal" style={{ animationDelay: '50ms' }}>
         {[
           { label: 'Total', value: suppliers.length, icon: Building2, color: 'text-text-primary' },
           { label: 'Contratados', value: totalContracted, icon: FileText, color: 'text-brand-blue' },
@@ -214,7 +214,7 @@ export function SuppliersPage() {
       )}
 
       {/* Toolbar */}
-      <div className="flex items-center gap-3 flex-wrap reveal" style={{ transitionDelay: '80ms' }}>
+      <div className="flex items-center gap-3 flex-wrap reveal" style={{ animationDelay: '80ms' }}>
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
           <input className="input pl-9 h-9 text-sm" placeholder="Buscar por empresa, contato ou serviço..."

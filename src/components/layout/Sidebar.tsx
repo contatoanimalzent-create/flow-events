@@ -16,22 +16,55 @@ interface SidebarProps {
   onToggle: () => void
 }
 
-const navItems: { id: NavSection; label: string; icon: React.ElementType }[] = [
-  { id: 'dashboard',     label: 'Dashboard',       icon: LayoutDashboard },
-  { id: 'events',        label: 'Eventos',          icon: CalendarDays },
-  { id: 'tickets',       label: 'Ingressos',        icon: Ticket },
-  { id: 'sales',         label: 'Vendas',           icon: TrendingUp },
-  { id: 'checkin',       label: 'Check-in',         icon: ScanLine },
-  { id: 'credentialing', label: 'Credenciamento',   icon: UserCheck },
-  { id: 'staff',         label: 'Staff',            icon: Users },
-  { id: 'suppliers',     label: 'Fornecedores',     icon: Truck },
-  { id: 'products',      label: 'Produtos & PDV',   icon: ShoppingBag },
-  { id: 'inventory',     label: 'Estoque',          icon: Package },
-  { id: 'communication', label: 'Comunicação',      icon: MessageSquare },
-  { id: 'financial',     label: 'Financeiro',       icon: DollarSign },
-  { id: 'growth',        label: 'Growth',           icon: Zap },
-  { id: 'help',          label: 'Ajuda',            icon: HelpCircle },
-  { id: 'settings',      label: 'Configurações',    icon: Settings },
+interface NavItem { id: NavSection; label: string; icon: React.ElementType }
+interface NavGroup { label: string; items: NavItem[] }
+
+const navGroups: NavGroup[] = [
+  {
+    label: 'Visão Geral',
+    items: [
+      { id: 'dashboard', label: 'Dashboard',    icon: LayoutDashboard },
+      { id: 'events',    label: 'Eventos',       icon: CalendarDays },
+    ],
+  },
+  {
+    label: 'Vendas & Ingressos',
+    items: [
+      { id: 'tickets', label: 'Ingressos',  icon: Ticket },
+      { id: 'sales',   label: 'Vendas',     icon: TrendingUp },
+    ],
+  },
+  {
+    label: 'Operações',
+    items: [
+      { id: 'checkin',       label: 'Check-in',       icon: ScanLine },
+      { id: 'credentialing', label: 'Credenciamento', icon: UserCheck },
+      { id: 'staff',         label: 'Staff',          icon: Users },
+      { id: 'suppliers',     label: 'Fornecedores',   icon: Truck },
+    ],
+  },
+  {
+    label: 'Loja & Estoque',
+    items: [
+      { id: 'products',  label: 'Produtos & PDV', icon: ShoppingBag },
+      { id: 'inventory', label: 'Estoque',         icon: Package },
+    ],
+  },
+  {
+    label: 'Crescimento',
+    items: [
+      { id: 'communication', label: 'Comunicação', icon: MessageSquare },
+      { id: 'financial',     label: 'Financeiro',  icon: DollarSign },
+      { id: 'growth',        label: 'Growth AI',   icon: Zap },
+    ],
+  },
+  {
+    label: 'Sistema',
+    items: [
+      { id: 'settings', label: 'Configurações', icon: Settings },
+      { id: 'help',     label: 'Ajuda',          icon: HelpCircle },
+    ],
+  },
 ]
 
 export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: SidebarProps) {
@@ -42,43 +75,72 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
       {/* Logo */}
       <div className={cn('flex items-center border-b border-bg-border shrink-0', isOpen ? 'px-5 py-4 gap-3' : 'px-4 py-4 justify-center')}>
         <div className="w-7 h-7 rounded-sm bg-brand-acid flex items-center justify-center shrink-0">
-          <span className="font-display text-bg-primary leading-none" style={{ fontSize: 13 }}>A</span>
+          <span className="font-display text-bg-primary leading-none" style={{ fontSize: 13 }}>F</span>
         </div>
         {isOpen && (
           <div className="animate-fade-in min-w-0">
             <div className="font-display text-xl leading-none text-text-primary tracking-wide">
-              ANIMALZ<span className="text-brand-acid">.</span>
+              FLOW<span className="text-brand-acid">.</span>EVENTS
             </div>
             <div className="text-[10px] text-text-muted truncate mt-0.5 font-mono tracking-widest uppercase">
-              {organization?.name ?? 'Events'}
+              {organization?.name ?? 'Plataforma'}
             </div>
           </div>
         )}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = activeSection === item.id
-          return (
-            <button
-              key={item.id}
-              onClick={() => onNavigate(item.id)}
-              className={cn(
-                'w-full flex items-center rounded-sm transition-all duration-150',
-                isOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5',
-                isActive
-                  ? 'bg-brand-acid/10 text-brand-acid'
-                  : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
-              )}
-              title={!isOpen ? item.label : undefined}
-            >
-              <Icon className={cn('shrink-0', isOpen ? 'w-4 h-4' : 'w-5 h-5')} />
-              {isOpen && <span className="text-sm font-medium truncate animate-fade-in flex-1 text-left">{item.label}</span>}
-            </button>
-          )
-        })}
+      <nav className="flex-1 overflow-y-auto py-3 px-2">
+        {isOpen ? (
+          navGroups.map((group) => (
+            <div key={group.label} className="mb-3">
+              <div className="px-3 mb-1 text-[9px] font-mono tracking-[0.15em] uppercase text-text-muted/50 select-none">
+                {group.label}
+              </div>
+              {group.items.map((item) => {
+                const Icon = item.icon
+                const isActive = activeSection === item.id
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onNavigate(item.id)}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all duration-150 mb-0.5',
+                      isActive
+                        ? 'bg-brand-acid/10 text-brand-acid'
+                        : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
+                    )}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span className="text-sm font-medium truncate flex-1 text-left">{item.label}</span>
+                    {isActive && <span className="w-1 h-1 rounded-full bg-brand-acid shrink-0" />}
+                  </button>
+                )
+              })}
+            </div>
+          ))
+        ) : (
+          // Collapsed: all icons flat
+          navGroups.flatMap(g => g.items).map((item) => {
+            const Icon = item.icon
+            const isActive = activeSection === item.id
+            return (
+              <button
+                key={item.id}
+                onClick={() => onNavigate(item.id)}
+                title={item.label}
+                className={cn(
+                  'w-full flex justify-center p-2.5 rounded-sm transition-all duration-150 mb-0.5',
+                  isActive
+                    ? 'bg-brand-acid/10 text-brand-acid'
+                    : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
+                )}
+              >
+                <Icon className="w-5 h-5" />
+              </button>
+            )
+          })
+        )}
       </nav>
 
       {/* Profile */}
@@ -92,7 +154,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-sm font-medium text-text-primary truncate">{profile?.first_name} {profile?.last_name}</div>
-              <div className="text-xs text-text-muted truncate capitalize">{profile?.role?.replace('_', ' ')}</div>
+              <div className="text-xs text-text-muted truncate capitalize">{profile?.role?.replace(/_/g, ' ')}</div>
             </div>
           </div>
         ) : (

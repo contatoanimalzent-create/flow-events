@@ -1,2 +1,2 @@
 export { cn } from './cn'
-export { formatDate, formatNumber, slugify } from './legacy-formatters'
+export { formatCurrency, formatDate, formatNumber, slugify } from './legacy-formatters'

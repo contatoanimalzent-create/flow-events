@@ -1,1 +1,1 @@
-export {}
+export { Surface } from './Surface'

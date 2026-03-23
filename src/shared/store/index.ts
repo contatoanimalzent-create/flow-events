@@ -1,1 +1,1 @@
-export {}
+export { useUIStore } from './ui.store'

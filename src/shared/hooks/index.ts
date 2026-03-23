@@ -1,1 +1,1 @@
-export {}
+export { useAppReady } from './useAppReady'

@@ -12,6 +12,7 @@ export function EventsPageContent() {
     events,
     filteredEvents,
     loading,
+    error,
     search,
     setSearch,
     filter,
@@ -29,10 +30,7 @@ export function EventsPageContent() {
     closeMenu,
     toggleMenu,
   } = useEventsList(organization?.id)
-  const { publishEvent, deleteEvent, duplicateEvent } = useEventActions({
-    organizationId: organization?.id,
-    onChanged: refreshEvents,
-  })
+  const { publishEvent, deleteEvent, duplicateEvent } = useEventActions({ organizationId: organization?.id })
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5 p-6" onClick={closeMenu}>
@@ -120,7 +118,18 @@ export function EventsPageContent() {
         </div>
       )}
 
-      {!loading && filteredEvents.length === 0 && (
+      {!loading && error && (
+        <div className="card flex flex-col items-center justify-center p-16 text-center">
+          <CalendarDays className="mb-3 h-10 w-10 text-status-error" />
+          <div className="mb-1 font-display text-2xl text-text-primary">ERRO AO CARREGAR EVENTOS</div>
+          <p className="mb-5 max-w-md text-sm text-text-muted">{error}</p>
+          <button onClick={() => void refreshEvents()} className="btn-primary">
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && filteredEvents.length === 0 && (
         <div className="card flex flex-col items-center justify-center p-16 text-center">
           <CalendarDays className="mb-3 h-10 w-10 text-text-muted" />
           <div className="mb-1 font-display text-2xl text-text-primary">
@@ -137,7 +146,7 @@ export function EventsPageContent() {
         </div>
       )}
 
-      {!loading && filteredEvents.length > 0 && view === 'grid' && (
+      {!loading && !error && filteredEvents.length > 0 && view === 'grid' && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredEvents.map((event, index) => (
             <EventCard
@@ -167,7 +176,7 @@ export function EventsPageContent() {
         </div>
       )}
 
-      {!loading && filteredEvents.length > 0 && view === 'list' && (
+      {!loading && !error && filteredEvents.length > 0 && view === 'list' && (
         <div className="card reveal overflow-hidden">
           <table className="w-full">
             <thead className="border-b border-bg-border">
@@ -247,10 +256,7 @@ export function EventsPageContent() {
           eventId={editingId}
           organizationId={organization.id}
           onClose={closeForm}
-          onSaved={() => {
-            void refreshEvents()
-            closeForm()
-          }}
+          onSaved={closeForm}
         />
       )}
     </div>

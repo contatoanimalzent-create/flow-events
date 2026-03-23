@@ -1,1 +1,1 @@
-export {}
+export { eventsService } from './events.service'

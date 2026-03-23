@@ -1,1 +1,1 @@
-export {}
+export { EventFormModal } from './EventFormModal'

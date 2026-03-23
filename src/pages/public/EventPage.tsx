@@ -113,25 +113,36 @@ export function EventPage({ slug }: { slug: string }) {
   }, [slug])
 
   async function fetchEvent() {
-    const { data: ev } = await supabase
-      .from('events').select('*').eq('slug', slug).single()
-    if (!ev) { setLoading(false); return }
-    setEvent(ev)
+    try {
+      const { data: ev, error } = await supabase
+        .from('events').select('*').eq('slug', slug).single()
+      
+      if (error || !ev) {
+        console.error('Event not found:', { slug, error })
+        setLoading(false)
+        return
+      }
 
-    const { data: types } = await supabase
-      .from('ticket_types').select('*')
-      .eq('event_id', ev.id).eq('is_active', true).order('position')
-    const { data: batches } = await supabase
-      .from('ticket_batches').select('*')
-      .eq('event_id', ev.id).order('position')
+      setEvent(ev)
 
-    const merged = (types ?? []).map(t => ({
-      ...t,
-      batches: (batches ?? []).filter(b => b.ticket_type_id === t.id),
-    }))
-    setTicketTypes(merged)
-    setLoading(false)
-    trackEvent('ViewContent', { event_id: ev.id, event_name: ev.name })
+      const { data: types } = await supabase
+        .from('ticket_types').select('*')
+        .eq('event_id', ev.id).eq('is_active', true).order('position')
+      const { data: batches } = await supabase
+        .from('ticket_batches').select('*')
+        .eq('event_id', ev.id).order('position')
+
+      const merged = (types ?? []).map(t => ({
+        ...t,
+        batches: (batches ?? []).filter(b => b.ticket_type_id === t.id),
+      }))
+      setTicketTypes(merged)
+      setLoading(false)
+      trackEvent('ViewContent', { event_id: ev.id, event_name: ev.name })
+    } catch (err) {
+      console.error('Fatal error fetching event:', err)
+      setLoading(false)
+    }
   }
 
   function addToCart(type: TicketType, batch: Batch) {

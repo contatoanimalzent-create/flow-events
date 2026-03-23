@@ -4,10 +4,10 @@ import {
   Zap, HelpCircle, Settings, ChevronLeft, ChevronRight,
   TrendingUp,
 } from 'lucide-react'
+import type { NavSection } from '@/app/layout'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store/auth'
 import { getInitials } from '@/lib/utils'
-import type { NavSection } from './AppShell'
 
 interface SidebarProps {
   activeSection: NavSection

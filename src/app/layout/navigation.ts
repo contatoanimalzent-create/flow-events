@@ -1,0 +1,17 @@
+export type NavSection =
+  | 'dashboard'
+  | 'events'
+  | 'tickets'
+  | 'sales'
+  | 'checkin'
+  | 'staff'
+  | 'suppliers'
+  | 'products'
+  | 'inventory'
+  | 'communication'
+  | 'financial'
+  | 'growth'
+  | 'help'
+  | 'settings'
+
+export const defaultNavSection: NavSection = 'dashboard'

@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { Menu, Bell, Search, LogOut, X } from 'lucide-react'
+import type { NavSection } from '@/app/layout'
 import { useAuthStore } from '@/lib/store/auth'
-import type { NavSection } from './AppShell'
 
 const sectionTitles: Record<NavSection, string> = {
   dashboard:     'Dashboard',

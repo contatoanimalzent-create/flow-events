@@ -1,5 +1,6 @@
 export { assertCheckinResult, CheckinServiceError } from './checkin.errors'
 export {
+  buildGateCommandCenterSnapshot,
   buildCheckinStats,
   mapCheckinEventScope,
   mapCheckinGateRow,

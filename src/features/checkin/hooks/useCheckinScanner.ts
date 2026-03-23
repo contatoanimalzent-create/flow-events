@@ -36,6 +36,7 @@ export function useCheckinScanner({ eventId, gateId, operatorId, deviceId }: Use
         queryClient.invalidateQueries({ queryKey: checkinKeys.recent(eventId, null) }),
         queryClient.invalidateQueries({ queryKey: checkinKeys.recent(eventId, normalizedGateId) }),
         queryClient.invalidateQueries({ queryKey: checkinKeys.stats(eventId) }),
+        queryClient.invalidateQueries({ queryKey: checkinKeys.commandCenter(eventId) }),
       ])
 
       if (result.digital_ticket?.id) {

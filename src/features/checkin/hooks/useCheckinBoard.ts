@@ -50,6 +50,13 @@ export function useCheckinBoard(organizationId?: string) {
     enabled: Boolean(selectedEventId),
   })
 
+  const commandCenterQuery = useQuery({
+    ...(selectedEventId
+      ? checkinQueries.commandCenter(selectedEventId)
+      : { queryKey: checkinKeys.commandCenter('empty'), queryFn: async () => ({ gateSummaries: [], alerts: [] }) }),
+    enabled: Boolean(selectedEventId),
+  })
+
   const filteredCheckins = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
 
@@ -74,7 +81,7 @@ export function useCheckinBoard(organizationId?: string) {
   const occupancyPct = event?.total_capacity ? Math.round(((statsQuery.data?.currentOccupancy ?? 0) / event.total_capacity) * 100) : 0
 
   async function refreshBoard() {
-    await Promise.all([recentCheckinsQuery.refetch(), statsQuery.refetch(), gatesQuery.refetch()])
+    await Promise.all([recentCheckinsQuery.refetch(), statsQuery.refetch(), gatesQuery.refetch(), commandCenterQuery.refetch()])
   }
 
   return {
@@ -90,6 +97,7 @@ export function useCheckinBoard(organizationId?: string) {
     setScanMode,
     filteredCheckins,
     stats: statsQuery.data ?? EMPTY_STATS,
+    commandCenter: commandCenterQuery.data ?? { gateSummaries: [], alerts: [] },
     loading: eventsQuery.isPending || recentCheckinsQuery.isPending,
     event,
     occupancyPct,

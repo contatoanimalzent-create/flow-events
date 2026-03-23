@@ -1,4 +1,5 @@
 export { CheckinPageContent } from './CheckinPageContent'
 export { CheckinScannerPanel } from './CheckinScannerPanel'
 export { CheckinStatsGrid } from './CheckinStatsGrid'
+export { CommandCenterOverview } from './CommandCenterOverview'
 export { RecentCheckinsTable } from './RecentCheckinsTable'

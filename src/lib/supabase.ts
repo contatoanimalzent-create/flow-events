@@ -24,7 +24,9 @@ export type Database = {
       orders: { Row: Order; Insert: Partial<Order>; Update: Partial<Order> }
       digital_tickets: { Row: DigitalTicket; Insert: Partial<DigitalTicket>; Update: Partial<DigitalTicket> }
       checkins: { Row: Checkin; Insert: Partial<Checkin>; Update: Partial<Checkin> }
+      gates: { Row: Gate; Insert: Partial<Gate>; Update: Partial<Gate> }
       staff_members: { Row: StaffMember; Insert: Partial<StaffMember>; Update: Partial<StaffMember> }
+      time_entries: { Row: TimeEntry; Insert: Partial<TimeEntry>; Update: Partial<TimeEntry> }
       suppliers: { Row: Supplier; Insert: Partial<Supplier>; Update: Partial<Supplier> }
       products: { Row: Product; Insert: Partial<Product>; Update: Partial<Product> }
       cost_entries: { Row: CostEntry; Insert: Partial<CostEntry>; Update: Partial<CostEntry> }
@@ -152,19 +154,63 @@ export interface Checkin {
   is_exit: boolean
 }
 
+export interface Gate {
+  id: string
+  event_id: string
+  name: string
+  is_entrance: boolean
+  is_exit: boolean
+  is_active: boolean
+  device_count: number
+  gate_type?: string
+  throughput_per_hour?: number
+  operational_status?: string
+  supervisor_staff_id?: string | null
+  notes?: string | null
+}
+
 export interface StaffMember {
   id: string
   organization_id: string
-  event_id?: string
+  event_id?: string | null
   first_name: string
-  last_name?: string
-  email?: string
-  phone?: string
-  role_title?: string
-  area?: string
+  last_name?: string | null
+  email?: string | null
+  phone?: string | null
+  cpf?: string | null
+  role_title?: string | null
+  department?: string | null
+  area?: string | null
+  company?: string | null
+  gate_id?: string | null
+  permissions?: string[] | Record<string, unknown> | null
+  shift_label?: string | null
+  shift_starts_at?: string | null
+  shift_ends_at?: string | null
+  linked_device_id?: string | null
+  daily_rate?: number | null
+  credential_issued_at?: string | null
+  checked_in_at?: string | null
+  checked_out_at?: string | null
+  notes?: string | null
+  is_active?: boolean
   status: string
-  qr_token?: string
+  qr_token?: string | null
   created_at: string
+}
+
+export interface TimeEntry {
+  id: string
+  staff_id: string
+  event_id?: string | null
+  gate_id?: string | null
+  type: string
+  recorded_at: string
+  method?: string | null
+  is_valid?: boolean
+  device_id?: string | null
+  notes?: string | null
+  metadata?: Record<string, unknown>
 }
 
 export interface Supplier {

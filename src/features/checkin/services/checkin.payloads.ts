@@ -1,7 +1,10 @@
 import type {
+  CommandCenterAlert,
+  CommandCenterSnapshot,
   CheckinEventScope,
   CheckinGateRow,
   CheckinHistoryRow,
+  GateCommandCenterSummary,
   CheckinLogResult,
   CheckinReasonCode,
   CheckinStats,
@@ -39,6 +42,11 @@ export function mapCheckinGateRow(row: Record<string, unknown>): CheckinGateRow 
     is_exit: Boolean(row.is_exit),
     is_active: Boolean(row.is_active),
     device_count: Number(row.device_count ?? 0),
+    gate_type: ((row.gate_type as CheckinGateRow['gate_type'] | undefined) ?? 'mixed'),
+    throughput_per_hour: Number(row.throughput_per_hour ?? 0),
+    operational_status: ((row.operational_status as CheckinGateRow['operational_status'] | undefined) ?? 'ready'),
+    supervisor_staff_id: (row.supervisor_staff_id as string | null | undefined) ?? null,
+    notes: (row.notes as string | null | undefined) ?? null,
   }
 }
 
@@ -126,5 +134,90 @@ export function mapSubmissionResult(raw: Record<string, unknown>): CheckinSubmis
     ...mapValidationResult(raw),
     checkin_id: (raw.checkin_id as string | null | undefined) ?? null,
     checked_in_at: (raw.checked_in_at as string | null | undefined) ?? null,
+  }
+}
+
+export function buildGateCommandCenterSnapshot(params: {
+  gates: CheckinGateRow[]
+  checkins: CheckinHistoryRow[]
+  staff: Array<Record<string, unknown>>
+}): CommandCenterSnapshot {
+  const { gates, checkins, staff } = params
+  const fifteenMinutesAgo = Date.now() - 15 * 60_000
+  const oneHourAgo = Date.now() - 60 * 60_000
+
+  const gateSummaries: GateCommandCenterSummary[] = gates.map((gate) => {
+    const gateStaff = staff.filter((member) => (member.gate_id as string | null | undefined) === gate.id)
+    const recentGateCheckins = checkins.filter((checkin) => checkin.gate_id === gate.id)
+    const lastHourCheckins = recentGateCheckins.filter((checkin) => new Date(checkin.checked_in_at).getTime() >= oneHourAgo)
+    const lastFifteenMinutes = recentGateCheckins.filter((checkin) => new Date(checkin.checked_in_at).getTime() >= fifteenMinutesAgo)
+    const recentSuccessCount = lastHourCheckins.filter((checkin) => checkin.result === 'success' && !checkin.is_exit).length
+    const recentInvalidAttempts = lastFifteenMinutes.filter((checkin) => checkin.result !== 'success').length
+    const activeStaffCount = gateStaff.filter((member) => String(member.status ?? '') === 'active').length
+    const lastActivityAt = recentGateCheckins[0]?.checked_in_at ?? null
+
+    const alertLevel: GateCommandCenterSummary['alert_level'] =
+      !gate.is_active || gate.operational_status === 'offline'
+        ? 'critical'
+        : recentInvalidAttempts >= 3 || activeStaffCount === 0
+          ? 'warning'
+          : 'normal'
+
+    return {
+      gate,
+      assigned_staff_count: gateStaff.length,
+      active_staff_count: activeStaffCount,
+      recent_success_count: recentSuccessCount,
+      recent_invalid_attempts: recentInvalidAttempts,
+      last_activity_at: lastActivityAt,
+      alert_level: alertLevel,
+      assigned_staff: gateStaff.map((member) => ({
+        id: String(member.id),
+        name: `${String(member.first_name ?? '')} ${String(member.last_name ?? '')}`.trim(),
+        role_title: (member.role_title as string | null | undefined) ?? null,
+        status: String(member.status ?? 'invited'),
+      })),
+    }
+  })
+
+  const alerts: CommandCenterAlert[] = gateSummaries.flatMap((summary) => {
+    const result: CommandCenterAlert[] = []
+
+    if (!summary.gate.is_active || summary.gate.operational_status === 'offline') {
+      result.push({
+        id: `gate-offline-${summary.gate.id}`,
+        severity: 'critical',
+        title: `Portaria ${summary.gate.name} indisponivel`,
+        description: 'A portaria esta inativa ou offline e precisa de atencao imediata.',
+        gate_id: summary.gate.id,
+      })
+    }
+
+    if (summary.active_staff_count === 0) {
+      result.push({
+        id: `gate-staff-${summary.gate.id}`,
+        severity: 'warning',
+        title: `Sem operador em ${summary.gate.name}`,
+        description: 'Nao ha membro de equipe em campo vinculado a esta portaria.',
+        gate_id: summary.gate.id,
+      })
+    }
+
+    if (summary.recent_invalid_attempts >= 3) {
+      result.push({
+        id: `gate-invalid-${summary.gate.id}`,
+        severity: 'warning',
+        title: `Tentativas invalidas em ${summary.gate.name}`,
+        description: `${summary.recent_invalid_attempts} tentativas invalidas nos ultimos 15 minutos.`,
+        gate_id: summary.gate.id,
+      })
+    }
+
+    return result
+  })
+
+  return {
+    gateSummaries,
+    alerts,
   }
 }

@@ -5,6 +5,7 @@ import { CheckinHistoryModal } from '@/features/checkin/modals'
 import { cn, formatNumber } from '@/shared/lib'
 import { CheckinScannerPanel } from './CheckinScannerPanel'
 import { CheckinStatsGrid } from './CheckinStatsGrid'
+import { CommandCenterOverview } from './CommandCenterOverview'
 import { RecentCheckinsTable } from './RecentCheckinsTable'
 
 export function CheckinPageContent() {
@@ -23,6 +24,7 @@ export function CheckinPageContent() {
     setScanMode,
     filteredCheckins,
     stats,
+    commandCenter,
     loading,
     event,
     occupancyPct,
@@ -126,6 +128,8 @@ export function CheckinPageContent() {
           </div>
         </div>
       </div>
+
+      <CommandCenterOverview snapshot={commandCenter} />
 
       {scanMode && (
         <CheckinScannerPanel

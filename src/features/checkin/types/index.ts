@@ -1,8 +1,13 @@
 export { CHECKIN_LOG_RESULT_LABELS, CHECKIN_REASON_LABELS, CHECKIN_RESULT_LABELS } from './checkin.constants'
 export type {
+  CommandCenterAlert,
+  CommandCenterSnapshot,
   CheckinEventScope,
   CheckinGateRow,
   CheckinHistoryRow,
+  GateCommandCenterSummary,
+  GateOperationalStatus,
+  GateType,
   CheckinLogResult,
   CheckinReasonCode,
   CheckinStats,

@@ -1,4 +1,4 @@
 # STAFF
 
 Responsavel pela estrutura de equipe operacional.
-Inclui papeis, alocacao, escalas, credenciais e contexto de execucao em campo.
+Inclui papeis, alocacao por portaria, credenciais, presenca de turno e contexto de execucao em campo.

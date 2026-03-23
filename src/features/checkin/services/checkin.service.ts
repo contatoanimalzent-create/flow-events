@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import type { Checkin as CheckinRecord } from '@/lib/supabase'
 import type {
+  CommandCenterSnapshot,
   CheckinEventScope,
   CheckinGateRow,
   CheckinHistoryRow,
@@ -15,6 +16,7 @@ import type {
 } from '@/features/checkin/types'
 import { assertCheckinResult, CheckinServiceError } from './checkin.errors'
 import {
+  buildGateCommandCenterSnapshot,
   buildCheckinStats,
   mapCheckinEventScope,
   mapCheckinGateRow,
@@ -294,9 +296,37 @@ export const checkinService = {
   },
 
   async listGatesByEvent(eventId: string): Promise<CheckinGateRow[]> {
-    const result = await supabase.from('gates').select('*').eq('event_id', eventId).eq('is_active', true).order('name')
+    const result = await supabase.from('gates').select('*').eq('event_id', eventId).order('name')
     assertCheckinResult(result)
     return ((result.data as Array<Record<string, unknown>> | null) ?? []).map(mapCheckinGateRow)
+  },
+
+  async getCommandCenterSnapshot(eventId: string): Promise<CommandCenterSnapshot> {
+    const [gates, checkinsResult, staffResult] = await Promise.all([
+      this.listGatesByEvent(eventId),
+      supabase
+        .from('checkins')
+        .select(
+          'id,event_id,digital_ticket_id,result,reason_code,checked_in_at,is_exit,was_offline,gate_id,operator_id,device_id,digital_ticket:digital_tickets(ticket_number,holder_name,holder_email,is_vip,ticket_type:ticket_types(name)),gate:gates(name)',
+        )
+        .eq('event_id', eventId)
+        .order('checked_in_at', { ascending: false })
+        .limit(500),
+      supabase
+        .from('staff_members')
+        .select('id,first_name,last_name,role_title,status,gate_id')
+        .eq('event_id', eventId)
+        .eq('is_active', true),
+    ])
+
+    assertCheckinResult(checkinsResult)
+    assertCheckinResult(staffResult)
+
+    return buildGateCommandCenterSnapshot({
+      gates,
+      checkins: ((checkinsResult.data as Array<Record<string, unknown>> | null) ?? []).map(mapCheckinHistoryRow),
+      staff: (staffResult.data as Array<Record<string, unknown>> | null) ?? [],
+    })
   },
 
   async listRecentCheckinsByEvent(eventId: string, gateId?: string | null, limit = 100): Promise<CheckinHistoryRow[]> {

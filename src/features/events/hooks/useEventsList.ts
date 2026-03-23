@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { formatNumber } from '@/lib/utils'
-import { eventsService } from '@/features/events/services'
-import type { EventListFilter, EventRow, EventStatus, EventViewMode } from '@/features/events/types'
+import { eventsQueries } from '@/features/events/services'
+import type { EventListFilter, EventRow, EventViewMode } from '@/features/events/types'
+import { formatNumber } from '@/shared/lib'
 
 export function useEventsList(organizationId?: string) {
   const [events, setEvents] = useState<EventRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<EventListFilter>('all')
   const [view, setView] = useState<EventViewMode>('grid')
@@ -17,13 +18,23 @@ export function useEventsList(organizationId?: string) {
     if (!organizationId) {
       setEvents([])
       setLoading(false)
+      setError('')
       return
     }
 
     setLoading(true)
-    const data = await eventsService.listEvents(organizationId)
-    setEvents(data)
-    setLoading(false)
+    setError('')
+
+    try {
+      const data = await eventsQueries.list(organizationId).queryFn()
+      setEvents(data)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao carregar eventos'
+      setError(message)
+      setEvents([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -75,6 +86,7 @@ export function useEventsList(organizationId?: string) {
     events,
     filteredEvents,
     loading,
+    error,
     search,
     setSearch,
     filter,

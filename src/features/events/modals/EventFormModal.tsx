@@ -1,8 +1,8 @@
 import { useRef } from 'react'
 import { AlertCircle, Check, ChevronRight, ImageIcon, Loader2, Upload, Video, X } from 'lucide-react'
-import { cn, formatDate, formatNumber } from '@/lib/utils'
 import { useEventForm } from '@/features/events/hooks'
 import { EVENT_AGE_RATINGS, EVENT_CATEGORIES, getUnsplashImages } from '@/features/events/types'
+import { cn, formatDate, formatNumber } from '@/shared/lib'
 
 interface EventFormModalProps {
   eventId: string | null
@@ -77,7 +77,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                   />
                 </div>
                 <div>
-                  <label className="input-label">SubtÃ­tulo</label>
+                  <label className="input-label">Subt\u00edtulo</label>
                   <input
                     className="input"
                     placeholder="Uma frase que descreve o evento"
@@ -98,7 +98,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                     </select>
                   </div>
                   <div>
-                    <label className="input-label">ClassificaÃ§Ã£o etÃ¡ria</label>
+                    <label className="input-label">Classifica\u00e7\u00e3o et\u00e1ria</label>
                     <select className="input" value={form.age_rating} onChange={(event) => setField('age_rating', event.target.value)}>
                       {EVENT_AGE_RATINGS.map((rating) => (
                         <option key={rating} value={rating}>
@@ -109,7 +109,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                   </div>
                 </div>
                 <div>
-                  <label className="input-label">DescriÃ§Ã£o curta</label>
+                  <label className="input-label">Descri\u00e7\u00e3o curta</label>
                   <textarea
                     className="input resize-none"
                     rows={3}
@@ -125,7 +125,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="input-label">InÃ­cio *</label>
+                    <label className="input-label">In\u00edcio *</label>
                     <input
                       type="datetime-local"
                       className="input"
@@ -134,7 +134,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                     />
                   </div>
                   <div>
-                    <label className="input-label">TÃ©rmino</label>
+                    <label className="input-label">T\u00e9rmino</label>
                     <input
                       type="datetime-local"
                       className="input"
@@ -193,10 +193,10 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                       />
                     </div>
                     <div>
-                      <label className="input-label">EndereÃ§o</label>
+                      <label className="input-label">Endere\u00e7o</label>
                       <input
                         className="input"
-                        placeholder="Rua, nÃºmero"
+                        placeholder="Rua, n\u00famero"
                         value={form.venue_street}
                         onChange={(event) => setField('venue_street', event.target.value)}
                       />
@@ -206,7 +206,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                         <label className="input-label">Cidade</label>
                         <input
                           className="input"
-                          placeholder="SÃ£o Paulo"
+                          placeholder="S\u00e3o Paulo"
                           value={form.venue_city}
                           onChange={(event) => setField('venue_city', event.target.value)}
                         />
@@ -252,22 +252,22 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                   <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between">
                       <span className="text-text-muted">Nome</span>
-                      <span className="font-medium text-text-primary">{form.name || 'â€”'}</span>
+                      <span className="font-medium text-text-primary">{form.name || '\u2014'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-text-muted">InÃ­cio</span>
+                      <span className="text-text-muted">In\u00edcio</span>
                       <span className="font-mono text-xs text-text-primary">
-                        {form.starts_at ? formatDate(form.starts_at, 'dd/MM/yyyy HH:mm') : 'â€”'}
+                        {form.starts_at ? formatDate(form.starts_at, 'dd/MM/yyyy HH:mm') : '\u2014'}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-text-muted">Local</span>
-                      <span className="text-text-primary">{form.venue_city || (form.is_online ? 'Online' : 'â€”')}</span>
+                      <span className="text-text-primary">{form.venue_city || (form.is_online ? 'Online' : '\u2014')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-text-muted">Capacidade</span>
                       <span className="text-text-primary">
-                        {form.total_capacity ? formatNumber(parseInt(form.total_capacity)) : 'â€”'}
+                        {form.total_capacity ? formatNumber(parseInt(form.total_capacity, 10)) : '\u2014'}
                       </span>
                     </div>
                   </div>
@@ -329,7 +329,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                 <div>
                   <label className="input-label flex items-center gap-1.5">
                     <ImageIcon className="h-3 w-3" /> Ou escolha do banco de imagens
-                    <span className="font-normal normal-case text-text-muted">â€” categoria: {form.category || 'geral'}</span>
+                    <span className="font-normal normal-case text-text-muted">\u2014 categoria: {form.category || 'geral'}</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {getUnsplashImages(form.category).map((url, index) => (
@@ -350,21 +350,21 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                       </button>
                     ))}
                   </div>
-                  <p className="mt-1.5 text-[10px] font-mono text-text-muted">Imagens via Unsplash Â· uso gratuito</p>
+                  <p className="mt-1.5 text-[10px] font-mono text-text-muted">Imagens via Unsplash \u00b7 uso gratuito</p>
                 </div>
 
                 <div>
                   <label className="input-label flex items-center gap-1.5">
-                    <Video className="h-3 w-3" /> VÃ­deo de fundo (opcional)
+                    <Video className="h-3 w-3" /> V\u00eddeo de fundo (opcional)
                   </label>
                   <input
                     className="input"
-                    placeholder="URL do vÃ­deo (MP4, WebM ou YouTube embed)"
+                    placeholder="URL do v\u00eddeo (MP4, WebM ou YouTube embed)"
                     value={form.video_url}
                     onChange={(event) => setField('video_url', event.target.value)}
                   />
                   <p className="mt-1 text-[10px] font-mono text-text-muted">
-                    O vÃ­deo toca em loop no hero da pÃ¡gina pÃºblica do evento
+                    O v\u00eddeo toca em loop no hero da p\u00e1gina p\u00fablica do evento
                   </p>
                 </div>
               </>
@@ -379,24 +379,15 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
           </div>
         )}
 
-        {error && (
-          <div className="px-6 pb-2">
-            <div className="flex items-center gap-2 rounded-sm border border-status-error/20 bg-status-error/8 px-3 py-2.5 text-xs text-status-error">
-              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-              {error}
-            </div>
-          </div>
-        )}
-
         <div className="flex items-center justify-between border-t border-bg-border px-6 py-4">
           <button onClick={() => (step > 1 ? setStep(step - 1) : onClose())} className="btn-secondary text-sm">
-            {step > 1 ? 'â† Voltar' : 'Cancelar'}
+            {step > 1 ? '\u2190 Voltar' : 'Cancelar'}
           </button>
           {step < TOTAL_STEPS ? (
             <button
               onClick={() => {
                 if (step === 1 && !form.name.trim()) {
-                  setError('Nome Ã© obrigatÃ³rio')
+                  setError('Nome \u00e9 obrigat\u00f3rio')
                   return
                 }
                 setError('')
@@ -412,7 +403,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
               disabled={saving}
               className="btn-primary flex min-w-[120px] items-center justify-center gap-2 text-sm"
             >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : eventId ? 'âœ“ Salvar' : 'âœ“ Criar evento'}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : eventId ? '\u2713 Salvar' : '\u2713 Criar evento'}
             </button>
           )}
         </div>

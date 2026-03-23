@@ -33,34 +33,45 @@ export function useEventForm({ eventId, organizationId, onSaved }: UseEventFormP
 
     async function loadEvent() {
       setLoading(true)
-      const data = await eventsService.getEventById(currentEventId)
+      setError('')
 
-      if (!active) return
+      try {
+        const data = await eventsService.getEventById(currentEventId)
 
-      if (data) {
-        setForm({
-          name: data.name ?? '',
-          subtitle: data.subtitle ?? '',
-          category: data.category ?? '',
-          short_description: data.short_description ?? '',
-          starts_at: data.starts_at ? data.starts_at.slice(0, 16) : '',
-          ends_at: data.ends_at ? data.ends_at.slice(0, 16) : '',
-          doors_open_at: data.doors_open_at ? data.doors_open_at.slice(0, 16) : '',
-          venue_name: data.venue_name ?? '',
-          venue_street: data.venue_address?.street ?? '',
-          venue_city: data.venue_address?.city ?? '',
-          venue_state: data.venue_address?.state ?? '',
-          total_capacity: data.total_capacity?.toString() ?? '',
-          age_rating: data.age_rating ?? 'livre',
-          dress_code: data.dress_code ?? '',
-          is_online: data.is_online ?? false,
-          online_url: data.online_url ?? '',
-          cover_url: data.cover_url ?? '',
-          video_url: data.settings?.video_url ?? '',
-        })
+        if (!active) return
+
+        if (data) {
+          setForm({
+            name: data.name ?? '',
+            subtitle: data.subtitle ?? '',
+            category: data.category ?? '',
+            short_description: data.short_description ?? '',
+            starts_at: data.starts_at ? data.starts_at.slice(0, 16) : '',
+            ends_at: data.ends_at ? data.ends_at.slice(0, 16) : '',
+            doors_open_at: data.doors_open_at ? data.doors_open_at.slice(0, 16) : '',
+            venue_name: data.venue_name ?? '',
+            venue_street: data.venue_address?.street ?? '',
+            venue_city: data.venue_address?.city ?? '',
+            venue_state: data.venue_address?.state ?? '',
+            total_capacity: data.total_capacity?.toString() ?? '',
+            age_rating: data.age_rating ?? 'livre',
+            dress_code: data.dress_code ?? '',
+            is_online: data.is_online ?? false,
+            online_url: data.online_url ?? '',
+            cover_url: data.cover_url ?? '',
+            video_url: data.settings?.video_url ?? '',
+          })
+        }
+      } catch (err) {
+        if (!active) return
+
+        const message = err instanceof Error ? err.message : 'Erro ao carregar evento'
+        setError(message)
+      } finally {
+        if (active) {
+          setLoading(false)
+        }
       }
-
-      setLoading(false)
     }
 
     void loadEvent()
@@ -76,23 +87,27 @@ export function useEventForm({ eventId, organizationId, onSaved }: UseEventFormP
 
   async function handleUpload(file: File) {
     setUploading(true)
-    const publicUrl = await eventsService.uploadEventCover(organizationId, file)
+    setError('')
 
-    if (publicUrl) {
+    try {
+      const publicUrl = await eventsService.uploadEventCover(organizationId, file)
       setField('cover_url', publicUrl)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao enviar imagem'
+      setError(message)
+    } finally {
+      setUploading(false)
     }
-
-    setUploading(false)
   }
 
   async function handleSave() {
     if (!form.name.trim()) {
-      setError('Nome do evento Ã© obrigatÃ³rio')
+      setError('Nome do evento \u00e9 obrigat\u00f3rio')
       return
     }
 
     if (!form.starts_at) {
-      setError('Data de inÃ­cio Ã© obrigatÃ³ria')
+      setError('Data de in\u00edcio \u00e9 obrigat\u00f3ria')
       return
     }
 

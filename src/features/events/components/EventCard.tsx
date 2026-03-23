@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react'
 import { CalendarDays, Copy, Edit2, ExternalLink, Globe, MapPin, MoreHorizontal, Trash2, Users } from 'lucide-react'
-import { cn, formatDate, formatNumber } from '@/lib/utils'
 import { EVENT_STATUS_CONFIG } from '@/features/events/types'
+import { cn, formatDate, formatNumber } from '@/shared/lib'
 import type { EventRow } from '@/features/events/types'
 
 interface EventCardProps {

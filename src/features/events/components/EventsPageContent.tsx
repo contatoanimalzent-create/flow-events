@@ -1,9 +1,9 @@
 import { CalendarDays, Copy, Edit2, Plus, Search, Trash2 } from 'lucide-react'
-import { useAuthStore } from '@/lib/store/auth'
-import { cn, formatDate, formatNumber } from '@/lib/utils'
+import { useAuthStore } from '@/features/auth'
 import { useEventActions, useEventsList } from '@/features/events/hooks'
 import { EventFormModal } from '@/features/events/modals'
 import { EVENT_STATUS_CONFIG } from '@/features/events/types'
+import { cn, formatDate } from '@/shared/lib'
 import { EventCard } from './EventCard'
 
 export function EventsPageContent() {
@@ -100,7 +100,7 @@ export function EventsPageContent() {
                 view === mode ? 'bg-brand-acid/15 text-brand-acid' : 'text-text-muted hover:text-text-primary',
               )}
             >
-              {mode === 'grid' ? 'âŠž Grid' : 'â˜° Lista'}
+              {mode === 'grid' ? 'Grid' : 'Lista'}
             </button>
           ))}
         </div>
@@ -127,7 +127,7 @@ export function EventsPageContent() {
             {search || filter !== 'all' ? 'NENHUM RESULTADO' : 'NENHUM EVENTO'}
           </div>
           <p className="mb-5 text-sm text-text-muted">
-            {search || filter !== 'all' ? 'Tente outros filtros' : 'Crie seu primeiro evento para comeÃ§ar'}
+            {search || filter !== 'all' ? 'Tente outros filtros' : 'Crie seu primeiro evento para come\u00e7ar'}
           </p>
           {!search && filter === 'all' && (
             <button onClick={openCreateForm} className="btn-primary">
@@ -172,7 +172,7 @@ export function EventsPageContent() {
           <table className="w-full">
             <thead className="border-b border-bg-border">
               <tr>
-                {['Evento', 'Status', 'Data', 'Local', 'OcupaÃ§Ã£o', 'AÃ§Ãµes'].map((header) => (
+                {['Evento', 'Status', 'Data', 'Local', 'Ocupa\u00e7\u00e3o', 'A\u00e7\u00f5es'].map((header) => (
                   <th key={header} className="table-header">
                     {header}
                   </th>
@@ -202,7 +202,7 @@ export function EventsPageContent() {
                       {formatDate(event.starts_at, 'dd/MM/yyyy')}
                     </td>
                     <td className="table-cell text-xs text-text-secondary">
-                      {event.venue_address?.city ?? event.venue_name ?? 'â€”'}
+                      {event.venue_address?.city ?? event.venue_name ?? '\u2014'}
                     </td>
                     <td className="table-cell">
                       <div className="flex items-center gap-2">

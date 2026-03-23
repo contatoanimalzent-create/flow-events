@@ -622,10 +622,14 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           </div>
           <div style={{ fontSize:11,fontFamily:'DM Mono,monospace',color:'#6b6b6b' }}>{t.footer_rights}</div>
           <div style={{ display:'flex',gap:28 }}>
-            {['TERMS','PRIVACY','CONTACT'].map(l=>(
-              <a key={l} href="#" data-hover style={{ fontSize:11,fontFamily:'DM Mono,monospace',color:'#6b6b6b',textDecoration:'none',cursor:'none',letterSpacing:'0.15em',transition:'color 0.2s' }}
+            {[
+              { label: 'TERMS', path: '/terms' },
+              { label: 'PRIVACY', path: '/privacy' },
+              { label: 'CONTACT', path: '/contact' }
+            ].map(l=>(
+              <a key={l.label} href={l.path} data-hover style={{ fontSize:11,fontFamily:'DM Mono,monospace',color:'#6b6b6b',textDecoration:'none',cursor:'none',letterSpacing:'0.15em',transition:'color 0.2s' }}
                 onMouseEnter={e=>(e.currentTarget as HTMLElement).style.color='#d4ff00'}
-                onMouseLeave={e=>(e.currentTarget as HTMLElement).style.color='#6b6b6b'}>{l}</a>
+                onMouseLeave={e=>(e.currentTarget as HTMLElement).style.color='#6b6b6b'}>{l.label}</a>
             ))}
           </div>
         </div>

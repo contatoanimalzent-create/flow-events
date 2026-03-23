@@ -1,5 +1,5 @@
 -- ============================================================
--- Flow Events — Stripe Connect integration
+-- ANIMALZ EVENTS — Stripe Connect integration
 -- Migration: 2026-03-22
 -- ============================================================
 

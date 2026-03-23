@@ -74,12 +74,12 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
       {/* Logo */}
       <div className={cn('flex items-center border-b border-bg-border shrink-0', isOpen ? 'px-5 py-4 gap-3' : 'px-4 py-4 justify-center')}>
         <div className="w-7 h-7 rounded-sm bg-brand-acid flex items-center justify-center shrink-0">
-          <span className="font-display text-bg-primary leading-none" style={{ fontSize: 13 }}>F</span>
+          <span className="font-display text-bg-primary leading-none" style={{ fontSize: 13 }}>A</span>
         </div>
         {isOpen && (
           <div className="animate-fade-in min-w-0">
             <div className="font-display text-xl leading-none text-text-primary tracking-wide">
-              FLOW<span className="text-brand-acid">.</span>EVENTS
+              ANIMALZ<span className="text-brand-acid">.</span>EVENTS
             </div>
             <div className="text-[10px] text-text-muted truncate mt-0.5 font-mono tracking-widest uppercase">
               {organization?.name ?? 'Plataforma'}

@@ -1,4 +1,4 @@
-# Flow Events 🎟️
+# ANIMALZ EVENTS 🎟️
 
 > Create, sell, operate and scale events beautifully.
 

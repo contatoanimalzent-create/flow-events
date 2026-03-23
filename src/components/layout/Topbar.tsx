@@ -32,6 +32,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
   const [showSearch, setShowSearch] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [notifications, setNotifications] = useState<Array<{ id: string; message: string }>>([])
 
   // Atalho de teclado ⌘K para abrir busca
   useEffect(() => {
@@ -78,7 +79,9 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
           className="relative p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-card transition-all"
         >
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-status-error rounded-full" />
+          {notifications.length > 0 && (
+            <span className="absolute top-1 right-1 w-2 h-2 bg-status-error rounded-full animate-pulse" />
+          )}
         </button>
         <button onClick={signOut} className="p-1.5 rounded-lg text-text-muted hover:text-status-error hover:bg-status-error/10 transition-all" title="Sair">
           <LogOut className="w-5 h-5" />
@@ -129,9 +132,19 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
             </button>
           </div>
           <div className="max-h-96 overflow-y-auto p-4">
-            <div className="text-center text-text-muted text-sm">
-              Nenhuma notificação no momento
-            </div>
+            {notifications.length > 0 ? (
+              <div className="space-y-2">
+                {notifications.map((notif) => (
+                  <div key={notif.id} className="p-3 rounded bg-bg-card border border-bg-border">
+                    <p className="text-sm text-text-primary">{notif.message}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-text-muted text-sm">
+                Nenhuma notificação no momento
+              </div>
+            )}
           </div>
         </div>
       )}

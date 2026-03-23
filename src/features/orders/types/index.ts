@@ -1,4 +1,5 @@
 export {
+  DEFAULT_CHECKOUT_BUYER,
   DIGITAL_TICKET_STATUS_LABELS,
   EMPTY_ORDER_DRAFT,
   ORDER_PAYMENT_METHOD_CONFIG,
@@ -6,6 +7,10 @@ export {
   ORDER_STATUS_CONFIG,
 } from './orders.constants'
 export type {
+  CheckoutBuyerForm,
+  CheckoutCartItem,
+  CheckoutDraftStatus,
+  CheckoutSummary,
   CreateOrderDraftInput,
   DigitalTicketRow,
   DigitalTicketStatus,

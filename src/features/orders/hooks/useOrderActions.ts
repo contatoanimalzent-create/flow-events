@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orderKeys, orderMutations } from '@/features/orders/services'
+import { ticketKeys } from '@/features/tickets/services/tickets.queries'
 
 interface UseOrderActionsParams {
   eventId?: string
@@ -16,6 +17,7 @@ export function useOrderActions({ eventId }: UseOrderActionsParams) {
 
     if (eventId) {
       tasks.push(queryClient.invalidateQueries({ queryKey: orderKeys.byEvent(eventId) }))
+      tasks.push(queryClient.invalidateQueries({ queryKey: ticketKeys.byEvent(eventId) }))
     }
 
     tasks.push(queryClient.invalidateQueries({ queryKey: orderKeys.items(orderId) }))

@@ -11,6 +11,10 @@ interface CancelOrderVariables {
   orderId: string
 }
 
+interface ExpireOrderVariables {
+  orderId: string
+}
+
 interface AddOrderItemsVariables {
   orderId: string
   items: CreateOrderDraftInput['items']
@@ -18,6 +22,10 @@ interface AddOrderItemsVariables {
 
 interface IssueDigitalTicketsVariables {
   orderId: string
+}
+
+interface ExpireStaleDraftsVariables {
+  eventId?: string
 }
 
 export const orderKeys = {
@@ -91,9 +99,19 @@ export const orderMutations = {
       mutationKey: [...orderKeys.actions(), 'cancel'] as const,
       mutationFn: ({ orderId }: CancelOrderVariables) => ordersService.cancelOrder(orderId),
     }),
+  expire: () =>
+    mutationOptions({
+      mutationKey: [...orderKeys.actions(), 'expire'] as const,
+      mutationFn: ({ orderId }: ExpireOrderVariables) => ordersService.expireOrder(orderId),
+    }),
   issueDigitalTickets: () =>
     mutationOptions({
       mutationKey: [...orderKeys.actions(), 'issue-digital-tickets'] as const,
       mutationFn: ({ orderId }: IssueDigitalTicketsVariables) => ordersService.issueDigitalTicketsForOrder(orderId),
+    }),
+  expireStaleDrafts: () =>
+    mutationOptions({
+      mutationKey: [...orderKeys.actions(), 'expire-stale-drafts'] as const,
+      mutationFn: ({ eventId }: ExpireStaleDraftsVariables) => ordersService.expireStaleDrafts(eventId),
     }),
 }

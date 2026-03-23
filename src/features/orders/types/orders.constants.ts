@@ -63,3 +63,10 @@ export const EMPTY_ORDER_DRAFT = {
   },
   items: [],
 }
+
+export const DEFAULT_CHECKOUT_BUYER = {
+  name: '',
+  email: '',
+  cpf: '',
+  phone: '',
+}

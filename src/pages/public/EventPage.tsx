@@ -3,6 +3,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { supabase } from '@/lib/supabase'
 import { stripePromise, calculateFees } from '@/lib/stripe'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
+import { PublicCheckoutContent } from '@/features/orders'
 import {
   MapPin, Calendar, Clock, Users, ChevronDown, ChevronRight,
   Check, Shield, Zap, Star, ArrowRight, Share2, Heart,
@@ -12,6 +13,7 @@ import {
 /* ── Types ──────────────────────────────────────────────────── */
 interface EventData {
   id: string
+  organization_id: string
   slug: string
   name: string
   subtitle: string
@@ -40,6 +42,7 @@ interface TicketType {
   color: string
   sector: string
   is_nominal: boolean
+  max_per_order: number
   batches: Batch[]
 }
 
@@ -50,6 +53,7 @@ interface Batch {
   price: number
   quantity: number
   sold_count: number
+  reserved_count: number
   ends_at?: string
   is_active: boolean
 }
@@ -147,6 +151,14 @@ export function EventPage({ slug }: { slug: string }) {
 
   function addToCart(type: TicketType, batch: Batch) {
     const existing = cart.find(c => c.batchId === batch.id)
+    const currentQuantity = existing?.qty ?? 0
+    const available = Math.max(batch.quantity - batch.sold_count - (batch.reserved_count ?? 0), 0)
+    const maxPerOrder = type.max_per_order > 0 ? type.max_per_order : available
+
+    if (currentQuantity >= available || currentQuantity >= maxPerOrder) {
+      return
+    }
+
     if (existing) {
       setCart(cart.map(c => c.batchId === batch.id ? { ...c, qty: c.qty + 1 } : c))
     } else {
@@ -186,12 +198,30 @@ export function EventPage({ slug }: { slug: string }) {
   if (!event)  return <NotFound />
 
   if (step === 'checkout') return (
-    <CheckoutScreen
-      event={event} cart={cart} total={cartTotal} isFree={!!isFree}
+    <PublicCheckoutContent
+      event={event}
+      cart={cart.map((item) => ({
+        ticket_type_id: item.ticketTypeId,
+        batch_id: item.batchId,
+        ticket_name: item.ticketName,
+        batch_name: item.batchName,
+        price: item.price,
+        quantity: item.qty,
+        color: item.color,
+        max_per_order: ticketTypes.find((ticketType) => ticketType.id === item.ticketTypeId)?.max_per_order ?? null,
+      }))}
       onBack={() => setStep('landing')}
       onSuccess={() => setStep('success')}
-      onAdd={addToCart} onRemove={removeFromCart}
-      ticketTypes={ticketTypes}
+      onAdd={(ticketTypeId, batchId) => {
+        const ticketType = ticketTypes.find((item) => item.id === ticketTypeId)
+        const batch = ticketType?.batches.find((item) => item.id === batchId)
+
+        if (ticketType && batch) {
+          addToCart(ticketType, batch)
+        }
+      }}
+      onRemove={removeFromCart}
+      onInventoryChanged={fetchEvent}
     />
   )
   if (step === 'success') return (
@@ -397,7 +427,7 @@ export function EventPage({ slug }: { slug: string }) {
               const activeBatch = type.batches.find(b => b.is_active)
               if (!activeBatch) return null
               const cartItem = cart.find(c => c.batchId === activeBatch.id)
-              const available = activeBatch.quantity - activeBatch.sold_count
+              const available = activeBatch.quantity - activeBatch.sold_count - (activeBatch.reserved_count ?? 0)
               const isSoldOut = available <= 0
               const typeFree  = activeBatch.price === 0
 

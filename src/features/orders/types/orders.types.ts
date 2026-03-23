@@ -116,6 +116,26 @@ export interface OrderDraftItemInput {
   total_price?: number
 }
 
+export interface CheckoutCartItem {
+  ticket_type_id: string
+  batch_id: string
+  ticket_name: string
+  batch_name: string
+  price: number
+  quantity: number
+  color?: string | null
+  max_per_order?: number | null
+}
+
+export interface CheckoutBuyerForm {
+  name: string
+  email: string
+  cpf: string
+  phone: string
+}
+
+export type CheckoutDraftStatus = 'idle' | 'draft_created' | 'confirmed' | 'cancelled' | 'expired'
+
 export interface CreateOrderDraftInput {
   organization_id: string
   event_id: string
@@ -146,4 +166,12 @@ export interface OrderDetailBundle {
   order: OrderRow | null
   items: OrderItemRow[]
   digitalTickets: DigitalTicketRow[]
+}
+
+export interface CheckoutSummary {
+  subtotal: number
+  discount_amount: number
+  fee_amount: number
+  total_amount: number
+  quantity: number
 }

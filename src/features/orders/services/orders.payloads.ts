@@ -159,12 +159,14 @@ export function buildDigitalTicketInsertPayload(order: OrderRow, orderItems: Ord
   const buyerName = order.buyer_name
   const buyerEmail = order.buyer_email
 
-  return orderItems.flatMap((item) =>
-    Array.from({ length: item.quantity }, (_, index) => ({
+  return orderItems.flatMap((item, itemIndex) =>
+    Array.from({ length: item.quantity }, (_, quantityIndex) => ({
       order_id: order.id,
+      order_item_id: item.id,
       ticket_type_id: item.ticket_type_id,
+      batch_id: item.batch_id ?? null,
       event_id: order.event_id,
-      ticket_number: `TK-${Date.now()}-${index}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+      ticket_number: `TK-${Date.now()}-${itemIndex}-${quantityIndex}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
       qr_token: crypto.randomUUID(),
       status: 'confirmed',
       is_vip: false,

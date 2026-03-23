@@ -11,12 +11,18 @@ import type {
 import { assertOrdersResult, OrdersServiceError } from './orders.errors'
 import {
   buildDigitalTicketInsertPayload,
-  buildOrderDraftPayload,
   buildOrderItemPayloads,
   mapDigitalTicketRow,
   mapOrderItemRow,
   mapOrderRow,
 } from './orders.payloads'
+import {
+  buildDefaultOrderExpiration,
+  confirmOrderAndCaptureInventory,
+  createOrderDraftWithReservations,
+  expireStaleOrderDrafts,
+  releaseOrderInventory,
+} from './orders.inventory'
 
 export const ordersService = {
   async listOrderEvents(organizationId: string): Promise<OrdersEventScope[]> {
@@ -56,21 +62,10 @@ export const ordersService = {
   },
 
   async createOrderDraft(input: CreateOrderDraftInput): Promise<OrderRow> {
-    const orderInsertResult = await supabase.from('orders').insert(buildOrderDraftPayload(input)).select('*').single()
-    assertOrdersResult(orderInsertResult)
-
-    const createdOrder = orderInsertResult.data ? mapOrderRow(orderInsertResult.data as Record<string, unknown>) : null
-
-    if (!createdOrder) {
-      throw new OrdersServiceError('N\u00e3o foi poss\u00edvel criar o pedido', 'order_draft_creation_failed')
-    }
-
-    if (input.items.length > 0) {
-      const addItemsResult = await supabase.from('order_items').insert(buildOrderItemPayloads(createdOrder.id, input.items))
-      assertOrdersResult(addItemsResult)
-    }
-
-    return createdOrder
+    return createOrderDraftWithReservations({
+      ...input,
+      expires_at: input.expires_at ?? buildDefaultOrderExpiration(),
+    })
   },
 
   async addOrderItems(orderId: string, items: CreateOrderDraftInput['items']) {
@@ -79,24 +74,33 @@ export const ordersService = {
   },
 
   async confirmOrder(orderId: string, paymentMethod?: OrderRow['payment_method']) {
-    const result = await supabase
-      .from('orders')
-      .update({
-        status: 'paid',
-        payment_method: paymentMethod ?? 'pix',
-        paid_at: new Date().toISOString(),
-      })
-      .eq('id', orderId)
-      .select('*')
-      .single()
-
-    assertOrdersResult(result)
-    return result.data ? mapOrderRow(result.data as Record<string, unknown>) : null
+    return confirmOrderAndCaptureInventory(orderId, paymentMethod)
   },
 
   async cancelOrder(orderId: string) {
-    const result = await supabase.from('orders').update({ status: 'cancelled' satisfies OrderStatus }).eq('id', orderId)
-    assertOrdersResult(result)
+    const order = await this.getOrderById(orderId)
+
+    if (!order) {
+      throw new OrdersServiceError('Pedido não encontrado', 'order_not_found')
+    }
+
+    if (order.status === 'paid') {
+      const result = await supabase
+        .from('orders')
+        .update({ status: 'cancelled' satisfies OrderStatus })
+        .eq('id', orderId)
+        .select('*')
+        .single()
+
+      assertOrdersResult(result)
+      return result.data ? mapOrderRow(result.data as Record<string, unknown>) : null
+    }
+
+    return releaseOrderInventory(orderId, 'cancelled')
+  },
+
+  async expireOrder(orderId: string) {
+    return releaseOrderInventory(orderId, 'expired')
   },
 
   async listDigitalTicketsByOrder(orderId: string): Promise<DigitalTicketRow[]> {
@@ -146,5 +150,9 @@ export const ordersService = {
       items,
       digitalTickets,
     }
+  },
+
+  async expireStaleDrafts(eventId?: string) {
+    return expireStaleOrderDrafts(eventId)
   },
 }

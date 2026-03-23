@@ -121,25 +121,32 @@ export type TicketStatus = 'pending' | 'confirmed' | 'cancelled' | 'refunded' | 
 export interface DigitalTicket {
   id: string
   order_id: string
+  order_item_id?: string | null
   ticket_type_id: string
+  batch_id?: string | null
   event_id: string
   ticket_number: string
   qr_token: string
-  holder_name?: string
-  holder_email?: string
+  holder_name?: string | null
+  holder_email?: string | null
   status: TicketStatus
   is_vip: boolean
-  checked_in_at?: string
-  email_sent_at?: string
+  checked_in_at?: string | null
+  email_sent_at?: string | null
   created_at: string
 }
 
 export interface Checkin {
   id: string
   event_id: string
-  digital_ticket_id?: string
-  gate_id?: string
-  operator_id?: string
+  digital_ticket_id?: string | null
+  gate_id?: string | null
+  operator_id?: string | null
+  device_id?: string | null
+  reason_code?: string | null
+  was_offline?: boolean
+  notes?: string | null
+  metadata?: Record<string, unknown>
   result: string
   checked_in_at: string
   is_exit: boolean

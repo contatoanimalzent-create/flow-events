@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { AlertTriangle, Download, Loader2, Plus, Receipt, RefreshCw, Wallet } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
+import { useAccessControl } from '@/features/access-control'
 import {
   FINANCIAL_CLOSURE_STATUS_LABELS,
   FINANCIAL_COST_CATEGORY_LABELS,
@@ -10,6 +11,7 @@ import {
 } from '@/features/financial/types'
 import { useFinancialDashboard, useFinancialMutations } from '@/features/financial/hooks'
 import { ClosureReviewModal, CostEntryModal, ForecastModal, PayoutModal } from '@/features/financial/modals'
+import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn, formatCurrency } from '@/shared/lib'
 import { FinancialClosuresTable } from './FinancialClosuresTable'
 import { FinancialEventsTable } from './FinancialEventsTable'
@@ -21,6 +23,8 @@ import { FinancialReconciliationTable } from './FinancialReconciliationTable'
 
 export function FinancialPageContent() {
   const organization = useAuthStore((state) => state.organization)
+  const access = useAccessControl()
+  const canManageFinancial = access.can('financial', 'manage')
   const dashboard = useFinancialDashboard(organization?.id)
   const mutations = useFinancialMutations({
     organizationId: organization?.id,
@@ -93,7 +97,7 @@ export function FinancialPageContent() {
           <button className="btn-secondary flex items-center gap-2 text-xs">
             <Download className="h-3.5 w-3.5" /> Exportar visao executiva
           </button>
-          {dashboard.tab === 'costs' ? (
+          {dashboard.tab === 'costs' && canManageFinancial ? (
             <button
               onClick={() => {
                 setEditingCostId(null)
@@ -104,17 +108,17 @@ export function FinancialPageContent() {
               <Plus className="h-4 w-4" /> Novo lancamento
             </button>
           ) : null}
-          {dashboard.tab === 'forecast' ? (
+          {dashboard.tab === 'forecast' && canManageFinancial ? (
             <button onClick={() => openForecastModal()} className="btn-primary flex items-center gap-2">
               <Plus className="h-4 w-4" /> Atualizar forecast
             </button>
           ) : null}
-          {dashboard.tab === 'payouts' ? (
+          {dashboard.tab === 'payouts' && canManageFinancial ? (
             <button onClick={() => openPayoutModal()} className="btn-primary flex items-center gap-2">
               <Plus className="h-4 w-4" /> Revisar repasse
             </button>
           ) : null}
-          {dashboard.tab === 'closure' ? (
+          {dashboard.tab === 'closure' && canManageFinancial ? (
             <button onClick={() => openClosureModal()} className="btn-primary flex items-center gap-2">
               <Plus className="h-4 w-4" /> Fechar evento
             </button>
@@ -146,17 +150,11 @@ export function FinancialPageContent() {
       </div>
 
       {dashboard.loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
-        </div>
+        <PageLoadingState title="Carregando financeiro" description="Atualizando previsoes, conciliacao e fechamento por evento." />
       ) : dashboard.error ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <AlertTriangle className="mb-3 h-10 w-10 text-status-error" />
-          <div className="font-display text-2xl text-text-primary">ERRO AO CARREGAR FINANCEIRO</div>
-          <p className="mt-2 text-sm text-text-muted">{dashboard.error}</p>
-        </div>
+        <PageErrorState title="ERRO AO CARREGAR FINANCEIRO" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : !dashboard.overview ? (
-        <div className="card p-16 text-center text-sm text-text-muted">Nenhum dado financeiro disponivel.</div>
+        <PageEmptyState title="NENHUM DADO FINANCEIRO" description="Ainda nao ha dados suficientes para consolidar a visao executiva." icon={<Wallet className="mb-3 h-10 w-10 text-text-muted" />} />
       ) : (
         <>
           {(dashboard.tab === 'overview' || dashboard.tab === 'dre') && <FinancialExecutiveCards overview={dashboard.overview} />}
@@ -378,11 +376,11 @@ export function FinancialPageContent() {
               </div>
 
               {dashboard.filteredCostEntries.length === 0 ? (
-                <div className="card flex flex-col items-center justify-center p-16 text-center">
-                  <Wallet className="mb-3 h-10 w-10 text-text-muted" />
-                  <div className="font-display text-2xl text-text-primary">NENHUM LANCAMENTO</div>
-                  <p className="mt-2 text-sm text-text-muted">Crie custos manuais para fortalecer a governanca financeira por evento.</p>
-                </div>
+                <PageEmptyState
+                  title="NENHUM LANCAMENTO"
+                  description="Crie custos manuais para fortalecer a governanca financeira por evento."
+                  icon={<Wallet className="mb-3 h-10 w-10 text-text-muted" />}
+                />
               ) : (
                 <div className="card overflow-hidden">
                   <table className="w-full">

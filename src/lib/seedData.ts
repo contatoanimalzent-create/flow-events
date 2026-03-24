@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { logError } from '@/shared/lib'
 
 export async function seedTestEventIfNeeded() {
   try {
@@ -9,7 +10,7 @@ export async function seedTestEventIfNeeded() {
       .limit(1)
 
     if (checkError) {
-      console.error('Error checking events:', checkError)
+      logError(checkError, { scope: 'seed', action: 'check-events' })
       return
     }
 
@@ -28,7 +29,7 @@ export async function seedTestEventIfNeeded() {
       .limit(1)
 
     if (orgError || !organizations || organizations.length === 0) {
-      console.error('No organization found, cannot seed event')
+      logError('No organization found, cannot seed event', { scope: 'seed', action: 'check-organization' })
       return
     }
 
@@ -73,12 +74,12 @@ export async function seedTestEventIfNeeded() {
       .select()
 
     if (eventError) {
-      console.error('Error creating event:', eventError)
+      logError(eventError, { scope: 'seed', action: 'create-event' })
       return
     }
 
     if (!event || event.length === 0) {
-      console.error('No event returned after insert')
+      logError('No event returned after insert', { scope: 'seed', action: 'create-event' })
       return
     }
 
@@ -123,12 +124,12 @@ export async function seedTestEventIfNeeded() {
       .select()
 
     if (typesError) {
-      console.error('Error creating ticket types:', typesError)
+      logError(typesError, { scope: 'seed', action: 'create-ticket-types' })
       return
     }
 
     if (!ticketTypes) {
-      console.error('No ticket types returned')
+      logError('No ticket types returned', { scope: 'seed', action: 'create-ticket-types' })
       return
     }
 
@@ -188,13 +189,13 @@ export async function seedTestEventIfNeeded() {
       .select()
 
     if (batchError) {
-      console.error('Error creating ticket batches:', batchError)
+      logError(batchError, { scope: 'seed', action: 'create-ticket-batches' })
       return
     }
 
     console.log('✓ Ticket batches created:', batchData?.length)
     console.log('✅ Test event seed completed successfully!')
   } catch (error) {
-    console.error('Unexpected error during seed:', error)
+    logError(error, { scope: 'seed', action: 'seed-test-event' })
   }
 }

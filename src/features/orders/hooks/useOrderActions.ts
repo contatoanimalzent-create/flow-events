@@ -1,4 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/features/auth'
+import { auditService } from '@/features/audit'
 import { orderKeys, orderMutations } from '@/features/orders/services'
 import { paymentKeys, paymentMutations } from '@/features/payments/services'
 import { ticketKeys } from '@/features/tickets/services/tickets.queries'
@@ -9,6 +11,8 @@ interface UseOrderActionsParams {
 
 export function useOrderActions({ eventId }: UseOrderActionsParams) {
   const queryClient = useQueryClient()
+  const organizationId = useAuthStore((state) => state.organization?.id)
+  const profile = useAuthStore((state) => state.profile)
 
   async function invalidateOrderState(orderId: string) {
     const tasks = [
@@ -61,6 +65,18 @@ export function useOrderActions({ eventId }: UseOrderActionsParams) {
 
   async function confirmOrder(orderId: string) {
     await confirmMutation.mutateAsync({ orderId })
+    if (organizationId) {
+      await auditService.record({
+        organization_id: organizationId,
+        user_id: profile?.id ?? null,
+        user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+        event_id: eventId ?? null,
+        entity_type: 'order',
+        entity_id: orderId,
+        action_type: 'status_change',
+        title: 'Pedido confirmado',
+      })
+    }
   }
 
   async function cancelOrder(orderId: string) {
@@ -69,15 +85,51 @@ export function useOrderActions({ eventId }: UseOrderActionsParams) {
     }
 
     await cancelMutation.mutateAsync({ orderId })
+    if (organizationId) {
+      await auditService.record({
+        organization_id: organizationId,
+        user_id: profile?.id ?? null,
+        user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+        event_id: eventId ?? null,
+        entity_type: 'order',
+        entity_id: orderId,
+        action_type: 'status_change',
+        title: 'Pedido cancelado',
+      })
+    }
     return true
   }
 
   async function issueDigitalTickets(orderId: string) {
     await issueDigitalTicketsMutation.mutateAsync({ orderId })
+    if (organizationId) {
+      await auditService.record({
+        organization_id: organizationId,
+        user_id: profile?.id ?? null,
+        user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+        event_id: eventId ?? null,
+        entity_type: 'order',
+        entity_id: orderId,
+        action_type: 'issue',
+        title: 'Ingressos digitais emitidos',
+      })
+    }
   }
 
   async function resendTickets(orderId: string) {
     await resendTicketsMutation.mutateAsync({ orderId })
+    if (organizationId) {
+      await auditService.record({
+        organization_id: organizationId,
+        user_id: profile?.id ?? null,
+        user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+        event_id: eventId ?? null,
+        entity_type: 'payment',
+        entity_id: orderId,
+        action_type: 'issue',
+        title: 'Ingressos reenviados',
+      })
+    }
   }
 
   return {

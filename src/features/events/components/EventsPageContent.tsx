@@ -1,13 +1,17 @@
 import { CalendarDays, Copy, Edit2, Plus, Search, Trash2 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
+import { useAccessControl } from '@/features/access-control'
 import { useEventActions, useEventsList } from '@/features/events/hooks'
 import { EventFormModal } from '@/features/events/modals'
 import { EVENT_STATUS_CONFIG } from '@/features/events/types'
+import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn, formatDate } from '@/shared/lib'
 import { EventCard } from './EventCard'
 
 export function EventsPageContent() {
   const organization = useAuthStore((state) => state.organization)
+  const access = useAccessControl()
+  const canManageEvents = access.can('events', 'manage')
   const {
     events,
     filteredEvents,
@@ -43,10 +47,12 @@ export function EventsPageContent() {
             {events.length} evento{events.length !== 1 ? 's' : ''} cadastrado{events.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <button onClick={openCreateForm} className="btn-primary flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Novo evento
-        </button>
+        {canManageEvents ? (
+          <button onClick={openCreateForm} className="btn-primary flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Novo evento
+          </button>
+        ) : null}
       </div>
 
       <div className="reveal grid grid-cols-4 gap-3" style={{ animationDelay: '40ms' }}>
@@ -105,45 +111,35 @@ export function EventsPageContent() {
       </div>
 
       {loading && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {[...Array(6)].map((_, index) => (
-            <div key={index} className="card animate-pulse overflow-hidden">
-              <div className="h-36 bg-bg-surface" />
-              <div className="space-y-3 p-4">
-                <div className="h-4 w-3/4 rounded-sm bg-bg-surface" />
-                <div className="h-3 w-1/2 rounded-sm bg-bg-surface" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <PageLoadingState title="Carregando eventos" description="Buscando o portfolio e os indicadores da organizacao." />
       )}
 
       {!loading && error && (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <CalendarDays className="mb-3 h-10 w-10 text-status-error" />
-          <div className="mb-1 font-display text-2xl text-text-primary">ERRO AO CARREGAR EVENTOS</div>
-          <p className="mb-5 max-w-md text-sm text-text-muted">{error}</p>
-          <button onClick={() => void refreshEvents()} className="btn-primary">
-            Tentar novamente
-          </button>
-        </div>
+        <PageErrorState
+          title="ERRO AO CARREGAR EVENTOS"
+          description={error}
+          icon={<CalendarDays className="mb-3 h-10 w-10 text-status-error" />}
+          action={
+            <button onClick={() => void refreshEvents()} className="btn-primary">
+              Tentar novamente
+            </button>
+          }
+        />
       )}
 
       {!loading && !error && filteredEvents.length === 0 && (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <CalendarDays className="mb-3 h-10 w-10 text-text-muted" />
-          <div className="mb-1 font-display text-2xl text-text-primary">
-            {search || filter !== 'all' ? 'NENHUM RESULTADO' : 'NENHUM EVENTO'}
-          </div>
-          <p className="mb-5 text-sm text-text-muted">
-            {search || filter !== 'all' ? 'Tente outros filtros' : 'Crie seu primeiro evento para come\u00e7ar'}
-          </p>
-          {!search && filter === 'all' && (
-            <button onClick={openCreateForm} className="btn-primary">
-              + Criar evento
-            </button>
-          )}
-        </div>
+        <PageEmptyState
+          title={search || filter !== 'all' ? 'NENHUM RESULTADO' : 'NENHUM EVENTO'}
+          description={search || filter !== 'all' ? 'Tente outros filtros.' : 'Crie seu primeiro evento para comecar.'}
+          icon={<CalendarDays className="mb-3 h-10 w-10 text-text-muted" />}
+          action={
+            !search && filter === 'all' && canManageEvents ? (
+              <button onClick={openCreateForm} className="btn-primary">
+                + Criar evento
+              </button>
+            ) : undefined
+          }
+        />
       )}
 
       {!loading && !error && filteredEvents.length > 0 && view === 'grid' && (

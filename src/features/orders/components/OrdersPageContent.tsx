@@ -3,6 +3,7 @@ import { useAuthStore } from '@/features/auth'
 import { useOrderActions, useOrderDetails, useOrdersList } from '@/features/orders/hooks'
 import { ORDER_PAYMENT_METHOD_CONFIG, ORDER_STATUS_CONFIG } from '@/features/orders/types'
 import { OrderDetailModal } from '@/features/orders/modals'
+import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn, formatCurrency, formatDate } from '@/shared/lib'
 
 function PaymentMethodIcon({ method }: { method?: string | null }) {
@@ -144,34 +145,30 @@ export function OrdersPageContent() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
-        </div>
+        <PageLoadingState title="Carregando pedidos" description="Consolidando vendas, pagamentos e emissoes digitais." />
       ) : error ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <Ticket className="mb-3 h-10 w-10 text-status-error" />
-          <div className="mb-1 font-display text-2xl text-text-primary">ERRO AO CARREGAR PEDIDOS</div>
-          <p className="mb-5 text-sm text-text-muted">{error}</p>
-          <button onClick={() => void refreshOrders()} className="btn-primary">
-            Tentar novamente
-          </button>
-        </div>
+        <PageErrorState
+          title="ERRO AO CARREGAR PEDIDOS"
+          description={error}
+          icon={<Ticket className="mb-3 h-10 w-10 text-status-error" />}
+          action={
+            <button onClick={() => void refreshOrders()} className="btn-primary">
+              Tentar novamente
+            </button>
+          }
+        />
       ) : events.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <Ticket className="mb-3 h-10 w-10 text-text-muted" />
-          <div className="mb-1 font-display text-2xl text-text-primary">NENHUM EVENTO</div>
-          <p className="text-sm text-text-muted">Crie um evento para come\u00e7ar a receber pedidos.</p>
-        </div>
+        <PageEmptyState title="NENHUM EVENTO" description="Crie um evento para comecar a receber pedidos." icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />} />
       ) : filteredOrders.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <Ticket className="mb-3 h-10 w-10 text-text-muted" />
-          <div className="mb-1 font-display text-2xl text-text-primary">NENHUM PEDIDO</div>
-          <p className="text-sm text-text-muted">
-            {search || statusFilter !== 'all' || methodFilter !== 'all'
-              ? 'Nenhum resultado para os filtros aplicados'
-              : 'Os pedidos aparecer\u00e3o aqui quando as vendas iniciarem'}
-          </p>
-        </div>
+        <PageEmptyState
+          title="NENHUM PEDIDO"
+          description={
+            search || statusFilter !== 'all' || methodFilter !== 'all'
+              ? 'Nenhum resultado para os filtros aplicados.'
+              : 'Os pedidos aparecerao aqui quando as vendas iniciarem.'
+          }
+          icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />}
+        />
       ) : (
         <div className="card reveal overflow-hidden">
           <table className="w-full">

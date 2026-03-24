@@ -1,10 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/features/auth'
+import { auditService } from '@/features/audit'
 import { checkinKeys } from '@/features/checkin/services'
 import { staffKeys, staffMutations } from '@/features/staff/services'
 import type { StaffStatus } from '@/features/staff/types'
 
 export function useStaffActions(eventId?: string) {
   const queryClient = useQueryClient()
+  const organizationId = useAuthStore((state) => state.organization?.id)
+  const profile = useAuthStore((state) => state.profile)
 
   async function invalidateEventState(staffId?: string) {
     if (!eventId) {
@@ -61,17 +65,78 @@ export function useStaffActions(eventId?: string) {
   })
 
   return {
-    updateStatus: async (staffId: string, status: StaffStatus) => updateStatusMutation.mutateAsync({ staffId, status }),
-    issueCredential: async (staffId: string) => issueCredentialMutation.mutateAsync({ staffId }),
-    deleteStaff: async (staffId: string) => deleteMutation.mutateAsync({ staffId }),
-    recordPresence: async (staffId: string, type: 'clock_in' | 'clock_out', gateId?: string | null) =>
-      recordPresenceMutation.mutateAsync({
+    updateStatus: async (staffId: string, status: StaffStatus) => {
+      const result = await updateStatusMutation.mutateAsync({ staffId, status })
+      if (organizationId) {
+        await auditService.record({
+          organization_id: organizationId,
+          user_id: profile?.id ?? null,
+          user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+          event_id: eventId ?? null,
+          entity_type: 'staff',
+          entity_id: staffId,
+          action_type: 'status_change',
+          title: 'Status de staff alterado',
+          description: `Novo status: ${status}`,
+        })
+      }
+      return result
+    },
+    issueCredential: async (staffId: string) => {
+      const result = await issueCredentialMutation.mutateAsync({ staffId })
+      if (organizationId) {
+        await auditService.record({
+          organization_id: organizationId,
+          user_id: profile?.id ?? null,
+          user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+          event_id: eventId ?? null,
+          entity_type: 'staff',
+          entity_id: staffId,
+          action_type: 'issue',
+          title: 'Credencial emitida',
+        })
+      }
+      return result
+    },
+    deleteStaff: async (staffId: string) => {
+      const result = await deleteMutation.mutateAsync({ staffId })
+      if (organizationId) {
+        await auditService.record({
+          organization_id: organizationId,
+          user_id: profile?.id ?? null,
+          user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+          event_id: eventId ?? null,
+          entity_type: 'staff',
+          entity_id: staffId,
+          action_type: 'delete',
+          title: 'Membro de staff removido',
+        })
+      }
+      return result
+    },
+    recordPresence: async (staffId: string, type: 'clock_in' | 'clock_out', gateId?: string | null) => {
+      const result = await recordPresenceMutation.mutateAsync({
         staffId,
         eventId: eventId as string,
         type,
         gateId: gateId ?? null,
         deviceId: typeof navigator !== 'undefined' ? navigator.userAgent : 'web-console',
-      }),
+      })
+      if (organizationId) {
+        await auditService.record({
+          organization_id: organizationId,
+          user_id: profile?.id ?? null,
+          user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+          event_id: eventId ?? null,
+          entity_type: 'staff',
+          entity_id: staffId,
+          action_type: 'status_change',
+          title: type === 'clock_in' ? 'Entrada registrada' : 'Saida registrada',
+          description: gateId ? `Gate ${gateId}` : null,
+        })
+      }
+      return result
+    },
     updatingStatus: updateStatusMutation.isPending,
     issuingCredential: issueCredentialMutation.isPending,
     deleting: deleteMutation.isPending,

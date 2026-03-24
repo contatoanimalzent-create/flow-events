@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/features/auth'
+import { auditService } from '@/features/audit'
 import { EMPTY_TICKET_BATCH_FORM } from '@/features/tickets/types'
 import { ticketKeys, ticketMutations, ticketQueries } from '@/features/tickets/services'
 import type { TicketBatch, TicketBatchFormData } from '@/features/tickets/types'
@@ -25,6 +27,8 @@ function mapBatchToForm(batch: TicketBatch): TicketBatchFormData {
 
 export function useTicketBatchForm({ eventId, ticketTypeId, batchId, position, onSaved }: UseTicketBatchFormParams) {
   const queryClient = useQueryClient()
+  const organizationId = useAuthStore((state) => state.organization?.id)
+  const profile = useAuthStore((state) => state.profile)
   const [form, setForm] = useState<TicketBatchFormData>(EMPTY_TICKET_BATCH_FORM)
   const [error, setError] = useState('')
 
@@ -97,8 +101,34 @@ export function useTicketBatchForm({ eventId, ticketTypeId, batchId, position, o
     try {
       if (batchId) {
         await updateBatchMutation.mutateAsync({ batchId, eventId, ticketTypeId, form, position })
+        if (organizationId) {
+          await auditService.record({
+            organization_id: organizationId,
+            user_id: profile?.id ?? null,
+            user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+            event_id: eventId,
+            entity_type: 'ticket',
+            entity_id: batchId,
+            action_type: 'update',
+            title: 'Lote atualizado',
+            description: form.name,
+          })
+        }
       } else {
         await createBatchMutation.mutateAsync({ eventId, ticketTypeId, form, position })
+        if (organizationId) {
+          await auditService.record({
+            organization_id: organizationId,
+            user_id: profile?.id ?? null,
+            user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+            event_id: eventId,
+            entity_type: 'ticket',
+            entity_id: ticketTypeId,
+            action_type: 'create',
+            title: 'Lote criado',
+            description: form.name,
+          })
+        }
       }
 
       onSaved()

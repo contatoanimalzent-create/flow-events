@@ -5,6 +5,7 @@ import { useCrmDashboard, useCrmMutations } from '@/features/crm/hooks'
 import { CustomerDetailModal } from '@/features/crm/modals'
 import { CRM_CUSTOMER_STATUS_LABELS, CRM_PERIOD_FILTER_LABELS } from '@/features/crm/types'
 import type { CustomerListRow } from '@/features/crm/types'
+import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { CustomerMetricsGrid } from './CustomerMetricsGrid'
 import { CustomersTable } from './CustomersTable'
@@ -118,21 +119,15 @@ export function CrmPageContent() {
       </div>
 
       {dashboard.loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
-        </div>
+        <PageLoadingState title="Carregando CRM" description="Consolidando clientes, tags e historico de relacionamento." />
       ) : dashboard.error ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <AlertTriangle className="mb-3 h-10 w-10 text-status-error" />
-          <div className="font-display text-2xl text-text-primary">ERRO AO CARREGAR CRM</div>
-          <p className="mt-2 text-sm text-text-muted">{dashboard.error}</p>
-        </div>
+        <PageErrorState title="ERRO AO CARREGAR CRM" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : dashboard.customers.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <UsersRound className="mb-3 h-10 w-10 text-text-muted" />
-          <div className="font-display text-2xl text-text-primary">NENHUM CUSTOMER ENCONTRADO</div>
-          <p className="mt-2 text-sm text-text-muted">Assim que os pedidos e check-ins acontecerem, a base de CRM aparece aqui.</p>
-        </div>
+        <PageEmptyState
+          title="NENHUM CUSTOMER ENCONTRADO"
+          description="Assim que os pedidos e check-ins acontecerem, a base de CRM aparece aqui."
+          icon={<UsersRound className="mb-3 h-10 w-10 text-text-muted" />}
+        />
       ) : (
         <CustomersTable customers={dashboard.customers} onSelect={(customer) => setSelectedCustomer(customer)} />
       )}

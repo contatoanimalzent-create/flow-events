@@ -1,4 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/features/auth'
+import { auditService } from '@/features/audit'
 import { campaignsKeys, campaignsMutations } from '@/features/campaigns/services'
 
 interface UseCampaignsMutationsParams {
@@ -7,6 +9,7 @@ interface UseCampaignsMutationsParams {
 
 export function useCampaignsMutations({ organizationId }: UseCampaignsMutationsParams) {
   const queryClient = useQueryClient()
+  const profile = useAuthStore((state) => state.profile)
 
   async function invalidateCampaigns() {
     if (!organizationId) {
@@ -60,6 +63,18 @@ export function useCampaignsMutations({ organizationId }: UseCampaignsMutationsP
     }
 
     await launchCampaignMutation.mutateAsync(params)
+    if (organizationId) {
+      await auditService.record({
+        organization_id: organizationId,
+        user_id: profile?.id ?? null,
+        user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+        entity_type: 'campaign',
+        entity_id: params.draftId,
+        action_type: 'execute',
+        title: 'Campanha lancada',
+        description: `Draft ${params.draftId} enviado para execucao.`,
+      })
+    }
     return true
   }
 

@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
 import { AlertTriangle, Loader2, Plus, RefreshCw } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
+import { useAccessControl } from '@/features/access-control'
 import { useCampaignsDashboard, useCampaignsMutations } from '@/features/campaigns/hooks'
 import { CampaignDraftModal, SegmentBuilderModal } from '@/features/campaigns/modals'
 import type { AudienceSegmentFormValues, AudienceSegmentRow, CampaignDraftFormValues, CampaignDraftRow } from '@/features/campaigns/types'
+import { PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { AudiencePreviewCard } from './AudiencePreviewCard'
 import { CampaignDraftsTable } from './CampaignDraftsTable'
@@ -75,6 +77,8 @@ function valuesFromDraft(draft: CampaignDraftRow): CampaignDraftFormValues {
 export function CampaignsPageContent() {
   const organization = useAuthStore((state) => state.organization)
   const profile = useAuthStore((state) => state.profile)
+  const access = useAccessControl()
+  const canManageCampaigns = access.can('campaigns', 'manage')
   const dashboard = useCampaignsDashboard(organization?.id)
   const mutations = useCampaignsMutations({ organizationId: organization?.id })
   const [showSegmentModal, setShowSegmentModal] = useState(false)
@@ -119,7 +123,7 @@ export function CampaignsPageContent() {
           <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
             <RefreshCw className="h-3.5 w-3.5" /> Atualizar
           </button>
-          {dashboard.tab === 'segments' ? (
+          {dashboard.tab === 'segments' && canManageCampaigns ? (
             <button
               onClick={() => {
                 setEditingSegment(null)
@@ -130,7 +134,7 @@ export function CampaignsPageContent() {
             >
               <Plus className="h-4 w-4" /> Novo segmento
             </button>
-          ) : dashboard.tab === 'drafts' ? (
+          ) : dashboard.tab === 'drafts' && canManageCampaigns ? (
             <button
               onClick={() => {
                 setEditingDraft(null)
@@ -169,15 +173,9 @@ export function CampaignsPageContent() {
       </div>
 
       {dashboard.loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
-        </div>
+        <PageLoadingState title="Carregando campanhas" description="Atualizando segmentos, drafts e execucoes em andamento." />
       ) : dashboard.error ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <AlertTriangle className="mb-3 h-10 w-10 text-status-error" />
-          <div className="font-display text-2xl text-text-primary">ERRO AO CARREGAR CAMPAIGNS</div>
-          <p className="mt-2 text-sm text-text-muted">{dashboard.error}</p>
-        </div>
+        <PageErrorState title="ERRO AO CARREGAR CAMPAIGNS" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : dashboard.tab === 'segments' ? (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.5fr_1fr]">
           <SegmentsTable

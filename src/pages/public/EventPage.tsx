@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { supabase } from '@/lib/supabase'
 import { stripePromise, calculateFees } from '@/lib/stripe'
+import { logError } from '@/shared/lib'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
 import { PublicCheckoutContent } from '@/features/orders'
 import {
@@ -122,7 +123,7 @@ export function EventPage({ slug }: { slug: string }) {
         .from('events').select('*').eq('slug', slug).single()
       
       if (error || !ev) {
-        console.error('Event not found:', { slug, error })
+        logError(error ?? 'Event not found', { scope: 'public-event-page', action: 'fetch-event', slug })
         setLoading(false)
         return
       }
@@ -144,7 +145,7 @@ export function EventPage({ slug }: { slug: string }) {
       setLoading(false)
       trackEvent('ViewContent', { event_id: ev.id, event_name: ev.name })
     } catch (err) {
-      console.error('Fatal error fetching event:', err)
+      logError(err, { scope: 'public-event-page', action: 'fetch-event', slug })
       setLoading(false)
     }
   }

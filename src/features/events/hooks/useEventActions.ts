@@ -1,4 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/features/auth'
+import { auditService } from '@/features/audit'
 import { eventsKeys, eventsMutations } from '@/features/events/services'
 import type { EventRow, EventStatus } from '@/features/events/types'
 
@@ -8,6 +10,7 @@ interface UseEventActionsParams {
 
 export function useEventActions({ organizationId }: UseEventActionsParams) {
   const queryClient = useQueryClient()
+  const profile = useAuthStore((state) => state.profile)
 
   async function invalidateEventQueries(eventId?: string) {
     if (!organizationId) {
@@ -46,6 +49,18 @@ export function useEventActions({ organizationId }: UseEventActionsParams) {
 
   async function publishEvent(eventId: string, currentStatus: EventStatus) {
     await publishMutation.mutateAsync({ eventId, currentStatus })
+    if (organizationId) {
+      await auditService.record({
+        organization_id: organizationId,
+        user_id: profile?.id ?? null,
+        user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+        entity_type: 'event',
+        entity_id: eventId,
+        action_type: 'status_change',
+        title: 'Status do evento atualizado',
+        description: `Evento ${currentStatus === 'published' ? 'despublicado' : 'publicado'} no backoffice.`,
+      })
+    }
   }
 
   async function deleteEvent(eventId: string) {
@@ -54,6 +69,18 @@ export function useEventActions({ organizationId }: UseEventActionsParams) {
     }
 
     await deleteMutation.mutateAsync({ eventId })
+    if (organizationId) {
+      await auditService.record({
+        organization_id: organizationId,
+        user_id: profile?.id ?? null,
+        user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+        entity_type: 'event',
+        entity_id: eventId,
+        action_type: 'delete',
+        title: 'Evento removido',
+        description: 'Registro excluido a partir da lista de eventos.',
+      })
+    }
     return true
   }
 
@@ -63,6 +90,17 @@ export function useEventActions({ organizationId }: UseEventActionsParams) {
     }
 
     await duplicateMutation.mutateAsync({ event, organizationId })
+    await auditService.record({
+      organization_id: organizationId,
+      user_id: profile?.id ?? null,
+      user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+      entity_type: 'event',
+      entity_id: event.id,
+      action_type: 'create',
+      title: 'Evento duplicado',
+      description: `Duplicacao iniciada a partir do evento ${event.name}.`,
+      event_id: event.id,
+    })
   }
 
   return {

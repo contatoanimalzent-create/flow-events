@@ -1,12 +1,16 @@
 import { ArrowUpDown, Loader2, Package, Plus, Ticket, ToggleRight } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
+import { useAccessControl } from '@/features/access-control'
 import { useTicketActions, useTicketsList } from '@/features/tickets/hooks'
 import { TicketBatchModal, TicketTypeModal } from '@/features/tickets/modals'
+import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { TicketTypeCard } from './TicketTypeCard'
 
 export function TicketsPageContent() {
   const organization = useAuthStore((state) => state.organization)
+  const access = useAccessControl()
+  const canManageTickets = access.can('tickets', 'manage')
   const {
     events,
     selectedEventId,
@@ -43,9 +47,11 @@ export function TicketsPageContent() {
           </h1>
           <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">Tipos de ingresso e lotes de venda</p>
         </div>
-        <button onClick={openCreateTypeModal} disabled={!selectedEventId} className="btn-primary flex items-center gap-2">
-          <Plus className="h-4 w-4" /> Novo tipo
-        </button>
+        {canManageTickets ? (
+          <button onClick={openCreateTypeModal} disabled={!selectedEventId} className="btn-primary flex items-center gap-2">
+            <Plus className="h-4 w-4" /> Novo tipo
+          </button>
+        ) : null}
       </div>
 
       {events.length > 1 && (
@@ -94,39 +100,39 @@ export function TicketsPageContent() {
       )}
 
       {loading && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
-        </div>
+        <PageLoadingState title="Carregando ingressos" description="Montando tipos e lotes do evento selecionado." />
       )}
 
       {!loading && error && (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <Ticket className="mb-3 h-10 w-10 text-status-error" />
-          <div className="mb-1 font-display text-2xl text-text-primary">ERRO AO CARREGAR INGRESSOS</div>
-          <p className="mb-5 max-w-md text-sm text-text-muted">{error}</p>
-          <button onClick={() => void refreshTickets()} className="btn-primary">
-            Tentar novamente
-          </button>
-        </div>
+        <PageErrorState
+          title="ERRO AO CARREGAR INGRESSOS"
+          description={error}
+          icon={<Ticket className="mb-3 h-10 w-10 text-status-error" />}
+          action={
+            <button onClick={() => void refreshTickets()} className="btn-primary">
+              Tentar novamente
+            </button>
+          }
+        />
       )}
 
       {!loading && !error && events.length === 0 && (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <Ticket className="mb-3 h-10 w-10 text-text-muted" />
-          <div className="mb-1 font-display text-2xl text-text-primary">NENHUM EVENTO</div>
-          <p className="text-sm text-text-muted">Crie um evento primeiro para adicionar ingressos</p>
-        </div>
+        <PageEmptyState title="NENHUM EVENTO" description="Crie um evento primeiro para adicionar ingressos." icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />} />
       )}
 
       {!loading && !error && events.length > 0 && ticketTypes.length === 0 && (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <Ticket className="mb-3 h-10 w-10 text-text-muted" />
-          <div className="mb-1 font-display text-2xl text-text-primary">NENHUM TIPO DE INGRESSO</div>
-          <p className="mb-5 text-sm text-text-muted">Adicione tipos de ingresso para come\u00e7ar a vender</p>
-          <button onClick={openCreateTypeModal} className="btn-primary">
-            + Novo tipo de ingresso
-          </button>
-        </div>
+        <PageEmptyState
+          title="NENHUM TIPO DE INGRESSO"
+          description="Adicione tipos de ingresso para comecar a vender."
+          icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />}
+          action={
+            canManageTickets ? (
+            <button onClick={openCreateTypeModal} className="btn-primary">
+              + Novo tipo de ingresso
+            </button>
+            ) : undefined
+          }
+        />
       )}
 
       {!loading && !error && ticketTypes.length > 0 && (

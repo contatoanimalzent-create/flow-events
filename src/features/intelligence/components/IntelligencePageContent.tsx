@@ -5,6 +5,7 @@ import { useIntelligenceDashboard, useIntelligenceMutations } from '@/features/i
 import { INTELLIGENCE_ALERT_SEVERITY_LABELS, INTELLIGENCE_ALERT_STATUS_LABELS, INTELLIGENCE_ALERT_TYPE_LABELS } from '@/features/intelligence/types'
 import type { IntelligenceAlert } from '@/features/intelligence/types'
 import { AlertAcknowledgeModal } from '@/features/intelligence/modals'
+import { PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { IntelligenceAlertsList } from './IntelligenceAlertsList'
 import { IntelligenceHealthScoreGrid } from './IntelligenceHealthScoreGrid'
@@ -176,15 +177,9 @@ export function IntelligencePageContent() {
       ) : null}
 
       {dashboard.loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
-        </div>
+        <PageLoadingState title="Carregando intelligence" description="Calculando health score, alertas e recomendacoes acionaveis." />
       ) : dashboard.error ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <AlertTriangle className="mb-3 h-10 w-10 text-status-error" />
-          <div className="font-display text-2xl text-text-primary">ERRO AO CARREGAR INTELLIGENCE</div>
-          <p className="mt-2 text-sm text-text-muted">{dashboard.error}</p>
-        </div>
+        <PageErrorState title="ERRO AO CARREGAR INTELLIGENCE" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : dashboard.tab === 'overview' ? (
         <IntelligenceHealthScoreGrid healthScores={dashboard.filteredHealthScores} />
       ) : dashboard.tab === 'alerts' ? (

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/features/auth'
+import { auditService } from '@/features/audit'
 import { EMPTY_TICKET_TYPE_FORM } from '@/features/tickets/types'
 import { ticketKeys, ticketMutations, ticketQueries } from '@/features/tickets/services'
 import { formatBenefitsForForm } from '@/features/tickets/services'
@@ -27,6 +29,8 @@ function mapTicketTypeToForm(ticketType: TicketType): TicketTypeFormData {
 
 export function useTicketForm({ eventId, ticketId, position, onSaved }: UseTicketFormParams) {
   const queryClient = useQueryClient()
+  const organizationId = useAuthStore((state) => state.organization?.id)
+  const profile = useAuthStore((state) => state.profile)
   const [form, setForm] = useState<TicketTypeFormData>(EMPTY_TICKET_TYPE_FORM)
   const [error, setError] = useState('')
 
@@ -86,8 +90,33 @@ export function useTicketForm({ eventId, ticketId, position, onSaved }: UseTicke
     try {
       if (ticketId) {
         await updateMutation.mutateAsync({ ticketId, eventId, form, position })
+        if (organizationId) {
+          await auditService.record({
+            organization_id: organizationId,
+            user_id: profile?.id ?? null,
+            user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+            event_id: eventId,
+            entity_type: 'ticket',
+            entity_id: ticketId,
+            action_type: 'update',
+            title: 'Tipo de ingresso atualizado',
+            description: form.name,
+          })
+        }
       } else {
         await createMutation.mutateAsync({ eventId, form, position })
+        if (organizationId) {
+          await auditService.record({
+            organization_id: organizationId,
+            user_id: profile?.id ?? null,
+            user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+            event_id: eventId,
+            entity_type: 'ticket',
+            action_type: 'create',
+            title: 'Tipo de ingresso criado',
+            description: form.name,
+          })
+        }
       }
 
       onSaved()

@@ -1,0 +1,1 @@
+export { useNotificationsCenter } from './useNotificationsCenter'

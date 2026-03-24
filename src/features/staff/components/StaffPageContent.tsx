@@ -2,10 +2,12 @@ import { Download, Loader2, Plus, Search, Upload, Users } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useAuthStore } from '@/features/auth'
+import { useAccessControl } from '@/features/access-control'
 import { useStaffActions, useStaffList } from '@/features/staff/hooks'
 import { staffKeys, staffQueries } from '@/features/staff/services'
 import { STAFF_STATUS_CONFIG } from '@/features/staff/types'
 import type { StaffTimeEntryRow } from '@/features/staff/types'
+import { PageEmptyState, PageLoadingState } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { StaffFormModal } from '@/features/staff/modals'
 import { StaffStatsGrid } from './StaffStatsGrid'
@@ -13,6 +15,8 @@ import { StaffMemberTableRow } from './StaffMemberRow'
 
 export function StaffPageContent() {
   const organization = useAuthStore((state) => state.organization)
+  const access = useAccessControl()
+  const canManageStaff = access.can('staff', 'manage')
   const {
     events,
     selectedEventId,
@@ -64,15 +68,17 @@ export function StaffPageContent() {
           <button className="btn-secondary flex items-center gap-2 text-xs">
             <Download className="h-3.5 w-3.5" /> Exportar
           </button>
-          <button
-            onClick={() => {
-              setEditingId(null)
-              setShowForm(true)
-            }}
-            className="btn-primary flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" /> Adicionar
-          </button>
+          {canManageStaff ? (
+            <button
+              onClick={() => {
+                setEditingId(null)
+                setShowForm(true)
+              }}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" /> Adicionar
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -123,20 +129,20 @@ export function StaffPageContent() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
-        </div>
+        <PageLoadingState title="Carregando staff" description="Buscando equipe, presenca e alocacoes operacionais." />
       ) : staff.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center p-16 text-center">
-          <Users className="mb-3 h-10 w-10 text-text-muted" />
-          <div className="mb-1 font-display text-2xl text-text-primary">NENHUM MEMBRO</div>
-          <p className="mb-5 text-sm text-text-muted">{search || statusFilter !== 'all' ? 'Nenhum resultado encontrado' : 'Adicione membros ao staff'}</p>
-          {!search && statusFilter === 'all' && (
-            <button onClick={() => setShowForm(true)} className="btn-primary">
-              + Adicionar
-            </button>
-          )}
-        </div>
+        <PageEmptyState
+          title="NENHUM MEMBRO"
+          description={search || statusFilter !== 'all' ? 'Nenhum resultado encontrado.' : 'Adicione membros ao staff.'}
+          icon={<Users className="mb-3 h-10 w-10 text-text-muted" />}
+          action={
+            !search && statusFilter === 'all' && canManageStaff ? (
+              <button onClick={() => setShowForm(true)} className="btn-primary">
+                + Adicionar
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
         <div className="card overflow-hidden">
           <table className="w-full">

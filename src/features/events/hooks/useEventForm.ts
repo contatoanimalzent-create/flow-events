@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/features/auth'
+import { auditService } from '@/features/audit'
 import { EMPTY_EVENT_FORM } from '@/features/events/types'
 import { eventsKeys, eventsMutations, eventsQueries } from '@/features/events/services'
 import type { EventEditorRecord, EventFormData } from '@/features/events/types'
@@ -35,6 +37,7 @@ function mapEditorRecordToForm(data: EventEditorRecord): EventFormData {
 
 export function useEventForm({ eventId, organizationId, onSaved }: UseEventFormParams) {
   const queryClient = useQueryClient()
+  const profile = useAuthStore((state) => state.profile)
   const [form, setForm] = useState<EventFormData>(EMPTY_EVENT_FORM)
   const [step, setStep] = useState(1)
   const [error, setError] = useState('')
@@ -115,8 +118,27 @@ export function useEventForm({ eventId, organizationId, onSaved }: UseEventFormP
     try {
       if (eventId) {
         await updateMutation.mutateAsync({ eventId, form })
+        await auditService.record({
+          organization_id: organizationId,
+          user_id: profile?.id ?? null,
+          user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+          entity_type: 'event',
+          entity_id: eventId,
+          action_type: 'update',
+          title: 'Evento atualizado',
+          description: form.name,
+        })
       } else {
         await createMutation.mutateAsync({ organizationId, form })
+        await auditService.record({
+          organization_id: organizationId,
+          user_id: profile?.id ?? null,
+          user_name: `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim() || null,
+          entity_type: 'event',
+          action_type: 'create',
+          title: 'Evento criado',
+          description: form.name,
+        })
       }
 
       onSaved()

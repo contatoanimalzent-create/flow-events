@@ -5,7 +5,7 @@ import { useCrmDashboard, useCrmMutations } from '@/features/crm/hooks'
 import { CustomerDetailModal } from '@/features/crm/modals'
 import { CRM_CUSTOMER_STATUS_LABELS, CRM_PERIOD_FILTER_LABELS } from '@/features/crm/types'
 import type { CustomerListRow } from '@/features/crm/types'
-import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
+import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { CustomerMetricsGrid } from './CustomerMetricsGrid'
 import { CustomersTable } from './CustomersTable'
@@ -122,14 +122,17 @@ export function CrmPageContent() {
         <PageLoadingState title="Carregando CRM" description="Consolidando clientes, tags e historico de relacionamento." />
       ) : dashboard.error ? (
         <PageErrorState title="ERRO AO CARREGAR CRM" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
-      ) : dashboard.customers.length === 0 ? (
+      ) : dashboard.allCustomers.length === 0 ? (
         <PageEmptyState
           title="NENHUM CUSTOMER ENCONTRADO"
           description="Assim que os pedidos e check-ins acontecerem, a base de CRM aparece aqui."
           icon={<UsersRound className="mb-3 h-10 w-10 text-text-muted" />}
         />
       ) : (
-        <CustomersTable customers={dashboard.customers} onSelect={(customer) => setSelectedCustomer(customer)} />
+        <div className="space-y-3">
+          <CustomersTable customers={dashboard.customers} onSelect={(customer) => setSelectedCustomer(customer)} />
+          <PaginationControls pagination={dashboard.pagination} onPageChange={dashboard.setPage} />
+        </div>
       )}
 
       {selectedCustomer ? (

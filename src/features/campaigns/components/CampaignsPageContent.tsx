@@ -5,7 +5,7 @@ import { useAccessControl } from '@/features/access-control'
 import { useCampaignsDashboard, useCampaignsMutations } from '@/features/campaigns/hooks'
 import { CampaignDraftModal, SegmentBuilderModal } from '@/features/campaigns/modals'
 import type { AudienceSegmentFormValues, AudienceSegmentRow, CampaignDraftFormValues, CampaignDraftRow } from '@/features/campaigns/types'
-import { PageErrorState, PageLoadingState } from '@/shared/components'
+import { PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { AudiencePreviewCard } from './AudiencePreviewCard'
 import { CampaignDraftsTable } from './CampaignDraftsTable'
@@ -177,49 +177,58 @@ export function CampaignsPageContent() {
       ) : dashboard.error ? (
         <PageErrorState title="ERRO AO CARREGAR CAMPAIGNS" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : dashboard.tab === 'segments' ? (
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.5fr_1fr]">
-          <SegmentsTable
-            segments={dashboard.overview?.segments ?? []}
-            onPreview={(segment) => {
-              dashboard.setSelectedSegmentId(segment.id)
-              setEditingSegment(segment)
-              setSegmentValues(valuesFromSegment(segment))
-              setShowSegmentModal(true)
-            }}
-            onEdit={(segment) => {
-              setEditingSegment(segment)
-              setSegmentValues(valuesFromSegment(segment))
-              setShowSegmentModal(true)
-            }}
-            onCreateDraft={(segment) => {
-              setEditingDraft(null)
-              setDraftValues(emptyDraftValues(segment.id))
-              setShowDraftModal(true)
-            }}
-            onDelete={(segment) => void mutations.deleteSegment(segment.id)}
-          />
-          <AudiencePreviewCard preview={selectedSegmentPreview} />
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.5fr_1fr]">
+            <SegmentsTable
+              segments={dashboard.paginatedSegments}
+              onPreview={(segment) => {
+                dashboard.setSelectedSegmentId(segment.id)
+                setEditingSegment(segment)
+                setSegmentValues(valuesFromSegment(segment))
+                setShowSegmentModal(true)
+              }}
+              onEdit={(segment) => {
+                setEditingSegment(segment)
+                setSegmentValues(valuesFromSegment(segment))
+                setShowSegmentModal(true)
+              }}
+              onCreateDraft={(segment) => {
+                setEditingDraft(null)
+                setDraftValues(emptyDraftValues(segment.id))
+                setShowDraftModal(true)
+              }}
+              onDelete={(segment) => void mutations.deleteSegment(segment.id)}
+            />
+            <AudiencePreviewCard preview={selectedSegmentPreview} />
+          </div>
+          <PaginationControls pagination={dashboard.segmentsPagination} onPageChange={dashboard.setSegmentsPage} />
         </div>
       ) : dashboard.tab === 'drafts' ? (
-        <CampaignDraftsTable
-          drafts={dashboard.overview?.drafts ?? []}
-          launchingDraftId={mutations.launchingDraftId}
-          onEdit={(draft) => {
-            setEditingDraft(draft)
-            setDraftValues(valuesFromDraft(draft))
-            setShowDraftModal(true)
-          }}
-          onLaunch={(draft) =>
-            void mutations.launchCampaign({
-              organizationId: organization.id,
-              draftId: draft.id,
-              launchedBy: profile?.id ?? null,
-            })
-          }
-          onDelete={(draft) => void mutations.deleteDraft(draft.id)}
-        />
+        <div className="space-y-3">
+          <CampaignDraftsTable
+            drafts={dashboard.paginatedDrafts}
+            launchingDraftId={mutations.launchingDraftId}
+            onEdit={(draft) => {
+              setEditingDraft(draft)
+              setDraftValues(valuesFromDraft(draft))
+              setShowDraftModal(true)
+            }}
+            onLaunch={(draft) =>
+              void mutations.launchCampaign({
+                organizationId: organization.id,
+                draftId: draft.id,
+                launchedBy: profile?.id ?? null,
+              })
+            }
+            onDelete={(draft) => void mutations.deleteDraft(draft.id)}
+          />
+          <PaginationControls pagination={dashboard.draftsPagination} onPageChange={dashboard.setDraftsPage} />
+        </div>
       ) : (
-        <CampaignRunsTable runs={dashboard.overview?.runs ?? []} />
+        <div className="space-y-3">
+          <CampaignRunsTable runs={dashboard.paginatedRuns} />
+          <PaginationControls pagination={dashboard.runsPagination} onPageChange={dashboard.setRunsPage} />
+        </div>
       )}
 
       {showSegmentModal ? (

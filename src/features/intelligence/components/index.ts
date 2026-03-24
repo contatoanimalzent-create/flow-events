@@ -1,4 +1,5 @@
 export { IntelligenceAlertsList } from './IntelligenceAlertsList'
+export { IntelligenceConsistencyPanel } from './IntelligenceConsistencyPanel'
 export { IntelligenceHealthScoreGrid } from './IntelligenceHealthScoreGrid'
 export { IntelligencePageContent } from './IntelligencePageContent'
 export { IntelligenceRecommendationsList } from './IntelligenceRecommendationsList'

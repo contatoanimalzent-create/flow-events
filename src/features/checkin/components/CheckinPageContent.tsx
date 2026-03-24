@@ -2,6 +2,7 @@ import { RefreshCw, ScanLine } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useCheckinBoard, useCheckinScanner } from '@/features/checkin/hooks'
 import { CheckinHistoryModal } from '@/features/checkin/modals'
+import { PaginationControls } from '@/shared/components'
 import { cn, formatNumber } from '@/shared/lib'
 import { CheckinScannerPanel } from './CheckinScannerPanel'
 import { CheckinStatsGrid } from './CheckinStatsGrid'
@@ -23,6 +24,8 @@ export function CheckinPageContent() {
     scanMode,
     setScanMode,
     filteredCheckins,
+    paginatedCheckins,
+    pagination,
     stats,
     commandCenter,
     loading,
@@ -30,6 +33,7 @@ export function CheckinPageContent() {
     occupancyPct,
     refreshBoard,
     historyTicketId,
+    setPage,
     openHistory,
     closeHistory,
   } = useCheckinBoard(organization?.id)
@@ -187,13 +191,14 @@ export function CheckinPageContent() {
       )}
 
       <RecentCheckinsTable
-        checkins={filteredCheckins}
+        checkins={paginatedCheckins}
         loading={loading}
         search={search}
         setSearch={setSearch}
         selectedGateLabel={selectedGateLabel}
         onSelectTicket={openHistory}
       />
+      <PaginationControls pagination={pagination} onPageChange={setPage} />
 
       {historyTicketId && <CheckinHistoryModal digitalTicketId={historyTicketId} onClose={closeHistory} />}
     </div>

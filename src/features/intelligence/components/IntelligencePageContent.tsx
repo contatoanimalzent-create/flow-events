@@ -8,6 +8,7 @@ import { AlertAcknowledgeModal } from '@/features/intelligence/modals'
 import { PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { IntelligenceAlertsList } from './IntelligenceAlertsList'
+import { IntelligenceConsistencyPanel } from './IntelligenceConsistencyPanel'
 import { IntelligenceHealthScoreGrid } from './IntelligenceHealthScoreGrid'
 import { IntelligenceRecommendationsList } from './IntelligenceRecommendationsList'
 
@@ -36,12 +37,14 @@ export function IntelligencePageContent() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {[
           { label: 'Health medio', value: dashboard.overview?.summary.average_overall_health ?? 0, sublabel: 'score consolidado', color: 'text-brand-blue' },
           { label: 'Alertas ativos', value: dashboard.overview?.summary.active_alerts_count ?? 0, sublabel: 'sinais abertos', color: 'text-status-warning' },
           { label: 'Criticos', value: dashboard.overview?.summary.critical_alerts_count ?? 0, sublabel: 'exigem acao rapida', color: 'text-status-error' },
           { label: 'Eventos em risco', value: dashboard.overview?.summary.high_risk_events_count ?? 0, sublabel: 'overall health < 60', color: 'text-brand-acid' },
+          { label: 'Issues de dados', value: dashboard.overview?.summary.consistency_issues_count ?? 0, sublabel: 'consistencia operacional', color: 'text-brand-purple' },
+          { label: 'Criticas de dados', value: dashboard.overview?.summary.critical_consistency_issues_count ?? 0, sublabel: 'impacto enterprise', color: 'text-status-error' },
         ].map((card) => (
           <div key={card.label} className="card p-4">
             <div className="mb-3 flex items-center justify-between">
@@ -59,6 +62,7 @@ export function IntelligencePageContent() {
           { key: 'overview', label: 'Health score' },
           { key: 'alerts', label: 'Alertas' },
           { key: 'recommendations', label: 'Recomendacoes' },
+          { key: 'consistency', label: 'Data consistency' },
         ] as const).map((tab) => (
           <button
             key={tab.key}
@@ -184,6 +188,8 @@ export function IntelligencePageContent() {
         <IntelligenceHealthScoreGrid healthScores={dashboard.filteredHealthScores} />
       ) : dashboard.tab === 'alerts' ? (
         <IntelligenceAlertsList alerts={dashboard.filteredAlerts} onAcknowledge={setSelectedAlert} />
+      ) : dashboard.tab === 'consistency' ? (
+        <IntelligenceConsistencyPanel issues={dashboard.filteredConsistencyIssues} />
       ) : (
         <IntelligenceRecommendationsList recommendations={dashboard.filteredRecommendations} />
       )}

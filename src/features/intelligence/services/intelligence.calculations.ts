@@ -72,12 +72,24 @@ function buildEmptyOverview(): IntelligenceOverview {
     health_scores: [],
     alerts: [],
     recommendations: [],
+    consistency: {
+      issues: [],
+      summary: {
+        total_issues: 0,
+        critical_issues: 0,
+        warning_issues: 0,
+        open_issues: 0,
+        resolved_issues: 0,
+      },
+    },
     summary: {
       average_overall_health: 0,
       active_alerts_count: 0,
       acknowledged_alerts_count: 0,
       critical_alerts_count: 0,
       high_risk_events_count: 0,
+      consistency_issues_count: 0,
+      critical_consistency_issues_count: 0,
     },
   }
 }
@@ -512,6 +524,16 @@ export function buildIntelligenceOverview(params: {
     health_scores: healthScores.sort((left, right) => right.overall_health_score - left.overall_health_score),
     alerts: orderedAlerts,
     recommendations,
+    consistency: {
+      issues: [],
+      summary: {
+        total_issues: 0,
+        critical_issues: 0,
+        warning_issues: 0,
+        open_issues: 0,
+        resolved_issues: 0,
+      },
+    },
     summary: {
       average_overall_health:
         healthScores.length > 0 ? roundMetric(healthScores.reduce((total, item) => total + item.overall_health_score, 0) / healthScores.length) : 0,
@@ -519,6 +541,8 @@ export function buildIntelligenceOverview(params: {
       acknowledged_alerts_count: orderedAlerts.filter((alert) => alert.status === 'acknowledged').length,
       critical_alerts_count: orderedAlerts.filter((alert) => alert.severity === 'critical' && alert.status === 'active').length,
       high_risk_events_count: healthScores.filter((score) => score.overall_health_score < 60).length,
+      consistency_issues_count: 0,
+      critical_consistency_issues_count: 0,
     },
   }
 }

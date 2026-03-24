@@ -1,1 +1,1 @@
-export {}
+export { useDashboardOverview } from './useDashboardOverview'

@@ -7,7 +7,7 @@ import { useStaffActions, useStaffList } from '@/features/staff/hooks'
 import { staffKeys, staffQueries } from '@/features/staff/services'
 import { STAFF_STATUS_CONFIG } from '@/features/staff/types'
 import type { StaffTimeEntryRow } from '@/features/staff/types'
-import { PageEmptyState, PageLoadingState } from '@/shared/components'
+import { PageEmptyState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { StaffFormModal } from '@/features/staff/modals'
 import { StaffStatsGrid } from './StaffStatsGrid'
@@ -22,6 +22,7 @@ export function StaffPageContent() {
     selectedEventId,
     setSelectedEventId,
     staff,
+    allStaff,
     loading,
     search,
     setSearch,
@@ -31,6 +32,8 @@ export function StaffPageContent() {
     setExpandedId,
     stats,
     refreshStaff,
+    pagination,
+    setPage,
   } = useStaffList(organization?.id)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -130,7 +133,7 @@ export function StaffPageContent() {
 
       {loading ? (
         <PageLoadingState title="Carregando staff" description="Buscando equipe, presenca e alocacoes operacionais." />
-      ) : staff.length === 0 ? (
+      ) : allStaff.length === 0 ? (
         <PageEmptyState
           title="NENHUM MEMBRO"
           description={search || statusFilter !== 'all' ? 'Nenhum resultado encontrado.' : 'Adicione membros ao staff.'}
@@ -176,6 +179,7 @@ export function StaffPageContent() {
               ))}
             </tbody>
           </table>
+          <PaginationControls pagination={pagination} onPageChange={setPage} />
         </div>
       )}
 

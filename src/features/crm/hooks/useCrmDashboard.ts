@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { crmKeys, crmQueries } from '@/features/crm/services'
 import type { CrmPeriodFilter, CustomerLifecycleStatus } from '@/features/crm/types'
+import { paginateItems } from '@/shared/api'
 
 function isWithinPeriod(value?: string | null, period?: CrmPeriodFilter) {
   if (!value || !period || period === 'all') {
@@ -19,6 +20,7 @@ export function useCrmDashboard(organizationId?: string | null) {
   const [periodFilter, setPeriodFilter] = useState<CrmPeriodFilter>('90d')
   const [search, setSearch] = useState('')
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
   const overviewQuery = useQuery({
     ...(organizationId
@@ -69,6 +71,10 @@ export function useCrmDashboard(organizationId?: string | null) {
     })
   }, [overviewQuery.data?.customers, periodFilter, search, selectedEventId, statusFilter])
 
+  useEffect(() => {
+    setPage(1)
+  }, [selectedEventId, statusFilter, periodFilter, search])
+
   const summary = useMemo(() => {
     const totalRevenue = filteredCustomers.reduce((sum, customer) => sum + customer.total_revenue, 0)
 
@@ -82,9 +88,13 @@ export function useCrmDashboard(organizationId?: string | null) {
     }
   }, [filteredCustomers])
 
+  const paginatedCustomers = useMemo(() => paginateItems(filteredCustomers, { page, pageSize: 12 }), [filteredCustomers, page])
+
   return {
     events: overviewQuery.data?.events ?? [],
-    customers: filteredCustomers,
+    customers: paginatedCustomers.items,
+    allCustomers: filteredCustomers,
+    pagination: paginatedCustomers.pagination,
     summary,
     selectedEventId,
     setSelectedEventId,
@@ -94,6 +104,8 @@ export function useCrmDashboard(organizationId?: string | null) {
     setPeriodFilter,
     search,
     setSearch,
+    page,
+    setPage,
     selectedCustomerId,
     setSelectedCustomerId,
     loading: overviewQuery.isPending,

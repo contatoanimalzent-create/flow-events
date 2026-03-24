@@ -3,7 +3,7 @@ import { useAuthStore } from '@/features/auth'
 import { useAccessControl } from '@/features/access-control'
 import { useTicketActions, useTicketsList } from '@/features/tickets/hooks'
 import { TicketBatchModal, TicketTypeModal } from '@/features/tickets/modals'
-import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
+import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { TicketTypeCard } from './TicketTypeCard'
 
@@ -16,6 +16,7 @@ export function TicketsPageContent() {
     selectedEventId,
     setSelectedEventId,
     ticketTypes,
+    allTicketTypes,
     loading,
     error,
     stats,
@@ -26,6 +27,8 @@ export function TicketsPageContent() {
     editingTypeId,
     editingBatchId,
     batchParentId,
+    pagination,
+    setPage,
     refreshTickets,
     openCreateTypeModal,
     openEditTypeModal,
@@ -120,7 +123,7 @@ export function TicketsPageContent() {
         <PageEmptyState title="NENHUM EVENTO" description="Crie um evento primeiro para adicionar ingressos." icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />} />
       )}
 
-      {!loading && !error && events.length > 0 && ticketTypes.length === 0 && (
+      {!loading && !error && events.length > 0 && allTicketTypes.length === 0 && (
         <PageEmptyState
           title="NENHUM TIPO DE INGRESSO"
           description="Adicione tipos de ingresso para comecar a vender."
@@ -153,6 +156,7 @@ export function TicketsPageContent() {
               onToggleBatch={(batch) => void toggleBatchStatus(batch.id, batch.is_active)}
             />
           ))}
+          <PaginationControls pagination={pagination} onPageChange={setPage} />
         </div>
       )}
 

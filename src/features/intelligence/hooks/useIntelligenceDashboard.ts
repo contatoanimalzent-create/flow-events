@@ -14,12 +14,24 @@ function buildEmptyOverview(): IntelligenceOverview {
     health_scores: [],
     alerts: [],
     recommendations: [],
+    consistency: {
+      issues: [],
+      summary: {
+        total_issues: 0,
+        critical_issues: 0,
+        warning_issues: 0,
+        open_issues: 0,
+        resolved_issues: 0,
+      },
+    },
     summary: {
       average_overall_health: 0,
       active_alerts_count: 0,
       acknowledged_alerts_count: 0,
       critical_alerts_count: 0,
       high_risk_events_count: 0,
+      consistency_issues_count: 0,
+      critical_consistency_issues_count: 0,
     },
   }
 }
@@ -70,6 +82,15 @@ export function useIntelligenceDashboard(organizationId?: string | null) {
     return recommendations.filter((recommendation) => recommendation.event_id === selectedEventId)
   }, [overview?.recommendations, selectedEventId])
 
+  const filteredConsistencyIssues = useMemo(() => {
+    const issues = overview?.consistency.issues ?? []
+    if (selectedEventId === 'all') {
+      return issues
+    }
+
+    return issues.filter((issue) => issue.event_id === selectedEventId)
+  }, [overview?.consistency.issues, selectedEventId])
+
   const eventOptions = useMemo(
     () => (overview?.health_scores ?? []).map((health) => ({ id: health.event_id, name: health.event_name })),
     [overview?.health_scores],
@@ -91,6 +112,7 @@ export function useIntelligenceDashboard(organizationId?: string | null) {
     filteredHealthScores,
     filteredAlerts,
     filteredRecommendations,
+    filteredConsistencyIssues,
     loading: overviewQuery.isPending,
     error: overviewQuery.error instanceof Error ? overviewQuery.error.message : '',
     refresh: () => overviewQuery.refetch(),

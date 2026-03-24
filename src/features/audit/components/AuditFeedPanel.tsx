@@ -1,6 +1,7 @@
 import { Activity } from 'lucide-react'
 import { useAuditTrail } from '@/features/audit/hooks/useAuditTrail'
 import type { AuditEntityType } from '@/features/audit/types/audit.types'
+import { PaginationControls } from '@/shared/components'
 import { formatDate } from '@/shared/lib'
 
 const ENTITY_LABELS: Record<AuditEntityType, string> = {
@@ -46,26 +47,27 @@ export function AuditFeedPanel() {
       </div>
 
       {audit.entries.length === 0 ? (
-        <div className="rounded-sm border border-bg-border bg-bg-card p-4 text-center text-sm text-text-muted">
-          Nenhuma atividade auditavel registrada ainda.
-        </div>
+        <div className="rounded-sm border border-bg-border bg-bg-card p-4 text-center text-sm text-text-muted">Nenhuma atividade auditavel registrada ainda.</div>
       ) : (
-        <div className="max-h-80 space-y-2 overflow-y-auto">
-          {audit.entries.map((entry) => (
-            <div key={entry.id} className="rounded-sm border border-bg-border bg-bg-card p-3">
-              <div className="mb-1 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
-                  <Activity className="h-3.5 w-3.5 text-brand-acid" />
-                  {entry.title}
+        <div className="space-y-2">
+          <div className="max-h-80 space-y-2 overflow-y-auto">
+            {audit.entries.map((entry) => (
+              <div key={entry.id} className="rounded-sm border border-bg-border bg-bg-card p-3">
+                <div className="mb-1 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
+                    <Activity className="h-3.5 w-3.5 text-brand-acid" />
+                    {entry.title}
+                  </div>
+                  <span className="text-[10px] font-mono text-text-muted">{formatDate(entry.created_at, 'dd/MM HH:mm')}</span>
                 </div>
-                <span className="text-[10px] font-mono text-text-muted">{formatDate(entry.created_at, 'dd/MM HH:mm')}</span>
+                <div className="text-[11px] text-text-muted">
+                  {entry.description ?? `${ENTITY_LABELS[entry.entity_type]} - ${entry.action_type}`}
+                  {entry.user_name ? ` - ${entry.user_name}` : ''}
+                </div>
               </div>
-              <div className="text-[11px] text-text-muted">
-                {entry.description ?? `${ENTITY_LABELS[entry.entity_type]} · ${entry.action_type}`}
-                {entry.user_name ? ` · ${entry.user_name}` : ''}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <PaginationControls pagination={audit.pagination} onPageChange={audit.setPage} compact />
         </div>
       )}
     </div>

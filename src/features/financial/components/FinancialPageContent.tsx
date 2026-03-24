@@ -11,7 +11,7 @@ import {
 } from '@/features/financial/types'
 import { useFinancialDashboard, useFinancialMutations } from '@/features/financial/hooks'
 import { ClosureReviewModal, CostEntryModal, ForecastModal, PayoutModal } from '@/features/financial/modals'
-import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
+import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn, formatCurrency } from '@/shared/lib'
 import { FinancialClosuresTable } from './FinancialClosuresTable'
 import { FinancialEventsTable } from './FinancialEventsTable'
@@ -80,6 +80,7 @@ export function FinancialPageContent() {
   }
 
   const filteredReports = dashboard.filteredReports
+  const paginatedReports = dashboard.paginatedReports
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5 p-6">
@@ -194,7 +195,7 @@ export function FinancialPageContent() {
           {dashboard.tab === 'overview' ? (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.6fr_1fr]">
               <FinancialEventsTable
-                reports={filteredReports}
+                reports={paginatedReports}
                 expandedEventId={dashboard.expandedEventId}
                 onToggleEvent={(eventId) => dashboard.setExpandedEventId(dashboard.expandedEventId === eventId ? null : eventId)}
               />
@@ -276,7 +277,11 @@ export function FinancialPageContent() {
             </div>
           ) : null}
 
-          {dashboard.tab === 'forecast' ? <FinancialForecastTable reports={filteredReports} onEditForecast={(report) => openForecastModal(report.event_id)} /> : null}
+          {dashboard.tab === 'overview' || dashboard.tab === 'dre' || dashboard.tab === 'forecast' || dashboard.tab === 'payouts' || dashboard.tab === 'closure' ? (
+            <PaginationControls pagination={dashboard.reportsPagination} onPageChange={dashboard.setReportsPage} />
+          ) : null}
+
+          {dashboard.tab === 'forecast' ? <FinancialForecastTable reports={paginatedReports} onEditForecast={(report) => openForecastModal(report.event_id)} /> : null}
 
           {dashboard.tab === 'payouts' ? (
             <div className="space-y-4">
@@ -297,22 +302,25 @@ export function FinancialPageContent() {
                 </div>
               </div>
 
-              <FinancialPayoutsTable reports={filteredReports} onEditPayout={(report) => openPayoutModal(report.event_id)} />
+              <FinancialPayoutsTable reports={paginatedReports} onEditPayout={(report) => openPayoutModal(report.event_id)} />
             </div>
           ) : null}
 
-          {dashboard.tab === 'closure' ? <FinancialClosuresTable reports={filteredReports} onReviewClosure={(report) => openClosureModal(report.event_id)} /> : null}
+          {dashboard.tab === 'closure' ? <FinancialClosuresTable reports={paginatedReports} onReviewClosure={(report) => openClosureModal(report.event_id)} /> : null}
 
           {dashboard.tab === 'dre' ? (
             <FinancialEventsTable
-              reports={filteredReports}
+              reports={paginatedReports}
               expandedEventId={dashboard.expandedEventId}
               onToggleEvent={(eventId) => dashboard.setExpandedEventId(dashboard.expandedEventId === eventId ? null : eventId)}
             />
           ) : null}
 
           {dashboard.tab === 'reconciliation' ? (
-            <FinancialReconciliationTable rows={dashboard.reconciliationRows} selectedEventId={dashboard.selectedEventId} />
+            <div className="space-y-3">
+              <FinancialReconciliationTable rows={dashboard.paginatedReconciliationRows} selectedEventId={dashboard.selectedEventId} />
+              <PaginationControls pagination={dashboard.reconciliationPagination} onPageChange={dashboard.setReconciliationPage} />
+            </div>
           ) : null}
 
           {dashboard.tab === 'costs' ? (
@@ -394,7 +402,7 @@ export function FinancialPageContent() {
                       </tr>
                     </thead>
                     <tbody>
-                      {dashboard.filteredCostEntries.map((entry) => (
+                      {dashboard.paginatedCostEntries.map((entry) => (
                         <tr key={entry.id} className="table-row">
                           <td className="table-cell">
                             <div className="text-[13px] font-medium text-text-primary">{entry.description}</div>
@@ -426,6 +434,7 @@ export function FinancialPageContent() {
                   </table>
                 </div>
               )}
+              <PaginationControls pagination={dashboard.costsPagination} onPageChange={dashboard.setCostsPage} />
 
               <div className="card p-4 text-sm">
                 <div className="mb-2 flex items-center gap-2 text-text-primary">

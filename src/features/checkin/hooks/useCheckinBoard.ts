@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { checkinKeys, checkinQueries } from '@/features/checkin/services'
 import type { CheckinStats } from '@/features/checkin/types'
+import { paginateItems } from '@/shared/api'
 
 const EMPTY_STATS: CheckinStats = {
   totalIn: 0,
@@ -17,6 +18,7 @@ export function useCheckinBoard(organizationId?: string) {
   const [search, setSearch] = useState('')
   const [scanMode, setScanMode] = useState(false)
   const [historyTicketId, setHistoryTicketId] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
   const eventsQuery = useQuery({
     ...(organizationId ? checkinQueries.events(organizationId) : { queryKey: ['checkin', 'events', 'empty'], queryFn: async () => [] }),
@@ -73,6 +75,12 @@ export function useCheckinBoard(organizationId?: string) {
     })
   }, [recentCheckinsQuery.data, search])
 
+  useEffect(() => {
+    setPage(1)
+  }, [selectedEventId, selectedGateId, search])
+
+  const paginatedCheckins = useMemo(() => paginateItems(filteredCheckins, { page, pageSize: 12 }), [filteredCheckins, page])
+
   const event = useMemo(
     () => (eventsQuery.data ?? []).find((item) => item.id === selectedEventId) ?? null,
     [eventsQuery.data, selectedEventId],
@@ -96,6 +104,8 @@ export function useCheckinBoard(organizationId?: string) {
     scanMode,
     setScanMode,
     filteredCheckins,
+    paginatedCheckins: paginatedCheckins.items,
+    pagination: paginatedCheckins.pagination,
     stats: statsQuery.data ?? EMPTY_STATS,
     commandCenter: commandCenterQuery.data ?? { gateSummaries: [], alerts: [] },
     loading: eventsQuery.isPending || recentCheckinsQuery.isPending,
@@ -103,6 +113,7 @@ export function useCheckinBoard(organizationId?: string) {
     occupancyPct,
     refreshBoard,
     historyTicketId,
+    setPage,
     openHistory: (ticketId: string) => setHistoryTicketId(ticketId),
     closeHistory: () => setHistoryTicketId(null),
   }

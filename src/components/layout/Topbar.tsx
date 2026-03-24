@@ -156,7 +156,12 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
           </div>
           <div className="max-h-96 overflow-y-auto p-4">
             {panelTab === 'notifications' ? (
-              <NotificationsPanel notifications={notifications.notifications} onMarkAsRead={notifications.markAsRead} />
+              <NotificationsPanel
+                notifications={notifications.notifications}
+                onMarkAsRead={notifications.markAsRead}
+                pagination={notifications.pagination}
+                onPageChange={notifications.setPage}
+              />
             ) : (
               <AuditFeedPanel />
             )}

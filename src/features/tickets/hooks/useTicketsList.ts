@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ticketKeys, ticketQueries } from '@/features/tickets/services'
 import type { TicketBatch, TicketTypeWithBatches } from '@/features/tickets/types'
 import { formatCurrency, formatNumber } from '@/shared/lib'
+import { paginateItems } from '@/shared/api'
 
 export function useTicketsList(organizationId?: string) {
   const [selectedEventId, setSelectedEventId] = useState('')
@@ -12,6 +13,7 @@ export function useTicketsList(organizationId?: string) {
   const [editingTypeId, setEditingTypeId] = useState<string | null>(null)
   const [editingBatchId, setEditingBatchId] = useState<string | null>(null)
   const [batchParentId, setBatchParentId] = useState('')
+  const [page, setPage] = useState(1)
 
   const saleEventsQuery = useQuery({
     ...(organizationId ? ticketQueries.saleEvents(organizationId) : { queryKey: ticketKeys.events('anonymous'), queryFn: async () => [] }),
@@ -33,6 +35,10 @@ export function useTicketsList(organizationId?: string) {
 
     setSelectedEventId((current) => current || firstEventId)
   }, [saleEventsQuery.data])
+
+  useEffect(() => {
+    setPage(1)
+  }, [selectedEventId])
 
   const events = saleEventsQuery.data ?? []
   const ticketTypes = ticketsQuery.data ?? []
@@ -57,6 +63,8 @@ export function useTicketsList(organizationId?: string) {
       { label: 'Lotes ativos', value: activeBatches.toString() },
     ]
   }, [ticketTypes])
+
+  const paginatedTicketTypes = useMemo(() => paginateItems(ticketTypes, { page, pageSize: 6 }), [ticketTypes, page])
 
   const selectedEvent = events.find((event) => event.id === selectedEventId)
 
@@ -101,7 +109,8 @@ export function useTicketsList(organizationId?: string) {
     selectedEvent,
     selectedEventId,
     setSelectedEventId,
-    ticketTypes,
+    ticketTypes: paginatedTicketTypes.items,
+    allTicketTypes: ticketTypes,
     loading,
     error,
     stats,
@@ -112,6 +121,9 @@ export function useTicketsList(organizationId?: string) {
     editingTypeId,
     editingBatchId,
     batchParentId,
+    page,
+    setPage,
+    pagination: paginatedTicketTypes.pagination,
     refreshTickets,
     openCreateTypeModal,
     openEditTypeModal,

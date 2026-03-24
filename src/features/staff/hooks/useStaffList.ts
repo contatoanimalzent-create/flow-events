@@ -2,12 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { staffKeys, staffQueries } from '@/features/staff/services'
 import type { StaffStatus } from '@/features/staff/types'
+import { paginateItems } from '@/shared/api'
 
 export function useStaffList(organizationId?: string) {
   const [selectedEventId, setSelectedEventId] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | StaffStatus>('all')
   const [search, setSearch] = useState('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
   const eventsQuery = useQuery({
     ...(organizationId ? staffQueries.events(organizationId) : { queryKey: staffKeys.events('empty'), queryFn: async () => [] }),
@@ -50,11 +52,18 @@ export function useStaffList(organizationId?: string) {
     })
   }, [search, staffQuery.data])
 
+  useEffect(() => {
+    setPage(1)
+  }, [selectedEventId, statusFilter, search])
+
+  const paginatedStaff = useMemo(() => paginateItems(filteredStaff, { page, pageSize: 10 }), [filteredStaff, page])
+
   return {
     events: eventsQuery.data ?? [],
     selectedEventId,
     setSelectedEventId,
-    staff: filteredStaff,
+    staff: paginatedStaff.items,
+    allStaff: filteredStaff,
     rawStaff: staffQuery.data ?? [],
     loading: staffQuery.isPending || eventsQuery.isPending,
     search,
@@ -63,6 +72,9 @@ export function useStaffList(organizationId?: string) {
     setStatusFilter,
     expandedId,
     setExpandedId,
+    page,
+    setPage,
+    pagination: paginatedStaff.pagination,
     stats: summaryQuery.data ?? { total: 0, confirmed: 0, active: 0, allocatedToGates: 0, totalDailyCost: 0 },
     refreshStaff: async () => {
       await Promise.all([staffQuery.refetch(), summaryQuery.refetch()])

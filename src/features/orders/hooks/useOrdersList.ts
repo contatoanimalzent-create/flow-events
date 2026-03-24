@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { orderKeys, orderQueries } from '@/features/orders/services'
 import { mapOrderStatusToPaymentStatus } from '@/features/orders/services'
 import type { OrderPaymentMethod, OrderStatus } from '@/features/orders/types'
+import { paginateItems } from '@/shared/api'
 
 export function useOrdersList(organizationId?: string) {
   const [selectedEventId, setSelectedEventId] = useState('')
@@ -10,6 +11,7 @@ export function useOrdersList(organizationId?: string) {
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
   const [methodFilter, setMethodFilter] = useState<'all' | OrderPaymentMethod>('all')
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
   const eventsQuery = useQuery({
     ...(organizationId ? orderQueries.events(organizationId) : { queryKey: orderKeys.events('anonymous'), queryFn: async () => [] }),
@@ -31,6 +33,10 @@ export function useOrdersList(organizationId?: string) {
 
     setSelectedEventId((current) => current || firstEventId)
   }, [eventsQuery.data])
+
+  useEffect(() => {
+    setPage(1)
+  }, [selectedEventId, search, statusFilter, methodFilter])
 
   const events = eventsQuery.data ?? []
   const orders = ordersQuery.data ?? []
@@ -54,6 +60,8 @@ export function useOrdersList(organizationId?: string) {
       return matchesSearch && matchesStatus && matchesMethod
     })
   }, [methodFilter, orders, search, statusFilter])
+
+  const paginatedOrders = useMemo(() => paginateItems(filteredOrders, { page, pageSize: 12 }), [filteredOrders, page])
 
   const stats = useMemo(() => {
     const paidOrders = orders.filter((order) => mapOrderStatusToPaymentStatus(order.status) === 'paid')
@@ -104,5 +112,9 @@ export function useOrdersList(organizationId?: string) {
     closeOrder,
     stats,
     refreshOrders,
+    page,
+    setPage,
+    paginatedOrders: paginatedOrders.items,
+    pagination: paginatedOrders.pagination,
   }
 }

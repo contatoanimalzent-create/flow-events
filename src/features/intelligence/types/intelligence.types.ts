@@ -1,8 +1,10 @@
-export type IntelligenceTab = 'overview' | 'alerts' | 'recommendations'
+export type IntelligenceTab = 'overview' | 'alerts' | 'recommendations' | 'consistency'
 export type IntelligenceAlertType = 'sales' | 'operations' | 'financial' | 'audience'
 export type IntelligenceAlertSeverity = 'critical' | 'warning' | 'info'
 export type IntelligenceAlertStatus = 'active' | 'acknowledged'
 export type IntelligenceRecommendationPriority = 'high' | 'medium' | 'low'
+export type IntelligenceConsistencyIssueType = 'order_payment' | 'ticket_link' | 'checkin' | 'campaign' | 'crm' | 'financial'
+export type IntelligenceConsistencyIssueStatus = 'open' | 'resolved'
 
 export interface IntelligenceEventHealth {
   event_id: string
@@ -54,12 +56,39 @@ export interface IntelligenceSummary {
   acknowledged_alerts_count: number
   critical_alerts_count: number
   high_risk_events_count: number
+  consistency_issues_count: number
+  critical_consistency_issues_count: number
+}
+
+export interface IntelligenceConsistencyIssue {
+  id: string
+  type: IntelligenceConsistencyIssueType
+  severity: IntelligenceAlertSeverity
+  status: IntelligenceConsistencyIssueStatus
+  title: string
+  description: string
+  event_id?: string | null
+  event_name?: string | null
+  entity_id?: string | null
+  created_at: string
+}
+
+export interface IntelligenceConsistencySummary {
+  total_issues: number
+  critical_issues: number
+  warning_issues: number
+  open_issues: number
+  resolved_issues: number
 }
 
 export interface IntelligenceOverview {
   health_scores: IntelligenceEventHealth[]
   alerts: IntelligenceAlert[]
   recommendations: IntelligenceRecommendation[]
+  consistency: {
+    issues: IntelligenceConsistencyIssue[]
+    summary: IntelligenceConsistencySummary
+  }
   summary: IntelligenceSummary
 }
 

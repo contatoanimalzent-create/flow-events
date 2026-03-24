@@ -1,14 +1,16 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/features/auth'
 import { auditService } from '@/features/audit/services/audit.service'
 import type { AuditEntityType } from '@/features/audit/types/audit.types'
+import { paginateItems } from '@/shared/api'
 
 export function useAuditTrail() {
   const organization = useAuthStore((state) => state.organization)
   const [eventId, setEventId] = useState<string>('all')
   const [userId, setUserId] = useState<string>('all')
   const [entityType, setEntityType] = useState<AuditEntityType | 'all'>('all')
+  const [page, setPage] = useState(1)
 
   const query = useQuery({
     queryKey: ['audit', organization?.id, eventId, userId, entityType] as const,
@@ -40,8 +42,15 @@ export function useAuditTrail() {
     [query.data],
   )
 
+  const paginatedEntries = useMemo(() => paginateItems(query.data ?? [], { page, pageSize: 8 }), [page, query.data])
+
+  useEffect(() => {
+    setPage(1)
+  }, [eventId, userId, entityType])
+
   return {
-    entries: query.data ?? [],
+    entries: paginatedEntries.items,
+    pagination: paginatedEntries.pagination,
     loading: query.isPending,
     eventId,
     setEventId,
@@ -49,6 +58,7 @@ export function useAuditTrail() {
     setUserId,
     entityType,
     setEntityType,
+    setPage,
     users,
     events,
   }

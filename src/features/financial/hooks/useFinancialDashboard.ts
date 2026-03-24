@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { financialKeys, financialQueries } from '@/features/financial/services'
 import { buildEmptyFinancialOverview } from '@/features/financial/services'
 import type { FinancialCostCategory, FinancialCostStatus, FinancialTab } from '@/features/financial/types'
+import { paginateItems } from '@/shared/api'
 
 export function useFinancialDashboard(organizationId?: string | null) {
   const [selectedEventId, setSelectedEventId] = useState<string>('all')
@@ -10,6 +11,9 @@ export function useFinancialDashboard(organizationId?: string | null) {
   const [categoryFilter, setCategoryFilter] = useState<'all' | FinancialCostCategory>('all')
   const [statusFilter, setStatusFilter] = useState<'all' | FinancialCostStatus>('all')
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
+  const [reportsPage, setReportsPage] = useState(1)
+  const [reconciliationPage, setReconciliationPage] = useState(1)
+  const [costsPage, setCostsPage] = useState(1)
 
   const overviewQuery = useQuery({
     ...(organizationId
@@ -68,6 +72,25 @@ export function useFinancialDashboard(organizationId?: string | null) {
     return reports.filter((report) => report.event_id === selectedEventId)
   }, [overview?.reports, selectedEventId])
 
+  const filteredReconciliationRows = useMemo(() => {
+    const rows = overview?.reconciliation_rows ?? []
+    if (selectedEventId === 'all') {
+      return rows
+    }
+
+    return rows.filter((row) => row.event_id === selectedEventId)
+  }, [overview?.reconciliation_rows, selectedEventId])
+
+  useEffect(() => {
+    setReportsPage(1)
+    setReconciliationPage(1)
+    setCostsPage(1)
+  }, [selectedEventId, categoryFilter, statusFilter, tab])
+
+  const paginatedReports = useMemo(() => paginateItems(filteredReports, { page: reportsPage, pageSize: 6 }), [filteredReports, reportsPage])
+  const paginatedReconciliationRows = useMemo(() => paginateItems(filteredReconciliationRows, { page: reconciliationPage, pageSize: 8 }), [filteredReconciliationRows, reconciliationPage])
+  const paginatedCostEntries = useMemo(() => paginateItems(filteredCostEntries, { page: costsPage, pageSize: 10 }), [filteredCostEntries, costsPage])
+
   return {
     tab,
     setTab,
@@ -82,9 +105,18 @@ export function useFinancialDashboard(organizationId?: string | null) {
     overview,
     reports: overview?.reports ?? [],
     filteredReports,
-    reconciliationRows: overview?.reconciliation_rows ?? [],
+    paginatedReports: paginatedReports.items,
+    reportsPagination: paginatedReports.pagination,
+    setReportsPage,
+    reconciliationRows: filteredReconciliationRows,
+    paginatedReconciliationRows: paginatedReconciliationRows.items,
+    reconciliationPagination: paginatedReconciliationRows.pagination,
+    setReconciliationPage,
     events: overview?.events ?? [],
     filteredCostEntries,
+    paginatedCostEntries: paginatedCostEntries.items,
+    costsPagination: paginatedCostEntries.pagination,
+    setCostsPage,
     selectedEventReport,
     loading: overviewQuery.isPending || costEntriesQuery.isPending,
     error:

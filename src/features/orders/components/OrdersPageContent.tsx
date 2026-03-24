@@ -3,7 +3,7 @@ import { useAuthStore } from '@/features/auth'
 import { useOrderActions, useOrderDetails, useOrdersList } from '@/features/orders/hooks'
 import { ORDER_PAYMENT_METHOD_CONFIG, ORDER_STATUS_CONFIG } from '@/features/orders/types'
 import { OrderDetailModal } from '@/features/orders/modals'
-import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
+import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn, formatCurrency, formatDate } from '@/shared/lib'
 
 function PaymentMethodIcon({ method }: { method?: string | null }) {
@@ -29,6 +29,7 @@ export function OrdersPageContent() {
     selectedEventId,
     setSelectedEventId,
     filteredOrders,
+    paginatedOrders,
     loading,
     error,
     search,
@@ -42,6 +43,8 @@ export function OrdersPageContent() {
     closeOrder,
     stats,
     refreshOrders,
+    pagination,
+    setPage,
   } = useOrdersList(organization?.id)
   const { order, items, digitalTickets, loading: loadingDetails } = useOrderDetails(selectedOrderId)
   const { confirmOrder, cancelOrder, issueDigitalTickets, resendTickets } = useOrderActions({ eventId: selectedEventId })
@@ -182,7 +185,7 @@ export function OrdersPageContent() {
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order) => {
+              {paginatedOrders.map((order) => {
                 const statusConfig = ORDER_STATUS_CONFIG[order.status] ?? ORDER_STATUS_CONFIG.pending
                 const paymentMethod = order.payment_method ? ORDER_PAYMENT_METHOD_CONFIG[order.payment_method] : undefined
 
@@ -222,6 +225,7 @@ export function OrdersPageContent() {
               })}
             </tbody>
           </table>
+          <PaginationControls pagination={pagination} onPageChange={setPage} />
         </div>
       )}
 

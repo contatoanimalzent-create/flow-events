@@ -22,6 +22,9 @@ export type Database = {
       profiles: { Row: Profile; Insert: Partial<Profile>; Update: Partial<Profile> }
       events: { Row: Event; Insert: Partial<Event>; Update: Partial<Event> }
       orders: { Row: Order; Insert: Partial<Order>; Update: Partial<Order> }
+      payments: { Row: Payment; Insert: Partial<Payment>; Update: Partial<Payment> }
+      payment_webhook_events: { Row: PaymentWebhookEvent; Insert: Partial<PaymentWebhookEvent>; Update: Partial<PaymentWebhookEvent> }
+      transactional_messages: { Row: TransactionalMessage; Insert: Partial<TransactionalMessage>; Update: Partial<TransactionalMessage> }
       digital_tickets: { Row: DigitalTicket; Insert: Partial<DigitalTicket>; Update: Partial<DigitalTicket> }
       checkins: { Row: Checkin; Insert: Partial<Checkin>; Update: Partial<Checkin> }
       gates: { Row: Gate; Insert: Partial<Gate>; Update: Partial<Gate> }
@@ -99,7 +102,7 @@ export interface Event {
   updated_at: string
 }
 
-export type OrderStatus = 'pending' | 'processing' | 'paid' | 'failed' | 'cancelled' | 'refunded' | 'chargeback'
+export type OrderStatus = 'draft' | 'pending' | 'processing' | 'paid' | 'failed' | 'cancelled' | 'refunded' | 'chargeback' | 'expired'
 
 export interface Order {
   id: string
@@ -108,13 +111,69 @@ export interface Order {
   buyer_name: string
   buyer_email: string
   buyer_phone?: string
+  buyer_cpf?: string
   subtotal: number
   discount_amount: number
   fee_amount: number
   total_amount: number
   status: OrderStatus
   payment_method?: string
+  source_channel?: string
+  expires_at?: string
   paid_at?: string
+  notes?: string
+  stripe_payment_intent?: string
+  stripe_session_id?: string
+  created_at: string
+}
+
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'cancelled' | 'refunded'
+
+export interface Payment {
+  id: string
+  order_id: string
+  organization_id?: string | null
+  event_id?: string | null
+  provider: string
+  payment_intent_id?: string | null
+  charge_id?: string | null
+  status: PaymentStatus
+  amount: number
+  currency: string
+  metadata?: Record<string, unknown>
+  paid_at?: string | null
+  failed_at?: string | null
+  refunded_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface PaymentWebhookEvent {
+  id: string
+  provider: string
+  provider_event_id: string
+  event_type: string
+  order_id?: string | null
+  payment_id?: string | null
+  payload?: Record<string, unknown>
+  processing_status: 'received' | 'processed' | 'ignored' | 'failed'
+  processed_at?: string | null
+  error_message?: string | null
+  created_at: string
+}
+
+export interface TransactionalMessage {
+  id: string
+  order_id?: string | null
+  event_id?: string | null
+  channel: 'email'
+  template_key: string
+  provider: string
+  provider_message_id?: string | null
+  recipient: string
+  status: 'queued' | 'sent' | 'failed' | 'skipped'
+  metadata?: Record<string, unknown>
+  sent_at?: string | null
   created_at: string
 }
 

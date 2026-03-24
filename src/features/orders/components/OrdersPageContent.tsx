@@ -43,7 +43,7 @@ export function OrdersPageContent() {
     refreshOrders,
   } = useOrdersList(organization?.id)
   const { order, items, digitalTickets, loading: loadingDetails } = useOrderDetails(selectedOrderId)
-  const { confirmOrder, cancelOrder, issueDigitalTickets } = useOrderActions({ eventId: selectedEventId })
+  const { confirmOrder, cancelOrder, issueDigitalTickets, resendTickets } = useOrderActions({ eventId: selectedEventId })
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5 p-6">
@@ -238,6 +238,7 @@ export function OrdersPageContent() {
           onConfirm={() => void confirmOrder(selectedOrderId)}
           onCancel={() => void cancelOrder(selectedOrderId)}
           onIssueDigitalTickets={() => void issueDigitalTickets(selectedOrderId)}
+          onResendTickets={() => void resendTickets(selectedOrderId)}
         />
       )}
     </div>

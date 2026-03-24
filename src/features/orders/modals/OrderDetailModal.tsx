@@ -12,6 +12,7 @@ interface OrderDetailModalProps {
   onConfirm: () => void
   onCancel: () => void
   onIssueDigitalTickets: () => void
+  onResendTickets: () => void
 }
 
 function PaymentMethodIcon({ method }: { method?: OrderRow['payment_method'] | null }) {
@@ -39,6 +40,7 @@ export function OrderDetailModal({
   onConfirm,
   onCancel,
   onIssueDigitalTickets,
+  onResendTickets,
 }: OrderDetailModalProps) {
   const statusConfig = ORDER_STATUS_CONFIG[order.status] ?? ORDER_STATUS_CONFIG.pending
   const paymentMethod = order.payment_method ? ORDER_PAYMENT_METHOD_CONFIG[order.payment_method] : undefined
@@ -186,9 +188,14 @@ export function OrderDetailModal({
                 Confirmar pedido
               </button>
             )}
-            {digitalTickets.length === 0 && (
+            {order.status === 'paid' && digitalTickets.length === 0 && (
               <button onClick={onIssueDigitalTickets} className="btn-secondary text-sm">
                 Emitir tickets digitais
+              </button>
+            )}
+            {digitalTickets.length > 0 && (
+              <button onClick={onResendTickets} className="btn-secondary text-sm">
+                Reenviar e-mail
               </button>
             )}
           </div>

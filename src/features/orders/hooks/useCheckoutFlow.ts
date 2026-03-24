@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ticketKeys } from '@/features/tickets/services/tickets.queries'
+import { paymentKeys, paymentMutations } from '@/features/payments/services'
 import { orderKeys, orderMutations } from '@/features/orders/services'
-import { buildOrderDraftTotals } from '@/features/orders/services'
-import { buildDefaultOrderExpiration } from '@/features/orders/services'
+import { buildDefaultOrderExpiration, buildOrderDraftTotals } from '@/features/orders/services'
 import { useCheckoutStore } from './useCheckoutStore'
-import type { CheckoutCartItem, CreateOrderDraftInput, OrderPaymentMethod, OrderRow } from '@/features/orders/types'
+import type { CheckoutCartItem, CreateOrderDraftInput, OrderPaymentMethod } from '@/features/orders/types'
 
 interface UseCheckoutFlowParams {
   eventId: string
@@ -32,10 +32,17 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
     draftOrderId,
     draftStatus,
     expiresAt,
+    paymentId,
+    paymentIntentId,
+    paymentClientSecret,
+    paymentStatus,
     setPaymentMethod,
     syncDraft,
+    syncPaymentIntent,
+    markPaymentStatus,
     markDraftStatus,
     clearDraft,
+    clearPayment,
   } = useCheckoutStore()
 
   const cartSummary = useMemo(() => {
@@ -74,6 +81,8 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
       tasks.push(queryClient.invalidateQueries({ queryKey: [...orderKeys.detail(orderId), 'bundle'] as const }))
       tasks.push(queryClient.invalidateQueries({ queryKey: orderKeys.items(orderId) }))
       tasks.push(queryClient.invalidateQueries({ queryKey: orderKeys.digitalTickets(orderId) }))
+      tasks.push(queryClient.invalidateQueries({ queryKey: paymentKeys.byOrder(orderId) }))
+      tasks.push(queryClient.invalidateQueries({ queryKey: paymentKeys.messages(orderId) }))
     }
 
     await Promise.all(tasks)
@@ -95,12 +104,21 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
     },
   })
 
+  const createPaymentIntentMutation = useMutation({
+    ...paymentMutations.createIntent(),
+    onSuccess: async (paymentIntent) => {
+      syncPaymentIntent(paymentIntent)
+      await invalidateOrderAndInventory(paymentIntent.orderId)
+    },
+  })
+
   const confirmOrderMutation = useMutation({
     ...orderMutations.confirm(),
     onSuccess: async (order) => {
       if (order) {
         syncDraft(order)
         markDraftStatus('confirmed')
+        markPaymentStatus('paid')
         await invalidateOrderAndInventory(order.id)
       }
     },
@@ -137,6 +155,7 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
 
   async function createDraft(selectedPaymentMethod?: OrderPaymentMethod | null) {
     await sweepExpiredDrafts()
+    clearPayment()
 
     const draft = await createDraftMutation.mutateAsync({
       organization_id: organizationId,
@@ -160,11 +179,32 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
     return draft
   }
 
+  async function beginPayment(selectedPaymentMethod?: OrderPaymentMethod | null) {
+    const currentOrderId = draftOrderId
+
+    if (!currentOrderId) {
+      throw new Error('Nenhum pedido em rascunho disponivel para pagamento.')
+    }
+
+    const result = await createPaymentIntentMutation.mutateAsync({
+      orderId: currentOrderId,
+      paymentMethod: selectedPaymentMethod ?? paymentMethod ?? 'pix',
+      buyerEmail: buyer.email,
+      buyerName: buyer.name,
+    })
+
+    if (selectedPaymentMethod) {
+      setPaymentMethod(selectedPaymentMethod)
+    }
+
+    return result
+  }
+
   async function confirmDraft(selectedPaymentMethod?: OrderPaymentMethod | null) {
     const currentOrderId = draftOrderId
 
     if (!currentOrderId) {
-      throw new Error('Nenhum pedido em rascunho disponível para confirmação')
+      throw new Error('Nenhum pedido em rascunho disponivel para confirmacao.')
     }
 
     const order = await confirmOrderMutation.mutateAsync({
@@ -206,15 +246,23 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
     draftOrderId,
     draftStatus,
     expiresAt,
+    paymentId,
+    paymentIntentId,
+    paymentClientSecret,
+    paymentStatus,
     cartSummary,
     createDraft,
+    beginPayment,
     confirmDraft,
     cancelDraft,
     expireDraft,
     sweepExpiredDrafts,
     setPaymentMethod,
+    clearPaymentState: clearPayment,
+    markPaymentStatus,
     isDraftExpired,
     creatingDraft: createDraftMutation.isPending,
+    startingPayment: createPaymentIntentMutation.isPending,
     confirmingDraft: confirmOrderMutation.isPending,
     cancellingDraft: cancelOrderMutation.isPending,
     expiringDraft: expireOrderMutation.isPending,

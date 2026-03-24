@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, Check, Clock3, Info, Loader2, Lock, Smartphone, Ticket, XCircle } from 'lucide-react'
-import { cn, formatCurrency } from '@/lib/utils'
+import { ArrowRight, Check, Clock3, Info, Loader2, Lock, RefreshCw, Smartphone, Ticket, XCircle } from 'lucide-react'
+import { usePaymentStatus } from '@/features/payments'
 import { ORDER_PAYMENT_METHOD_CONFIG } from '@/features/orders/types'
 import { useCheckoutFlow, useCheckoutStore } from '@/features/orders/hooks'
+import { cn, formatCurrency } from '@/shared/lib'
+import { PublicCheckoutPaymentStep } from './PublicCheckoutPaymentStep'
 import type { CheckoutCartItem, OrderPaymentMethod } from '@/features/orders/types'
 
 interface PublicCheckoutContentProps {
@@ -49,7 +51,7 @@ export function PublicCheckoutContent({
   onInventoryChanged,
 }: PublicCheckoutContentProps) {
   const { buyer, setBuyerField, resetCheckout } = useCheckoutStore()
-  const [phase, setPhase] = useState<'form' | 'review'>('form')
+  const [phase, setPhase] = useState<'form' | 'review' | 'payment' | 'processing'>('form')
   const [error, setError] = useState('')
 
   const {
@@ -57,14 +59,19 @@ export function PublicCheckoutContent({
     expiresAt,
     draftOrderId,
     draftStatus,
+    paymentClientSecret,
     cartSummary,
     createDraft,
+    beginPayment,
     confirmDraft,
     cancelDraft,
     expireDraft,
     setPaymentMethod,
+    clearPaymentState,
+    markPaymentStatus,
     isDraftExpired,
     creatingDraft,
+    startingPayment,
     confirmingDraft,
     cancellingDraft,
     expiringDraft,
@@ -75,8 +82,14 @@ export function PublicCheckoutContent({
     onInventoryChanged,
   })
 
+  const paymentStatus = usePaymentStatus({
+    orderId: draftOrderId,
+    enabled: phase === 'payment' || phase === 'processing',
+    refetchIntervalMs: 2500,
+  })
+
   const isFreeOrder = cartSummary.total_amount === 0
-  const isBusy = creatingDraft || confirmingDraft || cancellingDraft || expiringDraft
+  const isBusy = creatingDraft || startingPayment || confirmingDraft || cancellingDraft || expiringDraft
   const countdown = formatRemainingTime(expiresAt)
 
   const paymentOptions = useMemo(
@@ -85,7 +98,7 @@ export function PublicCheckoutContent({
   )
 
   useEffect(() => {
-    if (phase !== 'review' || !expiresAt || !draftOrderId) {
+    if (phase === 'form' || !expiresAt || !draftOrderId || paymentStatus.isPaid) {
       return
     }
 
@@ -94,18 +107,66 @@ export function PublicCheckoutContent({
         window.clearInterval(interval)
         void expireDraft()
           .then(() => {
-            setError('Sua reserva expirou e o inventário foi devolvido ao lote.')
+            clearPaymentState()
+            setError('Sua reserva expirou e o inventario foi devolvido ao lote.')
             setPhase('form')
           })
           .catch((draftError) => {
-            setError(draftError instanceof Error ? draftError.message : 'Não foi possível expirar a reserva.')
+            setError(draftError instanceof Error ? draftError.message : 'Nao foi possivel expirar a reserva.')
             setPhase('form')
           })
       }
     }, 1000)
 
     return () => window.clearInterval(interval)
-  }, [draftOrderId, expireDraft, expiresAt, isDraftExpired, phase])
+  }, [clearPaymentState, draftOrderId, expireDraft, expiresAt, isDraftExpired, paymentStatus.isPaid, phase])
+
+  useEffect(() => {
+    if (phase !== 'payment' && phase !== 'processing') {
+      return
+    }
+
+    if (paymentStatus.isPaid) {
+      markPaymentStatus('paid')
+      resetCheckout()
+      onSuccess()
+      return
+    }
+
+    if (paymentStatus.isFailed) {
+      markPaymentStatus('failed')
+      clearPaymentState()
+      setError('Pagamento nao aprovado. Revise os dados e tente novamente antes da reserva expirar.')
+      setPhase('review')
+      return
+    }
+
+    if (paymentStatus.isCancelled || paymentStatus.isExpired) {
+      markPaymentStatus(paymentStatus.isCancelled ? 'cancelled' : null)
+      clearPaymentState()
+      setError('O pagamento nao foi concluido e a reserva nao esta mais ativa.')
+      setPhase('form')
+      return
+    }
+
+    if (paymentStatus.isRefunded) {
+      markPaymentStatus('refunded')
+      clearPaymentState()
+      setError('Este pagamento foi reembolsado. Se precisar, inicie uma nova compra.')
+      setPhase('form')
+    }
+  }, [
+    clearPaymentState,
+    markPaymentStatus,
+    onSuccess,
+    paymentStatus.isCancelled,
+    paymentStatus.isExpired,
+    paymentStatus.isFailed,
+    paymentStatus.isPaid,
+    paymentStatus.isRefunded,
+    phase,
+    resetCheckout,
+  ])
 
   async function handleCreateDraft() {
     if (!buyer.name.trim() || !buyer.email.trim()) {
@@ -124,7 +185,7 @@ export function PublicCheckoutContent({
       await createDraft(isFreeOrder ? 'free' : paymentMethod ?? 'pix')
       setPhase('review')
     } catch (draftError) {
-      setError(draftError instanceof Error ? draftError.message : 'Não foi possível reservar o pedido.')
+      setError(draftError instanceof Error ? draftError.message : 'Nao foi possivel reservar o pedido.')
     }
   }
 
@@ -132,22 +193,34 @@ export function PublicCheckoutContent({
     setError('')
 
     try {
-      await confirmDraft(isFreeOrder ? 'free' : paymentMethod ?? 'pix')
-      resetCheckout()
-      onSuccess()
+      if (isFreeOrder) {
+        await confirmDraft('free')
+        resetCheckout()
+        onSuccess()
+        return
+      }
+
+      await beginPayment(paymentMethod ?? 'pix')
+      setPhase('payment')
     } catch (confirmError) {
-      setError(confirmError instanceof Error ? confirmError.message : 'Não foi possível confirmar o pedido.')
+      setError(confirmError instanceof Error ? confirmError.message : 'Nao foi possivel iniciar o pagamento.')
     }
   }
 
   async function handleBack() {
     setError('')
 
+    if ((phase === 'payment' || phase === 'processing') && draftOrderId) {
+      clearPaymentState()
+      setPhase('review')
+      return
+    }
+
     if (phase === 'review' && draftOrderId) {
       try {
         await cancelDraft()
       } catch (cancelError) {
-        setError(cancelError instanceof Error ? cancelError.message : 'Não foi possível liberar a reserva.')
+        setError(cancelError instanceof Error ? cancelError.message : 'Nao foi possivel liberar a reserva.')
         return
       }
     }
@@ -158,11 +231,11 @@ export function PublicCheckoutContent({
 
   return (
     <div className="min-h-screen bg-[#080808] text-[#f5f5f0]">
-      <nav className="sticky top-0 z-50 flex items-center gap-4 px-6 py-4 bg-[#080808]/95 border-b border-[#1a1a1a] backdrop-blur-sm">
+      <nav className="sticky top-0 z-50 flex items-center gap-4 border-b border-[#1a1a1a] bg-[#080808]/95 px-6 py-4 backdrop-blur-sm">
         <button
           onClick={() => void handleBack()}
           disabled={isBusy}
-          className="text-[#6b6b6b] hover:text-[#f5f5f0] text-xs font-mono transition-colors disabled:opacity-50"
+          className="text-xs font-mono text-[#6b6b6b] transition-colors hover:text-[#f5f5f0] disabled:opacity-50"
         >
           ← VOLTAR
         </button>
@@ -172,33 +245,33 @@ export function PublicCheckoutContent({
         </span>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-6 py-12 space-y-8">
+      <div className="mx-auto max-w-2xl space-y-8 px-6 py-12">
         <div>
-          <div className="text-[10px] font-mono tracking-[0.3em] text-[#d4ff00] mb-2 uppercase">
-            CHECKOUT · {phase === 'review' ? 'RESERVA' : 'DADOS'}
+          <div className="mb-2 text-[10px] font-mono uppercase tracking-[0.3em] text-[#d4ff00]">
+            CHECKOUT · {phase === 'review' ? 'RESERVA' : phase === 'payment' ? 'PAGAMENTO' : phase === 'processing' ? 'CONFIRMACAO' : 'DADOS'}
           </div>
           <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 40, letterSpacing: '-0.01em', lineHeight: 1 }}>
-            {phase === 'review' ? 'CONFIRME SUA' : 'FINALIZE SEU'}
+            {phase === 'review' ? 'CONFIRME SUA' : phase === 'payment' ? 'PAGUE SUA' : phase === 'processing' ? 'PROCESSANDO SUA' : 'FINALIZE SEU'}
             <br />
             <span>
-              {phase === 'review' ? 'COMPRA' : 'PEDIDO'}
+              {phase === 'processing' ? 'COMPRA' : 'PEDIDO'}
               <span style={{ color: '#d4ff00' }}>.</span>
             </span>
           </h1>
         </div>
 
-        <div className="border border-[#1a1a1a] rounded-sm overflow-hidden">
-          <div className="px-5 py-3 bg-[#0e0e0e] border-b border-[#1a1a1a]">
-            <span className="text-[10px] font-mono tracking-widest text-[#6b6b6b] uppercase">Resumo do pedido</span>
+        <div className="overflow-hidden rounded-sm border border-[#1a1a1a]">
+          <div className="border-b border-[#1a1a1a] bg-[#0e0e0e] px-5 py-3">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#6b6b6b]">Resumo do pedido</span>
           </div>
 
           {cart.map((item) => (
-            <div key={item.batch_id} className="flex items-center justify-between px-5 py-3.5 border-b border-[#1a1a1a] last:border-0">
+            <div key={item.batch_id} className="flex items-center justify-between border-b border-[#1a1a1a] px-5 py-3.5 last:border-0">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: item.color ?? '#d4ff00' }} />
+                <div className="h-2 w-2 shrink-0 rounded-full" style={{ background: item.color ?? '#d4ff00' }} />
                 <div>
                   <div className="text-sm font-medium">{item.ticket_name}</div>
-                  <div className="text-[11px] text-[#6b6b6b] font-mono">
+                  <div className="text-[11px] font-mono text-[#6b6b6b]">
                     {item.batch_name} · {item.quantity}x
                   </div>
                 </div>
@@ -213,14 +286,14 @@ export function PublicCheckoutContent({
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => onRemove(item.batch_id)}
-                      className="w-6 h-6 border border-[#242424] rounded-sm text-[#9a9a9a] hover:text-[#f5f5f0] flex items-center justify-center text-sm"
+                      className="flex h-6 w-6 items-center justify-center rounded-sm border border-[#242424] text-sm text-[#9a9a9a] hover:text-[#f5f5f0]"
                     >
                       −
                     </button>
                     <span className="w-5 text-center text-xs font-mono">{item.quantity}</span>
                     <button
                       onClick={() => onAdd(item.ticket_type_id, item.batch_id)}
-                      className="w-6 h-6 border border-[#242424] rounded-sm text-[#9a9a9a] hover:text-[#f5f5f0] flex items-center justify-center text-sm"
+                      className="flex h-6 w-6 items-center justify-center rounded-sm border border-[#242424] text-sm text-[#9a9a9a] hover:text-[#f5f5f0]"
                     >
                       +
                     </button>
@@ -230,7 +303,7 @@ export function PublicCheckoutContent({
             </div>
           ))}
 
-          <div className="px-5 py-4 bg-[#0e0e0e] space-y-2">
+          <div className="space-y-2 bg-[#0e0e0e] px-5 py-4">
             <div className="flex items-center justify-between text-xs text-[#9a9a9a]">
               <span>Subtotal</span>
               <span>{cartSummary.subtotal === 0 ? 'Gratuito' : formatCurrency(cartSummary.subtotal)}</span>
@@ -239,7 +312,7 @@ export function PublicCheckoutContent({
               <span>Taxas</span>
               <span>{cartSummary.fee_amount === 0 ? 'Sem taxa nesta etapa' : formatCurrency(cartSummary.fee_amount)}</span>
             </div>
-            <div className="flex justify-between items-center pt-2 border-t border-[#1a1a1a]">
+            <div className="flex items-center justify-between border-t border-[#1a1a1a] pt-2">
               <span className="text-sm font-semibold">Total</span>
               <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 24, color: '#d4ff00' }}>
                 {cartSummary.total_amount === 0 ? 'GRATUITO' : formatCurrency(cartSummary.total_amount)}
@@ -248,24 +321,24 @@ export function PublicCheckoutContent({
           </div>
         </div>
 
-        {phase === 'review' && (
-          <div className="p-4 bg-[#d4ff00]/5 border border-[#d4ff00]/20 rounded-sm flex items-start gap-3">
-            <Clock3 className="w-5 h-5 text-[#d4ff00] shrink-0 mt-0.5" />
+        {phase !== 'form' && (
+          <div className="flex items-start gap-3 rounded-sm border border-[#d4ff00]/20 bg-[#d4ff00]/5 p-4">
+            <Clock3 className="mt-0.5 h-5 w-5 shrink-0 text-[#d4ff00]" />
             <div>
               <div className="text-sm font-semibold text-[#d4ff00]">
                 Reserva ativa {countdown ? `· expira em ${countdown}` : ''}
               </div>
-              <div className="text-xs text-[#9a9a9a] mt-1">
-                Seu pedido já reservou inventário nos lotes selecionados. Ao confirmar, o sistema baixa a reserva e emite os ingressos digitais.
+              <div className="mt-1 text-xs text-[#9a9a9a]">
+                O inventario dos lotes selecionados esta reservado para este pedido. Os tickets digitais serao emitidos somente depois da confirmacao do pagamento.
               </div>
-              {draftOrderId && <div className="text-[11px] font-mono text-[#6b6b6b] mt-2">Pedido {draftOrderId.slice(0, 8).toUpperCase()}</div>}
+              {draftOrderId && <div className="mt-2 text-[11px] font-mono text-[#6b6b6b]">Pedido {draftOrderId.slice(0, 8).toUpperCase()}</div>}
             </div>
           </div>
         )}
 
         <div className="space-y-3">
-          <div className="text-[10px] font-mono tracking-[0.3em] text-[#6b6b6b] uppercase">Dados do comprador</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#6b6b6b]">Dados do comprador</div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {[
               { label: 'Nome completo *', key: 'name', type: 'text', placeholder: 'Seu nome' },
               { label: 'E-mail *', key: 'email', type: 'email', placeholder: 'seu@email.com' },
@@ -273,14 +346,14 @@ export function PublicCheckoutContent({
               { label: 'WhatsApp', key: 'phone', type: 'tel', placeholder: '(00) 00000-0000' },
             ].map((field) => (
               <div key={field.key}>
-                <label className="block text-[10px] font-mono tracking-wider text-[#6b6b6b] uppercase mb-1.5">{field.label}</label>
+                <label className="mb-1.5 block text-[10px] font-mono uppercase tracking-wider text-[#6b6b6b]">{field.label}</label>
                 <input
                   type={field.type}
                   placeholder={field.placeholder}
                   value={buyer[field.key as keyof typeof buyer]}
                   onChange={(event) => setBuyerField(field.key as keyof typeof buyer, event.target.value)}
-                  disabled={phase === 'review'}
-                  className="w-full bg-[#0e0e0e] border border-[#242424] text-[#f5f5f0] placeholder-[#4b4b4b] rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-[#d4ff00]/40 transition-colors disabled:opacity-60"
+                  disabled={phase !== 'form'}
+                  className="w-full rounded-sm border border-[#242424] bg-[#0e0e0e] px-4 py-3 text-sm text-[#f5f5f0] placeholder-[#4b4b4b] transition-colors focus:border-[#d4ff00]/40 focus:outline-none disabled:opacity-60"
                 />
               </div>
             ))}
@@ -288,7 +361,7 @@ export function PublicCheckoutContent({
         </div>
 
         <div className="space-y-3">
-          <div className="text-[10px] font-mono tracking-[0.3em] text-[#6b6b6b] uppercase">Forma de pagamento</div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#6b6b6b]">Forma de pagamento</div>
           <div className={cn('grid gap-2', isFreeOrder ? 'grid-cols-1' : 'grid-cols-2 md:grid-cols-5')}>
             {paymentOptions.map((method) => {
               const config = ORDER_PAYMENT_METHOD_CONFIG[method]
@@ -298,14 +371,14 @@ export function PublicCheckoutContent({
                 <button
                   key={method}
                   type="button"
-                  disabled={phase === 'review'}
+                  disabled={phase !== 'form'}
                   onClick={() => setPaymentMethod(method)}
                   className={cn(
-                    'relative flex flex-col items-center gap-1.5 p-3 rounded-sm border text-center transition-all disabled:opacity-60',
+                    'relative flex flex-col items-center gap-1.5 rounded-sm border p-3 text-center transition-all disabled:opacity-60',
                     selected ? 'border-[#d4ff00]/40 bg-[#d4ff00]/5 text-[#d4ff00]' : 'border-[#242424] text-[#9a9a9a] hover:border-[#d4ff00]/20',
                   )}
                 >
-                  {method === 'pix' ? <Smartphone className="w-4 h-4" /> : <Ticket className="w-4 h-4" />}
+                  {method === 'pix' ? <Smartphone className="h-4 w-4" /> : <Ticket className="h-4 w-4" />}
                   <span className="text-[10px] font-mono">{config?.label ?? method}</span>
                 </button>
               )
@@ -314,51 +387,53 @@ export function PublicCheckoutContent({
         </div>
 
         {draftStatus === 'expired' && (
-          <div className="flex items-center gap-2 text-xs text-[#FFB020] bg-[#FFB020]/8 border border-[#FFB020]/20 rounded-sm px-4 py-3">
-            <Clock3 className="w-3.5 h-3.5 shrink-0" /> Sua reserva anterior expirou. Revise o carrinho e tente novamente.
+          <div className="flex items-center gap-2 rounded-sm border border-[#FFB020]/20 bg-[#FFB020]/8 px-4 py-3 text-xs text-[#FFB020]">
+            <Clock3 className="h-3.5 w-3.5 shrink-0" /> Sua reserva anterior expirou. Revise o carrinho e tente novamente.
           </div>
         )}
 
         {draftStatus === 'cancelled' && (
-          <div className="flex items-center gap-2 text-xs text-[#9a9a9a] bg-[#0e0e0e] border border-[#242424] rounded-sm px-4 py-3">
-            <XCircle className="w-3.5 h-3.5 shrink-0" /> A reserva foi cancelada e o inventário voltou para o lote.
+          <div className="flex items-center gap-2 rounded-sm border border-[#242424] bg-[#0e0e0e] px-4 py-3 text-xs text-[#9a9a9a]">
+            <XCircle className="h-3.5 w-3.5 shrink-0" /> A reserva foi cancelada e o inventario voltou para o lote.
           </div>
         )}
 
         {error && (
-          <div className="flex items-center gap-2 text-xs text-[#FF5A6B] bg-[#FF5A6B]/8 border border-[#FF5A6B]/20 rounded-sm px-4 py-3">
-            <Info className="w-3.5 h-3.5 shrink-0" /> {error}
+          <div className="flex items-center gap-2 rounded-sm border border-[#FF5A6B]/20 bg-[#FF5A6B]/8 px-4 py-3 text-xs text-[#FF5A6B]">
+            <Info className="h-3.5 w-3.5 shrink-0" /> {error}
           </div>
         )}
 
-        {phase === 'form' ? (
+        {phase === 'form' && (
           <button
             onClick={() => void handleCreateDraft()}
             disabled={isBusy || cart.length === 0}
-            className="w-full flex items-center justify-center gap-3 bg-[#d4ff00] text-[#080808] py-5 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] transition-all disabled:opacity-50 active:scale-95"
+            className="flex w-full items-center justify-center gap-3 rounded-sm bg-[#d4ff00] py-5 text-sm font-bold tracking-wider text-[#080808] transition-all hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] disabled:opacity-50 active:scale-95"
           >
             {creatingDraft ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>
                 RESERVAR PEDIDO
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
-        ) : (
+        )}
+
+        {phase === 'review' && (
           <div className="space-y-3">
             <button
               onClick={() => void handleConfirmDraft()}
               disabled={isBusy}
-              className="w-full flex items-center justify-center gap-3 bg-[#d4ff00] text-[#080808] py-5 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] transition-all disabled:opacity-50 active:scale-95"
+              className="flex w-full items-center justify-center gap-3 rounded-sm bg-[#d4ff00] py-5 text-sm font-bold tracking-wider text-[#080808] transition-all hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] disabled:opacity-50 active:scale-95"
             >
-              {confirmingDraft ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+              {startingPayment || confirmingDraft ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <>
-                  <Lock className="w-4 h-4" />
-                  CONFIRMAR PEDIDO
+                  <Lock className="h-4 w-4" />
+                  {isFreeOrder ? 'CONFIRMAR PEDIDO' : 'IR PARA PAGAMENTO'}
                 </>
               )}
             </button>
@@ -366,25 +441,72 @@ export function PublicCheckoutContent({
             <button
               onClick={() => void handleBack()}
               disabled={isBusy}
-              className="w-full flex items-center justify-center gap-3 border border-[#242424] text-[#9a9a9a] py-4 rounded-sm text-xs font-mono tracking-wider hover:text-[#f5f5f0] hover:border-[#3a3a3a] transition-colors disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-3 rounded-sm border border-[#242424] py-4 text-xs font-mono tracking-wider text-[#9a9a9a] transition-colors hover:border-[#3a3a3a] hover:text-[#f5f5f0] disabled:opacity-50"
             >
-              <Check className="w-4 h-4" />
+              <Check className="h-4 w-4" />
               CANCELAR RESERVA
             </button>
           </div>
         )}
 
-        <div className="flex items-center justify-center gap-6 flex-wrap pt-2">
+        {phase === 'payment' && paymentClientSecret && (
+          <PublicCheckoutPaymentStep
+            clientSecret={paymentClientSecret}
+            totalAmount={cartSummary.total_amount}
+            buyerName={buyer.name}
+            buyerEmail={buyer.email}
+            onSubmitted={() => setPhase('processing')}
+            onBack={() => {
+              clearPaymentState()
+              setPhase('review')
+            }}
+          />
+        )}
+
+        {phase === 'processing' && (
+          <div className="space-y-4 rounded-sm border border-[#242424] bg-[#0e0e0e] p-5">
+            <div className="flex items-start gap-3">
+              <Loader2 className="mt-0.5 h-5 w-5 animate-spin text-[#d4ff00]" />
+              <div>
+                <div className="text-sm font-semibold text-[#f5f5f0]">Aguardando confirmacao do gateway</div>
+                <div className="mt-1 text-xs text-[#9a9a9a]">
+                  O pagamento ja foi enviado ao provedor. Assim que o webhook confirmar a transacao, o pedido sera marcado como pago e os ingressos digitais serao emitidos automaticamente.
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => void paymentStatus.refresh()}
+                className="flex items-center gap-2 rounded-sm border border-[#242424] px-3 py-2 text-xs font-mono text-[#9a9a9a] transition-colors hover:border-[#3a3a3a] hover:text-[#f5f5f0]"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                ATUALIZAR STATUS
+              </button>
+              <button
+                onClick={() => {
+                  clearPaymentState()
+                  setPhase('review')
+                }}
+                className="rounded-sm border border-[#242424] px-3 py-2 text-xs font-mono text-[#9a9a9a] transition-colors hover:border-[#3a3a3a] hover:text-[#f5f5f0]"
+              >
+                VOLTAR PARA A RESERVA
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center justify-center gap-6 pt-2">
           {[
-            { icon: Lock, text: 'Reserva com expiração automática' },
-            { icon: Ticket, text: 'Inventário controlado por lote' },
-            { icon: Check, text: 'Ingressos emitidos após confirmação' },
+            { icon: Lock, text: 'Reserva com expiracao automatica' },
+            { icon: Ticket, text: 'Inventario controlado por lote' },
+            { icon: Check, text: 'Tickets emitidos apos pagamento confirmado' },
           ].map((item) => {
             const Icon = item.icon
 
             return (
               <span key={item.text} className="flex items-center gap-1.5 text-[11px] text-[#6b6b6b]">
-                <Icon className="w-3.5 h-3.5 text-[#d4ff00]" />
+                <Icon className="h-3.5 w-3.5 text-[#d4ff00]" />
                 {item.text}
               </span>
             )

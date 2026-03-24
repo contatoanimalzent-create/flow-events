@@ -398,7 +398,7 @@ export async function expireStaleOrderDrafts(eventId?: string) {
   let query = supabase
     .from('orders')
     .select('id')
-    .in('status', ['draft', 'pending'])
+    .in('status', ['draft', 'pending', 'failed'])
     .not('expires_at', 'is', null)
     .lte('expires_at', now)
 

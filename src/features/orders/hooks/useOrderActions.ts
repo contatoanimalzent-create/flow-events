@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orderKeys, orderMutations } from '@/features/orders/services'
+import { paymentKeys, paymentMutations } from '@/features/payments/services'
 import { ticketKeys } from '@/features/tickets/services/tickets.queries'
 
 interface UseOrderActionsParams {
@@ -22,6 +23,8 @@ export function useOrderActions({ eventId }: UseOrderActionsParams) {
 
     tasks.push(queryClient.invalidateQueries({ queryKey: orderKeys.items(orderId) }))
     tasks.push(queryClient.invalidateQueries({ queryKey: orderKeys.digitalTickets(orderId) }))
+    tasks.push(queryClient.invalidateQueries({ queryKey: paymentKeys.byOrder(orderId) }))
+    tasks.push(queryClient.invalidateQueries({ queryKey: paymentKeys.messages(orderId) }))
 
     await Promise.all(tasks)
   }
@@ -49,6 +52,13 @@ export function useOrderActions({ eventId }: UseOrderActionsParams) {
     },
   })
 
+  const resendTicketsMutation = useMutation({
+    ...paymentMutations.resendTickets(),
+    onSuccess: async (_, variables) => {
+      await invalidateOrderState(variables.orderId)
+    },
+  })
+
   async function confirmOrder(orderId: string) {
     await confirmMutation.mutateAsync({ orderId })
   }
@@ -66,12 +76,18 @@ export function useOrderActions({ eventId }: UseOrderActionsParams) {
     await issueDigitalTicketsMutation.mutateAsync({ orderId })
   }
 
+  async function resendTickets(orderId: string) {
+    await resendTicketsMutation.mutateAsync({ orderId })
+  }
+
   return {
     confirmOrder,
     cancelOrder,
     issueDigitalTickets,
+    resendTickets,
     confirming: confirmMutation.isPending,
     cancelling: cancelMutation.isPending,
     issuing: issueDigitalTicketsMutation.isPending,
+    resendingTickets: resendTicketsMutation.isPending,
   }
 }

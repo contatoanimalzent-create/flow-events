@@ -128,6 +128,10 @@ export const ordersService = {
       throw new OrdersServiceError('Pedido n\u00e3o encontrado para emiss\u00e3o', 'order_not_found')
     }
 
+    if (order.status !== 'paid') {
+      throw new OrdersServiceError('Somente pedidos pagos podem emitir ingressos digitais', 'order_not_paid')
+    }
+
     if (orderItems.length === 0) {
       throw new OrdersServiceError('Pedido sem itens n\u00e3o pode emitir ingressos', 'order_has_no_items')
     }

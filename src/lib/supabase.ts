@@ -45,6 +45,8 @@ export type Database = {
       intelligence_alert_states:  { Row: IntelligenceAlertState;       Insert: Partial<IntelligenceAlertState>;       Update: Partial<IntelligenceAlertState> }
       customers:                  { Row: Customer;                    Insert: Partial<Customer>;                    Update: Partial<Customer> }
       customer_event_profiles:    { Row: CustomerEventProfile;        Insert: Partial<CustomerEventProfile>;        Update: Partial<CustomerEventProfile> }
+      audience_segments:          { Row: AudienceSegment;             Insert: Partial<AudienceSegment>;             Update: Partial<AudienceSegment> }
+      campaign_drafts:            { Row: CampaignDraft;               Insert: Partial<CampaignDraft>;               Update: Partial<CampaignDraft> }
       campaigns:                  { Row: Campaign;                    Insert: Partial<Campaign>;                    Update: Partial<Campaign> }
     }
   }
@@ -562,19 +564,61 @@ export interface CustomerEventProfile {
   updated_at: string
 }
 
+export type CampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'cancelled'
+export type CampaignChannel = 'email' | 'whatsapp' | 'sms' | 'push'
+
+export interface AudienceSegment {
+  id: string
+  organization_id: string
+  name: string
+  description?: string | null
+  filter_definition: Record<string, unknown>
+  audience_count?: number | null
+  last_previewed_at?: string | null
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CampaignDraft {
+  id: string
+  organization_id: string
+  segment_id?: string | null
+  event_id?: string | null
+  name: string
+  channel: CampaignChannel
+  status: string
+  subject?: string | null
+  message_body?: string | null
+  audience_count?: number | null
+  scheduled_at?: string | null
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Campaign {
   id: string
   organization_id: string
-  event_id?: string
+  event_id?: string | null
+  segment_id?: string | null
   name: string
-  type: string
-  status: string
-  subject?: string
+  channel: CampaignChannel
+  status: CampaignStatus
+  subject?: string | null
   body: string
+  message_body?: string | null
   audience_filter?: Record<string, unknown>
-  send_at?: string
+  audience_count?: number
+  scheduled_at?: string | null
+  started_at?: string | null
+  finished_at?: string | null
   sent_count?: number
+  delivered_count?: number
   opened_count?: number
   clicked_count?: number
+  failed_count?: number
+  created_by?: string | null
   created_at: string
+  updated_at: string
 }

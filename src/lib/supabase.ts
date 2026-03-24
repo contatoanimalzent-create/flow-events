@@ -18,26 +18,32 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export type Database = {
   public: {
     Tables: {
-      organizations: { Row: Organization; Insert: Partial<Organization>; Update: Partial<Organization> }
-      profiles: { Row: Profile; Insert: Partial<Profile>; Update: Partial<Profile> }
-      events: { Row: Event; Insert: Partial<Event>; Update: Partial<Event> }
-      orders: { Row: Order; Insert: Partial<Order>; Update: Partial<Order> }
-      payments: { Row: Payment; Insert: Partial<Payment>; Update: Partial<Payment> }
-      payment_webhook_events: { Row: PaymentWebhookEvent; Insert: Partial<PaymentWebhookEvent>; Update: Partial<PaymentWebhookEvent> }
-      transactional_messages: { Row: TransactionalMessage; Insert: Partial<TransactionalMessage>; Update: Partial<TransactionalMessage> }
-      digital_tickets: { Row: DigitalTicket; Insert: Partial<DigitalTicket>; Update: Partial<DigitalTicket> }
-      checkins: { Row: Checkin; Insert: Partial<Checkin>; Update: Partial<Checkin> }
-      gates: { Row: Gate; Insert: Partial<Gate>; Update: Partial<Gate> }
-      staff_members: { Row: StaffMember; Insert: Partial<StaffMember>; Update: Partial<StaffMember> }
-      time_entries: { Row: TimeEntry; Insert: Partial<TimeEntry>; Update: Partial<TimeEntry> }
-      suppliers: { Row: Supplier; Insert: Partial<Supplier>; Update: Partial<Supplier> }
-      products: { Row: Product; Insert: Partial<Product>; Update: Partial<Product> }
-      cost_entries: { Row: CostEntry; Insert: Partial<CostEntry>; Update: Partial<CostEntry> }
-      event_payouts: { Row: EventPayout; Insert: Partial<EventPayout>; Update: Partial<EventPayout> }
-      financial_forecasts: { Row: FinancialForecast; Insert: Partial<FinancialForecast>; Update: Partial<FinancialForecast> }
-      event_financial_closures: { Row: EventFinancialClosure; Insert: Partial<EventFinancialClosure>; Update: Partial<EventFinancialClosure> }
-      intelligence_alert_states: { Row: IntelligenceAlertState; Insert: Partial<IntelligenceAlertState>; Update: Partial<IntelligenceAlertState> }
-      campaigns: { Row: Campaign; Insert: Partial<Campaign>; Update: Partial<Campaign> }
+      organizations:             { Row: Organization;            Insert: Partial<Organization>;            Update: Partial<Organization> }
+      profiles:                  { Row: Profile;                 Insert: Partial<Profile>;                 Update: Partial<Profile> }
+      events:                    { Row: Event;                   Insert: Partial<Event>;                   Update: Partial<Event> }
+      ticket_types:              { Row: TicketType;              Insert: Partial<TicketType>;              Update: Partial<TicketType> }
+      ticket_batches:            { Row: TicketBatch;             Insert: Partial<TicketBatch>;             Update: Partial<TicketBatch> }
+      orders:                    { Row: Order;                   Insert: Partial<Order>;                   Update: Partial<Order> }
+      order_items:               { Row: OrderItem;               Insert: Partial<OrderItem>;               Update: Partial<OrderItem> }
+      digital_tickets:           { Row: DigitalTicket;           Insert: Partial<DigitalTicket>;           Update: Partial<DigitalTicket> }
+      payments:                  { Row: Payment;                 Insert: Partial<Payment>;                 Update: Partial<Payment> }
+      payment_webhook_events:    { Row: PaymentWebhookEvent;     Insert: Partial<PaymentWebhookEvent>;     Update: Partial<PaymentWebhookEvent> }
+      transactional_messages:    { Row: TransactionalMessage;    Insert: Partial<TransactionalMessage>;    Update: Partial<TransactionalMessage> }
+      checkins:                  { Row: Checkin;                 Insert: Partial<Checkin>;                 Update: Partial<Checkin> }
+      gates:                     { Row: Gate;                    Insert: Partial<Gate>;                    Update: Partial<Gate> }
+      staff_members:             { Row: StaffMember;             Insert: Partial<StaffMember>;             Update: Partial<StaffMember> }
+      time_entries:              { Row: TimeEntry;               Insert: Partial<TimeEntry>;               Update: Partial<TimeEntry> }
+      suppliers:                 { Row: Supplier;                Insert: Partial<Supplier>;                Update: Partial<Supplier> }
+      products:                  { Row: Product;                 Insert: Partial<Product>;                 Update: Partial<Product> }
+      cost_entries:              { Row: CostEntry;               Insert: Partial<CostEntry>;               Update: Partial<CostEntry> }
+      event_payouts:             { Row: EventPayout;             Insert: Partial<EventPayout>;             Update: Partial<EventPayout> }
+      financial_forecasts:       { Row: FinancialForecast;       Insert: Partial<FinancialForecast>;       Update: Partial<FinancialForecast> }
+      event_financial_closures:  { Row: EventFinancialClosure;   Insert: Partial<EventFinancialClosure>;   Update: Partial<EventFinancialClosure> }
+      event_health_snapshots:    { Row: EventHealthSnapshot;     Insert: Partial<EventHealthSnapshot>;     Update: Partial<EventHealthSnapshot> }
+      operational_alerts:        { Row: OperationalAlert;        Insert: Partial<OperationalAlert>;        Update: Partial<OperationalAlert> }
+      recommendation_logs:       { Row: RecommendationLog;       Insert: Partial<RecommendationLog>;       Update: Partial<RecommendationLog> }
+      intelligence_alert_states: { Row: IntelligenceAlertState;  Insert: Partial<IntelligenceAlertState>;  Update: Partial<IntelligenceAlertState> }
+      campaigns:                 { Row: Campaign;                Insert: Partial<Campaign>;                Update: Partial<Campaign> }
     }
   }
 }
@@ -50,9 +56,13 @@ export interface Organization {
   email?: string
   phone?: string
   logo_url?: string
+  cover_url?: string
+  stripe_account_id?: string | null
+  stripe_account_status?: string
   plan: string
   is_active: boolean
   created_at: string
+  updated_at: string
 }
 
 export interface Profile {
@@ -114,21 +124,85 @@ export interface Order {
   organization_id: string
   buyer_name: string
   buyer_email: string
-  buyer_phone?: string
-  buyer_cpf?: string
+  buyer_phone?: string | null
+  buyer_cpf?: string | null
   subtotal: number
   discount_amount: number
   fee_amount: number
   total_amount: number
   status: OrderStatus
-  payment_method?: string
-  source_channel?: string
-  expires_at?: string
-  paid_at?: string
-  notes?: string
-  stripe_payment_intent?: string
-  stripe_session_id?: string
+  payment_method?: string | null
+  source_channel?: string | null
+  expires_at?: string | null
+  paid_at?: string | null
+  confirmed_at?: string | null
+  cancelled_at?: string | null
+  notes?: string | null
+  stripe_payment_intent?: string | null
+  stripe_session_id?: string | null
+  pagarme_order_id?: string | null
+  metadata?: Record<string, unknown>
   created_at: string
+  updated_at: string
+}
+
+export interface OrderItem {
+  id: string
+  order_id: string
+  event_id?: string | null
+  ticket_type_id: string
+  batch_id?: string | null
+  holder_name?: string | null
+  holder_email?: string | null
+  holder_cpf?: string | null
+  unit_price: number
+  quantity: number
+  subtotal: number
+  discount_amount: number
+  fee_amount: number
+  total_amount: number
+  total_price: number
+  created_at: string
+  updated_at: string
+}
+
+export interface TicketType {
+  id: string
+  event_id: string
+  organization_id?: string | null
+  name: string
+  description?: string | null
+  benefits?: string[] | null
+  sector?: string | null
+  color?: string | null
+  is_transferable: boolean
+  is_nominal: boolean
+  max_per_order?: number | null
+  is_active: boolean
+  currency?: string
+  position: number
+  created_at: string
+  updated_at: string
+}
+
+export interface TicketBatch {
+  id: string
+  ticket_type_id: string
+  event_id: string
+  name: string
+  price: number
+  quantity: number
+  sold_count: number
+  reserved_count: number
+  starts_at?: string | null
+  ends_at?: string | null
+  is_active: boolean
+  is_visible: boolean
+  max_per_order?: number | null
+  auto_open_next: boolean
+  position: number
+  created_at: string
+  updated_at: string
 }
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'cancelled' | 'refunded'
@@ -194,11 +268,17 @@ export interface DigitalTicket {
   qr_token: string
   holder_name?: string | null
   holder_email?: string | null
+  holder_cpf?: string | null
   status: TicketStatus
   is_vip: boolean
   checked_in_at?: string | null
+  checked_out_at?: string | null
+  transferred_to_name?: string | null
+  transferred_to_email?: string | null
+  transfer_requested_at?: string | null
   email_sent_at?: string | null
   created_at: string
+  updated_at: string
 }
 
 export interface Checkin {
@@ -219,17 +299,20 @@ export interface Checkin {
 
 export interface Gate {
   id: string
+  organization_id?: string | null
   event_id: string
   name: string
+  description?: string | null
   is_entrance: boolean
   is_exit: boolean
   is_active: boolean
   device_count: number
-  gate_type?: string
-  throughput_per_hour?: number
-  operational_status?: string
+  status: string
+  throughput_target?: number | null
   supervisor_staff_id?: string | null
   notes?: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface StaffMember {
@@ -310,15 +393,16 @@ export interface Product {
 export interface CostEntry {
   id: string
   organization_id: string
-  event_id?: string
+  event_id?: string | null
   description: string
   category: string
   amount: number
-  due_date?: string
-  paid_date?: string
+  due_date?: string | null
+  paid_date?: string | null
   status: string
-  notes?: string
+  notes?: string | null
   created_at: string
+  updated_at: string
 }
 
 export interface EventPayout {
@@ -380,6 +464,60 @@ export interface IntelligenceAlertState {
   acknowledged_at?: string | null
   acknowledged_by?: string | null
   notes?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface EventHealthSnapshot {
+  id: string
+  organization_id: string
+  event_id: string
+  snapshot_at: string
+  sales_health_score?: number | null
+  ops_health_score?: number | null
+  finance_health_score?: number | null
+  audience_health_score?: number | null
+  overall_health_score?: number | null
+  metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export type AlertSeverity = 'warning' | 'critical' | 'info'
+export type AlertStatus   = 'active' | 'resolved' | 'acknowledged' | 'ignored'
+
+export interface OperationalAlert {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  gate_id?: string | null
+  staff_member_id?: string | null
+  type: string
+  category: string
+  severity: AlertSeverity
+  status: AlertStatus
+  title: string
+  description?: string | null
+  recommendation_summary?: string | null
+  source_context: Record<string, unknown>
+  first_detected_at: string
+  last_detected_at: string
+  resolved_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface RecommendationLog {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  alert_id?: string | null
+  recommendation_type: string
+  priority: string
+  title: string
+  description?: string | null
+  action_payload: Record<string, unknown>
+  status: string
   created_at: string
   updated_at: string
 }

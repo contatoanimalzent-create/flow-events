@@ -45,9 +45,12 @@ export type Database = {
       intelligence_alert_states:  { Row: IntelligenceAlertState;       Insert: Partial<IntelligenceAlertState>;       Update: Partial<IntelligenceAlertState> }
       customers:                  { Row: Customer;                    Insert: Partial<Customer>;                    Update: Partial<Customer> }
       customer_event_profiles:    { Row: CustomerEventProfile;        Insert: Partial<CustomerEventProfile>;        Update: Partial<CustomerEventProfile> }
-      audience_segments:          { Row: AudienceSegment;             Insert: Partial<AudienceSegment>;             Update: Partial<AudienceSegment> }
-      campaign_drafts:            { Row: CampaignDraft;               Insert: Partial<CampaignDraft>;               Update: Partial<CampaignDraft> }
-      campaigns:                  { Row: Campaign;                    Insert: Partial<Campaign>;                    Update: Partial<Campaign> }
+      audience_segments:            { Row: AudienceSegment;           Insert: Partial<AudienceSegment>;           Update: Partial<AudienceSegment> }
+      campaign_drafts:              { Row: CampaignDraft;             Insert: Partial<CampaignDraft>;             Update: Partial<CampaignDraft> }
+      campaign_runs:                { Row: CampaignRun;               Insert: Partial<CampaignRun>;               Update: Partial<CampaignRun> }
+      campaign_run_recipients:      { Row: CampaignRunRecipient;      Insert: Partial<CampaignRunRecipient>;      Update: Partial<CampaignRunRecipient> }
+      audience_resolution_jobs:     { Row: AudienceResolutionJob;     Insert: Partial<AudienceResolutionJob>;     Update: Partial<AudienceResolutionJob> }
+      campaigns:                    { Row: Campaign;                  Insert: Partial<Campaign>;                  Update: Partial<Campaign> }
     }
   }
 }
@@ -560,6 +563,65 @@ export interface CustomerEventProfile {
   net_revenue: number
   first_interaction_at?: string | null
   last_interaction_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type CampaignRunStatus     = 'pending' | 'resolving' | 'sending' | 'completed' | 'failed' | 'cancelled'
+export type CampaignRecipientStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'skipped'
+export type AudienceJobStatus     = 'pending' | 'running' | 'completed' | 'failed'
+
+export interface CampaignRun {
+  id: string
+  organization_id: string
+  campaign_draft_id?: string | null
+  segment_id?: string | null
+  event_id?: string | null
+  name: string
+  channel: CampaignChannel
+  status: CampaignRunStatus
+  audience_count: number
+  sent_count: number
+  delivered_count: number
+  failed_count: number
+  skipped_count: number
+  started_at?: string | null
+  completed_at?: string | null
+  cancelled_at?: string | null
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CampaignRunRecipient {
+  id: string
+  organization_id: string
+  campaign_run_id: string
+  customer_id?: string | null
+  recipient_email?: string | null
+  recipient_phone?: string | null
+  status: CampaignRecipientStatus
+  error_message?: string | null
+  provider_message_id?: string | null
+  payload_snapshot?: Record<string, unknown> | null
+  sent_at?: string | null
+  delivered_at?: string | null
+  failed_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AudienceResolutionJob {
+  id: string
+  organization_id: string
+  segment_id?: string | null
+  campaign_run_id?: string | null
+  status: AudienceJobStatus
+  input_snapshot: Record<string, unknown>
+  result_count: number
+  started_at?: string | null
+  completed_at?: string | null
+  error_message?: string | null
   created_at: string
   updated_at: string
 }

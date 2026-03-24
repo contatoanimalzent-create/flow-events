@@ -36,6 +36,7 @@ export type Database = {
       event_payouts: { Row: EventPayout; Insert: Partial<EventPayout>; Update: Partial<EventPayout> }
       financial_forecasts: { Row: FinancialForecast; Insert: Partial<FinancialForecast>; Update: Partial<FinancialForecast> }
       event_financial_closures: { Row: EventFinancialClosure; Insert: Partial<EventFinancialClosure>; Update: Partial<EventFinancialClosure> }
+      intelligence_alert_states: { Row: IntelligenceAlertState; Insert: Partial<IntelligenceAlertState>; Update: Partial<IntelligenceAlertState> }
       campaigns: { Row: Campaign; Insert: Partial<Campaign>; Update: Partial<Campaign> }
     }
   }
@@ -365,6 +366,19 @@ export interface EventFinancialClosure {
   divergences_resolved: boolean
   result_validated: boolean
   closed_at?: string | null
+  notes?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface IntelligenceAlertState {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  alert_id: string
+  status: 'active' | 'acknowledged'
+  acknowledged_at?: string | null
+  acknowledged_by?: string | null
   notes?: string | null
   created_at: string
   updated_at: string

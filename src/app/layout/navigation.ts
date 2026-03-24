@@ -8,6 +8,7 @@ export type NavSection =
   | 'suppliers'
   | 'products'
   | 'inventory'
+  | 'intelligence'
   | 'communication'
   | 'financial'
   | 'growth'

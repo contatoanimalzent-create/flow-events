@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, CalendarDays, Ticket, ScanLine, Users,
   Truck, ShoppingBag, Package, MessageSquare, DollarSign,
-  Zap, HelpCircle, Settings, ChevronLeft, ChevronRight,
+  Zap, HelpCircle, Settings, ChevronLeft, ChevronRight, BrainCircuit,
   TrendingUp,
 } from 'lucide-react'
 import type { NavSection } from '@/app/layout'
@@ -52,6 +52,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Crescimento',
     items: [
+      { id: 'intelligence',  label: 'Intelligence', icon: BrainCircuit },
       { id: 'communication', label: 'Comunicação', icon: MessageSquare },
       { id: 'financial',     label: 'Financeiro',  icon: DollarSign },
       { id: 'growth',        label: 'Growth AI',   icon: Zap },

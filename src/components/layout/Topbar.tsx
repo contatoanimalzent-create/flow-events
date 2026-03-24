@@ -15,6 +15,7 @@ const sectionTitles: Record<NavSection, string> = {
   suppliers:     'Fornecedores',
   products:      'Produtos & PDV',
   inventory:     'Estoque & Insumos',
+  intelligence:  'Intelligence',
   communication: 'Comunicação',
   financial:     'Financeiro',
   growth:        'Growth Services',

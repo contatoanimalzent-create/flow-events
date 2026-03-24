@@ -99,7 +99,7 @@ export function useTicketForm({ eventId, ticketId, position, onSaved }: UseTicke
 
   return {
     form,
-    loading: ticketDetailQuery.isPending,
+    loading: Boolean(ticketId) && ticketDetailQuery.isPending,
     saving: createMutation.isPending || updateMutation.isPending,
     error,
     setError,

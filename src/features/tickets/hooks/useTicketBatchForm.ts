@@ -110,7 +110,7 @@ export function useTicketBatchForm({ eventId, ticketTypeId, batchId, position, o
 
   return {
     form,
-    loading: batchDetailQuery.isPending,
+    loading: Boolean(batchId) && batchDetailQuery.isPending,
     saving: createBatchMutation.isPending || updateBatchMutation.isPending,
     error,
     setField,

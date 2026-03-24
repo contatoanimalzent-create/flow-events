@@ -126,7 +126,7 @@ export function useEventForm({ eventId, organizationId, onSaved }: UseEventFormP
     }
   }
 
-  const loading = eventDetailQuery.isPending
+  const loading = Boolean(eventId) && eventDetailQuery.isPending
   const saving = createMutation.isPending || updateMutation.isPending
   const uploading = uploadMutation.isPending
 

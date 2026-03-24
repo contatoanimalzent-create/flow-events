@@ -80,7 +80,7 @@ export function useStaffForm({ eventId, organizationId, staffId, onSaved }: UseS
     updateField,
     save,
     saving: createMutation.isPending || updateMutation.isPending,
-    loading: staffDetailQuery.isPending,
+    loading: Boolean(staffId) && staffDetailQuery.isPending,
     error: createMutation.error instanceof Error ? createMutation.error.message : updateMutation.error instanceof Error ? updateMutation.error.message : '',
     gateOptions: gateOptionsQuery.data ?? [],
   }

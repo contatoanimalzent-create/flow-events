@@ -20,6 +20,9 @@ export function useFinancialMutations({ organizationId, selectedEventId = 'all' 
         queryKey: financialKeys.costs(organizationId, selectedEventId === 'all' ? undefined : selectedEventId),
       }),
       queryClient.invalidateQueries({ queryKey: financialKeys.costs(organizationId) }),
+      queryClient.invalidateQueries({ queryKey: financialKeys.payouts(organizationId) }),
+      queryClient.invalidateQueries({ queryKey: financialKeys.forecasts(organizationId) }),
+      queryClient.invalidateQueries({ queryKey: financialKeys.closures(organizationId) }),
     ])
   }
 
@@ -33,10 +36,31 @@ export function useFinancialMutations({ organizationId, selectedEventId = 'all' 
     onSuccess: invalidateFinancialQueries,
   })
 
+  const savePayoutMutation = useMutation({
+    ...financialMutations.savePayout(),
+    onSuccess: invalidateFinancialQueries,
+  })
+
+  const saveForecastMutation = useMutation({
+    ...financialMutations.saveForecast(),
+    onSuccess: invalidateFinancialQueries,
+  })
+
+  const saveClosureMutation = useMutation({
+    ...financialMutations.saveClosure(),
+    onSuccess: invalidateFinancialQueries,
+  })
+
   return {
     saveCostEntry: saveCostEntryMutation.mutateAsync,
     deleteCostEntry: deleteCostEntryMutation.mutateAsync,
+    savePayout: savePayoutMutation.mutateAsync,
+    saveForecast: saveForecastMutation.mutateAsync,
+    saveClosure: saveClosureMutation.mutateAsync,
     savingCostEntry: saveCostEntryMutation.isPending,
     deletingCostEntry: deleteCostEntryMutation.isPending,
+    savingPayout: savePayoutMutation.isPending,
+    savingForecast: saveForecastMutation.isPending,
+    savingClosure: saveClosureMutation.isPending,
   }
 }

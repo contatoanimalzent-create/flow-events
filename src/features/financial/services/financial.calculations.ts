@@ -1,9 +1,14 @@
 import type {
+  EventFinancialClosureRow,
+  EventPayoutRow,
+  FinancialClosureStatus,
   FinancialCostEntryRow,
   FinancialEventOption,
   FinancialEventReport,
+  FinancialForecastRow,
   FinancialOverview,
   FinancialReconciliationRow,
+  ForecastRiskStatus,
   OrderFinancialSnapshot,
   PaymentFinancialSnapshot,
   StaffFinancialSnapshot,
@@ -17,6 +22,37 @@ function sum(values: number[]) {
 
 function roundCurrency(value: number) {
   return Math.round(value * 100) / 100
+}
+
+export function buildEmptyFinancialOverview(): FinancialOverview {
+  return {
+    events: [],
+    reports: [],
+    reconciliation_rows: [],
+    unallocated_costs: 0,
+    gross_sales: 0,
+    net_sales: 0,
+    approved_payments_amount: 0,
+    approved_payments_count: 0,
+    failed_payments_amount: 0,
+    refunded_amount: 0,
+    chargeback_amount: 0,
+    operational_costs: 0,
+    result: 0,
+    margin_percent: 0,
+    divergence_count: 0,
+    pending_reconciliation_count: 0,
+    total_projected_revenue: 0,
+    total_projected_cost: 0,
+    total_projected_margin: 0,
+    total_payable_amount: 0,
+    total_retained_amount: 0,
+    total_event_organizer_net: 0,
+    scheduled_payouts_count: 0,
+    paid_payouts_count: 0,
+    events_at_risk_count: 0,
+    events_ready_to_close_count: 0,
+  }
 }
 
 function buildReconciliationRow(
@@ -132,6 +168,71 @@ function buildReconciliationRow(
   }
 }
 
+function getFallbackProjectedRevenue(event: FinancialEventOption, grossSales: number, netSales: number) {
+  const soldTickets = Number(event.sold_tickets ?? 0)
+  const totalCapacity = Number(event.total_capacity ?? 0)
+
+  if (totalCapacity > 0 && soldTickets > 0 && soldTickets < totalCapacity) {
+    const averageNetPerTicket = netSales > 0 ? netSales / soldTickets : grossSales / soldTickets
+    return roundCurrency(averageNetPerTicket * totalCapacity)
+  }
+
+  if (event.status === 'finished' || event.status === 'archived') {
+    return roundCurrency(Math.max(netSales, grossSales))
+  }
+
+  return roundCurrency(Math.max(netSales, grossSales) * 1.12)
+}
+
+function getRiskStatus(params: {
+  report: Pick<FinancialEventReport, 'result' | 'pending_orders_count' | 'reconciliation_pending_count' | 'reconciliation_divergent_count'>
+  projectedMarginPercent: number
+  projectedMargin: number
+  explicitRisk?: ForecastRiskStatus
+}): ForecastRiskStatus {
+  if (params.explicitRisk) {
+    return params.explicitRisk
+  }
+
+  if (params.report.result < 0 || params.projectedMargin < 0 || params.report.reconciliation_divergent_count > 0) {
+    return 'high'
+  }
+
+  if (params.projectedMarginPercent < 15 || params.report.pending_orders_count > 0 || params.report.reconciliation_pending_count > 0) {
+    return 'medium'
+  }
+
+  return 'low'
+}
+
+function buildClosureStatus(pendingItems: string[], explicitStatus?: FinancialClosureStatus): FinancialClosureStatus {
+  if (explicitStatus) {
+    return explicitStatus
+  }
+
+  if (pendingItems.length === 0) {
+    return 'closed'
+  }
+
+  if (pendingItems.length <= 4) {
+    return 'in_closure'
+  }
+
+  return 'open'
+}
+
+function hasMeaningfulPayoutDivergence(payout: EventPayoutRow | undefined, derivedNet: number, derivedPayable: number, derivedRetained: number) {
+  if (!payout) {
+    return false
+  }
+
+  return (
+    Math.abs(payout.event_organizer_net - derivedNet) > 0.01 ||
+    Math.abs(payout.payable_amount - derivedPayable) > 0.01 ||
+    Math.abs(payout.retained_amount - derivedRetained) > 0.01
+  )
+}
+
 export function buildFinancialOverview(params: {
   events: FinancialEventOption[]
   orders: OrderFinancialSnapshot[]
@@ -140,8 +241,14 @@ export function buildFinancialOverview(params: {
   suppliers: SupplierFinancialSnapshot[]
   staff: StaffFinancialSnapshot[]
   transactionalMessages: TransactionalMessageFinancialSnapshot[]
+  payouts: EventPayoutRow[]
+  forecasts: FinancialForecastRow[]
+  closures: EventFinancialClosureRow[]
 }): FinancialOverview {
   const paymentsByOrderId = new Map(params.payments.map((payment) => [payment.order_id, payment]))
+  const payoutsByEventId = new Map(params.payouts.map((payout) => [payout.event_id, payout]))
+  const forecastsByEventId = new Map(params.forecasts.map((forecast) => [forecast.event_id, forecast]))
+  const closuresByEventId = new Map(params.closures.map((closure) => [closure.event_id, closure]))
   const transactionalMessagesByEventId = new Map<string, TransactionalMessageFinancialSnapshot[]>()
 
   for (const message of params.transactionalMessages) {
@@ -162,6 +269,9 @@ export function buildFinancialOverview(params: {
     const eventSuppliers = params.suppliers.filter((supplier) => supplier.event_id === event.id && supplier.status !== 'cancelled')
     const eventStaff = params.staff.filter((member) => member.event_id === event.id && member.status !== 'inactive' && member.is_active !== false)
     const eventMessages = transactionalMessagesByEventId.get(event.id) ?? []
+    const payout = payoutsByEventId.get(event.id)
+    const forecast = forecastsByEventId.get(event.id)
+    const closure = closuresByEventId.get(event.id)
 
     const revenueOrders = eventOrders.filter((order) => ['paid', 'refunded', 'chargeback'].includes(order.status))
     const approvedPayments = eventPayments.filter((payment) => payment.status === 'paid')
@@ -195,9 +305,24 @@ export function buildFinancialOverview(params: {
         ? approvedPayments.map((payment) => payment.amount)
         : eventOrders.filter((order) => order.status === 'paid' && order.payment_method === 'free').map((order) => order.total_amount),
     )
-    const refundedAmount = sum(refundedPayments.map((payment) => payment.amount)) || sum(eventOrders.filter((order) => order.status === 'refunded').map((order) => order.total_amount))
+    const refundedAmount =
+      sum(refundedPayments.map((payment) => payment.amount)) || sum(eventOrders.filter((order) => order.status === 'refunded').map((order) => order.total_amount))
     const chargebackAmount = sum(eventOrders.filter((order) => order.status === 'chargeback').map((order) => order.total_amount))
     const netSales = approvedPaymentsAmount - refundedAmount - chargebackAmount
+    const operationalCosts = manualCosts + derivedSupplierCosts + derivedStaffCosts
+    const result = netSales - operationalCosts
+    const marginPercent = netSales > 0 ? Number(((result / netSales) * 100).toFixed(1)) : 0
+
+    const derivedRetainedAmount = roundCurrency(refundedAmount + chargebackAmount)
+    const derivedPlatformFees = roundCurrency(sum(revenueOrders.map((order) => order.fee_amount)))
+    const derivedPayableAmount = roundCurrency(Math.max(approvedPaymentsAmount - derivedRetainedAmount, 0))
+    const derivedOrganizerNet = roundCurrency(Math.max(derivedPayableAmount - derivedPlatformFees, 0))
+
+    const projectedRevenue = roundCurrency(forecast?.projected_revenue ?? getFallbackProjectedRevenue(event, sum(revenueOrders.map((order) => order.subtotal)), netSales))
+    const projectedCost = roundCurrency(forecast?.projected_cost ?? operationalCosts)
+    const projectedMargin = roundCurrency(forecast?.projected_margin ?? projectedRevenue - projectedCost)
+    const projectedMarginPercent =
+      forecast?.projected_margin_percent ?? (projectedRevenue > 0 ? Number(((projectedMargin / projectedRevenue) * 100).toFixed(1)) : 0)
 
     const report: FinancialEventReport = {
       event_id: event.id,
@@ -205,7 +330,7 @@ export function buildFinancialOverview(params: {
       starts_at: event.starts_at,
       gross_sales: roundCurrency(sum(revenueOrders.map((order) => order.subtotal))),
       discounts: roundCurrency(sum(revenueOrders.map((order) => order.discount_amount))),
-      fees: roundCurrency(sum(revenueOrders.map((order) => order.fee_amount))),
+      fees: roundCurrency(derivedPlatformFees),
       approved_payments_amount: roundCurrency(approvedPaymentsAmount),
       approved_payments_count: approvedPayments.length + eventOrders.filter((order) => order.status === 'paid' && order.payment_method === 'free').length,
       failed_payments_amount: roundCurrency(sum(failedPayments.map((payment) => payment.amount))),
@@ -217,18 +342,79 @@ export function buildFinancialOverview(params: {
       manual_costs: roundCurrency(manualCosts),
       supplier_costs: roundCurrency(derivedSupplierCosts),
       staff_costs: roundCurrency(derivedStaffCosts),
-      operational_costs: roundCurrency(manualCosts + derivedSupplierCosts + derivedStaffCosts),
-      result: 0,
-      margin_percent: 0,
+      operational_costs: roundCurrency(operationalCosts),
+      result: roundCurrency(result),
+      margin_percent: marginPercent,
       pending_orders_count: eventOrders.filter((order) => ['draft', 'pending', 'processing'].includes(order.status)).length,
       reconciliation_pending_count: reconciliationPendingCount,
       reconciliation_divergent_count: reconciliationDivergentCount,
       order_confirmation_emails_sent: eventMessages.filter((message) => message.template_key === 'order-confirmation' && message.status === 'sent').length,
       ticket_emails_sent: eventMessages.filter((message) => message.template_key === 'tickets-issued' && message.status === 'sent').length,
+      payout_id: payout?.id ?? null,
+      payout_status: payout?.status ?? (reconciliationDivergentCount > 0 ? 'divergent' : reconciliationPendingCount > 0 ? 'held' : 'draft'),
+      payout_scheduled_at: payout?.scheduled_at ?? null,
+      payout_paid_out_at: payout?.paid_out_at ?? null,
+      payout_notes: payout?.notes ?? null,
+      platform_fees: roundCurrency(payout?.platform_fees ?? derivedPlatformFees),
+      retained_amount: roundCurrency(payout?.retained_amount ?? derivedRetainedAmount),
+      payable_amount: roundCurrency(payout?.payable_amount ?? derivedPayableAmount),
+      event_organizer_net: roundCurrency(payout?.event_organizer_net ?? derivedOrganizerNet),
+      payout_divergent:
+        reconciliationDivergentCount > 0 || hasMeaningfulPayoutDivergence(payout, derivedOrganizerNet, derivedPayableAmount, derivedRetainedAmount),
+      forecast_id: forecast?.id ?? null,
+      forecast_notes: forecast?.notes ?? null,
+      projected_revenue: projectedRevenue,
+      projected_cost: projectedCost,
+      projected_margin: projectedMargin,
+      projected_margin_percent: projectedMarginPercent,
+      realized_vs_projected_revenue: roundCurrency(netSales - projectedRevenue),
+      realized_vs_projected_cost: roundCurrency(operationalCosts - projectedCost),
+      realized_vs_projected_result: roundCurrency(result - projectedMargin),
+      risk_status: getRiskStatus({
+        report: {
+          result: roundCurrency(result),
+          pending_orders_count: eventOrders.filter((order) => ['draft', 'pending', 'processing'].includes(order.status)).length,
+          reconciliation_pending_count: reconciliationPendingCount,
+          reconciliation_divergent_count: reconciliationDivergentCount,
+        },
+        projectedMarginPercent,
+        projectedMargin,
+        explicitRisk: forecast?.risk_status,
+      }),
+      closure_id: closure?.id ?? null,
+      closure_status: 'open',
+      closure_closed_at: closure?.closed_at ?? null,
+      closure_notes: closure?.notes ?? null,
+      payments_reconciled: closure?.payments_reconciled ?? (reconciliationPendingCount === 0 && reconciliationDivergentCount === 0),
+      costs_recorded: closure?.costs_recorded ?? (eventCosts.length > 0 || operationalCosts > 0 || approvedPaymentsAmount === 0),
+      payouts_reviewed: closure?.payouts_reviewed ?? Boolean(payout && payout.status !== 'divergent'),
+      divergences_resolved: closure?.divergences_resolved ?? reconciliationDivergentCount === 0,
+      result_validated: closure?.result_validated ?? false,
+      closure_pending_items: [],
+      closure_pending_count: 0,
     }
 
-    report.result = roundCurrency(report.net_sales - report.operational_costs)
-    report.margin_percent = report.net_sales > 0 ? Number(((report.result / report.net_sales) * 100).toFixed(1)) : 0
+    const pendingItems: string[] = []
+
+    if (!report.payments_reconciled) {
+      pendingItems.push('Pagamentos ainda nao conciliados')
+    }
+    if (!report.costs_recorded) {
+      pendingItems.push('Custos operacionais ainda nao consolidados')
+    }
+    if (!report.payouts_reviewed) {
+      pendingItems.push('Repasse ainda nao revisado')
+    }
+    if (!report.divergences_resolved) {
+      pendingItems.push('Divergencias financeiras em aberto')
+    }
+    if (!report.result_validated) {
+      pendingItems.push('Resultado final ainda nao validado')
+    }
+
+    report.closure_pending_items = pendingItems
+    report.closure_pending_count = pendingItems.length
+    report.closure_status = buildClosureStatus(pendingItems, closure?.status)
 
     return report
   })
@@ -269,5 +455,15 @@ export function buildFinancialOverview(params: {
     margin_percent: netSales > 0 ? Number(((result / netSales) * 100).toFixed(1)) : 0,
     divergence_count: reconciliationRows.filter((row) => row.reconciliation_status === 'divergent').length,
     pending_reconciliation_count: reconciliationRows.filter((row) => row.reconciliation_status === 'pending').length,
+    total_projected_revenue: roundCurrency(sum(reports.map((report) => report.projected_revenue))),
+    total_projected_cost: roundCurrency(sum(reports.map((report) => report.projected_cost))),
+    total_projected_margin: roundCurrency(sum(reports.map((report) => report.projected_margin))),
+    total_payable_amount: roundCurrency(sum(reports.map((report) => report.payable_amount))),
+    total_retained_amount: roundCurrency(sum(reports.map((report) => report.retained_amount))),
+    total_event_organizer_net: roundCurrency(sum(reports.map((report) => report.event_organizer_net))),
+    scheduled_payouts_count: reports.filter((report) => report.payout_status === 'scheduled').length,
+    paid_payouts_count: reports.filter((report) => report.payout_status === 'paid').length,
+    events_at_risk_count: reports.filter((report) => report.risk_status === 'high').length,
+    events_ready_to_close_count: reports.filter((report) => report.closure_pending_count === 0).length,
   }
 }

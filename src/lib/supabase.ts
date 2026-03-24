@@ -33,6 +33,9 @@ export type Database = {
       suppliers: { Row: Supplier; Insert: Partial<Supplier>; Update: Partial<Supplier> }
       products: { Row: Product; Insert: Partial<Product>; Update: Partial<Product> }
       cost_entries: { Row: CostEntry; Insert: Partial<CostEntry>; Update: Partial<CostEntry> }
+      event_payouts: { Row: EventPayout; Insert: Partial<EventPayout>; Update: Partial<EventPayout> }
+      financial_forecasts: { Row: FinancialForecast; Insert: Partial<FinancialForecast>; Update: Partial<FinancialForecast> }
+      event_financial_closures: { Row: EventFinancialClosure; Insert: Partial<EventFinancialClosure>; Update: Partial<EventFinancialClosure> }
       campaigns: { Row: Campaign; Insert: Partial<Campaign>; Update: Partial<Campaign> }
     }
   }
@@ -315,6 +318,56 @@ export interface CostEntry {
   status: string
   notes?: string
   created_at: string
+}
+
+export interface EventPayout {
+  id: string
+  organization_id: string
+  event_id: string
+  gross_sales: number
+  refunds_amount: number
+  chargeback_amount: number
+  platform_fees: number
+  retained_amount: number
+  payable_amount: number
+  event_organizer_net: number
+  status: 'draft' | 'scheduled' | 'paid' | 'held' | 'divergent'
+  scheduled_at?: string | null
+  paid_out_at?: string | null
+  notes?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface FinancialForecast {
+  id: string
+  organization_id: string
+  event_id: string
+  projected_revenue: number
+  projected_cost: number
+  projected_margin: number
+  projected_margin_percent: number
+  risk_status: 'low' | 'medium' | 'high'
+  assumptions?: Record<string, unknown> | null
+  notes?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface EventFinancialClosure {
+  id: string
+  organization_id: string
+  event_id: string
+  status: 'open' | 'in_closure' | 'closed'
+  payments_reconciled: boolean
+  costs_recorded: boolean
+  payouts_reviewed: boolean
+  divergences_resolved: boolean
+  result_validated: boolean
+  closed_at?: string | null
+  notes?: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface Campaign {

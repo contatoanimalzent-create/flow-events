@@ -1,5 +1,10 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query'
-import type { UpsertFinancialCostEntryInput } from '@/features/financial/types'
+import type {
+  UpsertEventFinancialClosureInput,
+  UpsertEventPayoutInput,
+  UpsertFinancialCostEntryInput,
+  UpsertFinancialForecastInput,
+} from '@/features/financial/types'
 import { financialService } from './financial.service'
 
 interface DeleteFinancialCostEntryVariables {
@@ -10,6 +15,9 @@ export const financialKeys = {
   all: ['financial'] as const,
   overview: (organizationId: string) => [...financialKeys.all, 'overview', organizationId] as const,
   costs: (organizationId: string, eventId?: string) => [...financialKeys.all, 'costs', organizationId, eventId ?? 'all'] as const,
+  payouts: (organizationId: string) => [...financialKeys.all, 'payouts', organizationId] as const,
+  forecasts: (organizationId: string) => [...financialKeys.all, 'forecasts', organizationId] as const,
+  closures: (organizationId: string) => [...financialKeys.all, 'closures', organizationId] as const,
   actions: () => [...financialKeys.all, 'actions'] as const,
 }
 
@@ -24,6 +32,21 @@ export const financialQueries = {
       queryKey: financialKeys.costs(organizationId, eventId),
       queryFn: () => financialService.listCostEntries(organizationId, eventId),
     }),
+  payouts: (organizationId: string) =>
+    queryOptions({
+      queryKey: financialKeys.payouts(organizationId),
+      queryFn: () => financialService.listEventPayouts(organizationId),
+    }),
+  forecasts: (organizationId: string) =>
+    queryOptions({
+      queryKey: financialKeys.forecasts(organizationId),
+      queryFn: () => financialService.listFinancialForecasts(organizationId),
+    }),
+  closures: (organizationId: string) =>
+    queryOptions({
+      queryKey: financialKeys.closures(organizationId),
+      queryFn: () => financialService.listEventFinancialClosures(organizationId),
+    }),
 }
 
 export const financialMutations = {
@@ -36,5 +59,20 @@ export const financialMutations = {
     mutationOptions({
       mutationKey: [...financialKeys.actions(), 'delete-cost-entry'] as const,
       mutationFn: ({ costEntryId }: DeleteFinancialCostEntryVariables) => financialService.deleteCostEntry(costEntryId),
+    }),
+  savePayout: () =>
+    mutationOptions({
+      mutationKey: [...financialKeys.actions(), 'save-payout'] as const,
+      mutationFn: (input: UpsertEventPayoutInput) => financialService.saveEventPayout(input),
+    }),
+  saveForecast: () =>
+    mutationOptions({
+      mutationKey: [...financialKeys.actions(), 'save-forecast'] as const,
+      mutationFn: (input: UpsertFinancialForecastInput) => financialService.saveFinancialForecast(input),
+    }),
+  saveClosure: () =>
+    mutationOptions({
+      mutationKey: [...financialKeys.actions(), 'save-closure'] as const,
+      mutationFn: (input: UpsertEventFinancialClosureInput) => financialService.saveEventFinancialClosure(input),
     }),
 }

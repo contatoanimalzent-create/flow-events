@@ -1,29 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { financialKeys, financialQueries } from '@/features/financial/services'
-import type { FinancialOverview } from '@/features/financial/types'
+import { buildEmptyFinancialOverview } from '@/features/financial/services'
 import type { FinancialCostCategory, FinancialCostStatus, FinancialTab } from '@/features/financial/types'
-
-function buildEmptyOverview(): FinancialOverview {
-  return {
-    events: [],
-    reports: [],
-    reconciliation_rows: [],
-    unallocated_costs: 0,
-    gross_sales: 0,
-    net_sales: 0,
-    approved_payments_amount: 0,
-    approved_payments_count: 0,
-    failed_payments_amount: 0,
-    refunded_amount: 0,
-    chargeback_amount: 0,
-    operational_costs: 0,
-    result: 0,
-    margin_percent: 0,
-    divergence_count: 0,
-    pending_reconciliation_count: 0,
-  }
-}
 
 export function useFinancialDashboard(organizationId?: string | null) {
   const [selectedEventId, setSelectedEventId] = useState<string>('all')
@@ -37,7 +16,7 @@ export function useFinancialDashboard(organizationId?: string | null) {
       ? financialQueries.overview(organizationId)
       : {
           queryKey: financialKeys.overview('empty'),
-          queryFn: async () => buildEmptyOverview(),
+          queryFn: async () => buildEmptyFinancialOverview(),
         }),
     enabled: Boolean(organizationId),
   })
@@ -79,6 +58,16 @@ export function useFinancialDashboard(organizationId?: string | null) {
     return overview.reports.find((report) => report.event_id === selectedEventId) ?? null
   }, [overview, selectedEventId])
 
+  const filteredReports = useMemo(() => {
+    const reports = overview?.reports ?? []
+
+    if (selectedEventId === 'all') {
+      return reports
+    }
+
+    return reports.filter((report) => report.event_id === selectedEventId)
+  }, [overview?.reports, selectedEventId])
+
   return {
     tab,
     setTab,
@@ -92,6 +81,7 @@ export function useFinancialDashboard(organizationId?: string | null) {
     setExpandedEventId,
     overview,
     reports: overview?.reports ?? [],
+    filteredReports,
     reconciliationRows: overview?.reconciliation_rows ?? [],
     events: overview?.events ?? [],
     filteredCostEntries,

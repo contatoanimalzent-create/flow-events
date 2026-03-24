@@ -9,6 +9,7 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage').then((module) =
 const EventsPage = lazy(() => import('@/pages/EventsPage').then((module) => ({ default: module.EventsPage })))
 const TicketsPage = lazy(() => import('@/pages/TicketsPage').then((module) => ({ default: module.TicketsPage })))
 const SalesPage = lazy(() => import('@/pages/SalesPage').then((module) => ({ default: module.SalesPage })))
+const CRMPage = lazy(() => import('@/pages/CRMPage').then((module) => ({ default: module.CRMPage })))
 const CheckinPage = lazy(() => import('@/pages/CheckinPage').then((module) => ({ default: module.CheckinPage })))
 const StaffPage = lazy(() => import('@/pages/StaffPage').then((module) => ({ default: module.StaffPage })))
 const SuppliersPage = lazy(() => import('@/pages/SuppliersPage').then((module) => ({ default: module.SuppliersPage })))
@@ -46,6 +47,8 @@ function renderSection(activeSection: NavSection) {
       return <TicketsPage />
     case 'sales':
       return <SalesPage />
+    case 'crm':
+      return <CRMPage />
     case 'checkin':
       return <CheckinPage />
     case 'staff':

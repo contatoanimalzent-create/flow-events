@@ -10,6 +10,7 @@ const sectionTitles: Record<NavSection, string> = {
   events:        'Eventos',
   tickets:       'Ingressos & Lotes',
   sales:         'Vendas',
+  crm:           'CRM & Customers',
   checkin:       'Check-in Operacional',
   staff:         'Staff & Equipe',
   suppliers:     'Fornecedores',

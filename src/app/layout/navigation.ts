@@ -3,6 +3,7 @@ export type NavSection =
   | 'events'
   | 'tickets'
   | 'sales'
+  | 'crm'
   | 'checkin'
   | 'staff'
   | 'suppliers'

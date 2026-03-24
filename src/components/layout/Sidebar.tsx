@@ -32,6 +32,7 @@ const navGroups: NavGroup[] = [
     items: [
       { id: 'tickets', label: 'Ingressos',  icon: Ticket },
       { id: 'sales',   label: 'Vendas',     icon: TrendingUp },
+      { id: 'crm',     label: 'CRM',        icon: Users },
     ],
   },
   {

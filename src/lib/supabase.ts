@@ -45,12 +45,22 @@ export type Database = {
       intelligence_alert_states:  { Row: IntelligenceAlertState;       Insert: Partial<IntelligenceAlertState>;       Update: Partial<IntelligenceAlertState> }
       customers:                  { Row: Customer;                    Insert: Partial<Customer>;                    Update: Partial<Customer> }
       customer_event_profiles:    { Row: CustomerEventProfile;        Insert: Partial<CustomerEventProfile>;        Update: Partial<CustomerEventProfile> }
-      audience_segments:            { Row: AudienceSegment;           Insert: Partial<AudienceSegment>;           Update: Partial<AudienceSegment> }
-      campaign_drafts:              { Row: CampaignDraft;             Insert: Partial<CampaignDraft>;             Update: Partial<CampaignDraft> }
-      campaign_runs:                { Row: CampaignRun;               Insert: Partial<CampaignRun>;               Update: Partial<CampaignRun> }
-      campaign_run_recipients:      { Row: CampaignRunRecipient;      Insert: Partial<CampaignRunRecipient>;      Update: Partial<CampaignRunRecipient> }
-      audience_resolution_jobs:     { Row: AudienceResolutionJob;     Insert: Partial<AudienceResolutionJob>;     Update: Partial<AudienceResolutionJob> }
-      campaigns:                    { Row: Campaign;                  Insert: Partial<Campaign>;                  Update: Partial<Campaign> }
+      audience_segments:                { Row: AudienceSegment;                Insert: Partial<AudienceSegment>;                Update: Partial<AudienceSegment> }
+      campaign_drafts:                  { Row: CampaignDraft;                  Insert: Partial<CampaignDraft>;                  Update: Partial<CampaignDraft> }
+      campaign_runs:                    { Row: CampaignRun;                    Insert: Partial<CampaignRun>;                    Update: Partial<CampaignRun> }
+      campaign_run_recipients:          { Row: CampaignRunRecipient;           Insert: Partial<CampaignRunRecipient>;           Update: Partial<CampaignRunRecipient> }
+      audience_resolution_jobs:         { Row: AudienceResolutionJob;          Insert: Partial<AudienceResolutionJob>;          Update: Partial<AudienceResolutionJob> }
+      campaigns:                        { Row: Campaign;                       Insert: Partial<Campaign>;                       Update: Partial<Campaign> }
+      audit_logs:                       { Row: AuditLog;                       Insert: Partial<AuditLog>;                       Update: Partial<AuditLog> }
+      organization_members:             { Row: OrganizationMember;             Insert: Partial<OrganizationMember>;             Update: Partial<OrganizationMember> }
+      incidents:                        { Row: Incident;                       Insert: Partial<Incident>;                       Update: Partial<Incident> }
+      internal_notifications:           { Row: InternalNotification;           Insert: Partial<InternalNotification>;           Update: Partial<InternalNotification> }
+      executive_dashboard_snapshots:    { Row: ExecutiveDashboardSnapshot;     Insert: Partial<ExecutiveDashboardSnapshot>;     Update: Partial<ExecutiveDashboardSnapshot> }
+      data_integrity_checks:            { Row: DataIntegrityCheck;             Insert: Partial<DataIntegrityCheck>;             Update: Partial<DataIntegrityCheck> }
+      data_integrity_issues:            { Row: DataIntegrityIssue;             Insert: Partial<DataIntegrityIssue>;             Update: Partial<DataIntegrityIssue> }
+      intelligence_action_executions:   { Row: IntelligenceActionExecution;    Insert: Partial<IntelligenceActionExecution>;    Update: Partial<IntelligenceActionExecution> }
+      campaign_automation_rules:        { Row: CampaignAutomationRule;         Insert: Partial<CampaignAutomationRule>;         Update: Partial<CampaignAutomationRule> }
+      campaign_automation_executions:   { Row: CampaignAutomationExecution;    Insert: Partial<CampaignAutomationExecution>;    Update: Partial<CampaignAutomationExecution> }
     }
   }
 }
@@ -683,4 +693,257 @@ export interface Campaign {
   created_by?: string | null
   created_at: string
   updated_at: string
+}
+
+// ─── Audit & Access ──────────────────────────────────────────────────────────
+
+export type AuditSeverity = 'debug' | 'info' | 'warning' | 'error' | 'critical'
+export type AuditSource   = 'app' | 'api' | 'edge_function' | 'webhook' | 'system' | 'migration'
+
+export interface AuditLog {
+  id: string
+  organization_id?: string | null
+  user_id?: string | null
+  event_id?: string | null
+  action: string
+  entity_type?: string | null
+  entity_id?: string | null
+  old_data?: Record<string, unknown> | null
+  new_data?: Record<string, unknown> | null
+  ip_address?: string | null
+  user_agent?: string | null
+  device_id?: string | null
+  session_id?: string | null
+  metadata?: Record<string, unknown>
+  severity?: AuditSeverity
+  source?: AuditSource
+  created_at: string
+}
+
+export type OrgMemberRole =
+  | 'owner'
+  | 'admin'
+  | 'manager'
+  | 'finance'
+  | 'marketing'
+  | 'checkin_operator'
+  | 'pdv_operator'
+  | 'staff'
+  | 'viewer'
+
+export interface OrganizationMember {
+  id: string
+  organization_id: string
+  user_id: string
+  role: OrgMemberRole
+  invited_by?: string | null
+  invited_at?: string | null
+  accepted_at?: string | null
+  is_active?: boolean
+  permissions?: Record<string, unknown>
+  event_permissions?: Record<string, unknown>
+  created_at: string
+  updated_at?: string | null
+}
+
+// ─── Incidents ───────────────────────────────────────────────────────────────
+
+export type IncidentSeverity = 'low' | 'medium' | 'high' | 'critical'
+export type IncidentStatus   = 'open' | 'in_progress' | 'resolved' | 'closed'
+
+export interface Incident {
+  id: string
+  organization_id?: string | null
+  event_id: string
+  reported_by?: string | null
+  assigned_to?: string | null
+  title: string
+  description?: string | null
+  severity?: IncidentSeverity
+  status?: IncidentStatus
+  location?: string | null
+  resolved_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ─── Internal Notifications ───────────────────────────────────────────────────
+
+export type NotificationSeverity = 'info' | 'warning' | 'error' | 'critical'
+
+export interface InternalNotification {
+  id: string
+  organization_id: string
+  user_id: string
+  type: string
+  severity: NotificationSeverity
+  title: string
+  body?: string | null
+  action_url?: string | null
+  reference_type?: string | null
+  reference_id?: string | null
+  is_read: boolean
+  read_at?: string | null
+  created_at: string
+}
+
+// ─── Executive Dashboard Snapshots ──────────────────────────────────────────
+
+export type SnapshotPeriod = 'daily' | 'weekly' | 'monthly'
+
+export interface ExecutiveDashboardSnapshot {
+  id: string
+  organization_id: string
+  snapshot_period: SnapshotPeriod
+  snapshot_date: string              // ISO date string
+  total_events: number
+  active_events: number
+  upcoming_events: number
+  gross_revenue: number
+  net_revenue: number
+  platform_fees: number
+  tickets_sold: number
+  tickets_checked_in: number
+  total_customers: number
+  new_customers: number
+  returning_customers: number
+  campaigns_sent: number
+  emails_delivered: number
+  campaign_open_rate?: number | null  // 0.0000–1.0000
+  revenue_by_event: Record<string, unknown>[]
+  revenue_by_day: Record<string, unknown>[]
+  top_ticket_types: Record<string, unknown>[]
+  metadata: Record<string, unknown>
+  generated_by: string
+  created_at: string
+}
+
+// ─── Data Integrity ──────────────────────────────────────────────────────────
+
+export type IntegrityCheckType =
+  | 'orphan_detection'
+  | 'count_mismatch'
+  | 'stale_data'
+  | 'financial_reconciliation'
+  | 'duplicate_detection'
+  | 'custom'
+
+export type IntegrityCheckResult = 'pass' | 'fail' | 'error' | 'skip'
+export type IntegrityCheckScope  = 'organization' | 'event' | 'global'
+export type IntegrityIssueStatus = 'open' | 'acknowledged' | 'resolved' | 'ignored'
+export type IntegrityIssueSeverity = 'critical' | 'high' | 'medium' | 'low'
+
+export interface DataIntegrityCheck {
+  id: string
+  organization_id?: string | null
+  check_name: string
+  check_type: IntegrityCheckType
+  description?: string | null
+  scope: IntegrityCheckScope
+  is_active: boolean
+  schedule_cron?: string | null
+  last_run_at?: string | null
+  next_run_at?: string | null
+  last_result?: IntegrityCheckResult | null
+  last_issue_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface DataIntegrityIssue {
+  id: string
+  organization_id: string
+  check_id?: string | null
+  event_id?: string | null
+  severity: IntegrityIssueSeverity
+  title: string
+  description?: string | null
+  entity_type?: string | null
+  entity_id?: string | null
+  details: Record<string, unknown>
+  status: IntegrityIssueStatus
+  acknowledged_by?: string | null
+  acknowledged_at?: string | null
+  resolved_by?: string | null
+  resolved_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ─── Intelligence Action Executions ─────────────────────────────────────────
+
+export type IntelligenceActionResult = 'success' | 'failed' | 'partial' | 'pending' | 'reverted'
+
+export interface IntelligenceActionExecution {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  recommendation_id?: string | null
+  alert_id?: string | null
+  action_type: string
+  action_payload: Record<string, unknown>
+  executed_by: string
+  executed_at: string
+  result_status: IntelligenceActionResult
+  result_payload: Record<string, unknown>
+  reverted_at?: string | null
+  reverted_by?: string | null
+  notes?: string | null
+  created_at: string
+}
+
+// ─── Campaign Automation ─────────────────────────────────────────────────────
+
+export type AutomationTriggerType =
+  | 'ticket_purchased'
+  | 'order_confirmed'
+  | 'checkin_completed'
+  | 'event_created'
+  | 'days_before_event'
+  | 'days_after_event'
+  | 'segment_joined'
+  | 'order_abandoned'
+  | 'refund_issued'
+  | 'custom'
+
+export type AutomationExecutionStatus =
+  | 'pending'
+  | 'executing'
+  | 'completed'
+  | 'failed'
+  | 'skipped'
+  | 'cancelled'
+
+export interface CampaignAutomationRule {
+  id: string
+  organization_id: string
+  name: string
+  description?: string | null
+  is_active: boolean
+  trigger_type: AutomationTriggerType
+  trigger_conditions: Record<string, unknown>
+  campaign_draft_id?: string | null
+  audience_segment_id?: string | null
+  delay_minutes: number
+  max_executions?: number | null
+  total_executions: number
+  last_triggered_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CampaignAutomationExecution {
+  id: string
+  organization_id: string
+  rule_id: string
+  campaign_run_id?: string | null
+  trigger_type: string
+  trigger_entity_type?: string | null
+  trigger_entity_id?: string | null
+  trigger_payload: Record<string, unknown>
+  scheduled_for: string
+  executed_at?: string | null
+  status: AutomationExecutionStatus
+  error_message?: string | null
+  created_at: string
 }

@@ -3,22 +3,31 @@ import { crmService } from '@/features/crm/services'
 import type {
   AudienceSegmentRow,
   CampaignAudiencePreview,
+  CampaignDeliveryRow,
   CampaignDraftRow,
   CampaignEventOption,
+  CampaignRunRow,
   CampaignsOverview,
+  LaunchCampaignInput,
   UpsertAudienceSegmentInput,
   UpsertCampaignDraftInput,
 } from '@/features/campaigns/types'
-import { buildAudienceCustomers, buildCampaignsOverview, previewAudience } from './campaigns.calculations'
+import { buildAudienceCustomers, buildCampaignsOverview, previewAudience, resolveAudienceCustomers } from './campaigns.calculations'
 import { assertCampaignsResult, CampaignsServiceError } from './campaigns.errors'
 import {
+  buildAudienceResolutionJobPayload,
+  buildCampaignDeliverySummary,
+  buildCampaignRecipientPayload,
+  buildCampaignRunInsertPayload,
   buildAudienceSegmentPayload,
   buildAudienceSegmentRules,
   buildCampaignDraftPayload,
   mapAudienceSegmentRow,
+  mapCampaignRunRow,
   mapCampaignDraftRow,
 } from './campaigns.payloads'
 import { parseStringArray } from '@/features/crm/services/crm.payloads'
+import { CAMPAIGN_SEND_BATCH_LIMIT } from '@/features/campaigns/types'
 
 function isTableMissingError(message?: string) {
   const normalizedMessage = String(message ?? '').toLowerCase()
@@ -27,6 +36,10 @@ function isTableMissingError(message?: string) {
 
 async function ensureCrmSynced(organizationId: string) {
   await crmService.getOverview(organizationId)
+}
+
+function nowIso() {
+  return new Date().toISOString()
 }
 
 async function listAudienceCustomers(organizationId: string) {
@@ -95,6 +108,42 @@ async function listDraftsSafe(organizationId: string): Promise<CampaignDraftRow[
   return ((result.data as Record<string, unknown>[] | null) ?? []).map(mapCampaignDraftRow)
 }
 
+async function getCampaignDraftById(draftId: string): Promise<CampaignDraftRow | null> {
+  const result = await supabase
+    .from('campaign_drafts')
+    .select('*, segment:audience_segments(id,name), event:events(id,name)')
+    .eq('id', draftId)
+    .single()
+
+  if (result.error) {
+    if ((result.error as { code?: string }).code === 'PGRST116') {
+      return null
+    }
+
+    throw new CampaignsServiceError(result.error.message)
+  }
+
+  return result.data ? mapCampaignDraftRow(result.data as Record<string, unknown>) : null
+}
+
+async function listRunsSafe(organizationId: string): Promise<CampaignRunRow[]> {
+  const result = await supabase
+    .from('campaign_runs')
+    .select('*, draft:campaign_drafts(id,name), segment:audience_segments(id,name), event:events(id,name)')
+    .eq('organization_id', organizationId)
+    .order('created_at', { ascending: false })
+
+  if (result.error) {
+    if (isTableMissingError(result.error.message)) {
+      return []
+    }
+
+    throw new CampaignsServiceError(result.error.message)
+  }
+
+  return ((result.data as Record<string, unknown>[] | null) ?? []).map((row) => mapCampaignRunRow(row))
+}
+
 export const campaignsService = {
   async listSegments(organizationId: string): Promise<AudienceSegmentRow[]> {
     return listSegmentsSafe(organizationId)
@@ -157,6 +206,10 @@ export const campaignsService = {
     return listDraftsSafe(organizationId)
   },
 
+  async listCampaignRuns(organizationId: string): Promise<CampaignRunRow[]> {
+    return listRunsSafe(organizationId)
+  },
+
   async createCampaignDraft(input: UpsertCampaignDraftInput) {
     const segment = input.values.segment_id ? await this.getSegmentById(input.values.segment_id) : null
     const rules = segment?.filter_definition ?? {}
@@ -195,6 +248,146 @@ export const campaignsService = {
     assertCampaignsResult(result)
   },
 
+  async launchCampaign(input: LaunchCampaignInput) {
+    const draft = await getCampaignDraftById(input.draftId)
+
+    if (!draft || draft.organization_id !== input.organizationId) {
+      throw new CampaignsServiceError('Draft invalido para lancamento', 'campaign_launch_invalid_draft')
+    }
+
+    const segment = draft.segment_id ? await this.getSegmentById(draft.segment_id) : null
+    const rules = segment?.filter_definition ?? {}
+    const audienceCustomers = await listAudienceCustomers(input.organizationId)
+    const resolvedAudience = resolveAudienceCustomers(audienceCustomers, rules)
+    const runResult = await supabase
+      .from('campaign_runs')
+      .insert(buildCampaignRunInsertPayload({ organizationId: input.organizationId, draft, launchedBy: input.launchedBy ?? null }))
+      .select('*, draft:campaign_drafts(id,name), segment:audience_segments(id,name), event:events(id,name)')
+      .single()
+
+    assertCampaignsResult(runResult)
+
+    if (!runResult.data) {
+      throw new CampaignsServiceError('Nao foi possivel iniciar a execucao da campanha', 'campaign_launch_failed')
+    }
+
+    const initialRun = mapCampaignRunRow(runResult.data as Record<string, unknown>)
+    let resolutionJobId: string | null = null
+
+    try {
+      const jobResult = await supabase
+        .from('audience_resolution_jobs')
+        .insert(
+          buildAudienceResolutionJobPayload({
+            organizationId: input.organizationId,
+            segmentId: draft.segment_id ?? null,
+            campaignRunId: initialRun.id,
+            draft,
+          }),
+        )
+        .select('*')
+        .single()
+
+      assertCampaignsResult(jobResult)
+      resolutionJobId = jobResult.data ? String((jobResult.data as Record<string, unknown>).id ?? '') : null
+
+      const createdAt = nowIso()
+      const recipientRows: CampaignDeliveryRow[] = resolvedAudience.map((customer, index) => {
+        const payload = buildCampaignRecipientPayload({
+          organizationId: input.organizationId,
+          campaignRunId: initialRun.id,
+          customer,
+          draft,
+        })
+
+        return {
+          id: `pending-${index}`,
+          organization_id: input.organizationId,
+          campaign_run_id: initialRun.id,
+          customer_id: payload.customer_id ?? null,
+          recipient_email: payload.recipient_email ?? null,
+          recipient_phone: payload.recipient_phone ?? null,
+          status: payload.status,
+          error_message: payload.error_message ?? null,
+          provider_message_id: null,
+          payload_snapshot: (payload.payload_snapshot as Record<string, unknown> | null | undefined) ?? null,
+          sent_at: null,
+          delivered_at: null,
+          failed_at: null,
+          created_at: createdAt,
+          updated_at: createdAt,
+          customer: null,
+        }
+      })
+
+      for (let index = 0; index < recipientRows.length; index += CAMPAIGN_SEND_BATCH_LIMIT) {
+        const batch = recipientRows.slice(index, index + CAMPAIGN_SEND_BATCH_LIMIT).map(({ customer, ...row }) => row)
+        const result = await supabase.from('campaign_run_recipients').insert(batch)
+        assertCampaignsResult(result)
+      }
+
+      const summary = buildCampaignDeliverySummary(recipientRows, resolvedAudience.length)
+      const completedAt = summary.pending_count > 0 ? null : nowIso()
+      const runStatus: CampaignRunRow['status'] = summary.pending_count > 0 ? 'pending' : 'completed'
+
+      if (resolutionJobId) {
+        const resolutionUpdateResult = await supabase
+          .from('audience_resolution_jobs')
+          .update({
+            status: 'completed',
+            result_count: resolvedAudience.length,
+            completed_at: nowIso(),
+          })
+          .eq('id', resolutionJobId)
+
+        assertCampaignsResult(resolutionUpdateResult)
+      }
+
+      const updateResult = await supabase
+        .from('campaign_runs')
+        .update({
+          status: runStatus,
+          audience_count: resolvedAudience.length,
+          sent_count: summary.sent_count,
+          delivered_count: summary.delivered_count,
+          failed_count: summary.failed_count,
+          skipped_count: summary.skipped_count,
+          completed_at: completedAt,
+        })
+        .eq('id', initialRun.id)
+        .select('*, draft:campaign_drafts(id,name), segment:audience_segments(id,name), event:events(id,name)')
+        .single()
+
+      assertCampaignsResult(updateResult)
+
+      return updateResult.data ? mapCampaignRunRow(updateResult.data as Record<string, unknown>, recipientRows) : initialRun
+    } catch (error) {
+      if (resolutionJobId) {
+        const resolutionFailureResult = await supabase
+          .from('audience_resolution_jobs')
+          .update({
+            status: 'failed',
+            error_message: error instanceof Error ? error.message : 'Falha ao resolver audiencia',
+            completed_at: nowIso(),
+          })
+          .eq('id', resolutionJobId)
+
+        assertCampaignsResult(resolutionFailureResult)
+      }
+
+      const runFailureResult = await supabase
+        .from('campaign_runs')
+        .update({
+          status: 'failed',
+          completed_at: nowIso(),
+        })
+        .eq('id', initialRun.id)
+
+      assertCampaignsResult(runFailureResult)
+      throw error
+    }
+  },
+
   async listEvents(organizationId: string): Promise<CampaignEventOption[]> {
     const result = await supabase.from('events').select('id,name,starts_at,status').eq('organization_id', organizationId).order('starts_at', { ascending: false })
     assertCampaignsResult(result)
@@ -208,10 +401,11 @@ export const campaignsService = {
   },
 
   async getOverview(organizationId: string): Promise<CampaignsOverview> {
-    const [events, segments, drafts, audienceCustomers] = await Promise.all([
+    const [events, segments, drafts, runs, audienceCustomers] = await Promise.all([
       this.listEvents(organizationId),
       listSegmentsSafe(organizationId),
       listDraftsSafe(organizationId),
+      listRunsSafe(organizationId),
       listAudienceCustomers(organizationId),
     ])
 
@@ -219,6 +413,7 @@ export const campaignsService = {
       events,
       segments,
       drafts,
+      runs,
       addressableCustomers: audienceCustomers.length,
       highValueCustomers: audienceCustomers.filter((customer) => customer.total_revenue >= 500).length,
     })

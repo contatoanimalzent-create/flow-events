@@ -1,9 +1,13 @@
 import type {
   AudienceSegmentRules,
   CampaignAudienceCustomerRow,
+  CampaignAudienceCustomerRowInternal,
   CampaignAudiencePreview,
+  CampaignDeliveryRow,
   CampaignDraftRow,
   CampaignEventOption,
+  CampaignRunRow,
+  CampaignRunSummary,
   CampaignsOverview,
   AudienceSegmentRow,
 } from '@/features/campaigns/types'
@@ -93,11 +97,6 @@ function customerMatchesRules(customer: CampaignAudienceCustomerRowInternal, rul
   return true
 }
 
-export interface CampaignAudienceCustomerRowInternal extends CampaignAudienceCustomerRow {
-  attended_events: string[]
-  no_show_events: string[]
-}
-
 export function buildAudienceCustomers(params: {
   customers: StoredCustomerRecord[]
   profiles: StoredCustomerEventProfile[]
@@ -137,14 +136,20 @@ export function buildAudienceCustomers(params: {
   })
 }
 
+export function resolveAudienceCustomers(
+  customers: CampaignAudienceCustomerRowInternal[],
+  rules: AudienceSegmentRules,
+): CampaignAudienceCustomerRowInternal[] {
+  return customers
+    .filter((customer) => customerMatchesRules(customer, rules))
+    .sort((left, right) => right.total_revenue - left.total_revenue || toTimestamp(right.last_order_at) - toTimestamp(left.last_order_at))
+}
+
 export function previewAudience(
   customers: CampaignAudienceCustomerRowInternal[],
   rules: AudienceSegmentRules,
 ): CampaignAudiencePreview {
-  const matched = customers
-    .filter((customer) => customerMatchesRules(customer, rules))
-    .sort((left, right) => right.total_revenue - left.total_revenue || toTimestamp(right.last_order_at) - toTimestamp(left.last_order_at))
-
+  const matched = resolveAudienceCustomers(customers, rules)
   const totalRevenue = matched.reduce((sum, customer) => sum + customer.total_revenue, 0)
 
   return {
@@ -157,10 +162,108 @@ export function previewAudience(
   }
 }
 
+export function buildCampaignRunSummary(params: {
+  audienceCount: number
+  sentCount?: number
+  deliveredCount?: number
+  failedCount?: number
+  skippedCount?: number
+  cancelledCount?: number
+}): CampaignRunSummary {
+  const sentCount = params.sentCount ?? 0
+  const deliveredCount = params.deliveredCount ?? 0
+  const failedCount = params.failedCount ?? 0
+  const skippedCount = params.skippedCount ?? 0
+  const cancelledCount = params.cancelledCount ?? 0
+  const processedCount = sentCount + deliveredCount + failedCount + skippedCount + cancelledCount
+  const pendingCount = Math.max(params.audienceCount - processedCount, 0)
+
+  return {
+    audience_count: params.audienceCount,
+    pending_count: pendingCount,
+    sent_count: sentCount,
+    delivered_count: deliveredCount,
+    failed_count: failedCount,
+    skipped_count: skippedCount,
+    cancelled_count: cancelledCount,
+    processed_count: processedCount,
+    progress_percentage: params.audienceCount > 0 ? Math.round((processedCount / params.audienceCount) * 100) : 0,
+  }
+}
+
+export function calculateCampaignRunSummary(deliveries: CampaignDeliveryRow[], audienceCount = deliveries.length): CampaignRunSummary {
+  const counters = deliveries.reduce(
+    (accumulator, delivery) => {
+      switch (delivery.status) {
+        case 'sent':
+          accumulator.sent_count += 1
+          break
+        case 'delivered':
+          accumulator.delivered_count += 1
+          break
+        case 'failed':
+          accumulator.failed_count += 1
+          break
+        case 'skipped':
+          accumulator.skipped_count += 1
+          break
+        case 'cancelled':
+          accumulator.cancelled_count += 1
+          break
+        case 'pending':
+        default:
+          accumulator.pending_count += 1
+          break
+      }
+
+      return accumulator
+    },
+    {
+      pending_count: 0,
+      sent_count: 0,
+      delivered_count: 0,
+      failed_count: 0,
+      skipped_count: 0,
+      cancelled_count: 0,
+    },
+  )
+
+  const summary = buildCampaignRunSummary({
+    audienceCount,
+    sentCount: counters.sent_count,
+    deliveredCount: counters.delivered_count,
+    failedCount: counters.failed_count,
+    skippedCount: counters.skipped_count,
+    cancelledCount: counters.cancelled_count,
+  })
+
+  summary.pending_count = Math.max(summary.pending_count, counters.pending_count)
+
+  return summary
+}
+
+export function decorateCampaignRun(run: Omit<CampaignRunRow, 'summary'>, deliveries: CampaignDeliveryRow[] = []): CampaignRunRow {
+  return {
+    ...run,
+    summary:
+      deliveries.length > 0
+        ? calculateCampaignRunSummary(deliveries, run.audience_count)
+        : buildCampaignRunSummary({
+            audienceCount: run.audience_count,
+            sentCount: run.sent_count,
+            deliveredCount: run.delivered_count,
+            failedCount: run.failed_count,
+            skippedCount: run.skipped_count,
+            cancelledCount: run.status === 'cancelled' ? Math.max(run.audience_count - run.sent_count - run.delivered_count - run.failed_count - run.skipped_count, 0) : 0,
+          }),
+  }
+}
+
 export function buildCampaignsOverview(params: {
   events: CampaignEventOption[]
   segments: AudienceSegmentRow[]
   drafts: CampaignDraftRow[]
+  runs: CampaignRunRow[]
   addressableCustomers: number
   highValueCustomers: number
 }): CampaignsOverview {
@@ -168,9 +271,11 @@ export function buildCampaignsOverview(params: {
     events: params.events,
     segments: params.segments,
     drafts: params.drafts,
+    runs: params.runs,
     summary: {
       saved_segments: params.segments.length,
       draft_campaigns: params.drafts.length,
+      active_runs: params.runs.filter((run) => run.status === 'pending' || run.status === 'resolving' || run.status === 'sending' || run.status === 'paused').length,
       addressable_customers: params.addressableCustomers,
       high_value_customers: params.highValueCustomers,
     },

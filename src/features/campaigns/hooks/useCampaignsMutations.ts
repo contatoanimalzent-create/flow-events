@@ -49,6 +49,20 @@ export function useCampaignsMutations({ organizationId }: UseCampaignsMutationsP
     onSuccess: invalidateCampaigns,
   })
 
+  const launchCampaignMutation = useMutation({
+    ...campaignsMutations.launchCampaign(),
+    onSuccess: invalidateCampaigns,
+  })
+
+  async function launchCampaign(params: Parameters<typeof launchCampaignMutation.mutateAsync>[0]) {
+    if (!confirm('Lancar esta campanha agora?')) {
+      return false
+    }
+
+    await launchCampaignMutation.mutateAsync(params)
+    return true
+  }
+
   return {
     createSegment: createSegmentMutation.mutateAsync,
     updateSegment: updateSegmentMutation.mutateAsync,
@@ -56,9 +70,12 @@ export function useCampaignsMutations({ organizationId }: UseCampaignsMutationsP
     createDraft: createDraftMutation.mutateAsync,
     updateDraft: updateDraftMutation.mutateAsync,
     deleteDraft: deleteDraftMutation.mutateAsync,
+    launchCampaign,
     savingSegment: createSegmentMutation.isPending || updateSegmentMutation.isPending,
     deletingSegment: deleteSegmentMutation.isPending,
     savingDraft: createDraftMutation.isPending || updateDraftMutation.isPending,
     deletingDraft: deleteDraftMutation.isPending,
+    launchingCampaign: launchCampaignMutation.isPending,
+    launchingDraftId: launchCampaignMutation.variables?.draftId ?? null,
   }
 }

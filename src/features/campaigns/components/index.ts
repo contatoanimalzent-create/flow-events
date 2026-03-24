@@ -1,5 +1,6 @@
 export { AudiencePreviewCard } from './AudiencePreviewCard'
 export { CampaignDraftsTable } from './CampaignDraftsTable'
 export { CampaignsPageContent } from './CampaignsPageContent'
+export { CampaignRunsTable } from './CampaignRunsTable'
 export { CampaignsSummaryGrid } from './CampaignsSummaryGrid'
 export { SegmentsTable } from './SegmentsTable'

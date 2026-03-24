@@ -7,6 +7,7 @@ import type { AudienceSegmentFormValues, AudienceSegmentRow, CampaignDraftFormVa
 import { cn } from '@/shared/lib'
 import { AudiencePreviewCard } from './AudiencePreviewCard'
 import { CampaignDraftsTable } from './CampaignDraftsTable'
+import { CampaignRunsTable } from './CampaignRunsTable'
 import { CampaignsSummaryGrid } from './CampaignsSummaryGrid'
 import { SegmentsTable } from './SegmentsTable'
 
@@ -129,7 +130,7 @@ export function CampaignsPageContent() {
             >
               <Plus className="h-4 w-4" /> Novo segmento
             </button>
-          ) : (
+          ) : dashboard.tab === 'drafts' ? (
             <button
               onClick={() => {
                 setEditingDraft(null)
@@ -140,18 +141,19 @@ export function CampaignsPageContent() {
             >
               <Plus className="h-4 w-4" /> Novo draft
             </button>
-          )}
+          ) : null}
         </div>
       </div>
 
       <CampaignsSummaryGrid
-        summary={dashboard.overview?.summary ?? { saved_segments: 0, draft_campaigns: 0, addressable_customers: 0, high_value_customers: 0 }}
+        summary={dashboard.overview?.summary ?? { saved_segments: 0, draft_campaigns: 0, active_runs: 0, addressable_customers: 0, high_value_customers: 0 }}
       />
 
       <div className="reveal flex items-center gap-1 border-b border-bg-border">
         {([
           { key: 'segments', label: 'Segmentos' },
           { key: 'drafts', label: 'Campaign drafts' },
+          { key: 'runs', label: 'Execucoes' },
         ] as const).map((tab) => (
           <button
             key={tab.key}
@@ -200,16 +202,26 @@ export function CampaignsPageContent() {
           />
           <AudiencePreviewCard preview={selectedSegmentPreview} />
         </div>
-      ) : (
+      ) : dashboard.tab === 'drafts' ? (
         <CampaignDraftsTable
           drafts={dashboard.overview?.drafts ?? []}
+          launchingDraftId={mutations.launchingDraftId}
           onEdit={(draft) => {
             setEditingDraft(draft)
             setDraftValues(valuesFromDraft(draft))
             setShowDraftModal(true)
           }}
+          onLaunch={(draft) =>
+            void mutations.launchCampaign({
+              organizationId: organization.id,
+              draftId: draft.id,
+              launchedBy: profile?.id ?? null,
+            })
+          }
           onDelete={(draft) => void mutations.deleteDraft(draft.id)}
         />
+      ) : (
+        <CampaignRunsTable runs={dashboard.overview?.runs ?? []} />
       )}
 
       {showSegmentModal ? (

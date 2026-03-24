@@ -1,5 +1,5 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query'
-import type { AudienceSegmentRules, UpsertAudienceSegmentInput, UpsertCampaignDraftInput } from '@/features/campaigns/types'
+import type { AudienceSegmentRules, LaunchCampaignInput, UpsertAudienceSegmentInput, UpsertCampaignDraftInput } from '@/features/campaigns/types'
 import { campaignsService } from './campaigns.service'
 
 export const campaignsKeys = {
@@ -59,5 +59,10 @@ export const campaignsMutations = {
     mutationOptions({
       mutationKey: [...campaignsKeys.actions(), 'delete-draft'] as const,
       mutationFn: (draftId: string) => campaignsService.deleteCampaignDraft(draftId),
+    }),
+  launchCampaign: () =>
+    mutationOptions({
+      mutationKey: [...campaignsKeys.actions(), 'launch-campaign'] as const,
+      mutationFn: (input: LaunchCampaignInput) => campaignsService.launchCampaign(input),
     }),
 }

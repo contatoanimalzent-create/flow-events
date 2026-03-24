@@ -42,8 +42,10 @@ export type Database = {
       event_health_snapshots:    { Row: EventHealthSnapshot;     Insert: Partial<EventHealthSnapshot>;     Update: Partial<EventHealthSnapshot> }
       operational_alerts:        { Row: OperationalAlert;        Insert: Partial<OperationalAlert>;        Update: Partial<OperationalAlert> }
       recommendation_logs:       { Row: RecommendationLog;       Insert: Partial<RecommendationLog>;       Update: Partial<RecommendationLog> }
-      intelligence_alert_states: { Row: IntelligenceAlertState;  Insert: Partial<IntelligenceAlertState>;  Update: Partial<IntelligenceAlertState> }
-      campaigns:                 { Row: Campaign;                Insert: Partial<Campaign>;                Update: Partial<Campaign> }
+      intelligence_alert_states:  { Row: IntelligenceAlertState;       Insert: Partial<IntelligenceAlertState>;       Update: Partial<IntelligenceAlertState> }
+      customers:                  { Row: Customer;                    Insert: Partial<Customer>;                    Update: Partial<Customer> }
+      customer_event_profiles:    { Row: CustomerEventProfile;        Insert: Partial<CustomerEventProfile>;        Update: Partial<CustomerEventProfile> }
+      campaigns:                  { Row: Campaign;                    Insert: Partial<Campaign>;                    Update: Partial<Campaign> }
     }
   }
 }
@@ -138,6 +140,7 @@ export interface Order {
   confirmed_at?: string | null
   cancelled_at?: string | null
   notes?: string | null
+  customer_id?: string | null
   stripe_payment_intent?: string | null
   stripe_session_id?: string | null
   pagarme_order_id?: string | null
@@ -518,6 +521,43 @@ export interface RecommendationLog {
   description?: string | null
   action_payload: Record<string, unknown>
   status: string
+  created_at: string
+  updated_at: string
+}
+
+export interface Customer {
+  id: string
+  organization_id: string
+  full_name: string
+  email: string
+  phone?: string | null
+  document?: string | null
+  birth_date?: string | null
+  city?: string | null
+  state?: string | null
+  tags: string[] | Record<string, unknown>[]
+  notes?: string | null
+  first_order_at?: string | null
+  last_order_at?: string | null
+  total_orders: number
+  total_spent: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CustomerEventProfile {
+  id: string
+  organization_id: string
+  customer_id: string
+  event_id: string
+  orders_count: number
+  tickets_count: number
+  attended_count: number
+  no_show_count: number
+  gross_revenue: number
+  net_revenue: number
+  first_interaction_at?: string | null
+  last_interaction_at?: string | null
   created_at: string
   updated_at: string
 }

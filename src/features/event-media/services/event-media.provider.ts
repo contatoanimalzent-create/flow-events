@@ -26,9 +26,14 @@ const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
 const CLOUDINARY_FOLDER = import.meta.env.VITE_CLOUDINARY_FOLDER ?? 'animalz-events'
 const SUPABASE_BUCKET = import.meta.env.VITE_EVENT_MEDIA_SUPABASE_BUCKET ?? 'organization-assets'
+const CLOUDINARY_EDGE_FUNCTION = 'cloudinary-upload'
 
 function hasCloudinaryConfig() {
   return Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINARY_UPLOAD_PRESET)
+}
+
+function hasSupabaseFunctionConfig() {
+  return Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY)
 }
 
 function sanitizeFileName(name: string) {
@@ -44,48 +49,68 @@ function buildCloudinaryThumbnailUrl(publicId: string, assetType: EventMediaAsse
 }
 
 async function uploadToCloudinary(input: UploadProviderInput): Promise<UploadedProviderAsset> {
-  if (!input.file || !CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-    throw new Error('Cloudinary nao esta configurado para upload direto')
+  if (!input.file || !hasSupabaseFunctionConfig()) {
+    throw new Error('Cloudinary upload indisponivel')
   }
 
   const formData = new FormData()
   formData.append('file', input.file)
-  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET)
+  formData.append('organizationId', input.organizationId)
+  formData.append('eventId', input.eventId)
+  formData.append('assetType', input.assetType)
   formData.append('folder', `${CLOUDINARY_FOLDER}/${input.organizationId}/${input.eventId}`)
 
-  const resourceType = input.assetType === 'video' ? 'video' : 'image'
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`, {
+  if (input.thumbnailUrl) {
+    formData.append('thumbnailUrl', input.thumbnailUrl)
+  }
+
+  const { data } = await supabase.auth.getSession()
+  const accessToken = data.session?.access_token
+  const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${CLOUDINARY_EDGE_FUNCTION}`, {
     method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken ?? import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    },
     body: formData,
   })
 
+  const payload = (await response.json().catch(() => null)) as
+    | {
+        error?: string
+        provider?: EventMediaProvider
+        providerAssetId?: string | null
+        url?: string
+        secureUrl?: string
+        thumbnailUrl?: string | null
+        width?: number | null
+        height?: number | null
+        duration?: number | null
+        mimeType?: string | null
+      }
+    | null
+
   if (!response.ok) {
-    throw new Error('Nao foi possivel enviar o arquivo para o Cloudinary')
+    throw new Error(payload?.error ?? 'Nao foi possivel enviar o arquivo para o Cloudinary')
   }
 
-  const payload = (await response.json()) as {
-    public_id?: string
-    url?: string
-    secure_url?: string
-    width?: number
-    height?: number
-    duration?: number
-  }
-
-  if (!payload.secure_url) {
+  if (!payload?.secureUrl) {
     throw new Error('Cloudinary retornou um asset sem URL segura')
   }
 
   return {
-    provider: 'cloudinary',
-    providerAssetId: payload.public_id ?? null,
-    url: payload.url ?? payload.secure_url,
-    secureUrl: payload.secure_url,
-    thumbnailUrl: input.thumbnailUrl ?? buildCloudinaryThumbnailUrl(payload.public_id ?? '', input.assetType),
+    provider: payload.provider ?? 'cloudinary',
+    providerAssetId: payload.providerAssetId ?? null,
+    url: payload.url ?? payload.secureUrl,
+    secureUrl: payload.secureUrl,
+    thumbnailUrl:
+      payload.thumbnailUrl ??
+      input.thumbnailUrl ??
+      buildCloudinaryThumbnailUrl(payload.providerAssetId ?? '', input.assetType),
     width: payload.width ?? null,
     height: payload.height ?? null,
     duration: payload.duration ?? null,
-    mimeType: input.file.type || null,
+    mimeType: payload.mimeType ?? input.file.type ?? null,
   }
 }
 
@@ -137,8 +162,8 @@ function mapExternalUrlAsset(input: UploadProviderInput): UploadedProviderAsset 
 
 export function getEventMediaProviderStatus(): EventMediaProviderStatus {
   return {
-    primaryProvider: hasCloudinaryConfig() ? 'cloudinary' : 'supabase_storage',
-    cloudinaryEnabled: hasCloudinaryConfig(),
+    primaryProvider: hasSupabaseFunctionConfig() ? 'cloudinary' : 'supabase_storage',
+    cloudinaryEnabled: hasSupabaseFunctionConfig() || hasCloudinaryConfig(),
     fallbackProvider: 'supabase_storage',
     bucketName: SUPABASE_BUCKET,
   }
@@ -149,8 +174,14 @@ export async function uploadEventMediaFile(input: UploadProviderInput): Promise<
     return mapExternalUrlAsset(input)
   }
 
-  if (hasCloudinaryConfig()) {
-    return uploadToCloudinary(input)
+  if (hasSupabaseFunctionConfig()) {
+    try {
+      return await uploadToCloudinary(input)
+    } catch (error) {
+      if (!input.file) {
+        throw error
+      }
+    }
   }
 
   return uploadToSupabaseStorage(input)

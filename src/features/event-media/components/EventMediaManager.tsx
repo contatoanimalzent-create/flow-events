@@ -41,6 +41,7 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
   })
   const [editingAsset, setEditingAsset] = useState<EventMediaAsset | null>(null)
   const [showUploadModal, setShowUploadModal] = useState(false)
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const summary = useMemo(() => {
     const activeAssets = assets.filter((asset) => asset.is_active)
@@ -58,7 +59,12 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
       return
     }
 
-    await deleteAsset(asset)
+    try {
+      await deleteAsset(asset)
+      setFeedback({ type: 'success', message: 'Asset removido da biblioteca com sucesso.' })
+    } catch (error) {
+      setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel remover o asset.' })
+    }
   }
 
   async function handleEditSubmit(input: {
@@ -73,34 +79,52 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
     }
 
     if (input.usageType === 'cover') {
-      await updateAsset(editingAsset, {
-        altText: input.altText || null,
-        caption: input.caption || null,
-        isActive: input.isActive,
-        thumbnailUrl: input.thumbnailUrl || null,
-      })
-      await setCoverAsset(editingAsset)
+      try {
+        await updateAsset(editingAsset, {
+          altText: input.altText || null,
+          caption: input.caption || null,
+          isActive: input.isActive,
+          thumbnailUrl: input.thumbnailUrl || null,
+        })
+        await setCoverAsset(editingAsset)
+        setFeedback({ type: 'success', message: 'Capa do evento atualizada com sucesso.' })
+      } catch (error) {
+        setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar a capa.' })
+        throw error
+      }
       return
     }
 
     if (input.usageType === 'hero') {
+      try {
+        await updateAsset(editingAsset, {
+          altText: input.altText || null,
+          caption: input.caption || null,
+          isActive: input.isActive,
+          thumbnailUrl: input.thumbnailUrl || null,
+        })
+        await setHeroAsset(editingAsset)
+        setFeedback({ type: 'success', message: 'Hero principal atualizado com sucesso.' })
+      } catch (error) {
+        setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar o hero.' })
+        throw error
+      }
+      return
+    }
+
+    try {
       await updateAsset(editingAsset, {
+        usageType: input.usageType,
         altText: input.altText || null,
         caption: input.caption || null,
         isActive: input.isActive,
         thumbnailUrl: input.thumbnailUrl || null,
       })
-      await setHeroAsset(editingAsset)
-      return
+      setFeedback({ type: 'success', message: 'Asset atualizado com sucesso.' })
+    } catch (error) {
+      setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar o asset.' })
+      throw error
     }
-
-    await updateAsset(editingAsset, {
-      usageType: input.usageType,
-      altText: input.altText || null,
-      caption: input.caption || null,
-      isActive: input.isActive,
-      thumbnailUrl: input.thumbnailUrl || null,
-    })
   }
 
   if (loading) {
@@ -157,6 +181,18 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
         ))}
       </div>
 
+      {feedback ? (
+        <div
+          className={`rounded-sm border px-4 py-3 text-sm ${
+            feedback.type === 'success'
+              ? 'border-status-success/20 bg-status-success/8 text-status-success'
+              : 'border-status-error/20 bg-status-error/8 text-status-error'
+          }`}
+        >
+          {feedback.message}
+        </div>
+      ) : null}
+
       {assets.length === 0 ? (
         <PageEmptyState
           title="BIBLIOTECA VAZIA"
@@ -173,11 +209,40 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
           assets={assets}
           onEdit={setEditingAsset}
           onDelete={(asset) => void handleDelete(asset)}
-          onMoveUp={(asset) => void reorderAssets(reorderAssetIds(assets, asset.id, 'up'))}
-          onMoveDown={(asset) => void reorderAssets(reorderAssetIds(assets, asset.id, 'down'))}
-          onSetCover={(asset) => void setCoverAsset(asset)}
-          onSetHero={(asset) => void setHeroAsset(asset)}
-          onToggleActive={(asset) => void updateAsset(asset, { isActive: !asset.is_active })}
+          onMoveUp={(asset) =>
+            void reorderAssets(reorderAssetIds(assets, asset.id, 'up')).then(
+              () => setFeedback({ type: 'success', message: 'Ordem da galeria atualizada.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel reordenar os assets.' }),
+            )
+          }
+          onMoveDown={(asset) =>
+            void reorderAssets(reorderAssetIds(assets, asset.id, 'down')).then(
+              () => setFeedback({ type: 'success', message: 'Ordem da galeria atualizada.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel reordenar os assets.' }),
+            )
+          }
+          onSetCover={(asset) =>
+            void setCoverAsset(asset).then(
+              () => setFeedback({ type: 'success', message: 'Novo cover ativo definido para o evento.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel definir a capa.' }),
+            )
+          }
+          onSetHero={(asset) =>
+            void setHeroAsset(asset).then(
+              () => setFeedback({ type: 'success', message: 'Novo hero video ativo definido para o evento.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel definir o hero.' }),
+            )
+          }
+          onToggleActive={(asset) =>
+            void updateAsset(asset, { isActive: !asset.is_active }).then(
+              () =>
+                setFeedback({
+                  type: 'success',
+                  message: asset.is_active ? 'Asset desativado na landing publica.' : 'Asset ativado na landing publica.',
+                }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel alterar o status do asset.' }),
+            )
+          }
         />
       )}
 
@@ -193,7 +258,11 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
           uploading={uploading}
           onClose={() => setShowUploadModal(false)}
           onSubmit={async (input) => {
-            await uploadAsset(input)
+            const asset = await uploadAsset(input)
+            setFeedback({
+              type: 'success',
+              message: `${asset.asset_type === 'video' ? 'Video' : 'Imagem'} publicada com provider ${asset.provider}.`,
+            })
           }}
         />
       ) : null}

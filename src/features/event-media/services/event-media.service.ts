@@ -11,6 +11,29 @@ import { removeEventMediaFile, uploadEventMediaFile } from './event-media.provid
 
 const eventMediaApi = createApiClient('event-media')
 
+function assertUploadResult(asset: {
+  provider: string
+  url: string
+  secureUrl: string
+  thumbnailUrl: string | null
+  mimeType: string | null
+  width: number | null
+  height: number | null
+  duration: number | null
+}, assetType: EventAssetUploadInput['assetType']) {
+  if (!asset.provider || !asset.url || !asset.secureUrl) {
+    throw new Error('Upload incompleto: provider e URLs finais sao obrigatorios')
+  }
+
+  if (assetType === 'video' && !asset.thumbnailUrl) {
+    throw new Error('Upload incompleto: video precisa de thumbnail_url')
+  }
+
+  if (assetType === 'image' && asset.duration) {
+    throw new Error('Upload invalido: imagens nao devem registrar duracao')
+  }
+}
+
 async function getEventActiveAssets(eventId: string) {
   const result = await supabase
     .from('event_assets')
@@ -84,10 +107,10 @@ async function syncLegacyEventMediaFields(eventId: string) {
   }
 }
 
-async function demoteSiblingUsage(eventId: string, usageType: 'cover' | 'hero', assetId: string) {
+async function deactivateSiblingUsage(eventId: string, usageType: 'cover' | 'hero', assetId: string) {
   const result = await supabase
     .from('event_assets')
-    .update({ usage_type: 'gallery' })
+    .update({ is_active: false })
     .eq('event_id', eventId)
     .eq('usage_type', usageType)
     .neq('id', assetId)
@@ -131,6 +154,7 @@ export const eventMediaService = {
         externalUrl: input.externalUrl?.trim(),
         thumbnailUrl: input.thumbnailUrl?.trim() || undefined,
       })
+      assertUploadResult(uploadedAsset, input.assetType)
 
       const sortOrder = await getNextSortOrder(input.eventId)
       const insertResult = await supabase
@@ -164,12 +188,12 @@ export const eventMediaService = {
 
       const asset = insertResult.data as EventMediaAsset
 
-      if (asset.usage_type === 'cover') {
-        await demoteSiblingUsage(asset.event_id, 'cover', asset.id)
+      if (asset.usage_type === 'cover' && asset.is_active) {
+        await deactivateSiblingUsage(asset.event_id, 'cover', asset.id)
       }
 
-      if (asset.usage_type === 'hero') {
-        await demoteSiblingUsage(asset.event_id, 'hero', asset.id)
+      if (asset.usage_type === 'hero' && asset.is_active) {
+        await deactivateSiblingUsage(asset.event_id, 'hero', asset.id)
       }
 
       await syncLegacyEventMediaFields(input.eventId)
@@ -201,12 +225,12 @@ export const eventMediaService = {
 
       const asset = result.data as EventMediaAsset
 
-      if (asset.usage_type === 'cover') {
-        await demoteSiblingUsage(asset.event_id, 'cover', asset.id)
+      if (asset.usage_type === 'cover' && asset.is_active) {
+        await deactivateSiblingUsage(asset.event_id, 'cover', asset.id)
       }
 
-      if (asset.usage_type === 'hero') {
-        await demoteSiblingUsage(asset.event_id, 'hero', asset.id)
+      if (asset.usage_type === 'hero' && asset.is_active) {
+        await deactivateSiblingUsage(asset.event_id, 'hero', asset.id)
       }
 
       await syncLegacyEventMediaFields(asset.event_id)
@@ -258,7 +282,7 @@ export const eventMediaService = {
         throw new Error('A capa do evento precisa ser uma imagem')
       }
 
-      await demoteSiblingUsage(eventId, 'cover', assetId)
+      await deactivateSiblingUsage(eventId, 'cover', assetId)
       const result = await supabase
         .from('event_assets')
         .update({ usage_type: 'cover', is_active: true })
@@ -282,7 +306,7 @@ export const eventMediaService = {
         throw new Error('O hero principal precisa ser um video')
       }
 
-      await demoteSiblingUsage(eventId, 'hero', assetId)
+      await deactivateSiblingUsage(eventId, 'hero', assetId)
       const result = await supabase
         .from('event_assets')
         .update({ usage_type: 'hero', is_active: true })

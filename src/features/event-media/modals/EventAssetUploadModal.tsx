@@ -25,6 +25,7 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
   const [altText, setAltText] = useState('')
   const [isActive, setIsActive] = useState(true)
   const [error, setError] = useState('')
+  const [previewUrl, setPreviewUrl] = useState('')
 
   useEffect(() => {
     if (usageType === 'cover' || usageType === 'thumbnail') {
@@ -35,6 +36,20 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
       setAssetType('video')
     }
   }, [usageType])
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(source === 'url' ? externalUrl.trim() : '')
+      return
+    }
+
+    const objectUrl = URL.createObjectURL(file)
+    setPreviewUrl(objectUrl)
+
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
+  }, [externalUrl, file, source])
 
   async function handleSubmit() {
     if (source === 'file' && !file) {
@@ -65,8 +80,6 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
       setError(err instanceof Error ? err.message : 'Nao foi possivel publicar o asset')
     }
   }
-
-  const previewUrl = file ? URL.createObjectURL(file) : externalUrl.trim()
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center bg-bg-primary/80 p-4 backdrop-blur-sm">

@@ -61,6 +61,7 @@ export type Database = {
       intelligence_action_executions:   { Row: IntelligenceActionExecution;    Insert: Partial<IntelligenceActionExecution>;    Update: Partial<IntelligenceActionExecution> }
       campaign_automation_rules:        { Row: CampaignAutomationRule;         Insert: Partial<CampaignAutomationRule>;         Update: Partial<CampaignAutomationRule> }
       campaign_automation_executions:   { Row: CampaignAutomationExecution;    Insert: Partial<CampaignAutomationExecution>;    Update: Partial<CampaignAutomationExecution> }
+      event_assets:                     { Row: EventAsset;                     Insert: Partial<EventAsset>;                     Update: Partial<EventAsset> }
     }
   }
 }
@@ -946,4 +947,34 @@ export interface CampaignAutomationExecution {
   status: AutomationExecutionStatus
   error_message?: string | null
   created_at: string
+}
+
+// ─── Event Media Assets ───────────────────────────────────────────────────────
+
+export type AssetType     = 'image' | 'video'
+export type AssetUsage    = 'cover' | 'hero' | 'gallery' | 'thumbnail'
+export type AssetProvider = 'cloudinary' | 'supabase_storage' | 's3' | 'url'
+
+export interface EventAsset {
+  id: string
+  organization_id: string
+  event_id: string
+  asset_type: AssetType
+  usage_type: AssetUsage
+  provider: AssetProvider
+  provider_asset_id?: string | null   // Cloudinary public_id, S3 key, etc.
+  url: string
+  secure_url?: string | null
+  thumbnail_url?: string | null
+  width?: number | null
+  height?: number | null
+  duration?: number | null             // seconds (video only)
+  mime_type?: string | null
+  alt_text?: string | null
+  caption?: string | null
+  sort_order: number
+  is_active: boolean
+  created_by?: string | null
+  created_at: string
+  updated_at: string
 }

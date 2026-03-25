@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Film, ImagePlus, Library, Loader2 } from 'lucide-react'
-import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
+import { ActionConfirmationDialog, FeedbackBanner, PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
 import { useEventAssetActions, useEventAssetUpload, useEventAssets } from '@/features/event-media/hooks'
 import { getEventMediaProviderStatus } from '@/features/event-media/services'
 import type { EventMediaAsset } from '@/features/event-media/types'
@@ -40,6 +40,7 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
     organizationId,
   })
   const [editingAsset, setEditingAsset] = useState<EventMediaAsset | null>(null)
+  const [pendingDeleteAsset, setPendingDeleteAsset] = useState<EventMediaAsset | null>(null)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
@@ -53,19 +54,6 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
       videos: assets.filter((asset) => asset.asset_type === 'video').length,
     }
   }, [assets])
-
-  async function handleDelete(asset: EventMediaAsset) {
-    if (!confirm('Excluir este asset da biblioteca de midia?')) {
-      return
-    }
-
-    try {
-      await deleteAsset(asset)
-      setFeedback({ type: 'success', message: 'Asset removido da biblioteca com sucesso.' })
-    } catch (error) {
-      setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel remover o asset.' })
-    }
-  }
 
   async function handleEditSubmit(input: {
     usageType: EventMediaAsset['usage_type']
@@ -87,9 +75,9 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
           thumbnailUrl: input.thumbnailUrl || null,
         })
         await setCoverAsset(editingAsset)
-        setFeedback({ type: 'success', message: 'Capa do evento atualizada com sucesso.' })
+        setFeedback({ type: 'success', message: 'A capa principal do evento foi atualizada com sucesso.' })
       } catch (error) {
-        setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar a capa.' })
+        setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar a capa principal.' })
         throw error
       }
       return
@@ -104,9 +92,9 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
           thumbnailUrl: input.thumbnailUrl || null,
         })
         await setHeroAsset(editingAsset)
-        setFeedback({ type: 'success', message: 'Hero principal atualizado com sucesso.' })
+        setFeedback({ type: 'success', message: 'O hero principal do evento foi atualizado com sucesso.' })
       } catch (error) {
-        setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar o hero.' })
+        setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar o hero principal.' })
         throw error
       }
       return
@@ -120,9 +108,9 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
         isActive: input.isActive,
         thumbnailUrl: input.thumbnailUrl || null,
       })
-      setFeedback({ type: 'success', message: 'Asset atualizado com sucesso.' })
+      setFeedback({ type: 'success', message: 'Os dados editoriais do asset foram atualizados.' })
     } catch (error) {
-      setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar o asset.' })
+      setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel salvar as alteracoes do asset.' })
       throw error
     }
   }
@@ -182,15 +170,11 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
       </div>
 
       {feedback ? (
-        <div
-          className={`rounded-sm border px-4 py-3 text-sm ${
-            feedback.type === 'success'
-              ? 'border-status-success/20 bg-status-success/8 text-status-success'
-              : 'border-status-error/20 bg-status-error/8 text-status-error'
-          }`}
-        >
-          {feedback.message}
-        </div>
+        <FeedbackBanner
+          tone={feedback.type}
+          title={feedback.type === 'success' ? 'Atualizacao concluida' : 'Nao foi possivel concluir a acao'}
+          message={feedback.message}
+        />
       ) : null}
 
       {assets.length === 0 ? (
@@ -208,29 +192,29 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
         <EventAssetGrid
           assets={assets}
           onEdit={setEditingAsset}
-          onDelete={(asset) => void handleDelete(asset)}
+          onDelete={setPendingDeleteAsset}
           onMoveUp={(asset) =>
             void reorderAssets(reorderAssetIds(assets, asset.id, 'up')).then(
-              () => setFeedback({ type: 'success', message: 'Ordem da galeria atualizada.' }),
-              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel reordenar os assets.' }),
+              () => setFeedback({ type: 'success', message: 'A ordem editorial da galeria foi atualizada.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar a ordem dos assets.' }),
             )
           }
           onMoveDown={(asset) =>
             void reorderAssets(reorderAssetIds(assets, asset.id, 'down')).then(
-              () => setFeedback({ type: 'success', message: 'Ordem da galeria atualizada.' }),
-              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel reordenar os assets.' }),
+              () => setFeedback({ type: 'success', message: 'A ordem editorial da galeria foi atualizada.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel atualizar a ordem dos assets.' }),
             )
           }
           onSetCover={(asset) =>
             void setCoverAsset(asset).then(
-              () => setFeedback({ type: 'success', message: 'Novo cover ativo definido para o evento.' }),
-              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel definir a capa.' }),
+              () => setFeedback({ type: 'success', message: 'A nova capa ativa do evento ja esta publicada.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel definir a capa principal.' }),
             )
           }
           onSetHero={(asset) =>
             void setHeroAsset(asset).then(
-              () => setFeedback({ type: 'success', message: 'Novo hero video ativo definido para o evento.' }),
-              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel definir o hero.' }),
+              () => setFeedback({ type: 'success', message: 'O hero principal ja esta ativo na landing publica.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel definir o hero principal.' }),
             )
           }
           onToggleActive={(asset) =>
@@ -238,9 +222,9 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
               () =>
                 setFeedback({
                   type: 'success',
-                  message: asset.is_active ? 'Asset desativado na landing publica.' : 'Asset ativado na landing publica.',
+                  message: asset.is_active ? 'O asset foi retirado da experiencia publica.' : 'O asset voltou a ficar disponivel na experiencia publica.',
                 }),
-              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel alterar o status do asset.' }),
+              (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel alterar a disponibilidade do asset.' }),
             )
           }
         />
@@ -261,7 +245,7 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
             const asset = await uploadAsset(input)
             setFeedback({
               type: 'success',
-              message: `${asset.asset_type === 'video' ? 'Video' : 'Imagem'} publicada com provider ${asset.provider}.`,
+              message: `${asset.asset_type === 'video' ? 'Video' : 'Imagem'} publicada com sucesso via ${asset.provider}.`,
             })
           }}
         />
@@ -275,6 +259,29 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
           onSubmit={handleEditSubmit}
         />
       ) : null}
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteAsset)}
+        title="Excluir asset da media library"
+        description={pendingDeleteAsset ? `O arquivo ${pendingDeleteAsset.caption || pendingDeleteAsset.id.slice(0, 8)} sera removido deste evento.` : undefined}
+        impact="A landing publica pode perder uma capa, um hero ou um item de galeria imediatamente apos a confirmacao."
+        confirmLabel="Excluir asset"
+        confirming={saving}
+        onCancel={() => setPendingDeleteAsset(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteAsset) {
+            return
+          }
+
+          try {
+            await deleteAsset(pendingDeleteAsset)
+            setFeedback({ type: 'success', message: 'O asset foi removido da biblioteca do evento.' })
+            setPendingDeleteAsset(null)
+          } catch (error) {
+            setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Nao foi possivel remover o asset selecionado.' })
+          }
+        }}
+      />
     </section>
   )
 }

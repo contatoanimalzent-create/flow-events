@@ -6,8 +6,8 @@ import { useAccessControl } from '@/features/access-control'
 import { useStaffActions, useStaffList } from '@/features/staff/hooks'
 import { staffKeys, staffQueries } from '@/features/staff/services'
 import { STAFF_STATUS_CONFIG } from '@/features/staff/types'
-import type { StaffTimeEntryRow } from '@/features/staff/types'
-import { PageEmptyState, PageLoadingState, PaginationControls } from '@/shared/components'
+import type { StaffMemberRow, StaffTimeEntryRow } from '@/features/staff/types'
+import { ActionConfirmationDialog, PageEmptyState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { StaffFormModal } from '@/features/staff/modals'
 import { StaffStatsGrid } from './StaffStatsGrid'
@@ -37,6 +37,7 @@ export function StaffPageContent() {
   } = useStaffList(organization?.id)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [pendingDeleteMember, setPendingDeleteMember] = useState<StaffMemberRow | null>(null)
   const { updateStatus, issueCredential, deleteStaff, recordPresence } = useStaffActions(selectedEventId)
 
   const staffTimeEntriesQueries = useQueries({
@@ -173,7 +174,7 @@ export function StaffPageContent() {
                     setEditingId(member.id)
                     setShowForm(true)
                   }}
-                  onDelete={() => void deleteStaff(member.id)}
+                  onDelete={() => setPendingDeleteMember(member)}
                   onClockIn={() => void recordPresence(member.id, 'clock_in', member.gate_id ?? null)}
                   onClockOut={() => void recordPresence(member.id, 'clock_out', member.gate_id ?? null)}
                 />
@@ -200,6 +201,27 @@ export function StaffPageContent() {
           }}
         />
       )}
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteMember)}
+        title="Remover membro de staff"
+        description={
+          pendingDeleteMember
+            ? `O cadastro de ${pendingDeleteMember.first_name} ${pendingDeleteMember.last_name} sera removido deste evento.`
+            : undefined
+        }
+        impact="A remocao afeta alocacao, credencial e historico operacional vinculado a este membro no contexto do evento."
+        confirmLabel="Remover membro"
+        onCancel={() => setPendingDeleteMember(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteMember) {
+            return
+          }
+
+          await deleteStaff(pendingDeleteMember.id)
+          setPendingDeleteMember(null)
+        }}
+      />
     </div>
   )
 }

@@ -47,7 +47,7 @@ export function OrdersPageContent() {
     setPage,
   } = useOrdersList(organization?.id)
   const { order, items, digitalTickets, loading: loadingDetails } = useOrderDetails(selectedOrderId)
-  const { confirmOrder, cancelOrder, issueDigitalTickets, resendTickets } = useOrderActions({ eventId: selectedEventId })
+  const { confirmOrder, cancelOrder, issueDigitalTickets, resendTickets, cancelling } = useOrderActions({ eventId: selectedEventId })
 
   return (
     <div className="admin-page">
@@ -236,6 +236,7 @@ export function OrdersPageContent() {
           items={items}
           digitalTickets={digitalTickets}
           loading={loadingDetails}
+          cancelling={cancelling}
           onClose={closeOrder}
           onConfirm={() => void confirmOrder(selectedOrderId)}
           onCancel={() => void cancelOrder(selectedOrderId)}

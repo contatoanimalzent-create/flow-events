@@ -5,7 +5,7 @@ import { useAccessControl } from '@/features/access-control'
 import { useCampaignsDashboard, useCampaignsMutations } from '@/features/campaigns/hooks'
 import { CampaignDraftModal, SegmentBuilderModal } from '@/features/campaigns/modals'
 import type { AudienceSegmentFormValues, AudienceSegmentRow, CampaignDraftFormValues, CampaignDraftRow } from '@/features/campaigns/types'
-import { PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
+import { ActionConfirmationDialog, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { AudiencePreviewCard } from './AudiencePreviewCard'
 import { CampaignDraftsTable } from './CampaignDraftsTable'
@@ -85,6 +85,9 @@ export function CampaignsPageContent() {
   const [showDraftModal, setShowDraftModal] = useState(false)
   const [editingSegment, setEditingSegment] = useState<AudienceSegmentRow | null>(null)
   const [editingDraft, setEditingDraft] = useState<CampaignDraftRow | null>(null)
+  const [pendingDeleteSegment, setPendingDeleteSegment] = useState<AudienceSegmentRow | null>(null)
+  const [pendingDeleteDraft, setPendingDeleteDraft] = useState<CampaignDraftRow | null>(null)
+  const [pendingLaunchDraft, setPendingLaunchDraft] = useState<CampaignDraftRow | null>(null)
   const [segmentValues, setSegmentValues] = useState<AudienceSegmentFormValues>(emptySegmentValues())
   const [draftValues, setDraftValues] = useState<CampaignDraftFormValues>(emptyDraftValues())
 
@@ -198,7 +201,7 @@ export function CampaignsPageContent() {
                 setDraftValues(emptyDraftValues(segment.id))
                 setShowDraftModal(true)
               }}
-              onDelete={(segment) => void mutations.deleteSegment(segment.id)}
+              onDelete={setPendingDeleteSegment}
             />
             <AudiencePreviewCard preview={selectedSegmentPreview} />
           </div>
@@ -214,14 +217,8 @@ export function CampaignsPageContent() {
               setDraftValues(valuesFromDraft(draft))
               setShowDraftModal(true)
             }}
-            onLaunch={(draft) =>
-              void mutations.launchCampaign({
-                organizationId: organization.id,
-                draftId: draft.id,
-                launchedBy: profile?.id ?? null,
-              })
-            }
-            onDelete={(draft) => void mutations.deleteDraft(draft.id)}
+            onLaunch={setPendingLaunchDraft}
+            onDelete={setPendingDeleteDraft}
           />
           <PaginationControls pagination={dashboard.draftsPagination} onPageChange={dashboard.setDraftsPage} />
         </div>
@@ -295,6 +292,70 @@ export function CampaignsPageContent() {
           }}
         />
       ) : null}
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteSegment)}
+        title="Remover segmento salvo"
+        description={
+          pendingDeleteSegment
+            ? `O segmento ${pendingDeleteSegment.name} sera removido da operacao de CRM e campanhas.`
+            : undefined
+        }
+        impact="Drafts que dependem deste publico perdem a referencia principal e a equipe precisara revisar a estrategia antes do proximo disparo."
+        confirmLabel="Excluir segmento"
+        confirming={mutations.deletingSegment}
+        onCancel={() => setPendingDeleteSegment(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteSegment) {
+            return
+          }
+
+          await mutations.deleteSegment(pendingDeleteSegment.id)
+          setPendingDeleteSegment(null)
+        }}
+      />
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteDraft)}
+        title="Excluir draft de campanha"
+        description={pendingDeleteDraft ? `O draft ${pendingDeleteDraft.name} saira da fila editorial desta organizacao.` : undefined}
+        impact="O conteudo, o agendamento e o contexto comercial deste disparo deixam de ficar disponiveis para reaproveitamento imediato."
+        confirmLabel="Excluir draft"
+        confirming={mutations.deletingDraft}
+        onCancel={() => setPendingDeleteDraft(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteDraft) {
+            return
+          }
+
+          await mutations.deleteDraft(pendingDeleteDraft.id)
+          setPendingDeleteDraft(null)
+        }}
+      />
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingLaunchDraft)}
+        tone="default"
+        title="Lancar campanha"
+        description={pendingLaunchDraft ? `O draft ${pendingLaunchDraft.name} sera enviado para execucao agora.` : undefined}
+        impact="A plataforma vai criar a run operacional, resolver a audiencia e registrar os destinatarios desta campanha. Revise o conteudo antes de seguir."
+        confirmLabel="Lancar agora"
+        cancelLabel="Revisar draft"
+        confirming={mutations.launchingCampaign}
+        onCancel={() => setPendingLaunchDraft(null)}
+        onConfirm={async () => {
+          if (!pendingLaunchDraft) {
+            return
+          }
+
+          await mutations.launchCampaign({
+            organizationId: organization.id,
+            draftId: pendingLaunchDraft.id,
+            launchedBy: profile?.id ?? null,
+          })
+          setPendingLaunchDraft(null)
+        }}
+      />
     </div>
   )
 }

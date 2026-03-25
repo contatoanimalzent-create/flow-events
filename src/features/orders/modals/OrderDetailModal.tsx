@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { CheckCircle2, CreditCard, FileText, Loader2, Smartphone, Ticket } from 'lucide-react'
 import {
+  ActionConfirmationDialog,
   ConfirmActionBox,
   FormSection,
   ModalBody,
@@ -16,6 +18,7 @@ interface OrderDetailModalProps {
   items: OrderItemRow[]
   digitalTickets: DigitalTicketRow[]
   loading: boolean
+  cancelling?: boolean
   onClose: () => void
   onConfirm: () => void
   onCancel: () => void
@@ -44,6 +47,7 @@ export function OrderDetailModal({
   items,
   digitalTickets,
   loading,
+  cancelling = false,
   onClose,
   onConfirm,
   onCancel,
@@ -52,6 +56,7 @@ export function OrderDetailModal({
 }: OrderDetailModalProps) {
   const statusConfig = ORDER_STATUS_CONFIG[order.status] ?? ORDER_STATUS_CONFIG.pending
   const paymentMethod = order.payment_method ? ORDER_PAYMENT_METHOD_CONFIG[order.payment_method] : undefined
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false)
 
   return (
     <ModalShell size="4xl">
@@ -207,7 +212,7 @@ export function OrderDetailModal({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {order.status !== 'cancelled' ? (
-            <button onClick={onCancel} className="btn-danger text-sm">
+            <button onClick={() => setConfirmCancelOpen(true)} className="btn-danger text-sm">
               Cancelar pedido
             </button>
           ) : null}
@@ -216,6 +221,20 @@ export function OrderDetailModal({
           </button>
         </div>
       </ModalFooter>
+
+      <ActionConfirmationDialog
+        open={confirmCancelOpen}
+        title="Cancelar pedido"
+        description={`O pedido #${order.id.slice(0, 8).toUpperCase()} deixara de seguir no fluxo comercial.`}
+        impact="Pagamentos, emissao digital e acompanhamento operacional deste comprador podem precisar de nova revisao apos o cancelamento."
+        confirmLabel="Cancelar pedido"
+        confirming={cancelling}
+        onCancel={() => setConfirmCancelOpen(false)}
+        onConfirm={async () => {
+          await onCancel()
+          setConfirmCancelOpen(false)
+        }}
+      />
     </ModalShell>
   )
 }

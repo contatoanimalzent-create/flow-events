@@ -1,6 +1,8 @@
 export { PaginationControls } from './PaginationControls'
 export {
+  ActionConfirmationDialog,
   ConfirmActionBox,
+  FeedbackBanner,
   FormError,
   FormField,
   FormGrid,

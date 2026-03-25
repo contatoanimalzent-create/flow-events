@@ -1,10 +1,12 @@
+import { useState } from 'react'
 import { CalendarDays, Copy, Edit2, Plus, Search, Trash2 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useAccessControl } from '@/features/access-control'
 import { useEventActions, useEventsList } from '@/features/events/hooks'
 import { EventFormModal } from '@/features/events/modals'
 import { EVENT_STATUS_CONFIG } from '@/features/events/types'
-import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
+import type { EventRow } from '@/features/events/types'
+import { ActionConfirmationDialog, PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn, formatDate } from '@/shared/lib'
 import { EventCard } from './EventCard'
 
@@ -35,6 +37,7 @@ export function EventsPageContent() {
     toggleMenu,
   } = useEventsList(organization?.id)
   const { publishEvent, deleteEvent, duplicateEvent } = useEventActions({ organizationId: organization?.id })
+  const [pendingDeleteEvent, setPendingDeleteEvent] = useState<EventRow | null>(null)
 
   return (
     <div className="admin-page" onClick={closeMenu}>
@@ -165,7 +168,7 @@ export function EventsPageContent() {
                 closeMenu()
               }}
               onDelete={async () => {
-                await deleteEvent(event.id)
+                setPendingDeleteEvent(event)
                 closeMenu()
               }}
             />
@@ -233,7 +236,7 @@ export function EventsPageContent() {
                           <Copy className="h-3.5 w-3.5" />
                         </button>
                         <button
-                          onClick={() => void deleteEvent(event.id)}
+                          onClick={() => setPendingDeleteEvent(event)}
                           className="rounded-sm p-1.5 text-text-muted transition-all hover:bg-status-error/8 hover:text-status-error"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -256,6 +259,24 @@ export function EventsPageContent() {
           onSaved={closeForm}
         />
       )}
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteEvent)}
+        title="Remover evento"
+        description={pendingDeleteEvent ? `O evento "${pendingDeleteEvent.name}" sera removido do portfolio administrativo.` : undefined}
+        impact="A exclusao remove a configuracao principal do evento e pode afetar operacao, vendas futuras e historico associado no backoffice."
+        confirmLabel="Excluir evento"
+        confirming={false}
+        onCancel={() => setPendingDeleteEvent(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteEvent) {
+            return
+          }
+
+          await deleteEvent(pendingDeleteEvent.id)
+          setPendingDeleteEvent(null)
+        }}
+      />
     </div>
   )
 }

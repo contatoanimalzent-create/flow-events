@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
+import { ActionConfirmationDialog } from '@/shared/components'
 import { formatCurrency, formatNumber, cn } from '@/lib/utils'
 import {
   Plus, Search, Edit2, Trash2, Loader2, X, AlertCircle,
@@ -75,6 +76,7 @@ export function ProductsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [menuId, setMenuId] = useState<string | null>(null)
+  const [pendingDeleteProduct, setPendingDeleteProduct] = useState<Product | null>(null)
 
   // PDV state
   const [cart, setCart] = useState<CartItem[]>([])
@@ -104,7 +106,6 @@ export function ProductsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Remover este produto?')) return
     await supabase.from('products').delete().eq('id', id)
     fetchProducts()
     setMenuId(null)
@@ -315,7 +316,7 @@ export function ProductsPage() {
                           className="p-2 rounded-sm bg-bg-card text-text-primary hover:text-brand-acid transition-colors">
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={e => { e.stopPropagation(); handleDelete(p.id) }}
+                        <button onClick={e => { e.stopPropagation(); setPendingDeleteProduct(p) }}
                           className="p-2 rounded-sm bg-bg-card text-text-primary hover:text-status-error transition-colors">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -403,7 +404,7 @@ export function ProductsPage() {
                               className="p-1.5 rounded-sm text-text-muted hover:text-brand-acid hover:bg-brand-acid/8 transition-all">
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
-                            <button onClick={() => handleDelete(p.id)}
+                            <button onClick={() => setPendingDeleteProduct(p)}
                               className="p-1.5 rounded-sm text-text-muted hover:text-status-error hover:bg-status-error/8 transition-all">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -592,6 +593,23 @@ export function ProductsPage() {
           onSaved={() => { fetchProducts(); setShowForm(false); setEditingProduct(null) }}
         />
       )}
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteProduct)}
+        title="Remover produto do catalogo"
+        description={pendingDeleteProduct ? `O item ${pendingDeleteProduct.name} sera removido do catalogo e do PDV.` : undefined}
+        impact="Historicos operacionais podem perder a referencia visual deste SKU e a equipe precisara cadastrar novamente para voltar a vender."
+        confirmLabel="Excluir produto"
+        onCancel={() => setPendingDeleteProduct(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteProduct) {
+            return
+          }
+
+          await handleDelete(pendingDeleteProduct.id)
+          setPendingDeleteProduct(null)
+        }}
+      />
     </div>
   )
 }

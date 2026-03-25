@@ -15,8 +15,8 @@ export function CampaignDraftsTable({ drafts, onEdit, onDelete, onLaunch, launch
   if (drafts.length === 0) {
     return (
       <div className="card p-16 text-center">
-        <div className="font-display text-2xl text-text-primary">NENHUM DRAFT</div>
-        <p className="mt-2 text-sm text-text-muted">Crie campanhas draft para organizar reengajamento e proximas acoes comerciais.</p>
+        <div className="font-display text-2xl text-text-primary">NENHUMA CAMPANHA EM PREPARO</div>
+        <p className="mt-2 text-sm text-text-muted">Monte o proximo disparo com calma e deixe a operacao pronta para lancar no melhor momento.</p>
       </div>
     )
   }
@@ -26,7 +26,7 @@ export function CampaignDraftsTable({ drafts, onEdit, onDelete, onLaunch, launch
       <table className="w-full">
         <thead className="border-b border-bg-border">
           <tr>
-            {['Draft', 'Canal', 'Segmento', 'Audiencia', 'Agendamento', ''].map((header) => (
+            {['Campanha', 'Canal', 'Segmento', 'Audiencia', 'Janela', ''].map((header) => (
               <th key={header} className="table-header">
                 {header}
               </th>
@@ -38,12 +38,12 @@ export function CampaignDraftsTable({ drafts, onEdit, onDelete, onLaunch, launch
             <tr key={draft.id} className="table-row">
               <td className="table-cell">
                 <div className="text-[13px] font-medium text-text-primary">{draft.name}</div>
-                <div className="text-[11px] text-text-muted">{draft.subject ?? draft.message_body ?? 'Sem conteudo definido'}</div>
+                <div className="text-[11px] text-text-muted">{draft.subject ?? draft.message_body ?? 'Conteudo editorial ainda em construcao'}</div>
               </td>
               <td className="table-cell text-xs text-text-secondary">{CAMPAIGN_CHANNEL_LABELS[draft.channel]}</td>
-              <td className="table-cell text-xs text-text-secondary">{draft.segment?.name ?? 'Sem segmento'}</td>
+              <td className="table-cell text-xs text-text-secondary">{draft.segment?.name ?? 'Segmento livre'}</td>
               <td className="table-cell font-mono text-brand-acid">{draft.audience_count}</td>
-              <td className="table-cell text-[11px] text-text-muted">{draft.scheduled_at ? formatDate(draft.scheduled_at, 'dd/MM/yyyy HH:mm') : '-'}</td>
+              <td className="table-cell text-[11px] text-text-muted">{draft.scheduled_at ? formatDate(draft.scheduled_at, 'dd/MM/yyyy HH:mm') : 'Sem horario definido'}</td>
               <td className="table-cell">
                 <div className="flex justify-end gap-2">
                   <button onClick={() => onLaunch(draft)} disabled={launchingDraftId === draft.id} className="btn-secondary text-xs">

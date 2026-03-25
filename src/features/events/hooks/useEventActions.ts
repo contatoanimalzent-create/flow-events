@@ -64,10 +64,6 @@ export function useEventActions({ organizationId }: UseEventActionsParams) {
   }
 
   async function deleteEvent(eventId: string) {
-    if (!confirm('Tem certeza que deseja excluir este evento?')) {
-      return false
-    }
-
     await deleteMutation.mutateAsync({ eventId })
     if (organizationId) {
       await auditService.record({

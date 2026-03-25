@@ -11,7 +11,7 @@ import {
 } from '@/features/financial/types'
 import { useFinancialDashboard, useFinancialMutations } from '@/features/financial/hooks'
 import { ClosureReviewModal, CostEntryModal, ForecastModal, PayoutModal } from '@/features/financial/modals'
-import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
+import { ActionConfirmationDialog, PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn, formatCurrency } from '@/shared/lib'
 import { FinancialClosuresTable } from './FinancialClosuresTable'
 import { FinancialEventsTable } from './FinancialEventsTable'
@@ -35,6 +35,7 @@ export function FinancialPageContent() {
   const [editingForecastEventId, setEditingForecastEventId] = useState<string | null>(null)
   const [editingPayoutEventId, setEditingPayoutEventId] = useState<string | null>(null)
   const [editingClosureEventId, setEditingClosureEventId] = useState<string | null>(null)
+  const [pendingDeleteCostId, setPendingDeleteCostId] = useState<string | null>(null)
   const [showCostModal, setShowCostModal] = useState(false)
   const [showForecastModal, setShowForecastModal] = useState(false)
   const [showPayoutModal, setShowPayoutModal] = useState(false)
@@ -43,6 +44,11 @@ export function FinancialPageContent() {
   const editingCostEntry = useMemo(
     () => dashboard.filteredCostEntries.find((entry) => entry.id === editingCostId) ?? null,
     [dashboard.filteredCostEntries, editingCostId],
+  )
+
+  const pendingDeleteCostEntry = useMemo(
+    () => dashboard.filteredCostEntries.find((entry) => entry.id === pendingDeleteCostId) ?? null,
+    [dashboard.filteredCostEntries, pendingDeleteCostId],
   )
 
   const editingForecastReport = useMemo(
@@ -424,7 +430,7 @@ export function FinancialPageContent() {
                               >
                                 Editar
                               </button>
-                              <button onClick={() => void mutations.deleteCostEntry({ costEntryId: entry.id })} className="btn-secondary text-xs">
+                              <button onClick={() => setPendingDeleteCostId(entry.id)} className="btn-secondary text-xs">
                                 Excluir
                               </button>
                             </div>
@@ -526,6 +532,24 @@ export function FinancialPageContent() {
           saving={mutations.savingClosure}
         />
       ) : null}
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteCostEntry)}
+        title="Remover lancamento financeiro"
+        description={pendingDeleteCostEntry ? `O custo ${pendingDeleteCostEntry.description} sera retirado desta conciliacao.` : undefined}
+        impact="Os totais de custo, margem e fechamento podem mudar assim que o lancamento for removido."
+        confirmLabel="Excluir lancamento"
+        confirming={mutations.deletingCostEntry}
+        onCancel={() => setPendingDeleteCostId(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteCostEntry) {
+            return
+          }
+
+          await mutations.deleteCostEntry({ costEntryId: pendingDeleteCostEntry.id })
+          setPendingDeleteCostId(null)
+        }}
+      />
     </div>
   )
 }

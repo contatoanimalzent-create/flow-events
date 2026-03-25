@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { ArrowUpDown, Loader2, Package, Plus, Ticket, ToggleRight } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useAccessControl } from '@/features/access-control'
 import { useTicketActions, useTicketsList } from '@/features/tickets/hooks'
 import { TicketBatchModal, TicketTypeModal } from '@/features/tickets/modals'
-import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
+import type { TicketBatch, TicketTypeWithBatches } from '@/features/tickets/types'
+import { ActionConfirmationDialog, PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn } from '@/shared/lib'
 import { TicketTypeCard } from './TicketTypeCard'
 
@@ -40,6 +42,8 @@ export function TicketsPageContent() {
   const { toggleTicketStatus, deleteTicket, toggleBatchStatus, deleteBatch } = useTicketActions({
     selectedEventId,
   })
+  const [pendingDeleteTicket, setPendingDeleteTicket] = useState<TicketTypeWithBatches | null>(null)
+  const [pendingDeleteBatch, setPendingDeleteBatch] = useState<TicketBatch | null>(null)
 
   return (
     <div className="admin-page">
@@ -149,11 +153,11 @@ export function TicketsPageContent() {
               expanded={expandedType === ticketType.id}
               onToggleExpand={() => setExpandedType(expandedType === ticketType.id ? null : ticketType.id)}
               onEdit={() => openEditTypeModal(ticketType)}
-              onDelete={() => void deleteTicket(ticketType.id)}
+              onDelete={() => setPendingDeleteTicket(ticketType)}
               onToggleActive={() => void toggleTicketStatus(ticketType.id, ticketType.is_active)}
               onAddBatch={() => openCreateBatchModal(ticketType.id)}
               onEditBatch={(batch) => openEditBatchModal(ticketType.id, batch)}
-              onDeleteBatch={(batch) => void deleteBatch(batch)}
+              onDeleteBatch={(batch) => setPendingDeleteBatch(batch)}
               onToggleBatch={(batch) => void toggleBatchStatus(batch.id, batch.is_active)}
             />
           ))}
@@ -181,6 +185,40 @@ export function TicketsPageContent() {
           onSaved={closeBatchModal}
         />
       )}
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteTicket)}
+        title="Remover tipo de ingresso"
+        description={pendingDeleteTicket ? `O tipo "${pendingDeleteTicket.name}" e todos os lotes vinculados serao removidos.` : undefined}
+        impact="A exclusao afeta a arquitetura comercial desse ingresso e remove sua configuracao do catalogo administrativo."
+        confirmLabel="Excluir tipo e lotes"
+        onCancel={() => setPendingDeleteTicket(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteTicket) {
+            return
+          }
+
+          await deleteTicket(pendingDeleteTicket.id)
+          setPendingDeleteTicket(null)
+        }}
+      />
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteBatch)}
+        title="Remover lote"
+        description={pendingDeleteBatch ? `O lote "${pendingDeleteBatch.name}" sera retirado da estrutura de vendas.` : undefined}
+        impact="Use esta acao apenas quando o lote nao deve mais existir no planejamento comercial do ingresso."
+        confirmLabel="Excluir lote"
+        onCancel={() => setPendingDeleteBatch(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteBatch) {
+            return
+          }
+
+          await deleteBatch(pendingDeleteBatch)
+          setPendingDeleteBatch(null)
+        }}
+      />
     </div>
   )
 }

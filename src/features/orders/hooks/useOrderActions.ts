@@ -80,10 +80,6 @@ export function useOrderActions({ eventId }: UseOrderActionsParams) {
   }
 
   async function cancelOrder(orderId: string) {
-    if (!confirm('Cancelar este pedido?')) {
-      return false
-    }
-
     await cancelMutation.mutateAsync({ orderId })
     if (organizationId) {
       await auditService.record({

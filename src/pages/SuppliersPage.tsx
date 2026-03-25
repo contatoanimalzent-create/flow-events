@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
+import { ActionConfirmationDialog } from '@/shared/components'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
 import {
   Plus, Search, Edit2, Trash2, Loader2, X, AlertCircle,
@@ -89,6 +90,7 @@ export function SuppliersPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
   const [menuId, setMenuId] = useState<string | null>(null)
+  const [pendingDeleteSupplier, setPendingDeleteSupplier] = useState<Supplier | null>(null)
 
   useEffect(() => { if (organization) { fetchEvents(); fetchSuppliers() } }, [organization])
   useEffect(() => { if (organization) fetchSuppliers() }, [selectedEventId])
@@ -112,7 +114,6 @@ export function SuppliersPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Remover este fornecedor?')) return
     await supabase.from('suppliers').delete().eq('id', id)
     fetchSuppliers()
     setMenuId(null)
@@ -381,7 +382,7 @@ export function SuppliersPage() {
                               <ExternalLink className="w-3.5 h-3.5" /> Enviar e-mail
                             </button>
                             <div className="border-t border-bg-border" />
-                            <button onClick={() => handleDelete(s.id)}
+                            <button onClick={() => setPendingDeleteSupplier(s)}
                               className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-status-error hover:bg-status-error/8 transition-all">
                               <Trash2 className="w-3.5 h-3.5" /> Remover
                             </button>
@@ -408,6 +409,23 @@ export function SuppliersPage() {
           onSaved={() => { fetchSuppliers(); setShowForm(false); setEditingSupplier(null) }}
         />
       )}
+
+      <ActionConfirmationDialog
+        open={Boolean(pendingDeleteSupplier)}
+        title="Remover fornecedor"
+        description={pendingDeleteSupplier ? `O cadastro de ${pendingDeleteSupplier.company_name} sera removido desta operacao.` : undefined}
+        impact="Historico contratual, contato e contexto operacional deixam de ficar disponiveis para a equipe neste ambiente."
+        confirmLabel="Excluir fornecedor"
+        onCancel={() => setPendingDeleteSupplier(null)}
+        onConfirm={async () => {
+          if (!pendingDeleteSupplier) {
+            return
+          }
+
+          await handleDelete(pendingDeleteSupplier.id)
+          setPendingDeleteSupplier(null)
+        }}
+      />
     </div>
   )
 }

@@ -58,10 +58,6 @@ export function useCampaignsMutations({ organizationId }: UseCampaignsMutationsP
   })
 
   async function launchCampaign(params: Parameters<typeof launchCampaignMutation.mutateAsync>[0]) {
-    if (!confirm('Lancar esta campanha agora?')) {
-      return false
-    }
-
     await launchCampaignMutation.mutateAsync(params)
     if (organizationId) {
       await auditService.record({

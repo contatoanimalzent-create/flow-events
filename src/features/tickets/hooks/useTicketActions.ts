@@ -82,10 +82,6 @@ export function useTicketActions({ selectedEventId }: UseTicketActionsParams) {
   }
 
   async function deleteTicket(ticketId: string) {
-    if (!confirm('Excluir este tipo de ingresso e todos os seus lotes?')) {
-      return false
-    }
-
     await deleteTicketMutation.mutateAsync({ ticketId })
     const organizationId = useAuthStore.getState().organization?.id
     if (organizationId) {
@@ -140,10 +136,6 @@ export function useTicketActions({ selectedEventId }: UseTicketActionsParams) {
   }
 
   async function deleteBatch(batch: TicketBatch) {
-    if (!confirm('Excluir este lote?')) {
-      return false
-    }
-
     await deleteBatchMutation.mutateAsync({ batchId: batch.id })
     const organizationId = useAuthStore.getState().organization?.id
     if (organizationId) {

@@ -211,3 +211,73 @@ export function ConfirmActionBox({ tone = 'default', title, description, childre
     </div>
   )
 }
+
+interface FeedbackBannerProps {
+  tone?: 'success' | 'error' | 'info'
+  title?: ReactNode
+  message: ReactNode
+  className?: string
+}
+
+export function FeedbackBanner({ tone = 'info', title, message, className }: FeedbackBannerProps) {
+  const toneClassName =
+    tone === 'success'
+      ? 'border-status-success/20 bg-status-success/8 text-status-success'
+      : tone === 'error'
+        ? 'border-status-error/20 bg-status-error/8 text-status-error'
+        : 'border-brand-blue/20 bg-brand-blue/8 text-brand-blue'
+
+  return (
+    <div className={cn('rounded-2xl border px-4 py-3', toneClassName, className)}>
+      {title ? <div className="text-sm font-semibold">{title}</div> : null}
+      <div className={cn('text-sm leading-6', title ? 'mt-1' : '')}>{message}</div>
+    </div>
+  )
+}
+
+interface ActionConfirmationDialogProps {
+  open: boolean
+  tone?: 'default' | 'danger'
+  title: ReactNode
+  description?: ReactNode
+  impact?: ReactNode
+  confirmLabel: string
+  cancelLabel?: string
+  confirming?: boolean
+  onConfirm: () => void | Promise<void>
+  onCancel: () => void
+}
+
+export function ActionConfirmationDialog({
+  open,
+  tone = 'danger',
+  title,
+  description,
+  impact,
+  confirmLabel,
+  cancelLabel = 'Voltar',
+  confirming = false,
+  onConfirm,
+  onCancel,
+}: ActionConfirmationDialogProps) {
+  if (!open) {
+    return null
+  }
+
+  return (
+    <ModalShell size="md" className="z-[130]">
+      <ModalHeader eyebrow="Confirmacao" title={title} subtitle={description} onClose={onCancel} />
+      <ModalBody>
+        <ConfirmActionBox tone={tone} title="Impacto desta acao" description={impact} />
+      </ModalBody>
+      <ModalFooter>
+        <button onClick={onCancel} className="btn-secondary text-sm">
+          {cancelLabel}
+        </button>
+        <button onClick={() => void onConfirm()} className={tone === 'danger' ? 'btn-danger text-sm' : 'btn-primary text-sm'} disabled={confirming}>
+          {confirming ? 'Processando...' : confirmLabel}
+        </button>
+      </ModalFooter>
+    </ModalShell>
+  )
+}

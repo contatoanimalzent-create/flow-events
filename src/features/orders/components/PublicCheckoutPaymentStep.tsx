@@ -69,29 +69,29 @@ function EmbeddedPaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="rounded-sm border border-[#242424] bg-[#0e0e0e] p-4">
-        <div className="mb-3 text-[10px] font-mono uppercase tracking-[0.3em] text-[#6b6b6b]">Pagamento</div>
+      <div className="rounded-[32px] border border-white/70 bg-white/82 p-6 shadow-[0_16px_60px_rgba(48,35,18,0.05)]">
+        <div className="mb-3 text-[11px] uppercase tracking-[0.28em] text-[#8e7f68]">Pagamento</div>
         <PaymentElement options={{ layout: 'tabs' }} />
       </div>
 
-      {error && (
-        <div className="flex items-center gap-2 rounded-sm border border-[#FF5A6B]/20 bg-[#FF5A6B]/8 px-4 py-3 text-xs text-[#FF5A6B]">
-          <Info className="h-3.5 w-3.5 shrink-0" />
+      {error ? (
+        <div className="flex items-center gap-2 rounded-[24px] border border-[#f2c7cd] bg-[#fff4f5] px-5 py-4 text-sm text-[#a5505b]">
+          <Info className="h-4 w-4 shrink-0" />
           {error}
         </div>
-      )}
+      ) : null}
 
       <button
         type="submit"
         disabled={submitting || !stripe}
-        className="flex w-full items-center justify-center gap-3 rounded-sm bg-[#d4ff00] py-5 text-sm font-bold tracking-wider text-[#080808] transition-all hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] disabled:opacity-50 active:scale-95"
+        className="flex w-full items-center justify-center gap-3 rounded-full bg-[#1f1a15] px-5 py-4 text-sm font-semibold text-[#f8f3ea] transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40"
       >
         {submitting ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <>
             <Lock className="h-4 w-4" />
-            PAGAR {formatCurrency(totalAmount)}
+            Pagar {formatCurrency(totalAmount)}
           </>
         )}
       </button>
@@ -100,9 +100,9 @@ function EmbeddedPaymentForm({
         type="button"
         onClick={onBack}
         disabled={submitting}
-        className="w-full rounded-sm border border-[#242424] py-4 text-xs font-mono tracking-wider text-[#9a9a9a] transition-colors hover:border-[#3a3a3a] hover:text-[#f5f5f0] disabled:opacity-50"
+        className="w-full rounded-full border border-[#ddd1bf] bg-[#fbf7f1] px-5 py-4 text-sm font-medium text-[#5f5549] transition-colors hover:border-[#b79e74] hover:text-[#1f1a15] disabled:opacity-50"
       >
-        VOLTAR PARA A RESERVA
+        Voltar para a reserva
       </button>
     </form>
   )
@@ -111,7 +111,7 @@ function EmbeddedPaymentForm({
 export function PublicCheckoutPaymentStep(props: PublicCheckoutPaymentStepProps) {
   if (!stripePromise) {
     return (
-      <div className="rounded-sm border border-[#FFB020]/20 bg-[#FFB020]/8 px-4 py-4 text-sm text-[#FFB020]">
+      <div className="rounded-[24px] border border-[#eadaba] bg-[#faf4e7] px-5 py-4 text-sm text-[#6d5324]">
         A chave publica do Stripe nao esta configurada neste ambiente.
       </div>
     )
@@ -123,13 +123,33 @@ export function PublicCheckoutPaymentStep(props: PublicCheckoutPaymentStepProps)
       options={{
         clientSecret: props.clientSecret,
         appearance: {
-          theme: 'night',
+          theme: 'stripe',
           variables: {
-            colorPrimary: '#d4ff00',
-            colorBackground: '#0e0e0e',
-            colorText: '#f5f5f0',
-            colorDanger: '#FF5A6B',
-            borderRadius: '2px',
+            colorPrimary: '#1f1a15',
+            colorBackground: '#fbf7f1',
+            colorText: '#1f1a15',
+            colorDanger: '#a5505b',
+            colorTextPlaceholder: '#8e7f68',
+            borderRadius: '18px',
+            fontFamily: 'DM Sans, system-ui, sans-serif',
+          },
+          rules: {
+            '.Input': {
+              border: '1px solid #ddd1bf',
+              boxShadow: 'none',
+            },
+            '.Input:focus': {
+              border: '1px solid #b79e74',
+              boxShadow: 'none',
+            },
+            '.Tab': {
+              border: '1px solid #ddd1bf',
+              backgroundColor: '#fbf7f1',
+            },
+            '.Tab--selected': {
+              border: '1px solid #1f1a15',
+              backgroundColor: '#fff',
+            },
           },
         },
       }}

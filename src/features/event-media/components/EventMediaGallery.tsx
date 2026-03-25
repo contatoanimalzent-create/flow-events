@@ -12,19 +12,12 @@ export function EventMediaGallery({ presentation }: EventMediaGalleryProps) {
   }
 
   return (
-    <section className="px-6 py-20 md:px-16">
-      <div className="mx-auto max-w-6xl space-y-10">
+    <section className="px-5 py-6 md:px-10 lg:px-16 lg:py-10">
+      <div className="mx-auto max-w-7xl space-y-10">
         <div>
-          <div className="mb-4 text-[10px] font-mono uppercase tracking-[0.3em] text-[#d4ff00]">Media gallery</div>
-          <h2
-            style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(36px, 5vw, 72px)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
-            }}
-          >
-            EXPERIÊNCIA VISUAL<span style={{ color: '#d4ff00' }}>.</span>
+          <div className="mb-4 text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Galeria de midia</div>
+          <h2 className="font-serif text-4xl font-semibold leading-none text-[#1f1a15] md:text-6xl">
+            Assets reais para uma landing mais aspiracional.
           </h2>
         </div>
 

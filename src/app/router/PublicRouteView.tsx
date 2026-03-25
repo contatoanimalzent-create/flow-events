@@ -1,6 +1,7 @@
 import type { PublicRoute } from './public-routes'
 import { ContactPage } from '@/pages/public/ContactPage'
 import { EventPage } from '@/pages/public/EventPage'
+import { EventsCatalogPage } from '@/pages/public/EventsCatalogPage'
 import { HomePage } from '@/pages/public/HomePage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { PrivacyPage } from '@/pages/public/PrivacyPage'
@@ -20,6 +21,7 @@ export function PublicRouteView({ route, onLogin, onBackToHome }: PublicRouteVie
   if (route === 'terms') return <TermsPage />
   if (route === 'privacy') return <PrivacyPage />
   if (route === 'contact') return <ContactPage />
+  if (route === 'events') return <EventsCatalogPage onLogin={onLogin} />
   if (route === 'login') return <LoginPage onBack={onBackToHome} />
 
   return <HomePage onLogin={onLogin} />

@@ -11,7 +11,7 @@ export function EventImageGallery({ assets }: EventImageGalleryProps) {
       {assets.map((asset, index) => (
         <figure
           key={asset.id}
-          className={`group overflow-hidden rounded-sm border border-[#1a1a1a] bg-[#0e0e0e] ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
+          className={`group overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_16px_60px_rgba(48,35,18,0.05)] ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
         >
           <div className="overflow-hidden">
             <img
@@ -21,9 +21,9 @@ export function EventImageGallery({ assets }: EventImageGalleryProps) {
             />
           </div>
           {(asset.caption || asset.alt_text) && (
-            <figcaption className="space-y-1 px-4 py-3">
-              {asset.caption ? <div className="text-sm font-semibold text-[#f5f5f0]">{asset.caption}</div> : null}
-              {asset.alt_text ? <div className="text-xs text-[#9a9a9a]">{asset.alt_text}</div> : null}
+            <figcaption className="space-y-1 px-5 py-4">
+              {asset.caption ? <div className="font-serif text-2xl font-semibold leading-none text-[#1f1a15]">{asset.caption}</div> : null}
+              {asset.alt_text ? <div className="text-sm text-[#5f5549]">{asset.alt_text}</div> : null}
             </figcaption>
           )}
         </figure>

@@ -1,65 +1,29 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import { supabase } from '@/lib/supabase'
-import { stripePromise, calculateFees } from '@/lib/stripe'
-import { EventHeroMedia, EventMediaGallery, buildEventMediaPresentation, eventMediaService } from '@/features/event-media'
-import type { EventMediaAsset } from '@/features/event-media'
-import { logError } from '@/shared/lib'
-import { formatCurrency, formatDate, cn } from '@/lib/utils'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  ArrowRight,
+  CalendarDays,
+  Check,
+  ChevronRight,
+  Clock3,
+  Heart,
+  MapPin,
+  Share2,
+  ShieldCheck,
+  Sparkles,
+  Ticket,
+  Users,
+} from 'lucide-react'
+import { EventHeroMedia, EventMediaGallery } from '@/features/event-media'
 import { PublicCheckoutContent } from '@/features/orders'
 import {
-  MapPin, Calendar, Clock, Users, ChevronDown, ChevronRight,
-  Check, Shield, Zap, Star, ArrowRight, Share2, Heart,
-  Ticket, Info, Lock, CreditCard, Smartphone,
-} from 'lucide-react'
-
-/* ── Types ──────────────────────────────────────────────────── */
-interface EventData {
-  id: string
-  organization_id: string
-  slug: string
-  name: string
-  subtitle: string
-  short_description: string
-  full_description: string
-  category: string
-  starts_at: string
-  ends_at: string
-  doors_open_at: string
-  venue_name: string
-  venue_address: Record<string, string>
-  total_capacity: number
-  sold_tickets: number
-  age_rating: string
-  cover_url?: string
-  settings: Record<string, any>
-  is_free: boolean
-  registration_mode: 'tickets' | 'registration' | 'both'
-}
-
-interface TicketType {
-  id: string
-  name: string
-  description: string
-  benefits: string[]
-  color: string
-  sector: string
-  is_nominal: boolean
-  max_per_order: number
-  batches: Batch[]
-}
-
-interface Batch {
-  id: string
-  ticket_type_id: string
-  name: string
-  price: number
-  quantity: number
-  sold_count: number
-  reserved_count: number
-  ends_at?: string
-  is_active: boolean
-}
+  EventInfoBlock,
+  PremiumBadge,
+  PremiumSection,
+  PublicLayout,
+  PublicReveal,
+  usePublicEvent,
+} from '@/features/public'
+import { formatCurrency, formatDate } from '@/shared/lib'
 
 interface CartItem {
   ticketTypeId: string
@@ -71,930 +35,677 @@ interface CartItem {
   color: string
 }
 
-function trackEvent(name: string, data?: Record<string, any>) {
-  console.log('[PIXEL]', name, data)
+function trackEvent(_name: string, _data?: Record<string, unknown>) {
+  return undefined
 }
 
-/* ── Copy helper — muda texto baseado em pago/gratuito ──────── */
-function copy(isFree: boolean, paid: string, free: string) {
-  return isFree ? free : paid
-}
-
-/* ── Category fallback image ────────────────────────────────── */
-function getCategoryImage(category: string): string {
-  const c = (category || '').toLowerCase()
-  const map: [string[], string][] = [
-    [['festival','show','música','musica','concert','balada'], 'photo-1459749411175-04bf5292ceea'],
-    [['congresso','conferência','conferencia','summit','palestra'], 'photo-1540575467063-178a50c2df87'],
-    [['esporte','corrida','sport','futebol'], 'photo-1461896836934-ffe607ba8211'],
-    [['tech','tecnologia','startup','inovação','inovacao'], 'photo-1518770660439-4636190af475'],
-    [['gastronomia','culinária','culinaria','food','chef'], 'photo-1414235077428-338989a2e8c0'],
-    [['negócios','negocios','business','corporativo','corporate'], 'photo-1556761175-4b46a572b786'],
-    [['arte','cultura','teatro','theater','exposição'], 'photo-1478720568477-152d9b164e26'],
-  ]
-  for (const [keys, id] of map) {
-    if (keys.some(k => c.includes(k))) return `https://images.unsplash.com/photo-${id}?w=1920&q=85&fit=crop`
+function getFallbackImage(category: string, coverUrl?: string | null) {
+  if (coverUrl) {
+    return coverUrl
   }
-  return 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1920&q=85&fit=crop'
+
+  const normalizedCategory = (category || '').toLowerCase()
+
+  if (normalizedCategory.includes('festival') || normalizedCategory.includes('show') || normalizedCategory.includes('musica')) {
+    return 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1800&q=80&fit=crop'
+  }
+
+  if (normalizedCategory.includes('corporativo') || normalizedCategory.includes('summit')) {
+    return 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1800&q=80&fit=crop'
+  }
+
+  return 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1800&q=80&fit=crop'
 }
 
-/* ── Main ───────────────────────────────────────────────────── */
+function LoadingState() {
+  return (
+    <PublicLayout showFooter={false}>
+      <div className="px-5 py-8 md:px-10 lg:px-16">
+        <div className="mx-auto h-[82svh] max-w-7xl animate-pulse rounded-[40px] bg-white/75" />
+      </div>
+    </PublicLayout>
+  )
+}
+
+function NotFoundState() {
+  return (
+    <PublicLayout showFooter={false}>
+      <div className="flex min-h-[70svh] items-center justify-center px-5 text-center md:px-10 lg:px-16">
+        <div className="rounded-[36px] border border-white/70 bg-white/80 px-10 py-12 shadow-[0_16px_60px_rgba(48,35,18,0.05)]">
+          <div className="font-serif text-5xl font-semibold leading-none text-[#1f1a15]">Evento nao encontrado</div>
+          <p className="mt-4 text-sm leading-7 text-[#5f5549]">
+            O link pode ter expirado ou o evento nao esta mais publico.
+          </p>
+          <a
+            href="/events"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-5 py-3 text-sm font-medium text-[#f8f3ea]"
+          >
+            Voltar para o catalogo
+            <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
+    </PublicLayout>
+  )
+}
+
+function SuccessScreen({
+  slug,
+  eventName,
+  cart,
+  total,
+  isFreeOrder,
+}: {
+  slug: string
+  eventName: string
+  cart: CartItem[]
+  total: number
+  isFreeOrder: boolean
+}) {
+  return (
+    <PublicLayout showFooter={false} compactHeader>
+      <div className="flex min-h-[74svh] items-center justify-center px-5 py-12 md:px-10 lg:px-16">
+        <div className="w-full max-w-3xl rounded-[36px] border border-white/70 bg-white/80 p-8 text-center shadow-[0_16px_60px_rgba(48,35,18,0.05)] md:p-12">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#eef5ef] text-[#335741]">
+            <Check className="h-9 w-9" />
+          </div>
+          <div className="mt-8 text-[11px] uppercase tracking-[0.3em] text-[#8e7f68]">
+            Pedido confirmado
+          </div>
+          <h1 className="mt-4 font-serif text-5xl font-semibold leading-none text-[#1f1a15] md:text-6xl">
+            {isFreeOrder ? 'Sua inscricao foi confirmada.' : 'Sua compra foi concluida.'}
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-[#5f5549]">
+            {isFreeOrder
+              ? 'O QR code e a confirmacao serao enviados por e-mail em instantes. A experiencia ja esta reservada para voce.'
+              : 'Os ingressos digitais serao enviados por e-mail assim que o pagamento for confirmado pelo gateway.'}
+          </p>
+
+          <div className="mt-8 rounded-[28px] border border-[#eee2cf] bg-[#fbf7f1] p-6 text-left">
+            <div className="text-[11px] uppercase tracking-[0.28em] text-[#8e7f68]">Resumo</div>
+            <div className="mt-4 space-y-3">
+              {cart.map((item) => (
+                <div key={item.batchId} className="flex items-center justify-between gap-4 text-sm text-[#5f5549]">
+                  <span>{item.qty}x {item.ticketName}</span>
+                  <span>{item.price === 0 ? 'Gratuito' : formatCurrency(item.price * item.qty)}</span>
+                </div>
+              ))}
+            </div>
+            {!isFreeOrder ? (
+              <div className="mt-5 border-t border-[#eee2cf] pt-4 font-serif text-2xl text-[#1f1a15]">
+                {formatCurrency(total)}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href={`/e/${slug}`}
+              className="inline-flex items-center gap-2 rounded-full border border-[#ddd1bf] px-5 py-3 text-sm font-medium text-[#1f1a15]"
+            >
+              Voltar para {eventName}
+            </a>
+            <a
+              href="/events"
+              className="inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-5 py-3 text-sm font-medium text-[#f8f3ea]"
+            >
+              Explorar outros eventos
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </PublicLayout>
+  )
+}
+
 export function EventPage({ slug }: { slug: string }) {
-  const [event, setEvent] = useState<EventData | null>(null)
-  const [eventAssets, setEventAssets] = useState<EventMediaAsset[]>([])
-  const [ticketTypes, setTicketTypes] = useState<TicketType[]>([])
-  const [loading, setLoading] = useState(true)
+  const publicEventQuery = usePublicEvent(slug)
+  const detail = publicEventQuery.data
+  const event = detail?.event ?? null
+  const ticketTypes = detail?.ticketTypes ?? []
+  const mediaPresentation = detail?.mediaPresentation ?? null
+
   const [cart, setCart] = useState<CartItem[]>([])
+  const [liked, setLiked] = useState(false)
   const [step, setStep] = useState<'landing' | 'checkout' | 'success'>('landing')
   const [scrollY, setScrollY] = useState(0)
-  const [liked, setLiked] = useState(false)
-  const ticketsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    fetchEvent()
     trackEvent('PageView', { slug })
-    const onScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-    }
+
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [slug])
 
-  async function fetchEvent() {
-    try {
-      const { data: ev, error } = await supabase
-        .from('events').select('*').eq('slug', slug).single()
-      
-      if (error || !ev) {
-        logError(error ?? 'Event not found', { scope: 'public-event-page', action: 'fetch-event', slug })
-        setLoading(false)
-        return
-      }
+  const cartQty = cart.reduce((sum, item) => sum + item.qty, 0)
+  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  const isFreeMode = event ? event.is_free || event.registration_mode === 'registration' : false
+  const isFreeOrder = cartTotal === 0
+  const activeBatches = useMemo(
+    () =>
+      ticketTypes.flatMap((ticketType) =>
+        ticketType.batches
+          .filter((batch) => batch.is_active && batch.is_visible)
+          .map((batch) => batch.price),
+      ),
+    [ticketTypes],
+  )
+  const minPrice = useMemo(
+    () => {
+      const prices = activeBatches.filter((price) => price > 0)
+      return prices.length > 0 ? Math.min(...prices) : 0
+    },
+    [activeBatches],
+  )
 
-      setEvent(ev)
+  function addToCart(ticketTypeId: string, batchId: string) {
+    const ticketType = ticketTypes.find((item) => item.id === ticketTypeId)
+    const batch = ticketType?.batches.find((item) => item.id === batchId)
 
-      const [{ data: types }, { data: batches }, assets] = await Promise.all([
-        supabase
-          .from('ticket_types').select('*')
-          .eq('event_id', ev.id).eq('is_active', true).order('position'),
-        supabase
-          .from('ticket_batches').select('*')
-          .eq('event_id', ev.id).order('position'),
-        eventMediaService.listEventAssets(ev.id, { activeOnly: true }).catch((assetError) => {
-          logError(assetError, { scope: 'public-event-page', action: 'fetch-event-assets', slug, eventId: ev.id })
-          return []
-        }),
-      ])
-
-      const merged = (types ?? []).map(t => ({
-        ...t,
-        batches: (batches ?? []).filter(b => b.ticket_type_id === t.id),
-      }))
-      setEventAssets(assets)
-      setTicketTypes(merged)
-      setLoading(false)
-      trackEvent('ViewContent', { event_id: ev.id, event_name: ev.name })
-    } catch (err) {
-      logError(err, { scope: 'public-event-page', action: 'fetch-event', slug })
-      setLoading(false)
+    if (!ticketType || !batch) {
+      return
     }
-  }
 
-  function addToCart(type: TicketType, batch: Batch) {
-    const existing = cart.find(c => c.batchId === batch.id)
+    const existing = cart.find((item) => item.batchId === batch.id)
     const currentQuantity = existing?.qty ?? 0
     const available = Math.max(batch.quantity - batch.sold_count - (batch.reserved_count ?? 0), 0)
-    const maxPerOrder = type.max_per_order > 0 ? type.max_per_order : available
+    const maxPerOrder = batch.max_per_order ?? ticketType.max_per_order ?? available
 
     if (currentQuantity >= available || currentQuantity >= maxPerOrder) {
       return
     }
 
     if (existing) {
-      setCart(cart.map(c => c.batchId === batch.id ? { ...c, qty: c.qty + 1 } : c))
-    } else {
-      setCart([...cart, {
-        ticketTypeId: type.id, batchId: batch.id,
-        ticketName: type.name, batchName: batch.name,
-        price: batch.price, qty: 1, color: type.color,
-      }])
+      setCart((current) => current.map((item) => item.batchId === batch.id ? { ...item, qty: item.qty + 1 } : item))
+      return
     }
-    trackEvent('AddToCart', { ticket: type.name, price: batch.price })
+
+    setCart((current) => [
+      ...current,
+      {
+        ticketTypeId: ticketType.id,
+        batchId: batch.id,
+        ticketName: ticketType.name,
+        batchName: batch.name,
+        price: batch.price,
+        qty: 1,
+        color: ticketType.color || '#b79e74',
+      },
+    ])
   }
 
   function removeFromCart(batchId: string) {
-    const existing = cart.find(c => c.batchId === batchId)
-    if (!existing) return
-    if (existing.qty <= 1) setCart(cart.filter(c => c.batchId !== batchId))
-    else setCart(cart.map(c => c.batchId === batchId ? { ...c, qty: c.qty - 1 } : c))
+    setCart((current) => {
+      const existing = current.find((item) => item.batchId === batchId)
+
+      if (!existing) {
+        return current
+      }
+
+      if (existing.qty === 1) {
+        return current.filter((item) => item.batchId !== batchId)
+      }
+
+      return current.map((item) => item.batchId === batchId ? { ...item, qty: item.qty - 1 } : item)
+    })
   }
 
-  const cartTotal = cart.reduce((s, c) => s + c.price * c.qty, 0)
-  const cartQty   = cart.reduce((s, c) => s + c.qty, 0)
-  const occupancy = event ? Math.round((event.sold_tickets / event.total_capacity) * 100) : 0
-  const remaining = event ? event.total_capacity - event.sold_tickets : 0
-  const isFree    = event?.is_free || event?.registration_mode === 'registration' || cartTotal === 0
+  function shareEvent() {
+    const url = window.location.href
 
-  function scrollToTickets() {
-    ticketsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    trackEvent('InitiateCheckout')
+    if (navigator.share) {
+      void navigator.share({ title: event?.name, url })
+      return
+    }
+
+    void navigator.clipboard.writeText(url)
   }
 
-  function share() {
-    if (navigator.share) navigator.share({ title: event?.name, url: window.location.href })
-    else navigator.clipboard.writeText(window.location.href)
+  if (publicEventQuery.isPending) {
+    return <LoadingState />
   }
 
-  if (loading) return <Skeleton />
-  if (!event)  return <NotFound />
+  if (!event || !mediaPresentation) {
+    return <NotFoundState />
+  }
 
-  if (step === 'checkout') return (
-    <PublicCheckoutContent
-      event={event}
-      cart={cart.map((item) => ({
-        ticket_type_id: item.ticketTypeId,
-        batch_id: item.batchId,
-        ticket_name: item.ticketName,
-        batch_name: item.batchName,
-        price: item.price,
-        quantity: item.qty,
-        color: item.color,
-        max_per_order: ticketTypes.find((ticketType) => ticketType.id === item.ticketTypeId)?.max_per_order ?? null,
-      }))}
-      onBack={() => setStep('landing')}
-      onSuccess={() => setStep('success')}
-      onAdd={(ticketTypeId, batchId) => {
-        const ticketType = ticketTypes.find((item) => item.id === ticketTypeId)
-        const batch = ticketType?.batches.find((item) => item.id === batchId)
+  if (step === 'checkout') {
+    return (
+      <PublicCheckoutContent
+        event={{
+          id: event.id,
+          organization_id: event.organization_id,
+          name: event.name,
+        }}
+        cart={cart.map((item) => ({
+          ticket_type_id: item.ticketTypeId,
+          batch_id: item.batchId,
+          ticket_name: item.ticketName,
+          batch_name: item.batchName,
+          price: item.price,
+          quantity: item.qty,
+          color: item.color,
+          max_per_order: ticketTypes.find((ticketType) => ticketType.id === item.ticketTypeId)?.max_per_order ?? null,
+        }))}
+        onBack={() => setStep('landing')}
+        onSuccess={() => setStep('success')}
+        onAdd={addToCart}
+        onRemove={removeFromCart}
+        onInventoryChanged={async () => {
+          await publicEventQuery.refetch()
+        }}
+      />
+    )
+  }
 
-        if (ticketType && batch) {
-          addToCart(ticketType, batch)
-        }
-      }}
-      onRemove={removeFromCart}
-      onInventoryChanged={fetchEvent}
-    />
-  )
-  if (step === 'success') return (
-    <SuccessScreen event={event} cart={cart} total={cartTotal} isFree={!!isFree} />
-  )
+  if (step === 'success') {
+    return (
+      <SuccessScreen
+        slug={event.slug}
+        eventName={event.name}
+        cart={cart}
+        total={cartTotal}
+        isFreeOrder={isFreeOrder}
+      />
+    )
+  }
 
-  const minPrice = ticketTypes.length > 0
-    ? Math.min(...ticketTypes.flatMap(t => t.batches.filter(b => b.is_active).map(b => b.price)).filter(p => p > 0))
-    : 0
-  const mediaPresentation = useMemo(() => buildEventMediaPresentation(eventAssets, event), [eventAssets, event])
-  const fallbackHeroImage = getCategoryImage(event.category)
+  const fallbackImage = getFallbackImage(event.category, event.cover_url)
+  const occupancy = event.total_capacity > 0 ? Math.round((event.sold_tickets / event.total_capacity) * 100) : 0
 
   return (
-    <div className="min-h-screen bg-[#080808] text-[#f5f5f0] overflow-x-hidden">
-
-      {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-        style={{
-          background: scrollY > 60 ? 'rgba(8,8,8,0.96)' : 'transparent',
-          backdropFilter: scrollY > 60 ? 'blur(20px)' : 'none',
-          borderBottom: scrollY > 60 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-          transition: 'all 0.3s',
-        }}>
+    <PublicLayout
+      showFooter={false}
+      headerActionSlot={
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-[#d4ff00] rounded-sm flex items-center justify-center">
-            <span style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#080808', fontSize: 11 }}>A</span>
-          </div>
-          <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 15, letterSpacing: 2 }}>
-            ANIMALZ<span style={{ color: '#d4ff00' }}>.</span>
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => setLiked(!liked)}
-            className={cn('p-2 rounded-sm transition-all', liked ? 'text-[#FF5A6B]' : 'text-[#6b6b6b] hover:text-[#f5f5f0]')}>
-            <Heart className={cn('w-4 h-4', liked && 'fill-current')} />
+          <button
+            type="button"
+            onClick={() => setLiked((current) => !current)}
+            className={[
+              'flex h-11 w-11 items-center justify-center rounded-full border transition-colors',
+              liked ? 'border-[#f0c7cc] bg-[#fff4f5] text-[#a5505b]' : 'border-[#ddd1bf] bg-white/85 text-[#5f5549]',
+            ].join(' ')}
+          >
+            <Heart className={['h-4 w-4', liked ? 'fill-current' : ''].join(' ')} />
           </button>
-          <button onClick={share} className="p-2 rounded-sm text-[#6b6b6b] hover:text-[#f5f5f0] transition-all">
-            <Share2 className="w-4 h-4" />
+          <button
+            type="button"
+            onClick={shareEvent}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-[#ddd1bf] bg-white/85 text-[#5f5549]"
+          >
+            <Share2 className="h-4 w-4" />
           </button>
-          {cartQty > 0 && (
-            <button onClick={() => setStep('checkout')}
-              className="flex items-center gap-2 bg-[#d4ff00] text-[#080808] px-4 py-2 rounded-sm text-xs font-bold tracking-wider hover:shadow-[0_0_20px_rgba(212,255,0,0.4)] transition-all">
-              <Ticket className="w-3.5 h-3.5" />
-              {cartQty} {copy(!!isFree, `ingresso${cartQty > 1 ? 's' : ''}`, `inscrição${cartQty > 1 ? 'ões' : ''}`)}
-              {!isFree && ` · ${formatCurrency(cartTotal)}`}
+          {cartQty > 0 ? (
+            <button
+              type="button"
+              onClick={() => setStep('checkout')}
+              className="inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-4 py-2.5 text-sm font-medium text-[#f8f3ea]"
+            >
+              <Ticket className="h-4 w-4" />
+              {cartQty} selecionado{cartQty > 1 ? 's' : ''}
             </button>
-          )}
+          ) : null}
         </div>
-      </nav>
+      }
+    >
+      <PremiumSection className="pb-10 pt-6 lg:pt-8">
+        <div className="overflow-hidden rounded-[40px] border border-white/70 bg-white/80 p-4 shadow-[0_24px_90px_rgba(46,34,17,0.08)] md:p-6">
+          <div className="relative min-h-[78svh] overflow-hidden rounded-[32px]">
+            <EventHeroMedia
+              eventName={event.name}
+              coverAsset={mediaPresentation.coverAsset}
+              heroAsset={mediaPresentation.heroAsset}
+              fallbackImage={fallbackImage}
+              scrollY={scrollY}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#201913]/60 via-[#201913]/28 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#201913]/75 via-transparent to-transparent" />
 
-      {/* HERO */}
-      <div className="relative min-h-[100svh] flex flex-col overflow-hidden">
-        <EventHeroMedia
-          eventName={event.name}
-          coverAsset={mediaPresentation.coverAsset}
-          heroAsset={mediaPresentation.heroAsset}
-          fallbackImage={fallbackHeroImage}
-          scrollY={scrollY}
-        />
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: 'linear-gradient(#d4ff00 1px, transparent 1px), linear-gradient(90deg, #d4ff00 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(8,8,8,0.3) 0%, rgba(8,8,8,0.1) 30%, rgba(8,8,8,0.75) 70%, #080808 100%)' }} />
-
-        <div className="relative z-10 flex flex-col justify-end flex-1 px-6 md:px-16 pb-16 pt-28 max-w-5xl">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-[10px] font-mono tracking-[0.3em] text-[#d4ff00] uppercase border border-[#d4ff00]/30 px-3 py-1.5 rounded-sm">
-              {event.category}
-            </span>
-            {/* Badge gratuito/pago */}
-            {isFree ? (
-              <span className="text-[10px] font-mono text-[#5BE7C4] border border-[#5BE7C4]/30 px-3 py-1.5 rounded-sm">
-                INSCRIÇÃO GRATUITA
-              </span>
-            ) : remaining < 200 && remaining > 0 ? (
-              <span className="flex items-center gap-1.5 text-[10px] font-mono text-[#FFB020] border border-[#FFB020]/30 px-3 py-1.5 rounded-sm animate-pulse">
-                <Zap className="w-3 h-3" /> Apenas {remaining} ingressos restantes
-              </span>
-            ) : null}
-          </div>
-
-          <h1 className="leading-none mb-4"
-            style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(52px, 9vw, 120px)', letterSpacing: '-0.02em', transform: `translateY(${scrollY * 0.08}px)`, textShadow: '0 2px 40px rgba(0,0,0,0.8)' }}>
-            {event.name}<span style={{ color: '#d4ff00' }}>.</span>
-          </h1>
-
-          {event.subtitle && (
-            <p className="text-[#9a9a9a] text-lg max-w-xl mb-8 leading-relaxed">{event.subtitle}</p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 mb-10">
-            <span className="flex items-center gap-2 text-sm">
-              <Calendar className="w-4 h-4 text-[#d4ff00]" />
-              {formatDate(event.starts_at, "dd 'de' MMMM 'de' yyyy")}
-            </span>
-            <span className="flex items-center gap-2 text-sm">
-              <Clock className="w-4 h-4 text-[#d4ff00]" />
-              {formatDate(event.starts_at, 'HH:mm')}
-              {event.doors_open_at && ` · Portas às ${formatDate(event.doors_open_at, 'HH:mm')}`}
-            </span>
-            <span className="flex items-center gap-2 text-sm">
-              <MapPin className="w-4 h-4 text-[#d4ff00]" />
-              {event.venue_name} · {event.venue_address?.city}/{event.venue_address?.state}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4 flex-wrap">
-            <button onClick={scrollToTickets}
-              className="flex items-center gap-3 bg-[#d4ff00] text-[#080808] px-8 py-4 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_50px_rgba(212,255,0,0.5)] transition-all duration-300 hover:scale-105 active:scale-95">
-              {copy(!!isFree, 'GARANTIR INGRESSO', 'FAZER INSCRIÇÃO')}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            {!isFree && minPrice > 0 && (
-              <div className="text-xs text-[#6b6b6b]">
-                a partir de <span className="text-[#f5f5f0] font-semibold">{formatCurrency(minPrice)}</span>
+            <div className="relative z-10 flex min-h-[78svh] flex-col justify-between p-7 text-white md:p-10 lg:p-14">
+              <div className="flex flex-wrap items-center gap-3">
+                <PremiumBadge tone="default">{event.category || 'Evento premium'}</PremiumBadge>
+                <PremiumBadge tone="muted">{event.status === 'ongoing' ? 'Ao vivo' : 'Publico'}</PremiumBadge>
+                {isFreeMode ? <PremiumBadge tone="success">Inscricao gratuita</PremiumBadge> : null}
               </div>
-            )}
-            {isFree && (
-              <span className="text-xs text-[#5BE7C4] font-mono">100% gratuito</span>
-            )}
-          </div>
-        </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #d4ff00, transparent)' }} />
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce">
-          <ChevronDown className="w-5 h-5 text-[#6b6b6b]" />
-        </div>
-      </div>
+              <div className="max-w-4xl">
+                <PublicReveal>
+                  <div className="text-[11px] uppercase tracking-[0.32em] text-white/70">
+                    Landing publica com media library real
+                  </div>
+                  <h1 className="mt-5 font-serif text-5xl font-semibold leading-[0.92] md:text-7xl">
+                    {event.name}
+                  </h1>
+                  {(event.subtitle || event.short_description) ? (
+                    <p className="mt-5 max-w-2xl text-base leading-7 text-white/82 md:text-lg">
+                      {event.subtitle || event.short_description}
+                    </p>
+                  ) : null}
+                </PublicReveal>
 
-      {/* OCCUPANCY BAR */}
-      {event.settings?.show_remaining_tickets && (
-        <div className="px-6 md:px-16 py-4 bg-[#0e0e0e] border-b border-[#1a1a1a]">
-          <div className="max-w-4xl flex items-center gap-4">
-            <div className="flex-1 h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
-              <div className={cn('h-full rounded-full transition-all duration-1000',
-                occupancy > 80 ? 'bg-[#FF5A6B]' : occupancy > 60 ? 'bg-[#FFB020]' : 'bg-[#d4ff00]')}
-                style={{ width: `${Math.max(occupancy, 2)}%` }} />
+                <PublicReveal className="mt-8 flex flex-wrap items-center gap-4" delayMs={120}>
+                  <a
+                    href="#tickets"
+                    className="inline-flex items-center gap-3 rounded-full bg-[#f8f3ea] px-6 py-3 text-sm font-semibold text-[#1f1a15] transition-all hover:-translate-y-0.5"
+                  >
+                    {isFreeMode ? 'Garantir inscricao' : 'Comprar ingressos'}
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                  {!isFreeMode && minPrice > 0 ? (
+                    <span className="text-sm text-white/82">a partir de {formatCurrency(minPrice)}</span>
+                  ) : null}
+                </PublicReveal>
+              </div>
+
+              <PublicReveal className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]" delayMs={180}>
+                <div className="rounded-[28px] border border-white/20 bg-white/10 p-5 backdrop-blur-md">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {[
+                      {
+                        label: 'Data',
+                        value: formatDate(event.starts_at, "dd 'de' MMMM 'de' yyyy"),
+                      },
+                      {
+                        label: 'Venue',
+                        value: [event.venue_name, event.venue_address?.city].filter(Boolean).join(' · '),
+                      },
+                      {
+                        label: 'Capacidade',
+                        value: `${event.total_capacity.toLocaleString('pt-BR')} pessoas`,
+                      },
+                    ].map((item) => (
+                      <div key={item.label}>
+                        <div className="text-[10px] uppercase tracking-[0.24em] text-white/56">{item.label}</div>
+                        <div className="mt-2 text-sm font-medium text-white">{item.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-[28px] border border-white/20 bg-white/10 p-5 backdrop-blur-md">
+                  <div className="text-[10px] uppercase tracking-[0.24em] text-white/56">Procura</div>
+                  <div className="mt-3 font-serif text-4xl leading-none">{occupancy}%</div>
+                  <p className="mt-2 text-sm leading-6 text-white/76">
+                    {event.sold_tickets.toLocaleString('pt-BR')} ingressos vendidos de um total de {event.total_capacity.toLocaleString('pt-BR')}.
+                  </p>
+                </div>
+              </PublicReveal>
             </div>
-            <span className="text-xs font-mono text-[#9a9a9a] whitespace-nowrap">
-              {occupancy > 0
-                ? `${occupancy}% ${copy(!!isFree, 'vendido', 'inscrito')}`
-                : `${event.total_capacity.toLocaleString('pt-BR')} vagas disponíveis`}
-            </span>
           </div>
         </div>
-      )}
+      </PremiumSection>
 
-      {/* ABOUT */}
-      {event.short_description && (
-        <section className="px-6 md:px-16 py-20 max-w-4xl mx-auto">
-          <div className="text-[10px] font-mono tracking-[0.3em] text-[#d4ff00] mb-4 uppercase">Sobre o evento</div>
-          <p className="text-[#9a9a9a] text-lg leading-relaxed">{event.short_description}</p>
-        </section>
-      )}
+      <PremiumSection className="pt-0">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <EventInfoBlock
+            icon={CalendarDays}
+            label="Data e horario"
+            value={`${formatDate(event.starts_at, "dd 'de' MMMM 'de' yyyy")} · ${formatDate(event.starts_at, 'HH:mm')}`}
+          />
+          <EventInfoBlock
+            icon={Clock3}
+            label="Abertura"
+            value={event.doors_open_at ? `Portoes as ${formatDate(event.doors_open_at, 'HH:mm')}` : 'Horario confirmado no e-mail'}
+          />
+          <EventInfoBlock
+            icon={MapPin}
+            label="Local"
+            value={[event.venue_name, event.venue_address?.city, event.venue_address?.state].filter(Boolean).join(' · ')}
+          />
+          <EventInfoBlock
+            icon={ShieldCheck}
+            label="Acesso"
+            value={isFreeMode ? 'Inscricao validada com QR code digital' : 'Ingresso digital com QR code antifraude'}
+          />
+        </div>
+      </PremiumSection>
+
+      {(event.short_description || event.full_description) ? (
+        <PremiumSection
+          eyebrow="Narrativa do evento"
+          title="Uma pagina de experiencia, nao apenas uma ficha tecnica."
+          description={event.short_description}
+          className="pt-0"
+        >
+          {event.full_description ? (
+            <div className="rounded-[32px] border border-white/70 bg-white/80 p-7 text-base leading-8 text-[#5f5549] shadow-[0_16px_60px_rgba(48,35,18,0.05)] md:p-10">
+              {event.full_description}
+            </div>
+          ) : null}
+        </PremiumSection>
+      ) : null}
 
       <EventMediaGallery presentation={mediaPresentation} />
 
-      {/* HIGHLIGHTS */}
-      <section className="px-6 md:px-16 py-10 border-y border-[#1a1a1a]">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { icon: Users,  label: `${event.total_capacity.toLocaleString('pt-BR')} vagas`, desc: 'capacidade total' },
-            { icon: Star,   label: 'Classificação', desc: event.age_rating === 'livre' ? 'Livre para todos' : `+${event.age_rating} anos` },
-            { icon: Shield, label: isFree ? 'Inscrição segura' : 'Ingresso seguro', desc: 'QR code antifraude' },
-            { icon: Zap,    label: 'Acesso digital', desc: 'Receba por e-mail' },
-          ].map((h, i) => {
-            const Icon = h.icon
-            return (
-              <div key={i} className="flex items-start gap-3">
-                <div className="w-9 h-9 bg-[#d4ff00]/8 border border-[#d4ff00]/15 rounded-sm flex items-center justify-center shrink-0">
-                  <Icon className="w-4 h-4 text-[#d4ff00]" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-[#f5f5f0]">{h.label}</div>
-                  <div className="text-xs text-[#6b6b6b] mt-0.5">{h.desc}</div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </section>
-
-      {/* TICKETS / INSCRIÇÕES */}
-      <section ref={ticketsRef} className="px-6 md:px-16 py-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-[10px] font-mono tracking-[0.3em] text-[#d4ff00] mb-4 uppercase">
-            {copy(!!isFree, 'Ingressos', 'Inscrições')}
-          </div>
-          <h2 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(36px, 5vw, 64px)', letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 32 }}>
-            {copy(!!isFree, 'ESCOLHA SUA', 'ESCOLHA SUA')}<br />
-            {copy(!!isFree, 'EXPERIÊNCIA', 'MODALIDADE')}<span style={{ color: '#d4ff00' }}>.</span>
-          </h2>
-
-          <div className="space-y-4">
-            {ticketTypes.map((type, i) => {
-              const activeBatch = type.batches.find(b => b.is_active)
-              if (!activeBatch) return null
-              const cartItem = cart.find(c => c.batchId === activeBatch.id)
-              const available = activeBatch.quantity - activeBatch.sold_count - (activeBatch.reserved_count ?? 0)
-              const isSoldOut = available <= 0
-              const typeFree  = activeBatch.price === 0
+      <PremiumSection
+        eyebrow="Ingressos e acessos"
+        title={isFreeMode ? 'Escolha sua modalidade de inscricao.' : 'Selecione a experiencia ideal para o seu publico.'}
+        description="Todos os lotes abaixo respeitam disponibilidade real, contagem de vendidos e regras de compra por pedido."
+        className="pt-0"
+      >
+        <div id="tickets" className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-5">
+            {ticketTypes.map((ticketType, ticketTypeIndex) => {
+              const visibleBatches = ticketType.batches.filter((batch) => batch.is_active && batch.is_visible)
+              const soldOut = visibleBatches.every((batch) => batch.quantity - batch.sold_count - batch.reserved_count <= 0)
 
               return (
-                <div key={type.id}
-                  className={cn('border rounded-sm overflow-hidden transition-all duration-300',
-                    cartItem ? 'border-[#d4ff00]/40 bg-[#d4ff00]/3' : 'border-[#1a1a1a] hover:border-[#d4ff00]/20 bg-[#0e0e0e]',
-                    isSoldOut && 'opacity-50'
-                  )}>
-                  <div className="p-6 flex items-start gap-6">
-                    <div className="w-1 self-stretch rounded-full shrink-0" style={{ background: type.color }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 flex-wrap">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 24, letterSpacing: 1, color: '#f5f5f0', lineHeight: 1 }}>
-                              {type.name}
-                            </h3>
-                            {typeFree && (
-                              <span className="text-[10px] font-mono text-[#5BE7C4] border border-[#5BE7C4]/30 px-2 py-0.5 rounded-sm">
-                                GRATUITO
-                              </span>
-                            )}
-                          </div>
-                          {type.description && <p className="text-xs text-[#6b6b6b] mb-3">{type.description}</p>}
-                          {type.benefits?.length > 0 && (
-                            <ul className="space-y-1">
-                              {type.benefits.map((b, bi) => (
-                                <li key={bi} className="flex items-center gap-2 text-xs text-[#9a9a9a]">
-                                  <Check className="w-3 h-3 text-[#d4ff00] shrink-0" />{b}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
+                <PublicReveal key={ticketType.id} delayMs={ticketTypeIndex * 80}>
+                  <div className="rounded-[32px] border border-white/70 bg-white/82 p-6 shadow-[0_16px_60px_rgba(48,35,18,0.05)] md:p-7">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div>
+                        <div className="text-[11px] uppercase tracking-[0.28em] text-[#8e7f68]">
+                          {ticketType.sector || 'Ticket type'}
                         </div>
-
-                        <div className="flex flex-col items-end gap-3 shrink-0">
-                          <div className="text-right">
-                            {typeFree ? (
-                              <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 28, color: '#5BE7C4', lineHeight: 1 }}>
-                                GRATUITO
-                              </div>
-                            ) : (
-                              <>
-                                <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 32, color: '#d4ff00', lineHeight: 1 }}>
-                                  {formatCurrency(activeBatch.price)}
-                                </div>
-                                <div className="text-[11px] text-[#6b6b6b] font-mono">por pessoa</div>
-                              </>
-                            )}
-                          </div>
-
-                          {isSoldOut ? (
-                            <div className="text-xs text-[#6b6b6b] font-mono border border-[#242424] px-4 py-2 rounded-sm">
-                              {copy(typeFree, 'ESGOTADO', 'VAGAS ESGOTADAS')}
-                            </div>
-                          ) : cartItem ? (
-                            <div className="flex items-center gap-2">
-                              <button onClick={() => removeFromCart(activeBatch.id)}
-                                className="w-8 h-8 border border-[#242424] rounded-sm text-[#f5f5f0] hover:border-[#d4ff00]/40 transition-all flex items-center justify-center text-lg font-light">−</button>
-                              <span className="w-8 text-center text-sm font-mono text-[#d4ff00]">{cartItem.qty}</span>
-                              <button onClick={() => addToCart(type, activeBatch)}
-                                className="w-8 h-8 border border-[#d4ff00]/40 rounded-sm text-[#d4ff00] hover:bg-[#d4ff00]/10 transition-all flex items-center justify-center text-lg font-light">+</button>
-                            </div>
-                          ) : (
-                            <button onClick={() => addToCart(type, activeBatch)}
-                              className="bg-[#d4ff00] text-[#080808] px-5 py-2.5 rounded-sm text-xs font-bold tracking-wider hover:shadow-[0_0_20px_rgba(212,255,0,0.4)] transition-all active:scale-95">
-                              {copy(typeFree, 'INSCREVER', 'ADICIONAR')}
-                            </button>
-                          )}
-
-                          {!isSoldOut && available < 50 && (
-                            <span className="text-[10px] text-[#FFB020] font-mono">
-                              {copy(typeFree, `Restam ${available} vagas`, `Restam ${available}`)}
-                            </span>
-                          )}
-                        </div>
+                        <h3 className="mt-3 font-serif text-3xl font-semibold leading-none text-[#1f1a15]">
+                          {ticketType.name}
+                        </h3>
+                        {ticketType.description ? (
+                          <p className="mt-3 max-w-2xl text-sm leading-7 text-[#5f5549]">
+                            {ticketType.description}
+                          </p>
+                        ) : null}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {ticketType.is_nominal ? <PremiumBadge tone="default">Nominal</PremiumBadge> : null}
+                        {ticketType.is_transferable ? <PremiumBadge tone="muted">Transferivel</PremiumBadge> : null}
+                        {soldOut ? <PremiumBadge tone="accent">Esgotando</PremiumBadge> : null}
                       </div>
                     </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
 
-          <div className="mt-8 flex items-center gap-6 flex-wrap">
-            {[
-              { icon: Shield,  text: copy(!!isFree, 'Compra 100% segura', 'Inscrição 100% segura') },
-              { icon: Lock,    text: 'Dados criptografados' },
-              { icon: Ticket,  text: 'QR code antifraude' },
-            ].map((g, i) => {
-              const Icon = g.icon
-              return (
-                <span key={i} className="flex items-center gap-1.5 text-[11px] text-[#6b6b6b]">
-                  <Icon className="w-3.5 h-3.5 text-[#d4ff00]" />{g.text}
-                </span>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* LOCAL */}
-      <section className="px-6 md:px-16 py-16 border-t border-[#1a1a1a]">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-[10px] font-mono tracking-[0.3em] text-[#d4ff00] mb-4 uppercase">Local</div>
-          <h2 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(28px, 4vw, 48px)', letterSpacing: '-0.01em', lineHeight: 1, marginBottom: 16 }}>
-            {event.venue_name}
-          </h2>
-          <p className="text-[#9a9a9a] text-sm mb-6">
-            {event.venue_address?.street}, {event.venue_address?.city} — {event.venue_address?.state}
-          </p>
-          <a href={`https://maps.google.com/?q=${encodeURIComponent(`${event.venue_name}, ${event.venue_address?.city}`)}`}
-            target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs text-[#d4ff00] border border-[#d4ff00]/30 px-4 py-2.5 rounded-sm hover:bg-[#d4ff00]/8 transition-all">
-            <MapPin className="w-3.5 h-3.5" /> Ver no Google Maps
-          </a>
-        </div>
-      </section>
-
-      {/* FOOTER CTA */}
-      <section className="px-6 md:px-16 py-20 relative overflow-hidden">
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,255,0,0.05) 0%, transparent 70%)' }} />
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <h2 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(36px, 6vw, 80px)', letterSpacing: '-0.02em', lineHeight: 0.95, marginBottom: 16 }}>
-            {copy(!!isFree, 'NÃO FIQUE', 'NÃO PERCA')}<br />
-            {copy(!!isFree, 'DE FORA', 'SUA VAGA')}<span style={{ color: '#d4ff00' }}>.</span>
-          </h2>
-          <p className="text-[#9a9a9a] mb-10 text-sm">
-            {copy(!!isFree,
-              'Os ingressos acabam antes do evento. Garanta o seu agora.',
-              'As vagas são limitadas. Faça sua inscrição gratuita agora.'
-            )}
-          </p>
-          <button onClick={scrollToTickets}
-            className="inline-flex items-center gap-3 bg-[#d4ff00] text-[#080808] px-10 py-5 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_50px_rgba(212,255,0,0.5)] transition-all hover:scale-105 active:scale-95">
-            {copy(!!isFree, 'GARANTIR INGRESSO', 'FAZER INSCRIÇÃO')} <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-[#1a1a1a] px-6 py-8 text-center">
-        <div className="text-[11px] text-[#6b6b6b] font-mono">
-          Realização:{' '}
-          <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 14, color: '#f5f5f0', letterSpacing: 1 }}>
-            ANIMALZ<span style={{ color: '#d4ff00' }}>.</span>EVENTS
-          </span>{' '}· Plataforma certificada de {copy(!!isFree, 'venda de ingressos', 'inscrições')}
-        </div>
-      </footer>
-
-      {/* FLOATING CART */}
-      {cartQty > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
-          <button onClick={() => setStep('checkout')}
-            className="flex items-center gap-4 bg-[#d4ff00] text-[#080808] px-6 py-4 rounded-sm shadow-[0_8px_32px_rgba(212,255,0,0.4)] hover:shadow-[0_8px_40px_rgba(212,255,0,0.6)] transition-all hover:scale-105 active:scale-95">
-            <div className="flex items-center gap-2 font-mono font-bold text-sm">
-              <Ticket className="w-4 h-4" />
-              {cartQty} {copy(!!isFree, `ingresso${cartQty > 1 ? 's' : ''}`, `inscrição${cartQty > 1 ? 'ões' : ''}`)}
-            </div>
-            {!isFree && cartTotal > 0 && (
-              <>
-                <div className="w-px h-5 bg-[#080808]/20" />
-                <div className="font-bold text-base">{formatCurrency(cartTotal)}</div>
-              </>
-            )}
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ── Stripe appearance for dark theme ──────────────────────── */
-const stripeAppearance = {
-  theme: 'night' as const,
-  variables: {
-    colorPrimary:         '#d4ff00',
-    colorBackground:      '#1a1a1a',
-    colorText:            '#f5f5f0',
-    colorTextSecondary:   '#6b6b6b',
-    colorTextPlaceholder: '#4a4a4a',
-    colorDanger:          '#FF5A6B',
-    borderRadius:         '2px',
-    fontFamily:           'DM Sans, system-ui, sans-serif',
-    fontSizeBase:         '14px',
-    spacingUnit:          '4px',
-  },
-  rules: {
-    '.Input': { border: '1px solid #242424', backgroundColor: '#0e0e0e', color: '#f5f5f0' },
-    '.Input:focus': { border: '1px solid rgba(212,255,0,0.4)', boxShadow: '0 0 0 1px rgba(212,255,0,0.15)' },
-    '.Label': { color: '#6b6b6b', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase' as const },
-    '.Tab': { border: '1px solid #242424', backgroundColor: '#0e0e0e' },
-    '.Tab:hover': { border: '1px solid rgba(212,255,0,0.2)' },
-    '.Tab--selected': { border: '1px solid rgba(212,255,0,0.4)', backgroundColor: 'rgba(212,255,0,0.05)' },
-  },
-}
-
-/* ── Stripe inner form ──────────────────────────────────────── */
-function StripePaymentForm({ clientSecret, onSuccess, onBack, buyerName, total }: {
-  clientSecret: string; onSuccess: () => void; onBack: () => void
-  buyerName: string; total: number
-}) {
-  const stripe   = useStripe()
-  const elements = useElements()
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState('')
-
-  async function handlePay(e: React.FormEvent) {
-    e.preventDefault()
-    if (!stripe || !elements) return
-    setLoading(true); setError('')
-    const { error: err } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { payment_method_data: { billing_details: { name: buyerName } } },
-      redirect: 'if_required',
-    })
-    if (err) { setError(err.message ?? 'Erro no pagamento'); setLoading(false) }
-    else { onSuccess() }
-  }
-
-  return (
-    <form onSubmit={handlePay} className="space-y-6">
-      <PaymentElement options={{ layout: 'tabs' }} />
-      {error && (
-        <div className="flex items-center gap-2 text-xs text-[#FF5A6B] bg-[#FF5A6B]/8 border border-[#FF5A6B]/20 rounded-sm px-4 py-3">
-          <Info className="w-3.5 h-3.5 shrink-0" /> {error}
-        </div>
-      )}
-      <button type="submit" disabled={loading || !stripe}
-        className="w-full flex items-center justify-center gap-3 bg-[#d4ff00] text-[#080808] py-5 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] transition-all disabled:opacity-50 active:scale-95">
-        {loading ? <span className="font-mono">PROCESSANDO...</span> : (
-          <><Lock className="w-4 h-4" /> PAGAR · {formatCurrency(total)}</>
-        )}
-      </button>
-      <button type="button" onClick={onBack} className="w-full text-center text-xs text-[#6b6b6b] hover:text-[#f5f5f0] transition-colors font-mono py-2">
-        ← VOLTAR AOS DADOS
-      </button>
-    </form>
-  )
-}
-
-/* ── Checkout ───────────────────────────────────────────────── */
-function CheckoutScreen({ event, cart, total, isFree, onBack, onSuccess, onAdd, onRemove, ticketTypes }: {
-  event: EventData; cart: CartItem[]; total: number; isFree: boolean
-  onBack: () => void; onSuccess: () => void
-  onAdd: (type: any, batch: any) => void; onRemove: (id: string) => void
-  ticketTypes: TicketType[]
-}) {
-  const [phase, setPhase]             = useState<'form' | 'payment'>('form')
-  const [form, setForm]               = useState({ name: '', email: '', cpf: '', phone: '' })
-  const [installments, setInstallments] = useState(0)
-  const [clientSecret, setClientSecret] = useState('')
-  const [loading, setLoading]         = useState(false)
-  const [error, setError]             = useState('')
-
-  const fees        = calculateFees(cart[0]?.price ?? 0, installments)
-  const allInTotal  = isFree ? 0 : fees.totalBuyer * cart.reduce((s, c) => s + c.qty, 0)
-
-  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
-
-  /* Free events — direct DB insert */
-  async function handleFreeSubmit() {
-    if (!form.name.trim() || !form.email.trim()) { setError('Preencha nome e e-mail'); return }
-    setLoading(true); setError('')
-    const { data: order, error: err } = await supabase.from('orders').insert({
-      event_id: event.id,
-      organization_id: '00000000-0000-0000-0000-000000000001',
-      buyer_name: form.name, buyer_email: form.email,
-      buyer_cpf: form.cpf, buyer_phone: form.phone,
-      subtotal: 0, discount_amount: 0, fee_amount: 0, total_amount: 0,
-      status: 'paid', payment_method: 'free',
-    }).select().single()
-    if (err || !order) { setError('Erro ao processar. Tente novamente.'); setLoading(false); return }
-    for (const item of cart) {
-      await supabase.from('order_items').insert({
-        order_id: order.id, ticket_type_id: item.ticketTypeId, batch_id: item.batchId,
-        holder_name: form.name, holder_email: form.email,
-        unit_price: 0, quantity: item.qty, total_price: 0,
-      })
-    }
-    trackEvent('CompleteRegistration', { currency: 'BRL' })
-    setLoading(false); onSuccess()
-  }
-
-  /* Paid events — create PaymentIntent then show Stripe Elements */
-  async function handleProceedToPayment() {
-    if (!form.name.trim() || !form.email.trim()) { setError('Preencha nome e e-mail'); return }
-    setLoading(true); setError('')
-    const primaryItem = cart[0]
-    const qty = cart.reduce((s, c) => s + c.qty, 0)
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-payment-intent`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_ANON_KEY}` },
-        body: JSON.stringify({
-          eventId: event.id,
-          ticketTypeId: primaryItem.ticketTypeId,
-          quantity: qty,
-          installments,
-          buyerEmail: form.email,
-          buyerName: form.name,
-        }),
-      })
-      const json = await res.json()
-      if (json.error) throw new Error(json.error)
-      setClientSecret(json.clientSecret)
-      setPhase('payment')
-    } catch (err: any) {
-      setError(err.message ?? 'Erro ao iniciar pagamento')
-    }
-    setLoading(false)
-  }
-
-  const INSTALLMENT_OPTS = [
-    { value: 0,  label: 'PIX',        icon: <Smartphone className="w-4 h-4" />, badge: 'Menor preço' },
-    { value: 1,  label: 'Cartão 1x',  icon: <CreditCard className="w-4 h-4" />, badge: null },
-    { value: 2,  label: 'Cartão 2x',  icon: <CreditCard className="w-4 h-4" />, badge: null },
-    { value: 3,  label: 'Cartão 3x',  icon: <CreditCard className="w-4 h-4" />, badge: null },
-    { value: 6,  label: 'Cartão 6x',  icon: <CreditCard className="w-4 h-4" />, badge: null },
-    { value: 12, label: 'Cartão 12x', icon: <CreditCard className="w-4 h-4" />, badge: 'Máx parcelas' },
-  ]
-
-  return (
-    <div className="min-h-screen bg-[#080808] text-[#f5f5f0]">
-      <nav className="sticky top-0 z-50 flex items-center gap-4 px-6 py-4 bg-[#080808]/95 border-b border-[#1a1a1a] backdrop-blur-sm">
-        <button onClick={phase === 'payment' ? () => setPhase('form') : onBack}
-          className="text-[#6b6b6b] hover:text-[#f5f5f0] text-xs font-mono transition-colors">← VOLTAR</button>
-        <div className="flex-1" />
-        <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 16, letterSpacing: 2 }}>
-          ANIMALZ<span style={{ color: '#d4ff00' }}>.</span>
-        </span>
-      </nav>
-
-      <div className="max-w-2xl mx-auto px-6 py-12 space-y-8">
-        <div>
-          <div className="text-[10px] font-mono tracking-[0.3em] text-[#d4ff00] mb-2">
-            {copy(isFree, 'CHECKOUT', 'INSCRIÇÃO')} · {phase === 'payment' ? 'PAGAMENTO' : 'SEUS DADOS'}
-          </div>
-          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 40, letterSpacing: '-0.01em', lineHeight: 1 }}>
-            {phase === 'payment' ? 'FORMA DE' : copy(isFree, 'FINALIZE SEU', 'CONFIRME SUA')}<br />
-            {phase === 'payment' ? <span>PAGAMENTO<span style={{ color: '#d4ff00' }}>.</span></span>
-              : <span>{copy(isFree, 'PEDIDO', 'INSCRIÇÃO')}<span style={{ color: '#d4ff00' }}>.</span></span>}
-          </h1>
-        </div>
-
-        {/* Cart summary */}
-        <div className="border border-[#1a1a1a] rounded-sm overflow-hidden">
-          <div className="px-5 py-3 bg-[#0e0e0e] border-b border-[#1a1a1a]">
-            <span className="text-[10px] font-mono tracking-widest text-[#6b6b6b] uppercase">Resumo do pedido</span>
-          </div>
-          {cart.map(item => (
-            <div key={item.batchId} className="flex items-center justify-between px-5 py-3.5 border-b border-[#1a1a1a] last:border-0">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: item.color }} />
-                <div>
-                  <div className="text-sm font-medium">{item.ticketName}</div>
-                  <div className="text-[11px] text-[#6b6b6b] font-mono">{item.batchName} · {item.qty}x</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[#d4ff00]">
-                  {item.price === 0 ? 'Gratuito' : formatCurrency(item.price * item.qty)}
-                </span>
-                {phase === 'form' && (
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => onRemove(item.batchId)}
-                      className="w-6 h-6 border border-[#242424] rounded-sm text-[#9a9a9a] hover:text-[#f5f5f0] flex items-center justify-center text-sm">−</button>
-                    <span className="w-5 text-center text-xs font-mono">{item.qty}</span>
-                    <button onClick={() => {
-                      const type = ticketTypes.find(t => t.id === item.ticketTypeId)
-                      const batch = type?.batches.find(b => b.id === item.batchId)
-                      if (type && batch) onAdd(type, batch)
-                    }} className="w-6 h-6 border border-[#242424] rounded-sm text-[#9a9a9a] hover:text-[#f5f5f0] flex items-center justify-center text-sm">+</button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-          <div className="flex justify-between items-center px-5 py-4 bg-[#0e0e0e]">
-            <span className="text-sm font-semibold">Total{!isFree && installments > 0 ? ` (${installments}x)` : ''}</span>
-            <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 24, color: '#d4ff00' }}>
-              {isFree ? 'GRATUITO' : formatCurrency(allInTotal)}
-            </span>
-          </div>
-        </div>
-
-        {/* Phase 1: Form */}
-        {phase === 'form' && (
-          <>
-            {/* Buyer data */}
-            <div className="space-y-3">
-              <div className="text-[10px] font-mono tracking-[0.3em] text-[#6b6b6b] uppercase">Seus dados</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {[
-                  { label: 'Nome completo *', key: 'name',  type: 'text',  placeholder: 'Seu nome' },
-                  { label: 'E-mail *',        key: 'email', type: 'email', placeholder: 'seu@email.com' },
-                  { label: 'CPF',             key: 'cpf',   type: 'text',  placeholder: '000.000.000-00' },
-                  { label: 'WhatsApp',        key: 'phone', type: 'tel',   placeholder: '(00) 00000-0000' },
-                ].map(f => (
-                  <div key={f.key}>
-                    <label className="block text-[10px] font-mono tracking-wider text-[#6b6b6b] uppercase mb-1.5">{f.label}</label>
-                    <input type={f.type} placeholder={f.placeholder}
-                      value={(form as any)[f.key]} onChange={e => set(f.key, e.target.value)}
-                      className="w-full bg-[#0e0e0e] border border-[#242424] text-[#f5f5f0] placeholder-[#4b4b4b] rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-[#d4ff00]/40 transition-colors" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Payment method / installments — paid only */}
-            {!isFree && (
-              <div className="space-y-3">
-                <div className="text-[10px] font-mono tracking-[0.3em] text-[#6b6b6b] uppercase">Forma de pagamento</div>
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                  {INSTALLMENT_OPTS.map(opt => {
-                    const f = calculateFees(cart[0]?.price ?? 0, opt.value)
-                    return (
-                      <button key={opt.value} onClick={() => setInstallments(opt.value)}
-                        className={cn('relative flex flex-col items-center gap-1.5 p-3 rounded-sm border text-center transition-all',
-                          installments === opt.value
-                            ? 'border-[#d4ff00]/40 bg-[#d4ff00]/5 text-[#d4ff00]'
-                            : 'border-[#242424] text-[#9a9a9a] hover:border-[#d4ff00]/20')}>
-                        {opt.badge && (
-                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] font-mono bg-[#d4ff00] text-[#080808] px-1.5 py-0.5 rounded-sm whitespace-nowrap">
-                            {opt.badge}
+                    {ticketType.benefits?.length ? (
+                      <div className="mt-5 flex flex-wrap gap-2">
+                        {ticketType.benefits.map((benefit) => (
+                          <span
+                            key={benefit}
+                            className="rounded-full border border-[#eee2cf] bg-[#fbf7f1] px-3 py-1.5 text-xs text-[#6e6253]"
+                          >
+                            {benefit}
                           </span>
-                        )}
-                        {opt.icon}
-                        <span className="text-[10px] font-mono">{opt.label}</span>
-                        <span className="text-[9px] text-[#6b6b6b] font-mono">{formatCurrency(f.totalBuyer)}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-                {installments === 0 && (
-                  <div className="p-3 bg-[#d4ff00]/5 border border-[#d4ff00]/15 rounded-sm text-xs text-[#9a9a9a]">
-                    ⚡ PIX tem aprovação instantânea. Preço final: {formatCurrency(calculateFees(cart[0]?.price ?? 0, 0).totalBuyer)}
+                        ))}
+                      </div>
+                    ) : null}
+
+                    <div className="mt-6 space-y-3">
+                      {visibleBatches.length > 0 ? (
+                        visibleBatches.map((batch) => {
+                          const available = Math.max(batch.quantity - batch.sold_count - batch.reserved_count, 0)
+                          const selectedItem = cart.find((item) => item.batchId === batch.id)
+                          const selectedQuantity = selectedItem?.qty ?? 0
+                          const maxPerOrder = batch.max_per_order ?? ticketType.max_per_order ?? available
+                          const isDisabled = available === 0 || selectedQuantity >= maxPerOrder
+
+                          return (
+                            <div
+                              key={batch.id}
+                              className="rounded-[26px] border border-[#eee2cf] bg-[#fbf7f1] p-5"
+                            >
+                              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className="h-2.5 w-2.5 rounded-full"
+                                      style={{ background: ticketType.color || '#b79e74' }}
+                                    />
+                                    <div className="text-sm font-semibold text-[#1f1a15]">{batch.name}</div>
+                                  </div>
+                                  <div className="mt-2 flex flex-wrap gap-3 text-xs text-[#7c6f60]">
+                                    <span>{available.toLocaleString('pt-BR')} disponiveis</span>
+                                    {batch.ends_at ? <span>encerra em {formatDate(batch.ends_at, "dd/MM 'as' HH:mm")}</span> : null}
+                                    <span>max {maxPerOrder} por pedido</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-4">
+                                  <div className="font-serif text-3xl leading-none text-[#1f1a15]">
+                                    {batch.price === 0 ? 'Gratuito' : formatCurrency(batch.price)}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => removeFromCart(batch.id)}
+                                      disabled={!selectedQuantity}
+                                      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ddd1bf] text-[#5f5549] disabled:opacity-40"
+                                    >
+                                      −
+                                    </button>
+                                    <span className="w-10 text-center text-sm font-medium text-[#1f1a15]">
+                                      {selectedQuantity}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => addToCart(ticketType.id, batch.id)}
+                                      disabled={isDisabled}
+                                      className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1f1a15] text-[#f8f3ea] disabled:opacity-40"
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })
+                      ) : (
+                        <div className="rounded-[26px] border border-[#eee2cf] bg-[#fbf7f1] p-5 text-sm text-[#7c6f60]">
+                          Nenhum lote disponivel para este ticket no momento.
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            )}
+                </PublicReveal>
+              )
+            })}
+          </div>
 
-            {/* Free banner */}
-            {isFree && (
-              <div className="p-4 bg-[#5BE7C4]/8 border border-[#5BE7C4]/20 rounded-sm flex items-center gap-3">
-                <Check className="w-5 h-5 text-[#5BE7C4] shrink-0" />
-                <div>
-                  <div className="text-sm font-semibold text-[#5BE7C4]">Inscrição gratuita</div>
-                  <div className="text-xs text-[#9a9a9a] mt-0.5">Nenhum pagamento será cobrado. Você receberá o QR code por e-mail.</div>
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <PublicReveal>
+              <div className="rounded-[34px] border border-white/70 bg-white/82 p-6 shadow-[0_16px_60px_rgba(48,35,18,0.05)] md:p-7">
+                <div className="text-[11px] uppercase tracking-[0.28em] text-[#8e7f68]">Seu pedido</div>
+                <div className="mt-4 font-serif text-4xl font-semibold leading-none text-[#1f1a15]">
+                  {cartQty > 0 ? `${cartQty} selecionado${cartQty > 1 ? 's' : ''}` : 'Monte sua experiencia'}
+                </div>
+                <p className="mt-3 text-sm leading-7 text-[#5f5549]">
+                  {cartQty > 0
+                    ? 'Revise seus lotes e siga para o checkout premium. A reserva de inventario acontece no proximo passo.'
+                    : 'Escolha lotes ou modalidades acima para liberar o checkout. A reserva so comeca quando voce avancar.'}
+                </p>
+
+                <div className="mt-6 space-y-3">
+                  {cart.length > 0 ? (
+                    cart.map((item) => (
+                      <div key={item.batchId} className="rounded-[24px] border border-[#eee2cf] bg-[#fbf7f1] p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-semibold text-[#1f1a15]">{item.ticketName}</div>
+                            <div className="mt-1 text-xs text-[#7c6f60]">{item.batchName}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-[#1f1a15]">{item.qty}x</div>
+                            <div className="mt-1 text-xs text-[#7c6f60]">
+                              {item.price === 0 ? 'Gratuito' : formatCurrency(item.price * item.qty)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-[24px] border border-dashed border-[#ddd1bf] bg-[#fbf7f1] p-5 text-sm text-[#7c6f60]">
+                      Ainda nao ha lotes selecionados.
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-6 rounded-[26px] border border-[#eee2cf] bg-[#fbf7f1] p-5">
+                  <div className="flex items-center justify-between text-sm text-[#7c6f60]">
+                    <span>Subtotal</span>
+                    <span>{cartTotal === 0 ? 'Gratuito' : formatCurrency(cartTotal)}</span>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-[#eee2cf] pt-4">
+                    <span className="text-sm font-medium text-[#1f1a15]">Total nesta selecao</span>
+                    <span className="font-serif text-3xl leading-none text-[#1f1a15]">
+                      {cartTotal === 0 ? 'Gratuito' : formatCurrency(cartTotal)}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setStep('checkout')}
+                  disabled={cartQty === 0}
+                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-full bg-[#1f1a15] px-5 py-4 text-sm font-semibold text-[#f8f3ea] transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Ir para o checkout
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+
+                <div className="mt-6 space-y-3 text-sm text-[#5f5549]">
+                  {[
+                    'Reserva temporaria de inventario no checkout',
+                    'Pagamento protegido e emissao automatica de ticket digital',
+                    isFreeMode ? 'Inscricao com validacao por QR code' : 'Acesso com QR code antifraude',
+                  ].map((item) => (
+                    <div key={item} className="flex items-start gap-3">
+                      <Sparkles className="mt-0.5 h-4 w-4 text-[#7b6440]" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-
-            {error && (
-              <div className="flex items-center gap-2 text-xs text-[#FF5A6B] bg-[#FF5A6B]/8 border border-[#FF5A6B]/20 rounded-sm px-4 py-3">
-                <Info className="w-3.5 h-3.5 shrink-0" /> {error}
-              </div>
-            )}
-
-            <button onClick={isFree ? handleFreeSubmit : handleProceedToPayment} disabled={loading}
-              className="w-full flex items-center justify-center gap-3 bg-[#d4ff00] text-[#080808] py-5 rounded-sm text-sm font-bold tracking-wider hover:shadow-[0_0_40px_rgba(212,255,0,0.4)] transition-all disabled:opacity-50 active:scale-95">
-              {loading ? <span className="font-mono">AGUARDE...</span> : (
-                <>
-                  {isFree ? 'CONFIRMAR INSCRIÇÃO' : `CONTINUAR PARA PAGAMENTO · ${formatCurrency(allInTotal)}`}
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-
-            <p className="text-center text-[11px] text-[#6b6b6b]">
-              {copy(isFree,
-                'Ao confirmar você concorda com os termos de uso. QR code enviado por e-mail.',
-                'Taxa de serviço já inclusa no preço. Ao pagar você concorda com os termos de uso.'
-              )}
-            </p>
-          </>
-        )}
-
-        {/* Phase 2: Stripe Elements */}
-        {phase === 'payment' && clientSecret && stripePromise && (
-          <Elements stripe={stripePromise} options={{ clientSecret, appearance: stripeAppearance }}>
-            <StripePaymentForm
-              clientSecret={clientSecret}
-              buyerName={form.name}
-              total={allInTotal}
-              onSuccess={onSuccess}
-              onBack={() => setPhase('form')}
-            />
-          </Elements>
-        )}
-
-        {/* Security row */}
-        <div className="flex items-center justify-center gap-6 flex-wrap pt-2">
-          {[
-            { icon: Shield,  text: 'Compra 100% segura' },
-            { icon: Lock,    text: 'Dados criptografados' },
-            { icon: Ticket,  text: 'QR code antifraude' },
-          ].map((g, i) => {
-            const Icon = g.icon
-            return (
-              <span key={i} className="flex items-center gap-1.5 text-[11px] text-[#6b6b6b]">
-                <Icon className="w-3.5 h-3.5 text-[#d4ff00]" />{g.text}
-              </span>
-            )
-          })}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ── Success ────────────────────────────────────────────────── */
-function SuccessScreen({ event, cart, total, isFree }: { event: EventData; cart: CartItem[]; total: number; isFree: boolean }) {
-  return (
-    <div className="min-h-screen bg-[#080808] flex flex-col items-center justify-center px-6 text-center">
-      <div className="w-20 h-20 bg-[#d4ff00]/10 border border-[#d4ff00]/30 rounded-full flex items-center justify-center mb-8">
-        <Check className="w-10 h-10 text-[#d4ff00]" />
-      </div>
-      <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(36px, 6vw, 64px)', letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 16 }}>
-        {copy(isFree, 'PEDIDO CONFIRMADO', 'INSCRIÇÃO CONFIRMADA')}<span style={{ color: '#d4ff00' }}>.</span>
-      </h1>
-      <p className="text-[#9a9a9a] mb-4 max-w-md">
-        {copy(isFree,
-          'Seus ingressos serão enviados por e-mail em instantes.',
-          'Sua inscrição está confirmada! O QR code chegará por e-mail.'
-        )}
-      </p>
-      {!isFree && total > 0 && (
-        <div className="font-display text-2xl text-[#d4ff00] mb-6">{formatCurrency(total)}</div>
-      )}
-      <div className="space-y-2 mb-10">
-        {cart.map(item => (
-          <div key={item.batchId} className="flex items-center gap-2 text-sm text-[#9a9a9a] justify-center">
-            <span className="w-2 h-2 rounded-full" style={{ background: item.color }} />
-            {item.qty}x {item.ticketName}
+            </PublicReveal>
           </div>
-        ))}
-      </div>
-      <a href={`/e/${event.slug ?? ''}`}
-        className="text-xs text-[#6b6b6b] hover:text-[#d4ff00] transition-colors font-mono">
-        ← Voltar para o evento
-      </a>
-    </div>
-  )
-}
+        </div>
+      </PremiumSection>
 
-function Skeleton() {
-  return (
-    <div className="min-h-screen bg-[#080808] animate-pulse">
-      <div className="h-[100svh] bg-[#0e0e0e]" />
-    </div>
-  )
-}
-
-function NotFound() {
-  return (
-    <div className="min-h-screen bg-[#080808] flex items-center justify-center text-center px-6">
-      <div>
-        <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 80, color: '#d4ff00' }}>404</div>
-        <p className="text-[#9a9a9a] mt-4">Evento não encontrado.</p>
-      </div>
-    </div>
+      <PremiumSection className="pt-0">
+        <div className="rounded-[36px] border border-white/70 bg-[linear-gradient(135deg,#1f1a15_0%,#2d241d_100%)] p-8 text-white shadow-[0_20px_80px_rgba(20,12,3,0.16)] md:p-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_0.7fr] lg:items-end">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.32em] text-white/55">Confirmação instantanea</div>
+              <div className="mt-4 font-serif text-4xl font-semibold leading-none md:text-5xl">
+                Uma jornada de compra mais limpa, confiavel e pronta para conversao.
+              </div>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
+                O checkout da camada publica foi refinado para transmitir seguranca, clareza de valor e sensacao de experiencia premium, sem alterar a logica de pagamento, reserva e emissao que ja sustenta o produto.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+              {[
+                `${event.checked_in_count?.toLocaleString('pt-BR') ?? '0'} check-ins registrados`,
+                `${event.sold_tickets.toLocaleString('pt-BR')} tickets ja emitidos`,
+                event.age_rating ? `Classificacao ${event.age_rating}` : 'Politica de acesso enviada por e-mail',
+              ].map((item) => (
+                <div key={item} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-white/76">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </PremiumSection>
+    </PublicLayout>
   )
 }

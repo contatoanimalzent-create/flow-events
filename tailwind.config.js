@@ -33,6 +33,7 @@ export default {
         sans:    ['DM Sans', 'system-ui', 'sans-serif'],
         mono:    ['DM Mono', 'monospace'],
         display: ['Bebas Neue', 'sans-serif'],
+        serif:   ['Cormorant Garamond', 'serif'],
       },
       borderRadius: { sm: '2px', xl: '12px', '2xl': '16px' },
       boxShadow: {

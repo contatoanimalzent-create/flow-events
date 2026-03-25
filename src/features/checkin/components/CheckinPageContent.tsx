@@ -23,7 +23,6 @@ export function CheckinPageContent() {
     setSearch,
     scanMode,
     setScanMode,
-    filteredCheckins,
     paginatedCheckins,
     pagination,
     stats,
@@ -52,14 +51,16 @@ export function CheckinPageContent() {
     deviceId: typeof navigator !== 'undefined' ? navigator.userAgent : 'web-console',
   })
 
-  const selectedGateLabel = selectedGateId !== 'all' ? gates.find((gate) => gate.id === selectedGateId)?.name ?? null : null
+  const selectedGateLabel =
+    selectedGateId !== 'all' ? gates.find((gate) => gate.id === selectedGateId)?.name ?? null : null
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-5 p-6">
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            CHECK-IN<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Live operations</div>
+          <h1 className="admin-title">
+            Check-in<span className="admin-title-accent">.</span>
           </h1>
           <div className="mt-1 flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-status-success" />
@@ -85,7 +86,7 @@ export function CheckinPageContent() {
       </div>
 
       {events.length > 1 && (
-        <div className="reveal flex items-center gap-3">
+        <div className="admin-filterbar">
           <span className="text-xs font-mono text-text-muted">EVENTO:</span>
           <div className="flex flex-wrap gap-2">
             {events.map((item) => (
@@ -94,7 +95,9 @@ export function CheckinPageContent() {
                 onClick={() => setSelectedEventId(item.id)}
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                  selectedEventId === item.id ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                  selectedEventId === item.id
+                    ? 'bg-brand-acid text-bg-primary'
+                    : 'border border-bg-border text-text-muted hover:text-text-primary',
                 )}
               >
                 {item.name}
@@ -104,7 +107,7 @@ export function CheckinPageContent() {
         </div>
       )}
 
-      <div className="reveal flex flex-wrap items-center gap-4">
+      <div className="admin-filterbar">
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono text-text-muted">PORTARIA:</span>
           <div className="flex flex-wrap gap-1.5">
@@ -112,7 +115,9 @@ export function CheckinPageContent() {
               onClick={() => setSelectedGateId('all')}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                selectedGateId === 'all' ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                selectedGateId === 'all'
+                  ? 'bg-brand-acid text-bg-primary'
+                  : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               Todas
@@ -123,7 +128,9 @@ export function CheckinPageContent() {
                 onClick={() => setSelectedGateId(gate.id)}
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                  selectedGateId === gate.id ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                  selectedGateId === gate.id
+                    ? 'bg-brand-acid text-bg-primary'
+                    : 'border border-bg-border text-text-muted hover:text-text-primary',
                 )}
               >
                 {gate.name}
@@ -149,7 +156,7 @@ export function CheckinPageContent() {
       <CheckinStatsGrid stats={stats} />
 
       {event?.total_capacity ? (
-        <div className="card p-4 reveal">
+        <div className="surface-panel p-5 reveal">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted">Ocupacao atual</span>
             <span className="text-xs font-mono text-brand-acid">{occupancyPct}%</span>
@@ -173,10 +180,18 @@ export function CheckinPageContent() {
       {gates.length > 0 && (
         <div className="reveal">
           <div className="mb-2 text-[10px] font-mono uppercase tracking-widest text-text-muted">Portarias</div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
             {gates.map((gate) => (
-              <div key={gate.id} className={cn('card flex items-center gap-3 p-3', selectedGateId === gate.id && 'border-brand-acid/30')}>
-                <div className={cn('h-2 w-2 rounded-full', gate.is_active ? 'bg-status-success animate-pulse' : 'bg-bg-border')} />
+              <div
+                key={gate.id}
+                className={cn(
+                  'surface-panel flex items-center gap-3 p-4',
+                  selectedGateId === gate.id && 'border-brand-acid/30',
+                )}
+              >
+                <div
+                  className={cn('h-2 w-2 rounded-full', gate.is_active ? 'animate-pulse bg-status-success' : 'bg-bg-border')}
+                />
                 <div className="min-w-0">
                   <div className="truncate text-xs font-medium text-text-primary">{gate.name}</div>
                   <div className="text-[10px] font-mono text-text-muted">

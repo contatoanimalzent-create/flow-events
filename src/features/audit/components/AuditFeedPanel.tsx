@@ -48,20 +48,20 @@ export function AuditFeedPanel() {
       </div>
 
       {audit.entries.length === 0 ? (
-        <div className="rounded-sm border border-bg-border bg-bg-card p-4 text-center text-sm text-text-muted">Nenhuma atividade auditavel registrada ainda.</div>
+        <div className="rounded-2xl border border-bg-border bg-white/80 p-5 text-center text-sm text-text-muted">Nenhuma atividade auditavel registrada ainda.</div>
       ) : (
         <div className="space-y-2">
           <div className="max-h-80 space-y-2 overflow-y-auto">
             {audit.entries.map((entry) => (
-              <div key={entry.id} className="rounded-sm border border-bg-border bg-bg-card p-3">
+              <div key={entry.id} className="rounded-2xl border border-bg-border bg-white/80 p-4">
                 <div className="mb-1 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
                     <Activity className="h-3.5 w-3.5 text-brand-acid" />
                     {entry.title}
                   </div>
-                  <span className="text-[10px] font-mono text-text-muted">{formatDate(entry.created_at, 'dd/MM HH:mm')}</span>
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-text-muted">{formatDate(entry.created_at, 'dd/MM HH:mm')}</span>
                 </div>
-                <div className="text-[11px] text-text-muted">
+                <div className="text-[12px] leading-6 text-text-muted">
                   {entry.description ?? `${ENTITY_LABELS[entry.entity_type]} - ${entry.action_type}`}
                   {entry.user_name ? ` - ${entry.user_name}` : ''}
                 </div>

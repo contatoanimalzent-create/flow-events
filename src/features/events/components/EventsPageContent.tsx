@@ -37,13 +37,14 @@ export function EventsPageContent() {
   const { publishEvent, deleteEvent, duplicateEvent } = useEventActions({ organizationId: organization?.id })
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-5 p-6" onClick={closeMenu}>
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page" onClick={closeMenu}>
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            EVENTOS<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Portfolio & agenda</div>
+          <h1 className="admin-title">
+            Eventos<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">
+          <p className="admin-subtitle">
             {events.length} evento{events.length !== 1 ? 's' : ''} cadastrado{events.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -55,7 +56,7 @@ export function EventsPageContent() {
         ) : null}
       </div>
 
-      <div className="reveal grid grid-cols-4 gap-3" style={{ animationDelay: '40ms' }}>
+      <div className="reveal grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" style={{ animationDelay: '40ms' }}>
         {statsBar.map((stat, index) => (
           <div key={index} className="card p-4">
             <div className="text-[10px] uppercase tracking-widest text-text-muted">{stat.label}</div>
@@ -64,7 +65,7 @@ export function EventsPageContent() {
         ))}
       </div>
 
-      <div className="reveal flex items-center gap-3" style={{ animationDelay: '80ms' }}>
+      <div className="admin-filterbar" style={{ animationDelay: '80ms' }}>
         <div className="relative max-w-xs flex-1">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
           <input

@@ -11,15 +11,15 @@ interface CustomersTableProps {
 export function CustomersTable({ customers, onSelect }: CustomersTableProps) {
   if (customers.length === 0) {
     return (
-      <div className="card p-16 text-center">
-        <div className="font-display text-2xl text-text-primary">NENHUM CUSTOMER</div>
-        <p className="mt-2 text-sm text-text-muted">Ajuste os filtros ou aguarde novos pedidos para formar a base de CRM.</p>
+      <div className="surface-panel p-16 text-center">
+        <div className="font-display text-2xl text-text-primary">Nenhum customer encontrado</div>
+        <p className="mt-3 text-sm leading-6 text-text-muted">Ajuste os filtros ou aguarde novos pedidos para formar a base de CRM.</p>
       </div>
     )
   }
 
   return (
-    <div className="card overflow-hidden">
+    <div className="surface-panel overflow-hidden">
       <table className="w-full">
         <thead className="border-b border-bg-border">
           <tr>
@@ -34,13 +34,24 @@ export function CustomersTable({ customers, onSelect }: CustomersTableProps) {
           {customers.map((customer) => (
             <tr key={customer.id} className="table-row cursor-pointer" onClick={() => onSelect(customer)}>
               <td className="table-cell">
-                <div className="text-[13px] font-medium text-text-primary">{customer.full_name}</div>
-                <div className="text-[11px] text-text-muted">{customer.email}</div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-bg-border bg-bg-secondary text-xs font-semibold text-text-primary">
+                    {customer.full_name
+                      .split(' ')
+                      .slice(0, 2)
+                      .map((part) => part[0])
+                      .join('')}
+                  </div>
+                  <div>
+                    <div className="text-[13px] font-medium text-text-primary">{customer.full_name}</div>
+                    <div className="text-[11px] text-text-muted">{customer.email}</div>
+                  </div>
+                </div>
               </td>
               <td className="table-cell">
                 <span
                   className={cn(
-                    'rounded-sm px-2 py-1 text-[10px] font-mono uppercase tracking-wider',
+                    'rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.22em]',
                     customer.status === 'loyal'
                       ? 'bg-status-success/10 text-status-success'
                       : customer.status === 'at_risk'
@@ -62,7 +73,7 @@ export function CustomersTable({ customers, onSelect }: CustomersTableProps) {
               <td className="table-cell">
                 <div className="flex flex-wrap gap-1">
                   {customer.tags.length > 0 ? customer.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="rounded-sm bg-brand-acid/10 px-2 py-1 text-[10px] font-mono text-brand-acid">
+                    <span key={tag} className="rounded-full bg-brand-acid/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-brand-acid">
                       {tag}
                     </span>
                   )) : <span className="text-[11px] text-text-muted">Sem tags</span>}
@@ -72,7 +83,7 @@ export function CustomersTable({ customers, onSelect }: CustomersTableProps) {
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    className="rounded-sm p-2 text-text-muted transition-all hover:bg-bg-surface hover:text-brand-acid"
+                    className="rounded-full border border-transparent p-2 text-text-muted transition-all hover:border-brand-acid/15 hover:bg-brand-acid/8 hover:text-brand-acid"
                     onClick={(event) => {
                       event.stopPropagation()
                       onSelect(customer)

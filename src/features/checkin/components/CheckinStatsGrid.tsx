@@ -8,7 +8,7 @@ interface CheckinStatsGridProps {
 
 export function CheckinStatsGrid({ stats }: CheckinStatsGridProps) {
   return (
-    <div className="grid grid-cols-2 gap-3 reveal md:grid-cols-5">
+    <div className="grid grid-cols-1 gap-4 reveal sm:grid-cols-2 md:grid-cols-5">
       {[
         { label: 'Dentro agora', value: formatNumber(stats.currentOccupancy), icon: Users, color: 'text-brand-acid', big: true },
         { label: 'Total entradas', value: formatNumber(stats.totalIn), icon: DoorOpen, color: 'text-status-success' },
@@ -19,12 +19,15 @@ export function CheckinStatsGrid({ stats }: CheckinStatsGridProps) {
         const Icon = stat.icon
 
         return (
-          <div key={stat.label} className={cn('card p-4', stat.big && 'md:col-span-1 border-brand-acid/20')}>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted">{stat.label}</span>
-              <Icon className={cn('h-3.5 w-3.5', stat.color)} />
+          <div key={stat.label} className={cn('metric-card min-h-[150px]', stat.big && 'border-brand-acid/20')}>
+            <div className="flex items-start justify-between gap-3">
+              <span className="metric-label">{stat.label}</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-bg-border bg-bg-secondary">
+                <Icon className={cn('h-3.5 w-3.5', stat.color)} />
+              </div>
             </div>
-            <div className={cn(stat.big ? 'text-3xl' : 'text-xl', 'font-semibold', stat.color)}>{stat.value}</div>
+            <div className={cn(stat.big ? 'metric-value text-[2.2rem]' : 'metric-value text-[1.85rem]', stat.color)}>{stat.value}</div>
+            <div className="mt-3 text-[11px] text-text-muted">Leitura em tempo real da operacao de acesso.</div>
           </div>
         )
       })}

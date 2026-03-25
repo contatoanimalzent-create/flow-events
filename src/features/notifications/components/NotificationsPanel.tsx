@@ -14,18 +14,18 @@ interface NotificationsPanelProps {
 function priorityClasses(priority: NotificationItem['priority']) {
   switch (priority) {
     case 'high':
-      return 'border-status-error/20 bg-status-error/5'
+      return 'border-status-error/18 bg-status-error/6'
     case 'medium':
-      return 'border-status-warning/20 bg-status-warning/5'
+      return 'border-status-warning/18 bg-status-warning/6'
     case 'low':
     default:
-      return 'border-bg-border bg-bg-card'
+      return 'border-bg-border bg-white/80'
   }
 }
 
 export function NotificationsPanel({ notifications, onMarkAsRead, pagination, onPageChange }: NotificationsPanelProps) {
   if (notifications.length === 0) {
-    return <div className="rounded-sm border border-bg-border bg-bg-card p-4 text-center text-sm text-text-muted">Nenhuma notificacao no momento.</div>
+    return <div className="rounded-2xl border border-bg-border bg-white/80 p-5 text-center text-sm text-text-muted">Nenhuma notificacao no momento.</div>
   }
 
   return (
@@ -35,16 +35,16 @@ export function NotificationsPanel({ notifications, onMarkAsRead, pagination, on
           <button
             key={notification.id}
             onClick={() => onMarkAsRead(notification.id)}
-            className={`w-full rounded-sm border p-3 text-left transition-all ${priorityClasses(notification.priority)} ${notification.read ? 'opacity-70' : ''}`}
+            className={`w-full rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 ${priorityClasses(notification.priority)} ${notification.read ? 'opacity-70' : ''}`}
           >
             <div className="mb-1 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
                 <Bell className="h-3.5 w-3.5 text-brand-acid" />
                 {notification.title}
               </div>
-              <span className="text-[10px] font-mono text-text-muted">{formatDate(notification.created_at, 'dd/MM HH:mm')}</span>
+              <span className="text-[10px] uppercase tracking-[0.22em] text-text-muted">{formatDate(notification.created_at, 'dd/MM HH:mm')}</span>
             </div>
-            <div className="text-[11px] text-text-muted">{notification.description}</div>
+            <div className="text-[12px] leading-6 text-text-muted">{notification.description}</div>
           </button>
         ))}
       </div>

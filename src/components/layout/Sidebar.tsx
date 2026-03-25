@@ -101,28 +101,26 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
     .filter((group) => group.items.length > 0)
 
   return (
-    <aside className={cn('relative z-20 flex shrink-0 flex-col border-r border-bg-border bg-bg-secondary transition-all duration-300', isOpen ? 'w-60' : 'w-16')}>
-      <div className={cn('flex shrink-0 items-center border-b border-bg-border', isOpen ? 'gap-3 px-5 py-4' : 'justify-center px-4 py-4')}>
-        <div className="flex h-7 w-7 items-center justify-center rounded-sm bg-brand-acid shrink-0">
-          <span className="font-display leading-none text-bg-primary" style={{ fontSize: 13 }}>
-            A
-          </span>
+    <aside className={cn('relative z-20 flex shrink-0 flex-col border-r border-bg-border bg-[#fbf8f2]/92 backdrop-blur-xl transition-all duration-300', isOpen ? 'w-72' : 'w-20')}>
+      <div className={cn('flex shrink-0 items-center border-b border-bg-border/80', isOpen ? 'gap-4 px-6 py-5' : 'justify-center px-4 py-5')}>
+        <div className="flex h-11 w-11 items-center justify-center rounded-full border border-brand-acid/20 bg-white shadow-card shrink-0">
+          <span className="font-serif text-xl font-semibold leading-none text-brand-acid">A</span>
         </div>
         {isOpen ? (
           <div className="min-w-0 animate-fade-in">
-            <div className="font-display text-xl leading-none tracking-wide text-text-primary">
-              ANIMALZ<span className="text-brand-acid">.</span>EVENTS
+            <div className="font-serif text-2xl font-semibold leading-none text-text-primary">
+              Animalz Events
             </div>
-            <div className="mt-0.5 truncate text-[10px] font-mono uppercase tracking-widest text-text-muted">{organization?.name ?? 'Plataforma'}</div>
+            <div className="mt-1 truncate text-[11px] uppercase tracking-[0.26em] text-text-muted">{organization?.name ?? 'Plataforma'}</div>
           </div>
         ) : null}
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
+      <nav className="flex-1 overflow-y-auto px-3 py-5">
         {isOpen
           ? visibleGroups.map((group) => (
-              <div key={group.label} className="mb-3">
-                <div className="mb-1 px-3 text-[9px] font-mono uppercase tracking-[0.15em] text-text-muted/50">{group.label}</div>
+              <div key={group.label} className="mb-5">
+                <div className="mb-2 px-3 text-[10px] uppercase tracking-[0.24em] text-text-muted">{group.label}</div>
                 {group.items.map((item) => {
                   const Icon = item.icon
                   const isActive = activeSection === item.id
@@ -132,13 +130,15 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
                       key={item.id}
                       onClick={() => onNavigate(item.id)}
                       className={cn(
-                        'mb-0.5 flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left transition-all duration-150',
-                        isActive ? 'bg-brand-acid/10 text-brand-acid' : 'text-text-muted hover:bg-bg-surface hover:text-text-primary',
+                        'mb-1 flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left transition-all duration-200',
+                        isActive ? 'bg-white text-text-primary shadow-card' : 'text-text-muted hover:bg-white/85 hover:text-text-primary',
                       )}
                     >
-                      <Icon className="h-4 w-4 shrink-0" />
+                      <div className={cn('flex h-9 w-9 items-center justify-center rounded-full shrink-0', isActive ? 'bg-brand-acid/12 text-brand-acid' : 'bg-bg-surface text-text-muted')}>
+                        <Icon className="h-4 w-4 shrink-0" />
+                      </div>
                       <span className="flex-1 truncate text-sm font-medium">{item.label}</span>
-                      {isActive ? <span className="h-1 w-1 shrink-0 rounded-full bg-brand-acid" /> : null}
+                      {isActive ? <span className="h-2 w-2 shrink-0 rounded-full bg-brand-acid" /> : null}
                     </button>
                   )
                 })}
@@ -154,8 +154,8 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
                   onClick={() => onNavigate(item.id)}
                   title={item.label}
                   className={cn(
-                    'mb-0.5 flex w-full justify-center rounded-sm p-2.5 transition-all duration-150',
-                    isActive ? 'bg-brand-acid/10 text-brand-acid' : 'text-text-muted hover:bg-bg-surface hover:text-text-primary',
+                    'mb-1 flex w-full justify-center rounded-xl p-3 transition-all duration-200',
+                    isActive ? 'bg-white text-brand-acid shadow-card' : 'text-text-muted hover:bg-white hover:text-text-primary',
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -164,22 +164,22 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
             })}
       </nav>
 
-      <div className={cn('shrink-0 border-t border-bg-border', isOpen ? 'p-4' : 'p-2')}>
+      <div className={cn('shrink-0 border-t border-bg-border/80', isOpen ? 'p-5' : 'p-3')}>
         {isOpen ? (
-          <div className="flex items-center gap-3 animate-fade-in">
-            <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-brand-purple/20 shrink-0">
+          <div className="surface-panel flex items-center gap-3 p-3 animate-fade-in">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-purple/14 shrink-0">
               <span className="text-xs font-semibold text-brand-purple">{getInitials(`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`)}</span>
             </div>
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-medium text-text-primary">
                 {profile?.first_name} {profile?.last_name}
               </div>
-              <div className="truncate text-xs capitalize text-text-muted">{access.role}</div>
+              <div className="truncate text-[11px] capitalize text-text-muted">{access.role}</div>
             </div>
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-brand-purple/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-purple/14">
               <span className="text-xs font-semibold text-brand-purple">{getInitials(`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`)}</span>
             </div>
           </div>
@@ -188,7 +188,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
 
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-6 flex h-6 w-6 items-center justify-center rounded-full border border-bg-border bg-bg-card text-text-muted transition-all hover:border-brand-acid/40 hover:text-brand-acid"
+        className="absolute -right-3 top-8 flex h-7 w-7 items-center justify-center rounded-full border border-bg-border bg-white text-text-muted shadow-card transition-all hover:border-brand-acid/40 hover:text-brand-acid"
       >
         {isOpen ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
       </button>

@@ -1,7 +1,6 @@
 import { Suspense, lazy, useState } from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
-import { CustomCursor } from '@/components/ui/CustomCursor'
 import { useUIStore } from '@/shared/store'
 import { defaultNavSection, type NavSection } from './navigation'
 
@@ -24,11 +23,11 @@ const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((module) => 
 function PageFallback() {
   return (
     <div className="flex h-64 items-center justify-center">
-      <div className="flex gap-1.5">
+      <div className="surface-panel flex items-center gap-2 px-5 py-4">
         {[0, 1, 2].map((index) => (
           <div
             key={index}
-            className="h-2 w-2 animate-bounce rounded-full bg-brand-acid"
+            className="h-2.5 w-2.5 animate-bounce rounded-full bg-brand-acid"
             style={{ animationDelay: `${index * 100}ms` }}
           />
         ))}
@@ -81,8 +80,7 @@ export function AppShellV2() {
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-bg-primary" style={{ cursor: 'none' }}>
-      <CustomCursor />
+    <div className="flex h-screen overflow-hidden bg-bg-primary">
       <Sidebar
         activeSection={activeSection}
         onNavigate={setActiveSection}

@@ -8,7 +8,7 @@ interface DashboardExecutiveCardsProps {
 
 export function DashboardExecutiveCards({ summary }: DashboardExecutiveCardsProps) {
   return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {[
         { label: 'Receita bruta', value: formatCurrency(summary.grossRevenue), icon: DollarSign, color: 'text-brand-acid' },
         { label: 'Receita liquida', value: formatCurrency(summary.netRevenue), icon: Activity, color: 'text-status-success' },
@@ -21,12 +21,18 @@ export function DashboardExecutiveCards({ summary }: DashboardExecutiveCardsProp
       ].map((card) => {
         const Icon = card.icon
         return (
-          <div key={card.label} className="card p-4">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted">{card.label}</span>
-              <Icon className={cn('h-4 w-4', card.color)} />
+          <div key={card.label} className="metric-card reveal min-h-[156px] transition-all duration-300 hover:-translate-y-1 hover:border-brand-acid/20">
+            <div className="flex items-start justify-between gap-4">
+              <div className="metric-label">{card.label}</div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-bg-border bg-bg-secondary">
+                <Icon className={cn('h-4 w-4', card.color)} />
+              </div>
             </div>
-            <div className={cn('text-xl font-semibold', card.color)}>{card.value}</div>
+            <div className={cn('metric-value text-[2rem]', card.color)}>{card.value}</div>
+            <div className="mt-4 flex items-center justify-between text-[11px] text-text-muted">
+              <span>Visao consolidada</span>
+              <span className="font-mono uppercase tracking-[0.24em]">Live</span>
+            </div>
           </div>
         )
       })}

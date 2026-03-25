@@ -42,13 +42,14 @@ export function TicketsPageContent() {
   })
 
   return (
-    <div className="mx-auto max-w-[1200px] space-y-5 p-6">
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            INGRESSOS<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Inventory architecture</div>
+          <h1 className="admin-title">
+            Ingressos<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">Tipos de ingresso e lotes de venda</p>
+          <p className="admin-subtitle">Tipos de ingresso e lotes de venda.</p>
         </div>
         {canManageTickets ? (
           <button onClick={openCreateTypeModal} disabled={!selectedEventId} className="btn-primary flex items-center gap-2">
@@ -58,7 +59,7 @@ export function TicketsPageContent() {
       </div>
 
       {events.length > 1 && (
-        <div className="reveal flex items-center gap-3">
+        <div className="admin-filterbar">
           <span className="text-xs font-mono text-text-muted">EVENTO:</span>
           <div className="flex flex-wrap items-center gap-2">
             {events.map((event) => (
@@ -80,7 +81,7 @@ export function TicketsPageContent() {
       )}
 
       {selectedEventId && (
-        <div className="reveal grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="reveal grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[
             { ...stats[0], icon: Package },
             { ...stats[1], icon: Ticket },

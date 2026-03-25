@@ -39,18 +39,20 @@ export function FinancialExecutiveCards({ overview }: FinancialExecutiveCardsPro
   ] as const
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon
 
         return (
-          <div key={card.label} className="card p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted">{card.label}</span>
-              <Icon className={`h-4 w-4 ${card.color}`} />
+          <div key={card.label} className="metric-card min-h-[164px]">
+            <div className="flex items-start justify-between gap-3">
+              <span className="metric-label">{card.label}</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-bg-border bg-bg-secondary">
+                <Icon className={`h-4 w-4 ${card.color}`} />
+              </div>
             </div>
-            <div className={`text-2xl font-bold font-mono ${card.color}`}>{card.value}</div>
-            <div className="mt-1 text-[11px] text-text-muted">{card.sublabel}</div>
+            <div className={`metric-value font-mono text-[2rem] ${card.color}`}>{card.value}</div>
+            <div className="mt-3 text-[11px] leading-5 text-text-muted">{card.sublabel}</div>
           </div>
         )
       })}

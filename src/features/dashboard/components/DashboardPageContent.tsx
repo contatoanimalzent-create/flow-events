@@ -19,20 +19,21 @@ export function DashboardPageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-[1440px] space-y-5 p-6">
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            DASHBOARD<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Executive overview</div>
+          <h1 className="admin-title">
+            Dashboard<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">Visao executiva de receita, operacao, clientes e campanhas</p>
+          <p className="admin-subtitle">Visao executiva de receita, operacao, clientes e campanhas.</p>
         </div>
         <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
           <RefreshCw className="h-3.5 w-3.5" /> Atualizar
         </button>
       </div>
 
-      <div className="reveal flex flex-wrap items-center gap-3">
+      <div className="admin-filterbar">
         <span className="text-xs font-mono text-text-muted">PERIODO:</span>
         <div className="flex flex-wrap gap-2">
           {([

@@ -24,13 +24,14 @@ export function IntelligencePageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-5 p-6">
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            INTELLIGENCE<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Operational insights</div>
+          <h1 className="admin-title">
+            Intelligence<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">Health score, alertas e recomendacoes acionaveis por evento</p>
+          <p className="admin-subtitle">Health score, alertas e recomendacoes acionaveis por evento.</p>
         </div>
         <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
           <RefreshCw className="h-3.5 w-3.5" /> Atualizar
@@ -57,7 +58,7 @@ export function IntelligencePageContent() {
         ))}
       </div>
 
-      <div className="reveal flex items-center gap-1 border-b border-bg-border">
+      <div className="surface-panel reveal flex items-center gap-1 p-2">
         {([
           { key: 'overview', label: 'Health score' },
           { key: 'alerts', label: 'Alertas' },
@@ -77,7 +78,7 @@ export function IntelligencePageContent() {
         ))}
       </div>
 
-      <div className="reveal flex flex-wrap items-center gap-3">
+      <div className="admin-filterbar">
         <span className="text-xs font-mono text-text-muted">EVENTO:</span>
         <div className="flex flex-wrap gap-2">
           <button
@@ -105,7 +106,7 @@ export function IntelligencePageContent() {
       </div>
 
       {dashboard.tab === 'alerts' ? (
-        <div className="reveal flex flex-wrap items-center gap-3">
+        <div className="admin-filterbar">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => dashboard.setStatusFilter('all')}

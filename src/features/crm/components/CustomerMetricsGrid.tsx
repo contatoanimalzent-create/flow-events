@@ -23,16 +23,19 @@ export function CustomerMetricsGrid({ summary }: CustomerMetricsGridProps) {
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-6">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
       {cards.map((card) => {
         const Icon = card.icon
         return (
-          <div key={card.label} className="card p-4">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted">{card.label}</span>
-              <Icon className={`h-4 w-4 ${card.color}`} />
+          <div key={card.label} className="metric-card reveal min-h-[148px]">
+            <div className="flex items-start justify-between gap-3">
+              <span className="metric-label">{card.label}</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-bg-border bg-bg-secondary">
+                <Icon className={`h-4 w-4 ${card.color}`} />
+              </div>
             </div>
-            <div className={`text-xl font-bold ${card.color}`}>{card.value}</div>
+            <div className={`metric-value text-[1.85rem] ${card.color}`}>{card.value}</div>
+            <div className="mt-3 text-[11px] text-text-muted">Base viva de relacionamento e recorrencia.</div>
           </div>
         )
       })}

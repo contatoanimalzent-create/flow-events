@@ -20,16 +20,19 @@ export function CampaignsSummaryGrid({ summary }: CampaignsSummaryGridProps) {
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
       {cards.map((card) => {
         const Icon = card.icon
         return (
-          <div key={card.label} className="card p-4">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-text-muted">{card.label}</span>
-              <Icon className={`h-4 w-4 ${card.color}`} />
+          <div key={card.label} className="metric-card min-h-[148px]">
+            <div className="flex items-start justify-between gap-3">
+              <span className="metric-label">{card.label}</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-bg-border bg-bg-secondary">
+                <Icon className={`h-4 w-4 ${card.color}`} />
+              </div>
             </div>
-            <div className={`text-2xl font-bold ${card.color}`}>{card.value.toLocaleString('pt-BR')}</div>
+            <div className={`metric-value text-[1.95rem] ${card.color}`}>{card.value.toLocaleString('pt-BR')}</div>
+            <div className="mt-3 text-[11px] text-text-muted">Leitura comercial, segmentacao e execucao.</div>
           </div>
         )
       })}

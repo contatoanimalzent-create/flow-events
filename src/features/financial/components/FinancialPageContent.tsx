@@ -83,13 +83,14 @@ export function FinancialPageContent() {
   const paginatedReports = dashboard.paginatedReports
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-5 p-6">
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            FINANCEIRO<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Finance governance</div>
+          <h1 className="admin-title">
+            Financeiro<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">Receita, repasse, forecast e fechamento por evento</p>
+          <p className="admin-subtitle">Receita, repasse, forecast e fechamento por evento.</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
@@ -127,7 +128,7 @@ export function FinancialPageContent() {
         </div>
       </div>
 
-      <div className="reveal flex items-center gap-1 border-b border-bg-border">
+      <div className="surface-panel reveal flex items-center gap-1 p-2">
         {([
           { key: 'overview', label: 'Visao geral' },
           { key: 'forecast', label: 'Forecast' },
@@ -161,7 +162,7 @@ export function FinancialPageContent() {
           {(dashboard.tab === 'overview' || dashboard.tab === 'dre') && <FinancialExecutiveCards overview={dashboard.overview} />}
           {(dashboard.tab === 'overview' || dashboard.tab === 'forecast') && <FinancialForecastCards overview={dashboard.overview} />}
 
-          <div className="reveal flex flex-wrap items-center gap-3">
+          <div className="admin-filterbar">
             <span className="text-xs font-mono text-text-muted">EVENTO:</span>
             <div className="flex flex-wrap gap-2">
               <button
@@ -325,7 +326,7 @@ export function FinancialPageContent() {
 
           {dashboard.tab === 'costs' ? (
             <div className="space-y-4">
-              <div className="reveal flex flex-wrap items-center gap-3">
+              <div className="admin-filterbar">
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => dashboard.setCategoryFilter('all')}

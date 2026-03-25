@@ -13,8 +13,8 @@ export function PaginationControls({ pagination, onPageChange, compact = false }
   }
 
   return (
-    <div className={`flex items-center justify-between gap-3 ${compact ? 'pt-2' : 'border-t border-bg-border px-4 py-3'}`}>
-      <div className="text-[11px] font-mono text-text-muted">
+    <div className={`flex items-center justify-between gap-3 ${compact ? 'pt-3' : 'border-t border-bg-border px-5 py-4'}`}>
+      <div className="text-[11px] uppercase tracking-[0.24em] text-text-muted">
         Pagina {pagination.page} de {pagination.totalPages} · {pagination.total} registro{pagination.total !== 1 ? 's' : ''}
       </div>
       <div className="flex items-center gap-2">

@@ -50,13 +50,14 @@ export function OrdersPageContent() {
   const { confirmOrder, cancelOrder, issueDigitalTickets, resendTickets } = useOrderActions({ eventId: selectedEventId })
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-5 p-6">
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            VENDAS<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Orders & payments</div>
+          <h1 className="admin-title">
+            Vendas<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">Pedidos, pagamentos e emiss\u00e3o digital</p>
+          <p className="admin-subtitle">Pedidos, pagamentos e emissao digital.</p>
         </div>
         <button onClick={() => void refreshOrders()} className="btn-secondary flex items-center gap-2">
           <RefreshCw className="h-3.5 w-3.5" /> Atualizar
@@ -64,7 +65,7 @@ export function OrdersPageContent() {
       </div>
 
       {events.length > 1 && (
-        <div className="reveal flex items-center gap-3">
+        <div className="admin-filterbar">
           <span className="text-xs font-mono text-text-muted">EVENTO:</span>
           <div className="flex flex-wrap gap-2">
             {events.map((event) => (
@@ -85,7 +86,7 @@ export function OrdersPageContent() {
         </div>
       )}
 
-      <div className="reveal grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="reveal grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
           { label: 'Receita confirmada', value: formatCurrency(stats.confirmedRevenue), icon: DollarSign, color: 'text-status-success' },
           { label: 'Pedidos pagos', value: stats.paidOrders, icon: Ticket, color: 'text-brand-acid' },
@@ -105,7 +106,7 @@ export function OrdersPageContent() {
         })}
       </div>
 
-      <div className="reveal flex flex-wrap items-center gap-3">
+      <div className="admin-filterbar">
         <div className="relative min-w-[220px] max-w-sm flex-1">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
           <input

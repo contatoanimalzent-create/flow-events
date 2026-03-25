@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { cn, formatCurrency, formatDate } from '@/shared/lib'
 import type { FinancialEventReport } from '@/features/financial/types'
+import { cn, formatCurrency, formatDate } from '@/shared/lib'
 
 interface FinancialEventsTableProps {
   reports: FinancialEventReport[]
@@ -11,9 +11,9 @@ interface FinancialEventsTableProps {
 export function FinancialEventsTable({ reports, expandedEventId, onToggleEvent }: FinancialEventsTableProps) {
   if (reports.length === 0) {
     return (
-      <div className="card p-16 text-center">
-        <div className="font-display text-2xl text-text-primary">NENHUM EVENTO</div>
-        <p className="mt-2 text-sm text-text-muted">Crie eventos e movimente vendas para gerar o DRE.</p>
+      <div className="surface-panel p-16 text-center">
+        <div className="font-display text-2xl text-text-primary">Nenhum evento com DRE</div>
+        <p className="mt-2 text-sm text-text-muted">Crie eventos e movimente vendas para gerar a visao financeira.</p>
       </div>
     )
   }
@@ -25,15 +25,19 @@ export function FinancialEventsTable({ reports, expandedEventId, onToggleEvent }
         const profitable = report.result >= 0
 
         return (
-          <div key={report.event_id} className="card overflow-hidden">
+          <div key={report.event_id} className="surface-panel overflow-hidden">
             <button
               type="button"
               onClick={() => onToggleEvent(report.event_id)}
-              className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-bg-surface/50"
+              className="flex w-full items-center justify-between gap-6 p-5 text-left transition-colors hover:bg-bg-secondary/70"
             >
               <div>
-                <div className="font-display text-lg leading-none tracking-wide text-text-primary">{report.event_name}</div>
-                <div className="mt-1 text-[11px] font-mono text-text-muted">{formatDate(report.starts_at, 'dd/MM/yyyy')}</div>
+                <div className="font-display text-[1.65rem] leading-none tracking-[-0.03em] text-text-primary">
+                  {report.event_name}
+                </div>
+                <div className="mt-2 text-[11px] font-mono uppercase tracking-[0.22em] text-text-muted">
+                  {formatDate(report.starts_at, 'dd/MM/yyyy')}
+                </div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="hidden text-right md:block">
@@ -42,7 +46,9 @@ export function FinancialEventsTable({ reports, expandedEventId, onToggleEvent }
                 </div>
                 <div className="hidden text-right md:block">
                   <div className="text-[10px] font-mono uppercase text-text-muted">Custos</div>
-                  <div className="font-mono text-sm font-bold text-status-error">{formatCurrency(report.operational_costs)}</div>
+                  <div className="font-mono text-sm font-bold text-status-error">
+                    {formatCurrency(report.operational_costs)}
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] font-mono uppercase text-text-muted">Resultado</div>
@@ -50,7 +56,11 @@ export function FinancialEventsTable({ reports, expandedEventId, onToggleEvent }
                     {formatCurrency(report.result)}
                   </div>
                 </div>
-                {expanded ? <ChevronUp className="h-4 w-4 text-text-muted" /> : <ChevronDown className="h-4 w-4 text-text-muted" />}
+                {expanded ? (
+                  <ChevronUp className="h-4 w-4 text-text-muted" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-text-muted" />
+                )}
               </div>
             </button>
 
@@ -58,7 +68,7 @@ export function FinancialEventsTable({ reports, expandedEventId, onToggleEvent }
               <div className="border-t border-bg-border p-5">
                 <div className="mb-4 text-[10px] font-mono uppercase tracking-widest text-text-muted">DRE simplificado</div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="space-y-1 rounded-sm border border-bg-border bg-bg-surface p-4 text-sm">
+                  <div className="space-y-1 rounded-2xl border border-bg-border bg-bg-secondary/75 p-4 text-sm">
                     <div className="flex justify-between border-b border-bg-border py-1">
                       <span className="font-mono text-[11px] uppercase text-text-muted">Receita bruta</span>
                       <span className="font-mono font-bold text-status-success">{formatCurrency(report.gross_sales)}</span>
@@ -89,10 +99,12 @@ export function FinancialEventsTable({ reports, expandedEventId, onToggleEvent }
                     </div>
                   </div>
 
-                  <div className="space-y-1 rounded-sm border border-bg-border bg-bg-surface p-4 text-sm">
+                  <div className="space-y-1 rounded-2xl border border-bg-border bg-bg-secondary/75 p-4 text-sm">
                     <div className="flex justify-between border-b border-bg-border py-1">
                       <span className="font-mono text-[11px] uppercase text-text-muted">Custos operacionais</span>
-                      <span className="font-mono font-bold text-status-error">{formatCurrency(report.operational_costs)}</span>
+                      <span className="font-mono font-bold text-status-error">
+                        {formatCurrency(report.operational_costs)}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1 text-[12px]">
                       <span className="text-text-secondary">Custos de equipe</span>

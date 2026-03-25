@@ -24,13 +24,14 @@ export function CrmPageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-5 p-6">
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            CRM<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Customer intelligence</div>
+          <h1 className="admin-title">
+            CRM<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">
+          <p className="admin-subtitle">
             Customers, relacionamento, historico de compras e presenca por evento
           </p>
         </div>
@@ -41,7 +42,7 @@ export function CrmPageContent() {
 
       <CustomerMetricsGrid summary={dashboard.summary} />
 
-      <div className="reveal flex flex-wrap items-center gap-3">
+      <div className="admin-filterbar">
         <div className="relative min-w-[260px] max-w-md flex-1">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
           <input
@@ -77,7 +78,7 @@ export function CrmPageContent() {
         </div>
       </div>
 
-      <div className="reveal flex flex-wrap items-center gap-3">
+      <div className="admin-filterbar">
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => dashboard.setStatusFilter('all')}

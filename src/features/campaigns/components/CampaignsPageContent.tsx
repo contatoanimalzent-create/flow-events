@@ -109,13 +109,14 @@ export function CampaignsPageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-5 p-6">
-      <div className="reveal flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            CAMPAIGNS<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Audience operations</div>
+          <h1 className="admin-title">
+            Campaigns<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">
+          <p className="admin-subtitle">
             Segmentos, audiencia acionavel e campanhas draft conectadas ao CRM
           </p>
         </div>
@@ -153,7 +154,7 @@ export function CampaignsPageContent() {
         summary={dashboard.overview?.summary ?? { saved_segments: 0, draft_campaigns: 0, active_runs: 0, addressable_customers: 0, high_value_customers: 0 }}
       />
 
-      <div className="reveal flex items-center gap-1 border-b border-bg-border">
+      <div className="surface-panel reveal flex items-center gap-1 p-2">
         {([
           { key: 'segments', label: 'Segmentos' },
           { key: 'drafts', label: 'Campaign drafts' },

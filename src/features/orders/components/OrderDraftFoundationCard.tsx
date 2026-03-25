@@ -20,23 +20,25 @@ export function OrderDraftFoundationCard({ eventId, draft, onCreated }: OrderDra
   }
 
   return (
-    <div className="card space-y-4 p-4">
+    <div className="surface-panel space-y-5 p-5">
       <div className="flex items-start justify-between">
         <div>
-          <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted">Checkout Foundation</div>
-          <div className="mt-1 font-display text-2xl text-text-primary">RASCUNHO DE PEDIDO</div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-text-muted">Checkout foundation</div>
+          <div className="mt-2 font-display text-2xl text-text-primary">Rascunho de pedido</div>
         </div>
-        <ShoppingCart className="h-5 w-5 text-brand-acid" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-full border border-bg-border bg-bg-secondary">
+          <ShoppingCart className="h-5 w-5 text-brand-acid" />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <div className="rounded-sm border border-bg-border bg-bg-surface p-3">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted">Itens</div>
-          <div className="mt-1 text-xl font-semibold text-text-primary">{formatNumber(totalItems)}</div>
+        <div className="rounded-2xl border border-bg-border bg-bg-secondary p-4">
+          <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-text-muted">Itens</div>
+          <div className="mt-2 text-xl font-semibold text-text-primary">{formatNumber(totalItems)}</div>
         </div>
-        <div className="rounded-sm border border-bg-border bg-bg-surface p-3">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted">Subtotal</div>
-          <div className="mt-1 text-xl font-semibold text-text-primary">{formatCurrency(subtotal)}</div>
+        <div className="rounded-2xl border border-bg-border bg-bg-secondary p-4">
+          <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-text-muted">Subtotal</div>
+          <div className="mt-2 text-xl font-semibold text-text-primary">{formatCurrency(subtotal)}</div>
         </div>
       </div>
 
@@ -45,7 +47,7 @@ export function OrderDraftFoundationCard({ eventId, draft, onCreated }: OrderDra
       </button>
 
       {createOrderDraft.error instanceof Error && (
-        <div className="rounded-sm border border-status-error/20 bg-status-error/8 px-3 py-2 text-xs text-status-error">
+        <div className="rounded-2xl border border-status-error/20 bg-status-error/8 px-3 py-2 text-xs text-status-error">
           {createOrderDraft.error.message}
         </div>
       )}

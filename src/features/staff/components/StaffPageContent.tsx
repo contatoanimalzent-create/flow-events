@@ -54,13 +54,14 @@ export function StaffPageContent() {
   }, {})
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-5 p-6">
-      <div className="flex items-start justify-between">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-wide text-text-primary">
-            STAFF<span className="text-brand-acid">.</span>
+          <div className="admin-eyebrow">Operations workforce</div>
+          <h1 className="admin-title">
+            Staff<span className="admin-title-accent">.</span>
           </h1>
-          <p className="mt-1 text-xs font-mono tracking-wider text-text-muted">
+          <p className="admin-subtitle">
             {stats.total} membro{stats.total !== 1 ? 's' : ''}
           </p>
         </div>
@@ -86,7 +87,7 @@ export function StaffPageContent() {
       </div>
 
       {events.length > 1 && (
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="admin-filterbar">
           <span className="text-xs font-mono text-text-muted">EVENTO:</span>
           {events.map((event) => (
             <button
@@ -105,7 +106,7 @@ export function StaffPageContent() {
 
       <StaffStatsGrid stats={stats} />
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="admin-filterbar">
         <div className="relative min-w-[200px] max-w-sm flex-1">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
           <input

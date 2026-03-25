@@ -1,6 +1,15 @@
-import { Loader2, X } from 'lucide-react'
-import { STAFF_PERMISSION_OPTIONS } from '@/features/staff/types'
+import { Loader2 } from 'lucide-react'
 import { useStaffForm } from '@/features/staff/hooks'
+import { STAFF_PERMISSION_OPTIONS } from '@/features/staff/types'
+import {
+  FormField,
+  FormGrid,
+  FormSection,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalShell,
+} from '@/shared/components'
 
 interface StaffFormModalProps {
   eventId: string
@@ -20,7 +29,7 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
 
   const rows = [
     [
-      { label: 'Nome *', key: 'first_name', placeholder: 'Nome' },
+      { label: 'Nome', key: 'first_name', placeholder: 'Nome', required: true },
       { label: 'Sobrenome', key: 'last_name', placeholder: 'Sobrenome' },
     ],
     [
@@ -46,81 +55,102 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
   ] as const
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-bg-primary/80 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl overflow-hidden rounded-sm border border-bg-border bg-bg-card animate-slide-up">
-        <div className="flex items-center justify-between border-b border-bg-border px-6 py-4">
-          <h2 className="font-display text-xl leading-none">
-            {staffId ? 'EDITAR MEMBRO' : 'NOVO MEMBRO'}
-            <span className="text-brand-acid">.</span>
-          </h2>
-          <button onClick={onClose} className="rounded-sm p-1.5 text-text-muted transition-all hover:text-text-primary">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+    <ModalShell size="2xl">
+      <ModalHeader
+        eyebrow="Staff"
+        title={
+          <>
+            {staffId ? 'Editar membro' : 'Novo membro'}
+            <span className="admin-title-accent">.</span>
+          </>
+        }
+        subtitle="Cadastro operacional de equipe com alocacao, turno e permissoes."
+        onClose={onClose}
+      />
 
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
-          </div>
-        ) : (
-          <div className="max-h-[70vh] space-y-4 overflow-y-auto p-6">
-            {rows.map((row, rowIndex) => (
-              <div key={rowIndex} className="grid grid-cols-2 gap-3">
-                {row.map((field) => (
-                  <div key={field.key}>
-                    <label className="input-label">{field.label}</label>
-                    <input
-                      className="input"
-                      placeholder={field.placeholder}
-                      value={form[field.key]}
-                      onChange={(event) => updateField(field.key, event.target.value)}
-                    />
-                  </div>
+      {loading ? (
+        <div className="flex justify-center py-16">
+          <Loader2 className="h-6 w-6 animate-spin text-brand-acid" />
+        </div>
+      ) : (
+        <>
+          <ModalBody>
+            <FormSection title="Dados pessoais">
+              <div className="space-y-4">
+                {rows.slice(0, 3).map((row, rowIndex) => (
+                  <FormGrid key={rowIndex}>
+                    {row.map((field) => (
+                      <FormField key={field.key} label={field.label} required={field.key === 'first_name'}>
+                        <input
+                          className="input"
+                          placeholder={field.placeholder}
+                          value={form[field.key]}
+                          onChange={(event) => updateField(field.key, event.target.value)}
+                        />
+                      </FormField>
+                    ))}
+                  </FormGrid>
                 ))}
               </div>
-            ))}
+            </FormSection>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="input-label">Inicio do turno</label>
-                <input
-                  type="datetime-local"
-                  className="input"
-                  value={form.shift_starts_at}
-                  onChange={(event) => updateField('shift_starts_at', event.target.value)}
-                />
-              </div>
-              <div>
-                <label className="input-label">Fim do turno</label>
-                <input
-                  type="datetime-local"
-                  className="input"
-                  value={form.shift_ends_at}
-                  onChange={(event) => updateField('shift_ends_at', event.target.value)}
-                />
-              </div>
-            </div>
+            <FormSection title="Operacao e alocacao">
+              <div className="space-y-4">
+                {rows.slice(3).map((row, rowIndex) => (
+                  <FormGrid key={rowIndex}>
+                    {row.map((field) => (
+                      <FormField key={field.key} label={field.label}>
+                        <input
+                          className="input"
+                          placeholder={field.placeholder}
+                          value={form[field.key]}
+                          onChange={(event) => updateField(field.key, event.target.value)}
+                        />
+                      </FormField>
+                    ))}
+                  </FormGrid>
+                ))}
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="input-label">Portaria vinculada</label>
-                <select className="input" value={form.gate_id} onChange={(event) => updateField('gate_id', event.target.value)}>
-                  <option value="">Sem alocacao fixa</option>
-                  {gateOptions.map((gate) => (
-                    <option key={gate.id} value={gate.id}>
-                      {gate.name}
-                    </option>
-                  ))}
-                </select>
+                <FormGrid>
+                  <FormField label="Inicio do turno">
+                    <input
+                      type="datetime-local"
+                      className="input"
+                      value={form.shift_starts_at}
+                      onChange={(event) => updateField('shift_starts_at', event.target.value)}
+                    />
+                  </FormField>
+                  <FormField label="Fim do turno">
+                    <input
+                      type="datetime-local"
+                      className="input"
+                      value={form.shift_ends_at}
+                      onChange={(event) => updateField('shift_ends_at', event.target.value)}
+                    />
+                  </FormField>
+                </FormGrid>
+
+                <FormField label="Portaria vinculada">
+                  <select className="input" value={form.gate_id} onChange={(event) => updateField('gate_id', event.target.value)}>
+                    <option value="">Sem alocacao fixa</option>
+                    {gateOptions.map((gate) => (
+                      <option key={gate.id} value={gate.id}>
+                        {gate.name}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
               </div>
-              <div>
-                <label className="input-label">Permissoes operacionais</label>
-                <div className="grid grid-cols-1 gap-2 rounded-sm border border-bg-border bg-bg-surface/50 p-3">
+            </FormSection>
+
+            <FormSection title="Permissoes e notas">
+              <FormField label="Permissoes operacionais">
+                <div className="grid grid-cols-1 gap-2 rounded-[22px] border border-bg-border bg-bg-secondary/55 p-4">
                   {STAFF_PERMISSION_OPTIONS.map((permission) => {
                     const checked = form.permissions.includes(permission.value)
 
                     return (
-                      <label key={permission.value} className="flex items-center gap-2 text-xs text-text-secondary">
+                      <label key={permission.value} className="flex items-center gap-3 rounded-[18px] px-2 py-1.5 text-sm text-text-secondary">
                         <input
                           type="checkbox"
                           checked={checked}
@@ -138,27 +168,27 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
                     )
                   })}
                 </div>
-              </div>
-            </div>
+              </FormField>
 
-            <div>
-              <label className="input-label">Observacoes</label>
-              <textarea className="input resize-none" rows={3} value={form.notes} onChange={(event) => updateField('notes', event.target.value)} />
-            </div>
+              <FormField label="Observacoes">
+                <textarea className="input resize-none" rows={4} value={form.notes} onChange={(event) => updateField('notes', event.target.value)} />
+              </FormField>
+            </FormSection>
 
-            {error && <div className="rounded-sm border border-status-error/20 bg-status-error/8 px-3 py-2.5 text-xs text-status-error">{error}</div>}
-          </div>
-        )}
+            {error ? <div className="rounded-2xl border border-status-error/20 bg-status-error/8 px-3 py-2.5 text-xs text-status-error">{error}</div> : null}
+          </ModalBody>
 
-        <div className="flex items-center justify-between border-t border-bg-border px-6 py-4">
-          <button onClick={onClose} className="btn-secondary text-sm">
-            Cancelar
-          </button>
-          <button onClick={() => void save()} disabled={saving} className="btn-primary min-w-[140px] justify-center text-sm">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : staffId ? 'Salvar' : 'Adicionar'}
-          </button>
-        </div>
-      </div>
-    </div>
+          <ModalFooter>
+            <button onClick={onClose} className="btn-secondary text-sm">
+              Cancelar
+            </button>
+            <button onClick={() => void save()} disabled={saving} className="btn-primary flex min-w-[150px] items-center justify-center gap-2 text-sm">
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {saving ? 'Salvando...' : staffId ? 'Salvar membro' : 'Adicionar membro'}
+            </button>
+          </ModalFooter>
+        </>
+      )}
+    </ModalShell>
   )
 }

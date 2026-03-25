@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { AlertCircle, Loader2, X } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import {
   EMPTY_FINANCIAL_COST_ENTRY_FORM,
   FINANCIAL_COST_CATEGORY_LABELS,
   FINANCIAL_COST_STATUS_LABELS,
 } from '@/features/financial/types'
 import type { FinancialCostEntryRow, FinancialEventOption, UpsertFinancialCostEntryInput } from '@/features/financial/types'
+import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell } from '@/shared/components'
 
 interface CostEntryModalProps {
   organizationId: string
@@ -68,27 +69,27 @@ export function CostEntryModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-bg-primary/80 p-4 backdrop-blur-sm">
-      <div className="animate-slide-up w-full max-w-lg overflow-hidden rounded-sm border border-bg-border bg-bg-card shadow-card">
-        <div className="flex items-center justify-between border-b border-bg-border px-6 py-4">
-          <h2 className="font-display text-xl leading-none">
-            {initialCostEntry ? 'EDITAR LANCAMENTO' : 'NOVO LANCAMENTO'}
-            <span className="text-brand-acid">.</span>
-          </h2>
-          <button onClick={onClose} className="rounded-sm p-1.5 text-text-muted transition-all hover:bg-bg-surface hover:text-text-primary">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+    <ModalShell size="lg">
+      <ModalHeader
+        eyebrow="Financeiro"
+        title={
+          <>
+            {initialCostEntry ? 'Editar lancamento' : 'Novo lancamento'}
+            <span className="admin-title-accent">.</span>
+          </>
+        }
+        subtitle="Registre custos operacionais com melhor leitura, contexto e vinculacao por evento."
+        onClose={onClose}
+      />
 
-        <div className="max-h-[65vh] space-y-4 overflow-y-auto p-6">
-          <div>
-            <label className="input-label">Descricao *</label>
+      <ModalBody>
+        <FormSection title="Lancamento financeiro">
+          <FormField label="Descricao" required>
             <input className="input" value={values.description} onChange={(event) => setField('description', event.target.value)} autoFocus />
-          </div>
+          </FormField>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="input-label">Categoria</label>
+          <FormGrid>
+            <FormField label="Categoria">
               <select className="input" value={values.category} onChange={(event) => setField('category', event.target.value)}>
                 {Object.entries(FINANCIAL_COST_CATEGORY_LABELS).map(([key, label]) => (
                   <option key={key} value={key}>
@@ -96,9 +97,8 @@ export function CostEntryModal({
                   </option>
                 ))}
               </select>
-            </div>
-            <div>
-              <label className="input-label">Status</label>
+            </FormField>
+            <FormField label="Status">
               <select className="input" value={values.status} onChange={(event) => setField('status', event.target.value)}>
                 {Object.entries(FINANCIAL_COST_STATUS_LABELS).map(([key, label]) => (
                   <option key={key} value={key}>
@@ -106,23 +106,20 @@ export function CostEntryModal({
                   </option>
                 ))}
               </select>
-            </div>
-          </div>
+            </FormField>
+          </FormGrid>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="input-label">Valor (R$)</label>
+          <FormGrid>
+            <FormField label="Valor (R$)">
               <input type="number" min={0} step={0.01} className="input" value={values.amount} onChange={(event) => setField('amount', event.target.value)} />
-            </div>
-            <div>
-              <label className="input-label">Vencimento</label>
+            </FormField>
+            <FormField label="Vencimento">
               <input type="date" className="input" value={values.due_date} onChange={(event) => setField('due_date', event.target.value)} />
-            </div>
-          </div>
+            </FormField>
+          </FormGrid>
 
-          {events.length > 0 && (
-            <div>
-              <label className="input-label">Evento vinculado</label>
+          {events.length > 0 ? (
+            <FormField label="Evento vinculado">
               <select className="input" value={eventId} onChange={(event) => setEventId(event.target.value)}>
                 <option value="">Custo corporativo nao alocado</option>
                 {events.map((eventOption) => (
@@ -131,31 +128,31 @@ export function CostEntryModal({
                   </option>
                 ))}
               </select>
-            </div>
-          )}
+            </FormField>
+          ) : null}
 
-          <div>
-            <label className="input-label">Observacoes</label>
-            <textarea className="input resize-none" rows={3} value={values.notes} onChange={(event) => setField('notes', event.target.value)} />
+          <FormField label="Observacoes">
+            <textarea className="input resize-none" rows={4} value={values.notes} onChange={(event) => setField('notes', event.target.value)} />
+          </FormField>
+        </FormSection>
+
+        {error ? (
+          <div className="flex items-center gap-2 rounded-2xl border border-status-error/20 bg-status-error/8 px-3 py-2.5 text-xs text-status-error">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+            {error}
           </div>
+        ) : null}
+      </ModalBody>
 
-          {error && (
-            <div className="flex items-center gap-2 rounded-sm border border-status-error/20 bg-status-error/8 px-3 py-2.5 text-xs text-status-error">
-              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-              {error}
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between border-t border-bg-border px-6 py-4">
-          <button onClick={onClose} className="btn-secondary text-sm">
-            Cancelar
-          </button>
-          <button onClick={() => void handleSave()} disabled={saving} className="btn-primary flex min-w-[140px] items-center justify-center gap-2 text-sm">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Salvar'}
-          </button>
-        </div>
-      </div>
-    </div>
+      <ModalFooter>
+        <button onClick={onClose} className="btn-secondary text-sm">
+          Cancelar
+        </button>
+        <button onClick={() => void handleSave()} disabled={saving} className="btn-primary flex min-w-[140px] items-center justify-center gap-2 text-sm">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+          {saving ? 'Salvando...' : 'Salvar lancamento'}
+        </button>
+      </ModalFooter>
+    </ModalShell>
   )
 }

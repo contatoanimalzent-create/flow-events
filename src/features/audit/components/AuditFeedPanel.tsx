@@ -6,6 +6,7 @@ import { formatDate } from '@/shared/lib'
 
 const ENTITY_LABELS: Record<AuditEntityType, string> = {
   event: 'Evento',
+  event_media_asset: 'Midia do evento',
   order: 'Pedido',
   payment: 'Pagamento',
   ticket: 'Ingresso',

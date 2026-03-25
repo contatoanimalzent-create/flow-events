@@ -1,4 +1,4 @@
-export type AuditEntityType = 'event' | 'order' | 'payment' | 'ticket' | 'staff' | 'campaign' | 'financial'
+export type AuditEntityType = 'event' | 'event_media_asset' | 'order' | 'payment' | 'ticket' | 'staff' | 'campaign' | 'financial'
 
 export type AuditActionType = 'create' | 'update' | 'delete' | 'status_change' | 'execute' | 'issue'
 

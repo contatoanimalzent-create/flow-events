@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { AlertCircle, Check, ChevronRight, ImageIcon, Loader2, Upload, Video, X } from 'lucide-react'
+import { EventMediaManager } from '@/features/event-media'
 import { useEventForm } from '@/features/events/hooks'
 import { EVENT_AGE_RATINGS, EVENT_CATEGORIES, getUnsplashImages } from '@/features/events/types'
 import { cn, formatDate, formatNumber } from '@/shared/lib'
@@ -367,6 +368,22 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                     O v\u00eddeo toca em loop no hero da p\u00e1gina p\u00fablica do evento
                   </p>
                 </div>
+
+                <div className="rounded-sm border border-bg-border bg-bg-surface/60 p-4">
+                  <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-brand-acid">Media Library</div>
+                  <div className="mt-2 text-sm font-semibold text-text-primary">Biblioteca premium da landing</div>
+                  <p className="mt-1 text-xs text-text-muted">
+                    Use assets dedicados para hero video, capa e galeria. Os campos acima seguem como fallback de compatibilidade.
+                  </p>
+                </div>
+
+                {eventId ? (
+                  <EventMediaManager eventId={eventId} organizationId={organizationId} />
+                ) : (
+                  <div className="rounded-sm border border-dashed border-bg-border bg-bg-surface px-4 py-5 text-sm text-text-muted">
+                    Salve o evento primeiro para liberar uploads, ordenacao e gestao completa da media library.
+                  </div>
+                )}
               </>
             )}
 

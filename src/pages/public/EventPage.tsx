@@ -1,7 +1,9 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { supabase } from '@/lib/supabase'
 import { stripePromise, calculateFees } from '@/lib/stripe'
+import { EventHeroMedia, EventMediaGallery, buildEventMediaPresentation, eventMediaService } from '@/features/event-media'
+import type { EventMediaAsset } from '@/features/event-media'
 import { logError } from '@/shared/lib'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
 import { PublicCheckoutContent } from '@/features/orders'
@@ -99,6 +101,7 @@ function getCategoryImage(category: string): string {
 /* ── Main ───────────────────────────────────────────────────── */
 export function EventPage({ slug }: { slug: string }) {
   const [event, setEvent] = useState<EventData | null>(null)
+  const [eventAssets, setEventAssets] = useState<EventMediaAsset[]>([])
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([])
   const [loading, setLoading] = useState(true)
   const [cart, setCart] = useState<CartItem[]>([])
@@ -130,17 +133,24 @@ export function EventPage({ slug }: { slug: string }) {
 
       setEvent(ev)
 
-      const { data: types } = await supabase
-        .from('ticket_types').select('*')
-        .eq('event_id', ev.id).eq('is_active', true).order('position')
-      const { data: batches } = await supabase
-        .from('ticket_batches').select('*')
-        .eq('event_id', ev.id).order('position')
+      const [{ data: types }, { data: batches }, assets] = await Promise.all([
+        supabase
+          .from('ticket_types').select('*')
+          .eq('event_id', ev.id).eq('is_active', true).order('position'),
+        supabase
+          .from('ticket_batches').select('*')
+          .eq('event_id', ev.id).order('position'),
+        eventMediaService.listEventAssets(ev.id, { activeOnly: true }).catch((assetError) => {
+          logError(assetError, { scope: 'public-event-page', action: 'fetch-event-assets', slug, eventId: ev.id })
+          return []
+        }),
+      ])
 
       const merged = (types ?? []).map(t => ({
         ...t,
         batches: (batches ?? []).filter(b => b.ticket_type_id === t.id),
       }))
+      setEventAssets(assets)
       setTicketTypes(merged)
       setLoading(false)
       trackEvent('ViewContent', { event_id: ev.id, event_name: ev.name })
@@ -232,6 +242,8 @@ export function EventPage({ slug }: { slug: string }) {
   const minPrice = ticketTypes.length > 0
     ? Math.min(...ticketTypes.flatMap(t => t.batches.filter(b => b.is_active).map(b => b.price)).filter(p => p > 0))
     : 0
+  const mediaPresentation = useMemo(() => buildEventMediaPresentation(eventAssets, event), [eventAssets, event])
+  const fallbackHeroImage = getCategoryImage(event.category)
 
   return (
     <div className="min-h-screen bg-[#080808] text-[#f5f5f0] overflow-x-hidden">
@@ -273,25 +285,13 @@ export function EventPage({ slug }: { slug: string }) {
 
       {/* HERO */}
       <div className="relative min-h-[100svh] flex flex-col overflow-hidden">
-        {event.settings?.video_url ? (
-          <video
-            src={event.settings.video_url}
-            autoPlay muted loop playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ transform: `scale(1.05)` }}
-          />
-        ) : event.cover_url ? (
-          <img src={event.cover_url} alt={event.name}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ transform: `scale(1.1) translateY(${scrollY * 0.15}px)`, transition: 'transform 0.1s ease-out' }} />
-        ) : (
-          <img
-            src={getCategoryImage(event.category)}
-            alt={event.name}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ transform: `scale(1.1) translateY(${scrollY * 0.15}px)`, transition: 'transform 0.1s ease-out' }}
-          />
-        )}
+        <EventHeroMedia
+          eventName={event.name}
+          coverAsset={mediaPresentation.coverAsset}
+          heroAsset={mediaPresentation.heroAsset}
+          fallbackImage={fallbackHeroImage}
+          scrollY={scrollY}
+        />
         <div className="absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: 'linear-gradient(#d4ff00 1px, transparent 1px), linear-gradient(90deg, #d4ff00 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(8,8,8,0.3) 0%, rgba(8,8,8,0.1) 30%, rgba(8,8,8,0.75) 70%, #080808 100%)' }} />
@@ -386,6 +386,8 @@ export function EventPage({ slug }: { slug: string }) {
           <p className="text-[#9a9a9a] text-lg leading-relaxed">{event.short_description}</p>
         </section>
       )}
+
+      <EventMediaGallery presentation={mediaPresentation} />
 
       {/* HIGHLIGHTS */}
       <section className="px-6 md:px-16 py-10 border-y border-[#1a1a1a]">

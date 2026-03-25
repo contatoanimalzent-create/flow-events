@@ -34,12 +34,26 @@ function tableMissing(message?: string) {
   return normalizedMessage.includes('does not exist') || normalizedMessage.includes('could not find the table')
 }
 
+function mapSeverityToPriority(severity?: string | null): NotificationItem['priority'] {
+  switch (severity) {
+    case 'critical':
+    case 'error':
+    case 'high':
+      return 'high'
+    case 'warning':
+    case 'medium':
+      return 'medium'
+    default:
+      return 'low'
+  }
+}
+
 export const notificationsService = {
   async list(organizationId: string): Promise<NotificationItem[]> {
     return notificationsApi.request('list_notifications', async () => {
       const readIds = readNotificationState(organizationId)
 
-      const [runsResult, payoutsResult, alertStatesResult, paidOrdersResult] = await Promise.all([
+      const [runsResult, payoutsResult, alertStatesResult, paidOrdersResult, internalNotificationsResult] = await Promise.all([
         supabase
           .from('campaign_runs')
           .select('id,name,status,created_at')
@@ -68,6 +82,12 @@ export const notificationsService = {
           .eq('status', 'paid')
           .order('created_at', { ascending: false })
           .limit(5),
+        supabase
+          .from('internal_notifications')
+          .select('id,type,severity,title,body,created_at,is_read')
+          .eq('organization_id', organizationId)
+          .order('created_at', { ascending: false })
+          .limit(8),
       ])
 
       const items: NotificationItem[] = []
@@ -128,6 +148,21 @@ export const notificationsService = {
             description: `Pedido pago por ${String(row.buyer_name ?? 'cliente')}.`,
             created_at: String(row.created_at ?? new Date().toISOString()),
             read: readIds.has(`sales-${String(row.id)}`),
+          })
+        }
+      }
+
+      if (!internalNotificationsResult.error || tableMissing(internalNotificationsResult.error?.message)) {
+        for (const row of (internalNotificationsResult.data ?? []) as Array<Record<string, unknown>>) {
+          items.push({
+            id: `seeded-${String(row.id)}`,
+            organization_id: organizationId,
+            type: (String(row.type ?? 'operational') as NotificationItem['type']),
+            priority: mapSeverityToPriority((row.severity as string | null | undefined) ?? null),
+            title: String(row.title ?? 'Notificacao interna'),
+            description: String(row.body ?? 'Atualizacao interna do ambiente demo.'),
+            created_at: String(row.created_at ?? new Date().toISOString()),
+            read: Boolean(row.is_read) || readIds.has(`seeded-${String(row.id)}`),
           })
         }
       }

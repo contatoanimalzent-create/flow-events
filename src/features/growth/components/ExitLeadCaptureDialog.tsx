@@ -26,16 +26,16 @@ export function ExitLeadCaptureDialog({
   useEffect(() => {
     if (wasLeadCaptureDismissed()) return
 
-    const timer = window.setTimeout(() => setOpen(true), 10000)
+    const timer = window.setTimeout(() => setOpen(true), 40000)
 
     const handleMouseLeave = (event: MouseEvent) => {
-      if (event.clientY <= 12) setOpen(true)
+      if (event.clientY <= 0 && !event.relatedTarget) setOpen(true)
     }
 
-    document.addEventListener('mouseout', handleMouseLeave)
+    document.documentElement.addEventListener('mouseleave', handleMouseLeave)
     return () => {
       window.clearTimeout(timer)
-      document.removeEventListener('mouseout', handleMouseLeave)
+      document.documentElement.removeEventListener('mouseleave', handleMouseLeave)
     }
   }, [])
 

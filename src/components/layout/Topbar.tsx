@@ -49,108 +49,132 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
         event.preventDefault()
         setShowSearch(true)
       }
-
       if (event.key === 'Escape') {
         setShowSearch(false)
         setShowNotifications(false)
       }
     }
-
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   function handleSearch() {
-    if (!searchQuery.trim()) {
-      return
-    }
-
-    logError(`Search not implemented: ${searchQuery}`, {
-      scope: 'topbar',
-      action: 'search',
-    })
+    if (!searchQuery.trim()) return
+    logError(`Search not implemented: ${searchQuery}`, { scope: 'topbar', action: 'search' })
     setShowSearch(false)
   }
 
   return (
     <>
-      <header className="flex h-[76px] shrink-0 items-center gap-4 border-b border-bg-border/80 bg-[#fbf8f2]/92 px-6 backdrop-blur-xl">
-        <button onClick={onMenuToggle} className="rounded-full border border-bg-border bg-white/80 p-2 text-text-muted transition-all hover:bg-white hover:text-text-primary">
+      <header className="flex h-[72px] shrink-0 items-center gap-4 border-b border-[rgba(255,255,255,0.06)] bg-[#0d0c0b]/95 px-6 backdrop-blur-xl">
+        <button
+          onClick={onMenuToggle}
+          className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-2 text-[#6a6058] transition-all hover:bg-[rgba(255,255,255,0.08)] hover:text-[#f0ebe2]"
+        >
           <Menu className="h-5 w-5" />
         </button>
+
         <div>
-          <div className="text-[11px] uppercase tracking-[0.28em] text-text-muted">{access.role}</div>
-          <h1 className="mt-1 font-serif text-3xl font-semibold leading-none text-text-primary">{sectionTitles[activeSection]}</h1>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-[#c49a50]">{access.role}</div>
+          <h1 className="mt-0.5 font-serif text-[1.8rem] font-semibold leading-none text-[#f0ebe2]">
+            {sectionTitles[activeSection]}
+          </h1>
         </div>
+
         <div className="flex-1" />
+
         <button
           onClick={() => setShowSearch(true)}
-          className="hidden items-center gap-2 rounded-full border border-bg-border bg-white/80 px-4 py-2.5 text-sm text-text-muted transition-all hover:border-brand-acid/30 hover:bg-white md:flex"
+          className="hidden items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 py-2 text-sm text-[#6a6058] transition-all hover:border-[#c49a50]/30 hover:text-[#f0ebe2] md:flex"
         >
           <Search className="h-4 w-4" />
           <span>Buscar...</span>
-          <span className="rounded-full bg-bg-surface px-2 py-1 text-[11px]">Ctrl K</span>
+          <span className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-2 py-0.5 text-[11px]">
+            Ctrl K
+          </span>
         </button>
+
         <button
           onClick={() => setShowNotifications((current) => !current)}
-          className="relative rounded-full border border-bg-border bg-white/80 p-2 text-text-muted transition-all hover:bg-white hover:text-text-primary"
+          className="relative rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-2.5 text-[#6a6058] transition-all hover:bg-[rgba(255,255,255,0.08)] hover:text-[#f0ebe2]"
         >
           <Bell className="h-5 w-5" />
-          {notifications.unreadCount > 0 ? <span className="absolute right-1 top-1 h-2 w-2 animate-pulse rounded-full bg-status-error" /> : null}
+          {notifications.unreadCount > 0 ? (
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 animate-pulse rounded-full bg-[#c49a50]" />
+          ) : null}
         </button>
-        <button onClick={signOut} className="rounded-full border border-bg-border bg-white/80 p-2 text-text-muted transition-all hover:border-status-error/25 hover:text-status-error" title="Sair">
+
+        <button
+          onClick={signOut}
+          className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-2.5 text-[#6a6058] transition-all hover:border-[#c45c6a]/25 hover:text-[#c45c6a]"
+          title="Sair"
+        >
           <LogOut className="h-5 w-5" />
         </button>
       </header>
 
       {showSearch ? (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-[#211d18]/18 pt-20 backdrop-blur-sm">
-          <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-bg-border bg-bg-secondary shadow-[0_24px_80px_rgba(50,38,20,0.16)]">
-            <div className="flex items-center gap-3 border-b border-bg-border px-4 py-3">
-              <Search className="h-5 w-5 text-text-muted" />
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-20 backdrop-blur-sm">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#131110] shadow-[0_24px_80px_rgba(0,0,0,0.7)]">
+            <div className="flex items-center gap-3 border-b border-[rgba(255,255,255,0.06)] px-4 py-3">
+              <Search className="h-5 w-5 text-[#6a6058]" />
               <input
                 autoFocus
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    handleSearch()
-                  }
-                }}
+                onKeyDown={(event) => { if (event.key === 'Enter') handleSearch() }}
                 type="text"
                 placeholder="Buscar eventos, ingressos, clientes..."
-                className="flex-1 bg-transparent text-text-primary outline-none placeholder-text-muted"
+                className="flex-1 bg-transparent text-[#f0ebe2] outline-none placeholder:text-[#4a4540]"
               />
-              <button onClick={() => setShowSearch(false)} className="rounded-full p-1.5 text-text-muted hover:bg-white hover:text-text-primary">
+              <button
+                onClick={() => setShowSearch(false)}
+                className="rounded-full p-1.5 text-[#6a6058] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f0ebe2]"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="p-5 text-center text-sm text-text-muted">{searchQuery ? 'Pesquisa registrada para integracao futura.' : 'Digite para buscar'}</div>
+            <div className="p-5 text-center text-sm text-[#6a6058]">
+              {searchQuery ? 'Pesquisa registrada para integracao futura.' : 'Digite para buscar'}
+            </div>
           </div>
         </div>
       ) : null}
 
       {showNotifications ? (
-        <div className="absolute right-6 top-[84px] z-40 w-[420px] rounded-2xl border border-bg-border bg-bg-secondary shadow-[0_24px_80px_rgba(50,38,20,0.16)]">
-          <div className="flex items-center justify-between border-b border-bg-border p-5">
+        <div className="absolute right-6 top-[80px] z-40 w-[420px] overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#131110] shadow-[0_24px_80px_rgba(0,0,0,0.7)]">
+          <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.06)] p-5">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.28em] text-text-muted">{access.role}</div>
-              <h3 className="mt-1 font-serif text-2xl font-semibold leading-none text-text-primary">Centro interno</h3>
+              <div className="text-[10px] uppercase tracking-[0.3em] text-[#c49a50]">{access.role}</div>
+              <h3 className="mt-1 font-serif text-2xl font-semibold leading-none text-[#f0ebe2]">
+                Centro interno
+              </h3>
             </div>
-            <button onClick={() => setShowNotifications(false)} className="rounded-full p-1.5 text-text-muted hover:bg-white hover:text-text-primary">
+            <button
+              onClick={() => setShowNotifications(false)}
+              className="rounded-full p-1.5 text-[#6a6058] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f0ebe2]"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
-          <div className="flex items-center gap-2 border-b border-bg-border p-3">
+          <div className="flex items-center gap-2 border-b border-[rgba(255,255,255,0.06)] p-3">
             <button
               onClick={() => setPanelTab('notifications')}
-              className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${panelTab === 'notifications' ? 'bg-text-primary text-bg-secondary shadow-card' : 'text-text-muted hover:bg-white hover:text-text-primary'}`}
+              className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${
+                panelTab === 'notifications'
+                  ? 'bg-[#c49a50] text-[#0a0908] shadow-[0_4px_12px_rgba(196,154,80,0.3)]'
+                  : 'text-[#6a6058] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f0ebe2]'
+              }`}
             >
               Notificacoes
             </button>
             <button
               onClick={() => setPanelTab('activity')}
-              className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${panelTab === 'activity' ? 'bg-white text-text-primary shadow-card' : 'text-text-muted hover:bg-white hover:text-text-primary'}`}
+              className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${
+                panelTab === 'activity'
+                  ? 'bg-[rgba(255,255,255,0.08)] text-[#f0ebe2]'
+                  : 'text-[#6a6058] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f0ebe2]'
+              }`}
             >
               Atividade
             </button>

@@ -25,17 +25,17 @@ export function PremiumSection({
         {eyebrow || title || description ? (
           <PublicReveal className={cn('mb-10 max-w-3xl', align === 'center' && 'mx-auto text-center')}>
             {eyebrow ? (
-              <div className="mb-4 text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">
+              <div className="mb-4 text-[11px] uppercase tracking-[0.32em] text-[#c49a50]">
                 {eyebrow}
               </div>
             ) : null}
             {title ? (
-              <h2 className="font-serif text-4xl font-semibold leading-none text-[#1f1a15] md:text-6xl">
+              <h2 className="font-serif text-4xl font-semibold leading-none text-[#f0ebe2] md:text-6xl">
                 {title}
               </h2>
             ) : null}
             {description ? (
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[#5f5549] md:text-lg">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#9a9088] md:text-lg">
                 {description}
               </p>
             ) : null}

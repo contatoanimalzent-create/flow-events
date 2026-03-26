@@ -24,19 +24,26 @@ export function PublicHeader({ onLogin, actionSlot, compact = false, className }
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 border-b border-bg-border/60 bg-[#f7f2e8]/88 backdrop-blur-xl',
+        'sticky top-0 z-40 border-b border-[rgba(255,255,255,0.07)] bg-[#0a0908]/92 backdrop-blur-xl',
         className,
       )}
     >
-      <div className={cn('mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 md:px-10 lg:px-16', compact ? 'py-4' : 'py-5')}>
-        <a href="/" className="flex items-center gap-3 text-[#1f1a15] no-underline">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-bg-border bg-white/84 text-sm font-semibold tracking-[0.28em] shadow-card">
+      <div
+        className={cn(
+          'mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 md:px-10 lg:px-16',
+          compact ? 'py-4' : 'py-5',
+        )}
+      >
+        <a href="/" className="flex items-center gap-3 no-underline">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c49a50]/30 bg-[#c49a50]/10 text-sm font-semibold tracking-[0.28em] text-[#c49a50]">
             AE
           </div>
           <div>
-            <div className="font-display text-[2rem] font-semibold leading-none tracking-[-0.04em] text-text-primary">Animalz Events</div>
-            <div className="mt-1 text-[10px] uppercase tracking-[0.32em] text-text-muted">
-              Premium Experiences Ecosystem
+            <div className="font-display text-[1.9rem] font-semibold leading-none tracking-[-0.04em] text-[#f0ebe2]">
+              Animalz Events
+            </div>
+            <div className="mt-1 text-[10px] uppercase tracking-[0.32em] text-[#4a4540]">
+              Eventos & Experiencias
             </div>
           </div>
         </a>
@@ -46,7 +53,7 @@ export function PublicHeader({ onLogin, actionSlot, compact = false, className }
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
+              className="text-sm font-medium text-[#9a9088] transition-colors hover:text-[#f0ebe2]"
             >
               {link.label}
             </a>
@@ -58,7 +65,7 @@ export function PublicHeader({ onLogin, actionSlot, compact = false, className }
           {user ? (
             <a
               href="/me"
-              className="inline-flex items-center gap-2 rounded-full border border-text-primary px-4 py-2 text-sm font-medium text-text-primary transition-all hover:-translate-y-0.5 hover:bg-text-primary hover:text-bg-secondary"
+              className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.06)] px-4 py-2 text-sm font-medium text-[#f0ebe2] transition-all hover:-translate-y-0.5 hover:border-[#c49a50]/40 hover:bg-[#c49a50]/10"
             >
               <UserRound className="h-4 w-4" />
               Minha conta
@@ -67,7 +74,7 @@ export function PublicHeader({ onLogin, actionSlot, compact = false, className }
             <button
               type="button"
               onClick={onLogin}
-              className="inline-flex items-center gap-2 rounded-full border border-text-primary px-4 py-2 text-sm font-medium text-text-primary transition-all hover:-translate-y-0.5 hover:bg-text-primary hover:text-bg-secondary"
+              className="inline-flex items-center gap-2 rounded-full bg-[#c49a50] px-5 py-2.5 text-sm font-semibold text-[#0a0908] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(196,154,80,0.35)]"
             >
               Entrar
               <ArrowRight className="h-4 w-4" />

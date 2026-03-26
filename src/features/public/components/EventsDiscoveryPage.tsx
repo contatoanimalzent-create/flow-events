@@ -110,20 +110,20 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
         <div className="mx-auto max-w-7xl">
           <PublicReveal>
             <div className="max-w-4xl">
-              <h1 className="font-display text-[clamp(3.5rem,7vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-[#1f1a15]">
+              <h1 className="font-display text-[clamp(3.5rem,7vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-[#f0ebe2]">
                 Todos os eventos
               </h1>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-[#5f5549] md:text-lg">
+              <p className="mt-5 max-w-2xl text-base leading-8 text-[#9a9088] md:text-lg">
                 Encontre eventos por cidade, categoria ou data. Compre ingressos com facilidade e garanta seu lugar.
               </p>
             </div>
           </PublicReveal>
 
           <PublicReveal delayMs={80} className="mt-7 flex flex-wrap gap-3">
-            <PremiumBadge tone="default" className="border-[#ddd1bf] bg-white/76 text-[#5f5549]">
+            <PremiumBadge tone="default" className="border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] text-[#9a9088]">
               Ingressos online
             </PremiumBadge>
-            <PremiumBadge tone="accent" className="border-[#e1d0ab] bg-[#f7edd1] text-[#6d5324]">
+            <PremiumBadge tone="accent" className="border-[#c49a50]/25 bg-[#c49a50]/10 text-[#c49a50]">
               Acesso via QR code
             </PremiumBadge>
           </PublicReveal>

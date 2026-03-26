@@ -34,7 +34,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,13,9,0.18)_0%,rgba(18,13,9,0)_24%,rgba(18,13,9,0.68)_100%)]" />
             </>
           ) : (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#f2debf,transparent_30%),radial-gradient(circle_at_80%_18%,rgba(214,187,145,0.34),transparent_24%),linear-gradient(135deg,#f4efe7_0%,#ebe0d0_45%,#efe8dc_100%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(196,154,80,0.12),transparent_30%),radial-gradient(circle_at_80%_18%,rgba(106,134,173,0.08),transparent_24%),linear-gradient(135deg,#141210_0%,#0e0c0a_45%,#121010_100%)]" />
           )}
 
           <div

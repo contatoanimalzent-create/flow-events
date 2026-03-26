@@ -93,12 +93,14 @@ export function ExperienceVisualSection({ events }: ExperienceVisualSectionProps
           ))}
 
           <PublicReveal delayMs={220}>
-            <div className="rounded-[2rem] border border-[#eadfce] bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(244,236,224,0.78))] p-7 shadow-[0_22px_70px_rgba(48,35,18,0.07)]">
-              <div className="text-[11px] uppercase tracking-[0.3em] text-[#8e7f68]">Direcao</div>
-              <div className="mt-4 font-display text-[2.1rem] font-semibold leading-[0.94] tracking-[-0.04em] text-[#1f1a15]">
+            <div className="rounded-[2rem] border border-white/10 p-7 shadow-[0_22px_70px_rgba(0,0,0,0.32)]"
+              style={{ background: 'linear-gradient(150deg, #1c1610 0%, #14110c 100%)' }}
+            >
+              <div className="text-[11px] uppercase tracking-[0.3em] text-white/40">Direcao</div>
+              <div className="mt-4 font-display text-[2.1rem] font-semibold leading-[0.94] tracking-[-0.04em] text-white">
                 Menos vitrine tecnica. Mais atmosfera, ritmo e vontade de entrar.
               </div>
-              <p className="mt-4 text-sm leading-7 text-[#5f5549]">
+              <p className="mt-4 text-sm leading-7 text-white/58">
                 O design foi pensado para sustentar experiencias aspiracionais, com presenca cinematografica, tipografia editorial e um senso de curadoria constante.
               </p>
             </div>

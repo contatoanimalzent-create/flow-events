@@ -130,18 +130,55 @@
 
   .card {
     @apply bg-bg-card border border-bg-border rounded-2xl shadow-card;
-    background-image: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.86) 100%);
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(252,249,244,0.88) 100%);
+    box-shadow: 0 18px 46px rgba(63,46,26,0.08), inset 0 1px 0 rgba(255,255,255,0.7);
   }
-  .card-hover { @apply card transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-acid/25 hover:shadow-glow-acid; }
+  .card-hover {
+    @apply card transition-all duration-300;
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    border-color: rgba(125,109,82,0.28);
+    box-shadow: 0 28px 70px rgba(63,46,26,0.13), inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  /* Dark section utilities */
+  .section-dark {
+    background: linear-gradient(160deg, #1c1610 0%, #14110c 60%, #1a1510 100%);
+    color: #f4ede0;
+  }
+  .section-ink {
+    background: linear-gradient(160deg, #0e0b08 0%, #120f0b 60%, #0f0d0a 100%);
+    color: #f4ede0;
+  }
+  .card-dark {
+    background: linear-gradient(180deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.035) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 28px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .card-dark-hover {
+    background: linear-gradient(180deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.035) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 28px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  }
+  .card-dark-hover:hover {
+    background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.06) 100%);
+    border-color: rgba(255,255,255,0.18);
+    transform: translateY(-4px);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.12);
+  }
 
   /* Mesh/grid background for content area */
   .main-grid-bg {
     background-image:
-      radial-gradient(circle at top left, rgba(255,255,255,0.85), transparent 34%),
-      radial-gradient(circle at bottom right, rgba(233,221,203,0.55), transparent 34%),
-      linear-gradient(rgba(125,109,82,0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(125,109,82,0.045) 1px, transparent 1px);
-    background-size: auto, auto, 56px 56px, 56px 56px;
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.9), transparent 40%),
+      radial-gradient(ellipse at bottom right, rgba(220,206,184,0.6), transparent 40%),
+      radial-gradient(ellipse at 70% 20%, rgba(240,225,200,0.28), transparent 30%),
+      linear-gradient(rgba(125,109,82,0.038) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125,109,82,0.038) 1px, transparent 1px);
+    background-size: auto, auto, auto, 56px 56px, 56px 56px;
   }
 
   .btn-primary {
@@ -209,7 +246,7 @@
     @apply reveal flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between;
   }
   .admin-title {
-    @apply font-display text-4xl font-semibold tracking-[-0.04em] text-text-primary lg:text-5xl;
+    @apply font-display text-[2.8rem] font-semibold tracking-[-0.05em] text-text-primary lg:text-[3.6rem] leading-[0.92];
   }
   .admin-title-accent {
     @apply text-brand-acid;
@@ -267,8 +304,9 @@
     @apply space-y-8;
   }
   .surface-panel {
-    @apply rounded-[28px] border border-bg-border bg-white/80;
-    box-shadow: var(--ds-shadow-soft), inset 0 1px 0 rgba(255,255,255,0.65);
+    @apply rounded-[28px] border border-bg-border bg-white/85;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(252,249,244,0.88) 100%);
+    box-shadow: 0 20px 54px rgba(63,46,26,0.09), inset 0 1px 0 rgba(255,255,255,0.72);
   }
   .surface-panel-muted {
     @apply bg-bg-secondary/80;

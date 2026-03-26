@@ -35,3 +35,6 @@ pnpm-debug.log*
 # External/Third-party repos
 aios-core
 xquads-squads
+
+# Local scratch / conversion artifacts
+.tmp/

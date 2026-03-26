@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, UserRound } from 'lucide-react'
+import { useAuthStore } from '@/lib/store/auth'
 import { cn } from '@/shared/lib'
 
 interface PublicHeaderProps {
@@ -16,6 +17,8 @@ const NAV_LINKS = [
 ]
 
 export function PublicHeader({ onLogin, actionSlot, compact = false, className }: PublicHeaderProps) {
+  const user = useAuthStore((state) => state.user)
+
   return (
     <header
       className={cn(
@@ -50,7 +53,15 @@ export function PublicHeader({ onLogin, actionSlot, compact = false, className }
 
         <div className="flex items-center gap-3">
           {actionSlot}
-          {onLogin ? (
+          {user ? (
+            <a
+              href="/me"
+              className="inline-flex items-center gap-2 rounded-full border border-text-primary px-4 py-2 text-sm font-medium text-text-primary transition-all hover:-translate-y-0.5 hover:bg-text-primary hover:text-bg-secondary"
+            >
+              <UserRound className="h-4 w-4" />
+              Minha conta
+            </a>
+          ) : onLogin ? (
             <button
               type="button"
               onClick={onLogin}

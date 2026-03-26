@@ -6,7 +6,7 @@ export function PublicFooter() {
           <img
             src="/logo.png"
             alt="Animalz Events"
-            className="h-16 w-auto object-contain"
+            className="h-28 w-auto object-contain"
             style={{ filter: 'drop-shadow(0 0 10px rgba(196,154,80,0.2))' }}
           />
           <p className="mt-5 max-w-xl text-sm leading-7 text-[#6a6058] md:text-base">

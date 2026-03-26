@@ -41,8 +41,8 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
             <img
               src="/logo.png"
               alt="Animalz Events"
-              className="h-14 w-auto object-contain"
-              style={{ filter: 'drop-shadow(0 0 8px rgba(196,154,80,0.2))' }}
+              className="h-24 w-auto object-contain"
+              style={{ filter: 'drop-shadow(0 0 12px rgba(196,154,80,0.25))' }}
             />
           </div>
 

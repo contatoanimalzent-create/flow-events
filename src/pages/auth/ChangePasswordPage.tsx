@@ -35,7 +35,7 @@ export function ChangePasswordPage() {
           <img
             src="/logo.png"
             alt="Animalz Events"
-            className="h-12 w-auto object-contain"
+            className="h-20 w-auto object-contain"
             style={{ filter: 'drop-shadow(0 0 6px rgba(196,154,80,0.18))' }}
           />
         </div>

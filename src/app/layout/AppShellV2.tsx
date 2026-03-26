@@ -1,6 +1,8 @@
 import { Suspense, lazy, useState } from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
+import { AdminShell, LoadingState } from '@/shared/components'
+import { MotionPage } from '@/shared/motion'
 import { useUIStore } from '@/shared/store'
 import { defaultNavSection, type NavSection } from './navigation'
 
@@ -21,19 +23,7 @@ const HelpPage = lazy(() => import('@/pages/HelpPage').then((module) => ({ defau
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((module) => ({ default: module.SettingsPage })))
 
 function PageFallback() {
-  return (
-    <div className="flex h-64 items-center justify-center">
-      <div className="surface-panel flex items-center gap-2 px-5 py-4">
-        {[0, 1, 2].map((index) => (
-          <div
-            key={index}
-            className="h-2.5 w-2.5 animate-bounce rounded-full bg-brand-acid"
-            style={{ animationDelay: `${index * 100}ms` }}
-          />
-        ))}
-      </div>
-    </div>
-  )
+  return <LoadingState title="Preparando experiencia" description="Estamos montando esta area com a nova fundacao visual." className="mx-6 my-8" />
 }
 
 function renderSection(activeSection: NavSection) {
@@ -80,7 +70,7 @@ export function AppShellV2() {
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-bg-primary">
+    <AdminShell>
       <Sidebar
         activeSection={activeSection}
         onNavigate={setActiveSection}
@@ -91,10 +81,10 @@ export function AppShellV2() {
         <Topbar onMenuToggle={toggleSidebar} activeSection={activeSection} />
         <main className="main-grid-bg flex-1 overflow-y-auto">
           <Suspense fallback={<PageFallback />}>
-            <div className="animate-fade-in">{renderSection(activeSection)}</div>
+            <MotionPage>{renderSection(activeSection)}</MotionPage>
           </Suspense>
         </main>
       </div>
-    </div>
+    </AdminShell>
   )
 }

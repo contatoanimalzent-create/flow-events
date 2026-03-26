@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { PageShell } from '@/shared/components'
+import { MotionPage } from '@/shared/motion'
 import { cn } from '@/shared/lib'
 import { PublicFooter } from './PublicFooter'
 import { PublicHeader } from './PublicHeader'
@@ -21,7 +23,7 @@ export function PublicLayout({
   className,
 }: PublicLayoutProps) {
   return (
-    <div className={cn('min-h-screen bg-[#f8f3ea] text-[#1f1a15]', className)}>
+    <div className={cn('min-h-screen bg-bg-primary text-text-primary luxury-canvas', className)}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute left-[-8rem] top-[-10rem] h-[26rem] w-[26rem] rounded-full bg-[#f0dfbf]/35 blur-3xl" />
         <div className="absolute bottom-[-12rem] right-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[#ead8c6]/40 blur-3xl" />
@@ -37,7 +39,13 @@ export function PublicLayout({
 
       <div className="relative z-10">
         <PublicHeader onLogin={onLogin} actionSlot={headerActionSlot} compact={compactHeader} />
-        <main>{children}</main>
+        <MotionPage>
+          <main>
+            <PageShell tone="public" width="xl" className="px-0 py-0">
+              {children}
+            </PageShell>
+          </main>
+        </MotionPage>
         {showFooter ? <PublicFooter /> : null}
       </div>
     </div>

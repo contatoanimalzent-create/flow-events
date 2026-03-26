@@ -32,7 +32,7 @@ export default {
       fontFamily: {
         sans:    ['DM Sans', 'system-ui', 'sans-serif'],
         mono:    ['DM Mono', 'monospace'],
-        display: ['DM Sans', 'system-ui', 'sans-serif'],
+        display: ['Cormorant Garamond', 'serif'],
         serif:   ['Cormorant Garamond', 'serif'],
       },
       borderRadius: { sm: '14px', xl: '22px', '2xl': '30px' },
@@ -47,6 +47,7 @@ export default {
         'fade-in':  'fadeIn 0.2s ease-out',
         'slide-up': 'slideUp 0.3s ease-out',
         'marquee':  'marquee 30s linear infinite',
+        'float-in': 'slideUp 0.52s cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         fadeIn:  { from: { opacity: '0' }, to: { opacity: '1' } },

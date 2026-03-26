@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { cn } from '@/shared/lib'
 
 interface SurfaceProps {
   children: ReactNode
@@ -6,5 +7,5 @@ interface SurfaceProps {
 }
 
 export function Surface({ children, className }: SurfaceProps) {
-  return <div className={className}>{children}</div>
+  return <div className={cn('surface-panel', className)}>{children}</div>
 }

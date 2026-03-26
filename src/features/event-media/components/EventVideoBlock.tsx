@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { PlayCircle } from 'lucide-react'
 import { getEventAssetUrl } from '@/features/event-media/types'
 import type { EventMediaAsset } from '@/features/event-media/types'
@@ -7,12 +8,32 @@ interface EventVideoBlockProps {
 }
 
 export function EventVideoBlock({ asset }: EventVideoBlockProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [src, setSrc] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    const node = containerRef.current
+    if (!node) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSrc(getEventAssetUrl(asset))
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '200px' },
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [asset])
+
   return (
     <div className="group overflow-hidden rounded-[28px] border border-white/70 bg-white/80 shadow-[0_16px_60px_rgba(48,35,18,0.05)]">
-      <div className="relative aspect-video overflow-hidden">
+      <div ref={containerRef} className="relative aspect-video overflow-hidden">
         <video
-          src={getEventAssetUrl(asset)}
+          src={src}
           poster={asset.thumbnail_url ?? undefined}
+          preload="none"
           controls
           className="h-full w-full object-cover"
         />

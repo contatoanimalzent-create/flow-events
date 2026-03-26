@@ -9,4 +9,18 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    target: 'es2020',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'query-vendor': ['@tanstack/react-query'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+          'stripe-vendor': ['@stripe/react-stripe-js', '@stripe/stripe-js'],
+          'charts-vendor': ['recharts'],
+        },
+      },
+    },
+  },
 })

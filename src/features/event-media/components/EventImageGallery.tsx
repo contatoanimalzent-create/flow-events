@@ -17,6 +17,8 @@ export function EventImageGallery({ assets }: EventImageGalleryProps) {
             <img
               src={getEventAssetUrl(asset)}
               alt={asset.alt_text ?? asset.caption ?? 'Imagem do evento'}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              decoding="async"
               className={`w-full object-cover transition-transform duration-700 group-hover:scale-105 ${index === 0 ? 'h-[420px]' : 'h-[200px]'}`}
             />
           </div>

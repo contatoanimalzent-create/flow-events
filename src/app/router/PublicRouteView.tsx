@@ -1,15 +1,22 @@
+import { Suspense, lazy } from 'react'
 import type { PublicRoute } from './public-routes'
 import { AuthLoadingGate, useAuthStore } from '@/features/auth'
-import { AboutPage } from '@/pages/public/AboutPage'
-import { ContactPage } from '@/pages/public/ContactPage'
-import { AccountPage } from '@/pages/public/AccountPage'
-import { CreateEventPage } from '@/pages/public/CreateEventPage'
-import { EventPage } from '@/pages/public/EventPage'
-import { EventsCatalogPage } from '@/pages/public/EventsCatalogPage'
-import { HomePage } from '@/pages/public/HomePage'
-import { LoginPage } from '@/pages/auth/LoginPage'
-import { PrivacyPage } from '@/pages/public/PrivacyPage'
-import { TermsPage } from '@/pages/public/TermsPage'
+import { LoadingState } from '@/shared/components'
+
+const AboutPage = lazy(() => import('@/pages/public/AboutPage').then((m) => ({ default: m.AboutPage })))
+const ContactPage = lazy(() => import('@/pages/public/ContactPage').then((m) => ({ default: m.ContactPage })))
+const AccountPage = lazy(() => import('@/pages/public/AccountPage').then((m) => ({ default: m.AccountPage })))
+const CreateEventPage = lazy(() => import('@/pages/public/CreateEventPage').then((m) => ({ default: m.CreateEventPage })))
+const EventPage = lazy(() => import('@/pages/public/EventPage').then((m) => ({ default: m.EventPage })))
+const EventsCatalogPage = lazy(() => import('@/pages/public/EventsCatalogPage').then((m) => ({ default: m.EventsCatalogPage })))
+const HomePage = lazy(() => import('@/pages/public/HomePage').then((m) => ({ default: m.HomePage })))
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage').then((m) => ({ default: m.LoginPage })))
+const PrivacyPage = lazy(() => import('@/pages/public/PrivacyPage').then((m) => ({ default: m.PrivacyPage })))
+const TermsPage = lazy(() => import('@/pages/public/TermsPage').then((m) => ({ default: m.TermsPage })))
+
+function PublicFallback() {
+  return <LoadingState title="Carregando" description="" className="min-h-screen" />
+}
 
 interface PublicRouteViewProps {
   route: PublicRoute
@@ -20,24 +27,31 @@ interface PublicRouteViewProps {
 export function PublicRouteView({ route, onLogin, onBackToHome }: PublicRouteViewProps) {
   const user = useAuthStore((state) => state.user)
 
-  if (typeof route === 'object' && route.type === 'event') {
-    return <EventPage slug={route.slug} />
-  }
-
-  if (route === 'terms') return <TermsPage />
-  if (route === 'privacy') return <PrivacyPage />
-  if (route === 'contact') return <ContactPage />
-  if (route === 'about') return <AboutPage onLogin={onLogin} />
-  if (route === 'create-event') return <CreateEventPage onLogin={onLogin} />
-  if (route === 'account') {
-    return (
-      <AuthLoadingGate>
-        {user ? <AccountPage /> : <LoginPage onBack={onBackToHome} />}
-      </AuthLoadingGate>
-    )
-  }
-  if (route === 'events') return <EventsCatalogPage onLogin={onLogin} />
-  if (route === 'login') return <LoginPage onBack={onBackToHome} />
-
-  return <HomePage onLogin={onLogin} />
+  return (
+    <Suspense fallback={<PublicFallback />}>
+      {typeof route === 'object' && route.type === 'event' ? (
+        <EventPage slug={route.slug} />
+      ) : route === 'terms' ? (
+        <TermsPage />
+      ) : route === 'privacy' ? (
+        <PrivacyPage />
+      ) : route === 'contact' ? (
+        <ContactPage />
+      ) : route === 'about' ? (
+        <AboutPage onLogin={onLogin} />
+      ) : route === 'create-event' ? (
+        <CreateEventPage onLogin={onLogin} />
+      ) : route === 'account' ? (
+        <AuthLoadingGate>
+          {user ? <AccountPage /> : <LoginPage onBack={onBackToHome} />}
+        </AuthLoadingGate>
+      ) : route === 'events' ? (
+        <EventsCatalogPage onLogin={onLogin} />
+      ) : route === 'login' ? (
+        <LoginPage onBack={onBackToHome} />
+      ) : (
+        <HomePage onLogin={onLogin} />
+      )}
+    </Suspense>
+  )
 }

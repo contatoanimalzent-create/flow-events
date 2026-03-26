@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import type { EventMediaAsset } from '@/features/event-media/types'
 import { EventAssetCard } from './EventAssetCard'
 
@@ -13,6 +14,16 @@ interface EventAssetGridProps {
 }
 
 export function EventAssetGrid(props: EventAssetGridProps) {
+  const { onEdit, onDelete, onMoveUp, onMoveDown, onSetCover, onSetHero, onToggleActive } = props
+
+  const handleEdit = useCallback((asset: EventMediaAsset) => onEdit(asset), [onEdit])
+  const handleDelete = useCallback((asset: EventMediaAsset) => onDelete(asset), [onDelete])
+  const handleMoveUp = useCallback((asset: EventMediaAsset) => onMoveUp(asset), [onMoveUp])
+  const handleMoveDown = useCallback((asset: EventMediaAsset) => onMoveDown(asset), [onMoveDown])
+  const handleSetCover = useCallback((asset: EventMediaAsset) => onSetCover(asset), [onSetCover])
+  const handleSetHero = useCallback((asset: EventMediaAsset) => onSetHero(asset), [onSetHero])
+  const handleToggleActive = useCallback((asset: EventMediaAsset) => onToggleActive(asset), [onToggleActive])
+
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {props.assets.map((asset, index) => (
@@ -21,13 +32,13 @@ export function EventAssetGrid(props: EventAssetGridProps) {
           asset={asset}
           isFirst={index === 0}
           isLast={index === props.assets.length - 1}
-          onEdit={props.onEdit}
-          onDelete={props.onDelete}
-          onMoveUp={props.onMoveUp}
-          onMoveDown={props.onMoveDown}
-          onSetCover={props.onSetCover}
-          onSetHero={props.onSetHero}
-          onToggleActive={props.onToggleActive}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onMoveUp={handleMoveUp}
+          onMoveDown={handleMoveDown}
+          onSetCover={handleSetCover}
+          onSetHero={handleSetHero}
+          onToggleActive={handleToggleActive}
         />
       ))}
     </div>

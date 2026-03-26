@@ -17,6 +17,7 @@ export function EventHeroMedia({ eventName, coverAsset, heroAsset, fallbackImage
       <video
         src={getEventAssetUrl(heroAsset)}
         poster={posterUrl}
+        preload="metadata"
         autoPlay
         muted
         loop
@@ -33,6 +34,9 @@ export function EventHeroMedia({ eventName, coverAsset, heroAsset, fallbackImage
     <img
       src={coverUrl}
       alt={coverAsset?.alt_text ?? eventName}
+      loading="eager"
+      decoding="async"
+      fetchPriority="high"
       className="absolute inset-0 h-full w-full object-cover"
       style={{ transform: `scale(1.1) translateY(${scrollY * 0.15}px)`, transition: 'transform 0.1s ease-out' }}
     />

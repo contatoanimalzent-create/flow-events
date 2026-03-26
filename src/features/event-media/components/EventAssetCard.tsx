@@ -1,3 +1,4 @@
+import { memo, useEffect, useRef, useState } from 'react'
 import { ArrowDown, ArrowUp, Eye, EyeOff, Film, ImageIcon, Pencil, Star, Trash2, Video } from 'lucide-react'
 import { cn } from '@/shared/lib'
 import { getEventAssetUrl } from '@/features/event-media/types'
@@ -30,7 +31,7 @@ function usageLabel(asset: EventMediaAsset) {
   }
 }
 
-export function EventAssetCard({
+function EventAssetCardBase({
   asset,
   isFirst,
   isLast,
@@ -43,20 +44,40 @@ export function EventAssetCard({
   onToggleActive,
 }: EventAssetCardProps) {
   const previewUrl = asset.thumbnail_url ?? getEventAssetUrl(asset)
+  const mediaRef = useRef<HTMLDivElement>(null)
+  const [videoSrc, setVideoSrc] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    if (asset.asset_type !== 'video') return
+    const node = mediaRef.current
+    if (!node) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVideoSrc(getEventAssetUrl(asset))
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '200px' },
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [asset])
 
   return (
     <article className={cn('card overflow-hidden transition-all', !asset.is_active && 'opacity-70')}>
-      <div className="relative aspect-[4/3] overflow-hidden bg-bg-surface">
+      <div ref={mediaRef} className="relative aspect-[4/3] overflow-hidden bg-bg-surface">
         {asset.asset_type === 'video' ? (
           <video
-            src={getEventAssetUrl(asset)}
+            src={videoSrc}
             poster={asset.thumbnail_url ?? undefined}
+            preload="none"
             muted
             playsInline
             className="h-full w-full object-cover"
           />
         ) : (
-          <img src={previewUrl} alt={asset.alt_text ?? asset.caption ?? 'Asset do evento'} className="h-full w-full object-cover" />
+          <img src={previewUrl} alt={asset.alt_text ?? asset.caption ?? 'Asset do evento'} loading="lazy" decoding="async" className="h-full w-full object-cover" />
         )}
 
         <div className="absolute left-3 top-3 flex items-center gap-2">
@@ -145,3 +166,5 @@ export function EventAssetCard({
     </article>
   )
 }
+
+export const EventAssetCard = memo(EventAssetCardBase)

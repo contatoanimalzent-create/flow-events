@@ -1,0 +1,46 @@
+{
+  "name": "Animalz Events",
+  "short_name": "Animalz",
+  "description": "Ingressos para os melhores eventos de cultura, gastronomia, musica e lifestyle.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0908",
+  "theme_color": "#0a0908",
+  "lang": "pt-BR",
+  "categories": ["entertainment", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ver eventos",
+      "short_name": "Eventos",
+      "url": "/events",
+      "description": "Explorar todos os eventos disponiveis"
+    },
+    {
+      "name": "Criar evento",
+      "short_name": "Criar",
+      "url": "/create-event",
+      "description": "Publicar um novo evento"
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 import { ArrowRight, Check, Sparkles, Zap } from 'lucide-react'
 import { PublicLayout, PublicReveal } from '@/features/public'
 import type { PublicEventSummary } from '@/features/public/types/public.types'
-import { ExitLeadCaptureDialog } from '@/features/growth/components/ExitLeadCaptureDialog'
 import { SocialProofBlock } from '@/features/growth/components/SocialProofBlock'
 import { useSeoMeta } from '@/shared/lib'
 
@@ -146,7 +145,6 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
           </div>
         </div>
       </section>
-      <ExitLeadCaptureDialog source="create_event_exit" />
     </PublicLayout>
   )
 }

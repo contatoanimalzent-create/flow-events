@@ -1,4 +1,3 @@
-import { ExitLeadCaptureDialog } from '@/features/growth'
 import { EventsDiscoveryPage, usePublicEvents } from '@/features/public'
 import { useSeoMeta } from '@/shared/lib'
 
@@ -16,7 +15,6 @@ export function EventsCatalogPage({ onLogin }: { onLogin: () => void }) {
   return (
     <>
       <EventsDiscoveryPage onLogin={onLogin} />
-      <ExitLeadCaptureDialog source="public_events_exit" />
     </>
   )
 }

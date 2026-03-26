@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ExitLeadCaptureDialog, SocialProofBlock } from '@/features/growth'
+import { SocialProofBlock } from '@/features/growth'
 import { LoadingState } from '@/shared/components'
 import {
   ConversionCTASection,
@@ -118,7 +118,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           <ConversionCTASection onLogin={onLogin} />
         </>
       )}
-      <ExitLeadCaptureDialog source="public_home_exit" />
     </PublicLayout>
   )
 }

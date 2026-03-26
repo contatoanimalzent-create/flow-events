@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, Heart, Ticket } from 'lucide-react'
 import type { EventMediaAsset } from '@/features/event-media/types'
-import { ExitLeadCaptureDialog, ReferralTracker, ShareButtons, SocialProofBlock } from '@/features/growth'
+import { ReferralTracker, ShareButtons, SocialProofBlock } from '@/features/growth'
 import { CheckoutSuccessPage, PublicCheckoutContent } from '@/features/orders'
 import {
   EventCinematicHero,
@@ -411,7 +411,6 @@ export function EventPage({ slug }: { slug: string }) {
       />
 
       <EventFinalCTA event={event} isFreeMode={isFreeMode} />
-      <ExitLeadCaptureDialog source="public_event_exit" organizationId={event.organization_id} eventId={event.id} />
     </PublicLayout>
   )
 }

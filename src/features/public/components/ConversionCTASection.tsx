@@ -34,13 +34,13 @@ export function ConversionCTASection({ onLogin }: ConversionCTASectionProps) {
               <div className="max-w-3xl">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-white/56">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Pronto para a proxima camada
+                  Para produtores e curadores
                 </div>
                 <h2 className="mt-6 font-display text-[clamp(2.8rem,5vw,5.2rem)] font-semibold leading-[0.88] tracking-[-0.05em] text-white">
-                  Descubra, publique e sustente experiencias com linguagem de marca global.
+                  Venda, cresça e comande eventos com confianca.
                 </h2>
-                <p className="mt-6 max-w-2xl text-base leading-8 text-white/62 md:text-lg">
-                  A mesma camada que posiciona experiencias com sofisticacao tambem sustenta vendas, CRM, campanhas, check-in, monetizacao e growth com profundidade real.
+                <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 md:text-lg">
+                  Operacao inteligente, vendas sem fricção, dados que convertem. Escale experiencias profissionais com a precisão que voce merece.
                 </p>
               </div>
 

@@ -41,12 +41,12 @@ export function EditorialIntroSection() {
         <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <PublicReveal>
             <div className="max-w-xl">
-              <div className="text-[11px] uppercase tracking-[0.34em] text-white/42">Como funciona</div>
+              <div className="text-[11px] uppercase tracking-[0.34em] text-white/48">O caminho da experiência</div>
               <h2 className="mt-5 font-display text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
-                Eventos com identidade. Compra sem complicacao.
+                Descubra. Compre. Viva.
               </h2>
-              <p className="mt-6 max-w-lg text-base leading-8 text-white/64 md:text-lg">
-                Cada evento e apresentado com atencao ao detalhe para que sua experiencia comece na descoberta — e termine com uma lembranca que vale o ingresso.
+              <p className="mt-6 max-w-lg text-base leading-8 text-white/72 md:text-lg">
+                Cada detalhe foi desenhado para que sua jornada comece com desejo real e termine com uma lembrança que justifica o investimento.
               </p>
               <div className="mt-8 flex items-center gap-3 text-sm font-medium text-white/78">
                 <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/14 bg-white/8 shadow-[0_12px_30px_rgba(0,0,0,0.3)]">

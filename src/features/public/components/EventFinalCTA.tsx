@@ -17,12 +17,12 @@ export function EventFinalCTA({ event, isFreeMode }: EventFinalCTAProps) {
             <div className="absolute bottom-[-5rem] left-[-3rem] h-52 w-52 rounded-full bg-[#d4b98e]/12 blur-3xl" />
             <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
               <div className="max-w-3xl">
-                <div className="text-[11px] uppercase tracking-[0.34em] text-white/52">Ultimo convite</div>
+                <div className="text-[11px] uppercase tracking-[0.34em] text-white/52">Sua entrada ja era</div>
                 <h2 className="mt-5 font-display text-[clamp(2.8rem,4.5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
-                  Faça parte de {event.name} e entre na experiencia pela camada certa.
+                  Garanta {event.name}
                 </h2>
                 <p className="mt-6 text-base leading-8 text-white/72 md:text-lg">
-                  Presenca, narrativa e operacao real trabalhando juntas para transformar a decisao de compra em desejo imediato.
+                  Vagas limitadas. Demanda real. Experiencias como essa nao esperam.
                 </p>
               </div>
 

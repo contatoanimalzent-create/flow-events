@@ -80,8 +80,10 @@ export function buildOrderDraftPayload(input: CreateOrderDraftInput) {
     total_amount: totals.totalAmount,
     status: 'draft',
     payment_method: input.payment_method ?? null,
+    source_channel: input.source_channel ?? null,
     expires_at: input.expires_at ?? null,
     notes: input.notes ?? null,
+    metadata: input.metadata ?? {},
   }
 }
 
@@ -129,6 +131,7 @@ export function mapOrderRow(row: Record<string, unknown>): OrderRow {
     stripe_payment_intent: (row.stripe_payment_intent as string | null | undefined) ?? null,
     stripe_session_id: (row.stripe_session_id as string | null | undefined) ?? null,
     pagarme_order_id: (row.pagarme_order_id as string | null | undefined) ?? null,
+    metadata: (row.metadata as Record<string, unknown> | null | undefined) ?? {},
     created_at: String(row.created_at ?? nowIso()),
   }
 }

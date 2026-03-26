@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
+import { growthService, readStoredReferralCode } from '@/features/growth'
 import { usePaymentStatus } from '@/features/payments'
 import { useCheckoutFlow, useCheckoutStore } from '@/features/orders/hooks'
 import type { CheckoutCartItem, OrderPaymentMethod } from '@/features/orders/types'
@@ -63,6 +64,8 @@ export function PublicCheckoutContent({
   const [phase, setPhase] = useState<'form' | 'review' | 'payment' | 'processing'>('form')
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
   const [error, setError] = useState('')
+  const processedConversionOrderRef = useRef<string | null>(null)
+  const referralCode = useMemo(() => readStoredReferralCode(event.id), [event.id])
 
   const {
     paymentMethod,
@@ -89,6 +92,11 @@ export function PublicCheckoutContent({
     eventId: event.id,
     organizationId: event.organization_id,
     cartItems: cart,
+    sourceChannel: referralCode ? 'public_referral' : 'public_event_page',
+    metadata: {
+      landing_path: typeof window !== 'undefined' ? window.location.pathname : '',
+      referral_code: referralCode ?? null,
+    },
     feeConfig: {
       fee_type: event.fee_type,
       fee_value: event.fee_value,
@@ -151,6 +159,19 @@ export function PublicCheckoutContent({
     }
 
     if (paymentStatus.isPaid) {
+      if (draftOrderId && processedConversionOrderRef.current !== draftOrderId) {
+        processedConversionOrderRef.current = draftOrderId
+        void growthService.registerReferralConversion({
+          organizationId: event.organization_id,
+          eventId: event.id,
+          orderId: draftOrderId,
+          buyerEmail: buyer.email,
+          grossAmount: cartSummary.total_amount,
+          referralCode,
+          source: 'public_checkout',
+        })
+      }
+
       markPaymentStatus('paid')
       setCurrentStep(4)
       resetCheckout()
@@ -185,6 +206,11 @@ export function PublicCheckoutContent({
     }
   }, [
     clearPaymentState,
+    buyer.email,
+    cartSummary.total_amount,
+    draftOrderId,
+    event.id,
+    event.organization_id,
     markPaymentStatus,
     onSuccess,
     paymentStatus.isCancelled,
@@ -193,6 +219,7 @@ export function PublicCheckoutContent({
     paymentStatus.isPaid,
     paymentStatus.isRefunded,
     phase,
+    referralCode,
     resetCheckout,
   ])
 
@@ -226,8 +253,22 @@ export function PublicCheckoutContent({
 
     try {
       if (isFreeOrder) {
-        setCurrentStep(4)
         await confirmDraft('free')
+
+        if (draftOrderId && processedConversionOrderRef.current !== draftOrderId) {
+          processedConversionOrderRef.current = draftOrderId
+          void growthService.registerReferralConversion({
+            organizationId: event.organization_id,
+            eventId: event.id,
+            orderId: draftOrderId,
+            buyerEmail: buyer.email,
+            grossAmount: cartSummary.total_amount,
+            referralCode,
+            source: 'free_checkout',
+          })
+        }
+
+        setCurrentStep(4)
         resetCheckout()
         onSuccess()
         return

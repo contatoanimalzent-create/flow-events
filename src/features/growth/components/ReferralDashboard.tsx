@@ -1,0 +1,115 @@
+import { Copy, Loader2, MoveUpRight } from 'lucide-react'
+import { useState } from 'react'
+import type { GrowthOverview } from '@/features/growth/types/growth.types'
+import { formatDate, formatCurrency } from '@/shared/lib'
+
+interface ReferralDashboardProps {
+  overview: GrowthOverview
+  isLoading?: boolean
+}
+
+export function ReferralDashboard({ overview, isLoading = false }: ReferralDashboardProps) {
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  async function copyLink(linkId: string, url: string) {
+    await navigator.clipboard.writeText(url)
+    setCopiedId(linkId)
+    window.setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  return (
+    <div className="space-y-8">
+      <section className="grid gap-5 xl:grid-cols-4">
+        {overview.metrics.map((metric) => (
+          <article key={metric.label} className="rounded-[2rem] border border-[#e6dac9] bg-white/92 p-6 shadow-[0_18px_55px_rgba(66,48,24,0.06)]">
+            <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">{metric.label}</div>
+            <div className="mt-4 font-display text-[2.6rem] font-semibold leading-none tracking-[-0.05em] text-[#1f1a15]">
+              {metric.value}
+            </div>
+            <p className="mt-4 text-sm leading-7 text-[#665948]">{metric.note}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-[2.2rem] border border-[#e6dac9] bg-white/92 p-7 shadow-[0_18px_55px_rgba(66,48,24,0.06)]">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">Referral links</div>
+            <h2 className="mt-3 font-display text-[2.6rem] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
+              Links compartilhaveis prontos para ativar o proximo ciclo.
+            </h2>
+          </div>
+
+          <div className="mt-8 space-y-4">
+            {overview.referralLinks.length === 0 ? (
+              <div className="rounded-[1.8rem] border border-dashed border-[#d9ccb8] bg-[#fbf7f1] p-6 text-sm leading-7 text-[#6c5e4f]">
+                Assim que o primeiro link for gerado por um comprador ou embaixador, ele aparece aqui com receita e conversoes.
+              </div>
+            ) : (
+              overview.referralLinks.map((link) => (
+                <div key={link.id} className="grid gap-4 rounded-[1.8rem] border border-[#ece1d1] bg-[#fcfaf6] p-5 md:grid-cols-[1.1fr_0.9fr_auto] md:items-center">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">{link.eventName}</div>
+                    <div className="mt-2 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-[#1f1a15]">
+                      {link.code}
+                    </div>
+                    <div className="mt-3 text-sm leading-7 text-[#6b5d4d]">{link.benefitLabel}</div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">Conversoes</div>
+                      <div className="mt-2 text-lg font-semibold text-[#1f1a15]">{link.conversions}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">Receita</div>
+                      <div className="mt-2 text-lg font-semibold text-[#1f1a15]">{formatCurrency(link.revenue)}</div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => void copyLink(link.id, link.shareUrl)}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-[#d3c6b4] px-4 py-3 text-sm font-medium text-[#1f1a15] transition-all hover:-translate-y-0.5 hover:border-[#bca17f]"
+                  >
+                    <Copy className="h-4 w-4" />
+                    {copiedId === link.id ? 'Copiado' : 'Copiar'}
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-[2.2rem] border border-[#e6dac9] bg-white/92 p-7 shadow-[0_18px_55px_rgba(66,48,24,0.06)]">
+          <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">Recent signals</div>
+          <h2 className="mt-3 font-display text-[2.2rem] font-semibold leading-[0.94] tracking-[-0.04em] text-[#1f1a15]">
+            O loop de crescimento esta vivo e deixa rastro claro.
+          </h2>
+
+          <div className="mt-8 space-y-4">
+            {isLoading ? (
+              <div className="flex items-center gap-3 rounded-[1.6rem] border border-[#ece1d1] bg-[#fcfaf6] p-5 text-sm text-[#6b5d4d]">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Carregando sinais recentes de aquisicao.
+              </div>
+            ) : (
+              overview.recentSignals.map((signal) => (
+                <div key={signal.id} className="rounded-[1.6rem] border border-[#ece1d1] bg-[#fcfaf6] p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-medium text-[#1f1a15]">{signal.title}</div>
+                      <p className="mt-2 text-sm leading-7 text-[#6b5d4d]">{signal.description}</p>
+                    </div>
+                    <MoveUpRight className={`mt-1 h-4 w-4 ${signal.tone === 'success' ? 'text-[#496348]' : signal.tone === 'warning' ? 'text-[#9b6a2e]' : 'text-[#8b7c69]'}`} />
+                  </div>
+                  <div className="mt-3 text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">{formatDate(signal.timestamp)}</div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}

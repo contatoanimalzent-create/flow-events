@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, Heart, Share2, Ticket } from 'lucide-react'
+import { ArrowRight, Heart, Ticket } from 'lucide-react'
 import type { EventMediaAsset } from '@/features/event-media/types'
+import { ExitLeadCaptureDialog, ReferralTracker, ShareButtons, SocialProofBlock } from '@/features/growth'
 import { CheckoutSuccessPage, PublicCheckoutContent } from '@/features/orders'
 import {
   EventCinematicHero,
@@ -14,7 +15,7 @@ import {
   StickyPurchaseCTA,
   usePublicEvent,
 } from '@/features/public'
-import { formatCurrency } from '@/shared/lib'
+import { formatCurrency, useSeoMeta } from '@/shared/lib'
 
 interface CartItem {
   ticketTypeId: string
@@ -171,17 +172,6 @@ export function EventPage({ slug }: { slug: string }) {
     })
   }
 
-  function shareEvent() {
-    const url = window.location.href
-
-    if (navigator.share) {
-      void navigator.share({ title: event?.name, url })
-      return
-    }
-
-    void navigator.clipboard.writeText(url)
-  }
-
   const storyAssets = useMemo(() => {
     if (!mediaPresentation) {
       return []
@@ -194,6 +184,21 @@ export function EventPage({ slug }: { slug: string }) {
       mediaPresentation.galleryImages[2] ?? mediaPresentation.coverAsset,
     ].filter(Boolean) as EventMediaAsset[]
   }, [mediaPresentation])
+
+  useSeoMeta({
+    title: event ? `${event.name} | Animalz Events` : 'Experiencia | Animalz Events',
+    description:
+      event?.short_description ||
+      event?.full_description ||
+      'Experiencias premium com narrativa visual, checkout refinado e operacao real conectada ao mesmo produto.',
+    image:
+      mediaPresentation?.heroAsset?.thumbnail_url ||
+      mediaPresentation?.heroAsset?.secure_url ||
+      mediaPresentation?.coverAsset?.secure_url ||
+      event?.cover_url ||
+      getFallbackImage(event?.category ?? '', event?.cover_url),
+    url: typeof window !== 'undefined' ? window.location.href : event ? `/e/${event.slug}` : '/events',
+  })
 
   if (publicEventQuery.isPending) {
     return <LoadingState />
@@ -311,13 +316,6 @@ export function EventPage({ slug }: { slug: string }) {
           >
             <Heart className={['h-4 w-4', liked ? 'fill-current' : ''].join(' ')} />
           </button>
-          <button
-            type="button"
-            onClick={shareEvent}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-[#ddd1bf] bg-white/85 text-[#5f5549]"
-          >
-            <Share2 className="h-4 w-4" />
-          </button>
           {cartQty > 0 ? (
             <button
               type="button"
@@ -331,6 +329,7 @@ export function EventPage({ slug }: { slug: string }) {
         </div>
       }
     >
+      <ReferralTracker eventId={event.id} />
       <StickyPurchaseCTA
         cartQty={cartQty}
         cartTotal={cartTotal}
@@ -348,7 +347,42 @@ export function EventPage({ slug }: { slug: string }) {
         minPrice={minPrice}
       />
 
+      <div className="px-5 pt-6 md:px-10 lg:px-16">
+        <div className="mx-auto max-w-7xl">
+          <ShareButtons
+            organizationId={event.organization_id}
+            eventId={event.id}
+            eventName={event.name}
+            eventSlug={event.slug}
+            description={event.short_description}
+            tone="light"
+          />
+        </div>
+      </div>
+
       <EventManifestSection event={event} />
+      <SocialProofBlock
+        eyebrow="Social proof"
+        title="A demanda aparece antes do primeiro QR code ser lido."
+        description="Cada sinal reforca a sensacao de evento desejado, prova social viva e urgencia elegante para quem ainda esta decidindo."
+        items={[
+          {
+            label: 'Participantes',
+            value: event.sold_tickets.toLocaleString('pt-BR'),
+            note: 'Acessos vendidos e convertidos a partir de uma pagina publica com midia real e checkout premium.',
+          },
+          {
+            label: 'Capacidade aberta',
+            value: event.total_capacity.toLocaleString('pt-BR'),
+            note: 'Escala mapeada para sustentar vendas, check-in, CRM e relacao continua com o publico.',
+          },
+          {
+            label: 'Check-ins operados',
+            value: event.checked_in_count.toLocaleString('pt-BR'),
+            note: 'Prova de que a camada publica conecta conversao e operacao real no mesmo produto.',
+          },
+        ]}
+      />
       <EventInformationHighlights event={event} isFreeMode={isFreeMode} />
 
       {storySections.map((section) => (
@@ -377,6 +411,7 @@ export function EventPage({ slug }: { slug: string }) {
       />
 
       <EventFinalCTA event={event} isFreeMode={isFreeMode} />
+      <ExitLeadCaptureDialog source="public_event_exit" organizationId={event.organization_id} eventId={event.id} />
     </PublicLayout>
   )
 }

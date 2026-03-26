@@ -12,6 +12,8 @@ interface UseCheckoutFlowParams {
   eventId: string
   organizationId: string
   cartItems: CheckoutCartItem[]
+  sourceChannel?: string
+  metadata?: Record<string, unknown>
   feeConfig?: {
     fee_type?: 'fixed' | 'percentage' | null
     fee_value?: number | null
@@ -30,7 +32,15 @@ function mapCartItemsToDraftItems(cartItems: CheckoutCartItem[]): CreateOrderDra
   }))
 }
 
-export function useCheckoutFlow({ eventId, organizationId, cartItems, feeConfig, onInventoryChanged }: UseCheckoutFlowParams) {
+export function useCheckoutFlow({
+  eventId,
+  organizationId,
+  cartItems,
+  sourceChannel,
+  metadata,
+  feeConfig,
+  onInventoryChanged,
+}: UseCheckoutFlowParams) {
   const queryClient = useQueryClient()
   const {
     buyer,
@@ -201,8 +211,9 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, feeConfig,
       fee_value: cartSummary.fee_value,
       absorb_fee: cartSummary.absorb_fee,
       payment_method: selectedPaymentMethod ?? paymentMethod ?? (cartSummary.total_amount === 0 ? 'free' : 'pix'),
-      source_channel: 'public_event_page',
+      source_channel: sourceChannel ?? 'public_event_page',
       expires_at: buildDefaultOrderExpiration(),
+      metadata,
     })
 
     if (selectedPaymentMethod) {

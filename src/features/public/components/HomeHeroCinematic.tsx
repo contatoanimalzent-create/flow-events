@@ -91,18 +91,16 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHe
                     Explorar eventos
                     <ArrowRight className="h-4 w-4" />
                   </a>
-                  {onLogin ? (
-                    <button
-                      type="button"
-                      onClick={onLogin}
-                      className="inline-flex items-center gap-3 rounded-full border border-white/36 bg-white/6 px-6 py-3 text-sm font-medium text-white transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
-                    >
-                      Acessar plataforma
-                    </button>
-                  ) : heroEvent ? (
+                  <a
+                    href="/create-event"
+                    className="inline-flex items-center gap-3 rounded-full border border-white/36 bg-white/6 px-6 py-3 text-sm font-medium text-white transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
+                  >
+                    Criar evento
+                  </a>
+                  {heroEvent ? (
                     <a
                       href={`/e/${heroEvent.slug}`}
-                      className="inline-flex items-center gap-3 rounded-full border border-white/36 bg-white/6 px-6 py-3 text-sm font-medium text-white transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
+                      className="inline-flex items-center gap-3 rounded-full border border-white/24 bg-white/6 px-6 py-3 text-sm font-medium text-white/90 transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
                     >
                       Ver experiencia em destaque
                     </a>

@@ -70,6 +70,7 @@ export interface OrderRow {
   stripe_payment_intent?: string | null
   stripe_session_id?: string | null
   pagarme_order_id?: string | null
+  metadata?: Record<string, unknown>
   created_at: string
 }
 
@@ -159,6 +160,7 @@ export interface CreateOrderDraftInput {
   source_channel?: string | null
   expires_at?: string | null
   notes?: string | null
+  metadata?: Record<string, unknown>
 }
 
 export interface OrderSummaryStats {

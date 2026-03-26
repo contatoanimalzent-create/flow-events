@@ -2,6 +2,7 @@ import type { PublicRoute } from './public-routes'
 import { AuthLoadingGate, useAuthStore } from '@/features/auth'
 import { ContactPage } from '@/pages/public/ContactPage'
 import { AccountPage } from '@/pages/public/AccountPage'
+import { CreateEventPage } from '@/pages/public/CreateEventPage'
 import { EventPage } from '@/pages/public/EventPage'
 import { EventsCatalogPage } from '@/pages/public/EventsCatalogPage'
 import { HomePage } from '@/pages/public/HomePage'
@@ -25,6 +26,7 @@ export function PublicRouteView({ route, onLogin, onBackToHome }: PublicRouteVie
   if (route === 'terms') return <TermsPage />
   if (route === 'privacy') return <PrivacyPage />
   if (route === 'contact') return <ContactPage />
+  if (route === 'create-event') return <CreateEventPage onLogin={onLogin} />
   if (route === 'account') {
     return (
       <AuthLoadingGate>

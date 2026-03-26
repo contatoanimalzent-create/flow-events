@@ -13,6 +13,7 @@ interface PublicHeaderProps {
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Eventos', href: '/events' },
+  { label: 'Criar evento', href: '/create-event' },
   { label: 'Contato', href: '/contact' },
 ]
 

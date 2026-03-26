@@ -33,22 +33,20 @@ export function ConversionCTASection({ onLogin }: ConversionCTASectionProps) {
                 Explorar eventos
                 <ArrowRight className="h-4 w-4" />
               </a>
-              {onLogin ? (
-                <button
-                  type="button"
-                  onClick={onLogin}
-                  className="inline-flex items-center gap-3 rounded-full border border-[#cdbfa9] bg-white/75 px-6 py-3 text-sm font-medium text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:bg-white"
-                >
-                  Entrar na plataforma
-                </button>
-              ) : (
+              <a
+                href="/create-event"
+                className="inline-flex items-center gap-3 rounded-full border border-[#cdbfa9] bg-white/75 px-6 py-3 text-sm font-medium text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:bg-white"
+              >
+                Criar evento
+              </a>
+              {!onLogin ? (
                 <a
                   href="/contact"
                   className="inline-flex items-center gap-3 rounded-full border border-[#cdbfa9] bg-white/75 px-6 py-3 text-sm font-medium text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:bg-white"
                 >
                   Falar com a equipe
                 </a>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

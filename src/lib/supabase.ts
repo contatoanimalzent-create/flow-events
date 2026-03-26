@@ -56,6 +56,9 @@ export type Database = {
       organization_members:             { Row: OrganizationMember;             Insert: Partial<OrganizationMember>;             Update: Partial<OrganizationMember> }
       incidents:                        { Row: Incident;                       Insert: Partial<Incident>;                       Update: Partial<Incident> }
       internal_notifications:           { Row: InternalNotification;           Insert: Partial<InternalNotification>;           Update: Partial<InternalNotification> }
+      growth_leads:                     { Row: GrowthLead;                     Insert: Partial<GrowthLead>;                     Update: Partial<GrowthLead> }
+      referral_links:                   { Row: ReferralLink;                   Insert: Partial<ReferralLink>;                   Update: Partial<ReferralLink> }
+      referral_conversions:             { Row: ReferralConversion;             Insert: Partial<ReferralConversion>;             Update: Partial<ReferralConversion> }
       executive_dashboard_snapshots:    { Row: ExecutiveDashboardSnapshot;     Insert: Partial<ExecutiveDashboardSnapshot>;     Update: Partial<ExecutiveDashboardSnapshot> }
       data_integrity_checks:            { Row: DataIntegrityCheck;             Insert: Partial<DataIntegrityCheck>;             Update: Partial<DataIntegrityCheck> }
       data_integrity_issues:            { Row: DataIntegrityIssue;             Insert: Partial<DataIntegrityIssue>;             Update: Partial<DataIntegrityIssue> }
@@ -811,6 +814,55 @@ export interface InternalNotification {
   reference_id?: string | null
   is_read: boolean
   read_at?: string | null
+  created_at: string
+}
+
+export type GrowthLeadStatus = 'new' | 'qualified' | 'contacted' | 'converted' | 'archived'
+
+export interface GrowthLead {
+  id: string
+  organization_id?: string | null
+  event_id?: string | null
+  email: string
+  full_name?: string | null
+  source: string
+  status: GrowthLeadStatus
+  metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export type ReferralBenefitType = 'discount' | 'cashback' | 'future_credit' | 'vip_upgrade'
+
+export interface ReferralLink {
+  id: string
+  organization_id: string
+  event_id: string
+  referrer_id: string
+  code: string
+  benefit_type: ReferralBenefitType
+  benefit_value: number
+  benefit_description?: string | null
+  conversion_count: number
+  revenue_generated: number
+  is_active: boolean
+  metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export interface ReferralConversion {
+  id: string
+  organization_id: string
+  referral_link_id: string
+  referrer_id: string
+  event_id: string
+  order_id: string
+  buyer_email?: string | null
+  conversion: boolean
+  gross_amount: number
+  reward_status: 'pending' | 'granted' | 'rejected' | 'expired'
+  metadata: Record<string, unknown>
   created_at: string
 }
 

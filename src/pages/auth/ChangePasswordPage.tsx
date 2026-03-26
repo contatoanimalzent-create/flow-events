@@ -31,11 +31,13 @@ export function ChangePasswordPage() {
   return (
     <div className="min-h-screen bg-bg-primary flex items-center justify-center px-8">
       <div className="w-full max-w-md">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-teal flex items-center justify-center">
-            <Ticket className="w-5 h-5 text-bg-primary" />
-          </div>
-          <div className="font-bold text-text-primary text-lg">Animalz Events</div>
+        <div className="flex items-center mb-8">
+          <img
+            src="/logo.png"
+            alt="Animalz Events"
+            className="h-12 w-auto object-contain"
+            style={{ filter: 'drop-shadow(0 0 6px rgba(196,154,80,0.18))' }}
+          />
         </div>
 
         <div className="card p-8">

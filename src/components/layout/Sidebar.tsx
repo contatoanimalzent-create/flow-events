@@ -117,19 +117,28 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
           isOpen ? 'gap-4 px-6 py-5' : 'justify-center px-4 py-5',
         )}
       >
-        <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#c49a50]/30 bg-[#c49a50]/10 shrink-0">
-          <span className="font-serif text-xl font-semibold leading-none text-[#c49a50]">A</span>
-        </div>
         {isOpen ? (
-          <div className="min-w-0 animate-fade-in">
-            <div className="font-serif text-2xl font-semibold leading-none text-[#f0ebe2]">
-              Animalz Events
-            </div>
-            <div className="mt-1 truncate text-[10px] uppercase tracking-[0.26em] text-[#6a6058]">
-              {organization?.name ?? 'Plataforma'}
+          <div className="flex items-center gap-3 animate-fade-in min-w-0">
+            <img
+              src="/logo.png"
+              alt="Animalz Events"
+              className="h-10 w-auto shrink-0 object-contain"
+              style={{ filter: 'drop-shadow(0 0 6px rgba(196,154,80,0.15))' }}
+            />
+            <div className="min-w-0">
+              <div className="mt-1 truncate text-[10px] uppercase tracking-[0.26em] text-[#6a6058]">
+                {organization?.name ?? 'Plataforma'}
+              </div>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <img
+            src="/logo.png"
+            alt="A"
+            className="h-9 w-9 object-contain shrink-0"
+            style={{ filter: 'drop-shadow(0 0 5px rgba(196,154,80,0.2))' }}
+          />
+        )}
       </div>
 
       {/* Nav */}

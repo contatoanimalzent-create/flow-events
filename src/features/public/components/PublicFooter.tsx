@@ -3,10 +3,12 @@ export function PublicFooter() {
     <footer className="border-t border-[rgba(255,255,255,0.07)] bg-[#080706]">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 md:px-10 lg:grid-cols-[1.15fr_0.85fr] lg:px-16 lg:py-16">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.34em] text-[#c49a50]">Animalz Events</div>
-          <div className="mt-4 font-display text-[3.6rem] font-semibold leading-[0.9] tracking-[-0.05em] text-[#f0ebe2]">
-            Animalz Events
-          </div>
+          <img
+            src="/logo.png"
+            alt="Animalz Events"
+            className="h-16 w-auto object-contain"
+            style={{ filter: 'drop-shadow(0 0 10px rgba(196,154,80,0.2))' }}
+          />
           <p className="mt-5 max-w-xl text-sm leading-7 text-[#6a6058] md:text-base">
             Os melhores eventos de cultura, gastronomia, musica e lifestyle. Compre ingressos com facilidade e garanta seu lugar.
           </p>

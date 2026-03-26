@@ -37,13 +37,13 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
           )}
 
           {/* Logo */}
-          <div className="flex items-center gap-3 mb-12">
-            <div className="w-8 h-8 rounded-sm bg-brand-acid flex items-center justify-center">
-              <span className="font-display text-bg-primary text-sm font-bold">A</span>
-            </div>
-            <div className="font-display text-2xl tracking-wide text-text-primary leading-none">
-              ANIMALZ<span className="text-brand-acid">.</span>
-            </div>
+          <div className="mb-12">
+            <img
+              src="/logo.png"
+              alt="Animalz Events"
+              className="h-14 w-auto object-contain"
+              style={{ filter: 'drop-shadow(0 0 8px rgba(196,154,80,0.2))' }}
+            />
           </div>
 
           <h1 className="font-display text-4xl tracking-wide text-text-primary leading-none mb-1">

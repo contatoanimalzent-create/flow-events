@@ -34,18 +34,13 @@ export function PublicHeader({ onLogin, actionSlot, compact = false, className }
           compact ? 'py-4' : 'py-5',
         )}
       >
-        <a href="/" className="flex items-center gap-3 no-underline">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c49a50]/30 bg-[#c49a50]/10 text-sm font-semibold tracking-[0.28em] text-[#c49a50]">
-            AE
-          </div>
-          <div>
-            <div className="font-display text-[1.9rem] font-semibold leading-none tracking-[-0.04em] text-[#f0ebe2]">
-              Animalz Events
-            </div>
-            <div className="mt-1 text-[10px] uppercase tracking-[0.32em] text-[#4a4540]">
-              Eventos & Experiencias
-            </div>
-          </div>
+        <a href="/" className="flex items-center no-underline">
+          <img
+            src="/logo.png"
+            alt="Animalz Events"
+            className="h-12 w-auto object-contain"
+            style={{ filter: 'drop-shadow(0 0 8px rgba(196,154,80,0.18))' }}
+          />
         </a>
 
         <nav className="hidden items-center gap-8 lg:flex">

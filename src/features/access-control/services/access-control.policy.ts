@@ -15,6 +15,7 @@ export const SECTION_PERMISSIONS: SectionPermissionMap = {
   intelligence: { module: 'intelligence', action: 'view' },
   communication: { module: 'campaigns', action: 'view' },
   financial: { module: 'financial', action: 'view' },
+  billing: { module: 'financial', action: 'view' },
   growth: { module: 'dashboard', action: 'view' },
   help: { module: 'dashboard', action: 'view' },
   settings: { module: 'settings', action: 'view' },

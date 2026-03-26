@@ -21,6 +21,9 @@ export interface EventRow {
   total_capacity?: number
   sold_tickets: number
   cover_url?: string
+  fee_type: 'fixed' | 'percentage'
+  fee_value: number
+  absorb_fee: boolean
   created_at: string
 }
 
@@ -55,6 +58,9 @@ export interface EventFormData {
   online_url: string
   cover_url: string
   video_url: string
+  fee_type: 'fixed' | 'percentage'
+  fee_value: string
+  absorb_fee: boolean
 }
 
 export type EventListFilter = 'all' | EventStatus

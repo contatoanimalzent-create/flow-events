@@ -18,6 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export type Database = {
   public: {
     Tables: {
+      subscription_plans:        { Row: SubscriptionPlan;        Insert: Partial<SubscriptionPlan>;        Update: Partial<SubscriptionPlan> }
       organizations:             { Row: Organization;            Insert: Partial<Organization>;            Update: Partial<Organization> }
       profiles:                  { Row: Profile;                 Insert: Partial<Profile>;                 Update: Partial<Profile> }
       events:                    { Row: Event;                   Insert: Partial<Event>;                   Update: Partial<Event> }
@@ -66,6 +67,20 @@ export type Database = {
   }
 }
 
+export interface SubscriptionPlan {
+  id: string
+  slug: string
+  name: string
+  description?: string | null
+  price: number
+  billing_cycle: 'monthly' | 'annual' | 'custom'
+  features: string[]
+  limits: Record<string, number | null>
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface Organization {
   id: string
   name: string
@@ -78,6 +93,8 @@ export interface Organization {
   stripe_account_id?: string | null
   stripe_account_status?: string
   plan: string
+  subscription_plan_id?: string | null
+  feature_flags?: Record<string, boolean> | null
   is_active: boolean
   created_at: string
   updated_at: string
@@ -128,6 +145,9 @@ export interface Event {
   checked_in_count: number
   logo_url?: string
   cover_url?: string
+  fee_type: 'fixed' | 'percentage'
+  fee_value: number
+  absorb_fee: boolean
   status: EventStatus
   published_at?: string
   created_at: string
@@ -147,6 +167,12 @@ export interface Order {
   subtotal: number
   discount_amount: number
   fee_amount: number
+  platform_fee_amount: number
+  customer_fee_amount: number
+  absorbed_fee_amount: number
+  fee_type: 'fixed' | 'percentage'
+  fee_value: number
+  absorb_fee: boolean
   total_amount: number
   status: OrderStatus
   payment_method?: string | null

@@ -17,6 +17,7 @@ const SuppliersPage = lazy(() => import('@/pages/SuppliersPage').then((module) =
 const ProductsPage = lazy(() => import('@/pages/ProductsPage').then((module) => ({ default: module.ProductsPage })))
 const IntelligencePage = lazy(() => import('@/pages/IntelligencePage').then((module) => ({ default: module.IntelligencePage })))
 const FinancialPage = lazy(() => import('@/pages/FinancialPage').then((module) => ({ default: module.FinancialPage })))
+const BillingPage = lazy(() => import('@/pages/BillingPage').then((module) => ({ default: module.BillingPage })))
 const CommunicationPage = lazy(() => import('@/pages/CommunicationPage').then((module) => ({ default: module.CommunicationPage })))
 const GrowthPage = lazy(() => import('@/pages/GrowthPage').then((module) => ({ default: module.GrowthPage })))
 const HelpPage = lazy(() => import('@/pages/HelpPage').then((module) => ({ default: module.HelpPage })))
@@ -51,6 +52,8 @@ function renderSection(activeSection: NavSection) {
       return <IntelligencePage />
     case 'financial':
       return <FinancialPage />
+    case 'billing':
+      return <BillingPage />
     case 'communication':
       return <CommunicationPage />
     case 'growth':

@@ -33,6 +33,9 @@ export const EMPTY_EVENT_FORM: EventFormData = {
   online_url: '',
   cover_url: '',
   video_url: '',
+  fee_type: 'percentage',
+  fee_value: '10',
+  absorb_fee: false,
 }
 
 export const EVENT_CATEGORIES = ['M\u00fasica', 'Tech', 'Arte', 'Esportes', 'Business', 'Gastronomia', 'Moda', 'Educa\u00e7\u00e3o', 'Outro']

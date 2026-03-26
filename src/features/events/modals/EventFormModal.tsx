@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { AlertCircle, Check, ChevronRight, ImageIcon, Loader2, Upload, Video } from 'lucide-react'
 import { EventMediaManager } from '@/features/event-media'
+import { FeeConfigurationPanel } from '@/features/billing'
 import { useEventForm } from '@/features/events/hooks'
 import { EVENT_AGE_RATINGS, EVENT_CATEGORIES, getUnsplashImages } from '@/features/events/types'
 import {
@@ -194,6 +195,17 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                       onChange={(event) => setField('dress_code', event.target.value)}
                     />
                   </FormField>
+                </FormSection>
+
+                <FormSection title="Monetizacao do evento" description="Defina como a plataforma monetiza este evento e como a taxa aparece para o comprador.">
+                  <FeeConfigurationPanel
+                    feeType={form.fee_type}
+                    feeValue={form.fee_value}
+                    absorbFee={form.absorb_fee}
+                    onFeeTypeChange={(value) => setField('fee_type', value)}
+                    onFeeValueChange={(value) => setField('fee_value', value)}
+                    onAbsorbFeeChange={(value) => setField('absorb_fee', value)}
+                  />
                 </FormSection>
 
                 <ConfirmActionBox

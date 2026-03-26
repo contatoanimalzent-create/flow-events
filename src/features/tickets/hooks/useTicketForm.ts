@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/features/auth'
 import { auditService } from '@/features/audit'
+import { billingService } from '@/features/billing/services'
 import { EMPTY_TICKET_TYPE_FORM } from '@/features/tickets/types'
 import { ticketKeys, ticketMutations, ticketQueries } from '@/features/tickets/services'
 import { formatBenefitsForForm } from '@/features/tickets/services'
@@ -88,6 +89,19 @@ export function useTicketForm({ eventId, ticketId, position, onSaved }: UseTicke
     setError('')
 
     try {
+      if (!ticketId && organizationId) {
+        const gate = await billingService.getPlanGateSnapshot(organizationId, eventId)
+
+        if (!gate.canCreateTicketType) {
+          const limitLabel =
+            gate.usage.ticketsPerEventLimit == null
+              ? 'do plano atual'
+              : `de ${gate.usage.ticketsPerEventLimit} tipos por evento`
+          setError(`Este evento ja alcançou o limite ${limitLabel}. Ajuste o plano em Billing para liberar novos tipos de ingresso.`)
+          return
+        }
+      }
+
       if (ticketId) {
         await updateMutation.mutateAsync({ ticketId, eventId, form, position })
         if (organizationId) {

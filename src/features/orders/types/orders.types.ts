@@ -53,6 +53,12 @@ export interface OrderRow {
   subtotal: number
   discount_amount: number
   fee_amount: number
+  platform_fee_amount: number
+  customer_fee_amount: number
+  absorbed_fee_amount: number
+  fee_type: 'fixed' | 'percentage'
+  fee_value: number
+  absorb_fee: boolean
   total_amount: number
   status: OrderStatus
   payment_status: OrderPaymentStatus
@@ -143,6 +149,12 @@ export interface CreateOrderDraftInput {
   items: OrderDraftItemInput[]
   discount_amount?: number
   fee_amount?: number
+  platform_fee_amount?: number
+  customer_fee_amount?: number
+  absorbed_fee_amount?: number
+  fee_type?: 'fixed' | 'percentage'
+  fee_value?: number
+  absorb_fee?: boolean
   payment_method?: OrderPaymentMethod | null
   source_channel?: string | null
   expires_at?: string | null
@@ -172,6 +184,12 @@ export interface CheckoutSummary {
   subtotal: number
   discount_amount: number
   fee_amount: number
+  platform_fee_amount: number
+  customer_fee_amount: number
+  absorbed_fee_amount: number
+  fee_type: 'fixed' | 'percentage'
+  fee_value: number
+  absorb_fee: boolean
   total_amount: number
   quantity: number
 }

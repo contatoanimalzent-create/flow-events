@@ -23,6 +23,7 @@ const sectionTitles: Record<NavSection, string> = {
   intelligence: 'Intelligence',
   communication: 'Comunicacao',
   financial: 'Financeiro',
+  billing: 'Billing & Monetizacao',
   growth: 'Growth Services',
   help: 'Ajuda & Treinamento',
   settings: 'Configuracoes',

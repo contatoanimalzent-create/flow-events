@@ -23,6 +23,9 @@ export interface PublicEventRecord {
   settings: Record<string, unknown>
   is_free: boolean
   registration_mode: 'tickets' | 'registration' | 'both'
+  fee_type: 'fixed' | 'percentage'
+  fee_value: number
+  absorb_fee: boolean
   status: string
 }
 

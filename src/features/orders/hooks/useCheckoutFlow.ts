@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { calculateFeeBreakdown } from '@/features/billing/services/billing.calculations'
 import { ticketKeys } from '@/features/tickets/services/tickets.queries'
 import { paymentKeys, paymentMutations } from '@/features/payments/services'
 import { orderKeys, orderMutations } from '@/features/orders/services'
@@ -11,6 +12,11 @@ interface UseCheckoutFlowParams {
   eventId: string
   organizationId: string
   cartItems: CheckoutCartItem[]
+  feeConfig?: {
+    fee_type?: 'fixed' | 'percentage' | null
+    fee_value?: number | null
+    absorb_fee?: boolean | null
+  }
   onInventoryChanged?: () => Promise<void> | void
 }
 
@@ -24,7 +30,7 @@ function mapCartItemsToDraftItems(cartItems: CheckoutCartItem[]): CreateOrderDra
   }))
 }
 
-export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventoryChanged }: UseCheckoutFlowParams) {
+export function useCheckoutFlow({ eventId, organizationId, cartItems, feeConfig, onInventoryChanged }: UseCheckoutFlowParams) {
   const queryClient = useQueryClient()
   const {
     buyer,
@@ -47,6 +53,13 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
 
   const cartSummary = useMemo(() => {
     const items = mapCartItemsToDraftItems(cartItems)
+    const feeBreakdown = calculateFeeBreakdown({
+      subtotal: items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0),
+      quantity: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+      feeType: feeConfig?.fee_type ?? 'percentage',
+      feeValue: feeConfig?.fee_value ?? 0,
+      absorbFee: feeConfig?.absorb_fee ?? false,
+    })
     const totals = buildOrderDraftTotals({
       organization_id: organizationId,
       event_id: eventId,
@@ -57,6 +70,13 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
         phone: buyer.phone,
       },
       items,
+      fee_amount: feeBreakdown.platformFeeAmount,
+      platform_fee_amount: feeBreakdown.platformFeeAmount,
+      customer_fee_amount: feeBreakdown.customerFeeAmount,
+      absorbed_fee_amount: feeBreakdown.absorbedFeeAmount,
+      fee_type: feeBreakdown.feeType,
+      fee_value: feeBreakdown.feeValue,
+      absorb_fee: feeBreakdown.absorbFee,
       payment_method: paymentMethod,
     })
 
@@ -65,10 +85,16 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
       subtotal: totals.subtotal,
       discount_amount: totals.discountAmount,
       fee_amount: totals.feeAmount,
+      platform_fee_amount: totals.platformFeeAmount,
+      customer_fee_amount: totals.customerFeeAmount,
+      absorbed_fee_amount: totals.absorbedFeeAmount,
+      fee_type: totals.feeType,
+      fee_value: totals.feeValue,
+      absorb_fee: totals.absorbFee,
       total_amount: totals.totalAmount,
       quantity: cartItems.reduce((sum, item) => sum + item.quantity, 0),
     }
-  }, [buyer.cpf, buyer.email, buyer.name, buyer.phone, cartItems, eventId, organizationId, paymentMethod])
+  }, [buyer.cpf, buyer.email, buyer.name, buyer.phone, cartItems, eventId, feeConfig?.absorb_fee, feeConfig?.fee_type, feeConfig?.fee_value, organizationId, paymentMethod])
 
   async function invalidateOrderAndInventory(orderId?: string) {
     const tasks: Promise<unknown>[] = [
@@ -167,6 +193,13 @@ export function useCheckoutFlow({ eventId, organizationId, cartItems, onInventor
         phone: buyer.phone || undefined,
       },
       items: cartSummary.items,
+      fee_amount: cartSummary.platform_fee_amount,
+      platform_fee_amount: cartSummary.platform_fee_amount,
+      customer_fee_amount: cartSummary.customer_fee_amount,
+      absorbed_fee_amount: cartSummary.absorbed_fee_amount,
+      fee_type: cartSummary.fee_type,
+      fee_value: cartSummary.fee_value,
+      absorb_fee: cartSummary.absorb_fee,
       payment_method: selectedPaymentMethod ?? paymentMethod ?? (cartSummary.total_amount === 0 ? 'free' : 'pix'),
       source_channel: 'public_event_page',
       expires_at: buildDefaultOrderExpiration(),

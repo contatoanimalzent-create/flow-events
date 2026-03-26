@@ -210,6 +210,9 @@ export function EventPage({ slug }: { slug: string }) {
           id: event.id,
           organization_id: event.organization_id,
           name: event.name,
+          fee_type: event.fee_type,
+          fee_value: event.fee_value,
+          absorb_fee: event.absorb_fee,
         }}
         ticketTypes={ticketTypes}
         cart={cart.map((item) => ({

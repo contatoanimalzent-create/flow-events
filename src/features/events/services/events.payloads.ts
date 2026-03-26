@@ -2,7 +2,7 @@ import { slugify } from '@/shared/lib'
 import type { EventFormData, EventRow } from '@/features/events/types'
 
 export const EVENT_LIST_SELECT =
-  'id,name,slug,subtitle,category,status,starts_at,ends_at,venue_name,venue_address,total_capacity,sold_tickets,cover_url,created_at'
+  'id,name,slug,subtitle,category,status,starts_at,ends_at,venue_name,venue_address,total_capacity,sold_tickets,cover_url,fee_type,fee_value,absorb_fee,created_at'
 
 function toOptionalString(value: string) {
   return value.trim() || null
@@ -38,6 +38,9 @@ export function buildEventPayload(form: EventFormData) {
     is_online: form.is_online,
     online_url: form.is_online ? toOptionalString(form.online_url) : null,
     cover_url: toOptionalString(form.cover_url),
+    fee_type: form.fee_type,
+    fee_value: Number(form.fee_value || 0),
+    absorb_fee: form.absorb_fee,
     settings: form.video_url ? { video_url: form.video_url.trim() } : {},
   }
 }
@@ -64,5 +67,8 @@ export function buildDuplicateEventPayload(event: EventRow, organizationId: stri
     venue_name: event.venue_name,
     venue_address: event.venue_address,
     total_capacity: event.total_capacity,
+    fee_type: event.fee_type,
+    fee_value: event.fee_value,
+    absorb_fee: event.absorb_fee,
   }
 }

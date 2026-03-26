@@ -16,6 +16,9 @@ interface PublicCheckoutContentProps {
     id: string
     organization_id: string
     name: string
+    fee_type?: 'fixed' | 'percentage'
+    fee_value?: number
+    absorb_fee?: boolean
   }
   ticketTypes: PublicTicketType[]
   cart: CheckoutCartItem[]
@@ -86,6 +89,11 @@ export function PublicCheckoutContent({
     eventId: event.id,
     organizationId: event.organization_id,
     cartItems: cart,
+    feeConfig: {
+      fee_type: event.fee_type,
+      fee_value: event.fee_value,
+      absorb_fee: event.absorb_fee,
+    },
     onInventoryChanged,
   })
 
@@ -302,7 +310,9 @@ export function PublicCheckoutContent({
         ? 'Mantivemos apenas os campos essenciais para reservar, pagar e emitir os ingressos com confianca.'
         : phase === 'processing'
           ? 'O gateway esta processando a transacao. Assim que a confirmacao chegar, os ingressos digitais serao emitidos automaticamente.'
-          : 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional do produto, agora com uma experiencia publica muito mais refinada.'
+          : event.absorb_fee
+            ? 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional, com fee absorvida pelo produtor para manter o total limpo ao comprador.'
+            : 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional do produto, agora com uma experiencia publica muito mais refinada.'
 
   return (
     <PublicLayout

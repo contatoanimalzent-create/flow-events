@@ -39,13 +39,21 @@ export function mapOrderStatusToPaymentStatus(status: OrderStatus): OrderPayment
 export function buildOrderDraftTotals(input: CreateOrderDraftInput) {
   const subtotal = input.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
   const discountAmount = input.discount_amount ?? 0
-  const feeAmount = input.fee_amount ?? 0
-  const totalAmount = subtotal - discountAmount + feeAmount
+  const platformFeeAmount = input.platform_fee_amount ?? input.fee_amount ?? 0
+  const customerFeeAmount = input.customer_fee_amount ?? input.fee_amount ?? 0
+  const absorbedFeeAmount = input.absorbed_fee_amount ?? Math.max(platformFeeAmount - customerFeeAmount, 0)
+  const totalAmount = subtotal - discountAmount + customerFeeAmount
 
   return {
     subtotal,
     discountAmount,
-    feeAmount,
+    feeAmount: platformFeeAmount,
+    platformFeeAmount,
+    customerFeeAmount,
+    absorbedFeeAmount,
+    feeType: input.fee_type ?? 'percentage',
+    feeValue: input.fee_value ?? 0,
+    absorbFee: input.absorb_fee ?? false,
     totalAmount,
   }
 }
@@ -63,6 +71,12 @@ export function buildOrderDraftPayload(input: CreateOrderDraftInput) {
     subtotal: totals.subtotal,
     discount_amount: totals.discountAmount,
     fee_amount: totals.feeAmount,
+    platform_fee_amount: totals.platformFeeAmount,
+    customer_fee_amount: totals.customerFeeAmount,
+    absorbed_fee_amount: totals.absorbedFeeAmount,
+    fee_type: totals.feeType,
+    fee_value: totals.feeValue,
+    absorb_fee: totals.absorbFee,
     total_amount: totals.totalAmount,
     status: 'draft',
     payment_method: input.payment_method ?? null,
@@ -98,6 +112,12 @@ export function mapOrderRow(row: Record<string, unknown>): OrderRow {
     subtotal: Number(row.subtotal ?? 0),
     discount_amount: Number(row.discount_amount ?? 0),
     fee_amount: Number(row.fee_amount ?? 0),
+    platform_fee_amount: Number(row.platform_fee_amount ?? row.fee_amount ?? 0),
+    customer_fee_amount: Number(row.customer_fee_amount ?? row.fee_amount ?? 0),
+    absorbed_fee_amount: Number(row.absorbed_fee_amount ?? 0),
+    fee_type: (row.fee_type as OrderRow['fee_type']) ?? 'percentage',
+    fee_value: Number(row.fee_value ?? 0),
+    absorb_fee: Boolean(row.absorb_fee),
     total_amount: Number(row.total_amount ?? 0),
     status,
     payment_status: mapOrderStatusToPaymentStatus(status),

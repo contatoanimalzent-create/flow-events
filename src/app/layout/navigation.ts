@@ -12,6 +12,7 @@ export type NavSection =
   | 'intelligence'
   | 'communication'
   | 'financial'
+  | 'billing'
   | 'growth'
   | 'help'
   | 'settings'

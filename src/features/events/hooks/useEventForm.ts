@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/features/auth'
 import { auditService } from '@/features/audit'
+import { billingService } from '@/features/billing/services'
 import { EMPTY_EVENT_FORM } from '@/features/events/types'
 import { eventsKeys, eventsMutations, eventsQueries } from '@/features/events/services'
 import type { EventEditorRecord, EventFormData } from '@/features/events/types'
@@ -32,6 +33,9 @@ function mapEditorRecordToForm(data: EventEditorRecord): EventFormData {
     online_url: data.online_url ?? '',
     cover_url: data.cover_url ?? '',
     video_url: data.settings?.video_url ?? '',
+    fee_type: data.fee_type ?? 'percentage',
+    fee_value: String(data.fee_value ?? 10),
+    absorb_fee: data.absorb_fee ?? false,
   }
 }
 
@@ -116,6 +120,16 @@ export function useEventForm({ eventId, organizationId, onSaved }: UseEventFormP
     setError('')
 
     try {
+      if (!eventId) {
+        const gate = await billingService.getPlanGateSnapshot(organizationId)
+
+        if (!gate.canCreateEvent) {
+          const limitLabel = gate.usage.eventLimit == null ? 'do plano atual' : `de ${gate.usage.eventLimit} eventos`
+          setError(`Este plano ja atingiu o limite ${limitLabel}. Ative um plano superior em Billing para criar novos eventos.`)
+          return
+        }
+      }
+
       if (eventId) {
         await updateMutation.mutateAsync({ eventId, form })
         await auditService.record({

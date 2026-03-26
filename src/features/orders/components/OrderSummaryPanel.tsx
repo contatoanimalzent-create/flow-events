@@ -86,9 +86,22 @@ export function OrderSummaryPanel({
             <span>{summary.subtotal === 0 ? 'Gratuito' : formatCurrency(summary.subtotal)}</span>
           </div>
           <div className="mt-3 flex items-center justify-between text-sm text-[#7c6f60]">
-            <span>Taxas</span>
-            <span>{summary.fee_amount === 0 ? 'Sem taxa nesta etapa' : formatCurrency(summary.fee_amount)}</span>
+            <span>{summary.absorb_fee ? 'Taxa absorvida' : 'Taxa no checkout'}</span>
+            <span>
+              {summary.absorb_fee
+                ? summary.absorbed_fee_amount === 0
+                  ? 'Sem absorcao'
+                  : formatCurrency(summary.absorbed_fee_amount)
+                : summary.customer_fee_amount === 0
+                  ? 'Sem taxa nesta etapa'
+                  : formatCurrency(summary.customer_fee_amount)}
+            </span>
           </div>
+          {summary.absorb_fee && summary.customer_fee_amount === 0 ? (
+            <div className="mt-2 text-xs leading-5 text-[#7c6f60]">
+              O comprador ve um total limpo. A plataforma ainda gera {formatCurrency(summary.platform_fee_amount)} e esse valor e descontado no repasse do produtor.
+            </div>
+          ) : null}
           <div className="mt-4 flex items-center justify-between border-t border-[#eee2cf] pt-4">
             <span className="text-sm font-medium text-[#1f1a15]">Total</span>
             <span className="font-display text-[2.4rem] font-semibold leading-none tracking-[-0.04em] text-[#1f1a15]">

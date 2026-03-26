@@ -3,12 +3,12 @@ export function PublicFooter() {
     <footer className="border-t border-bg-border/80 bg-[linear-gradient(180deg,rgba(244,238,229,0.74),rgba(239,230,215,0.96))]">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 text-text-secondary md:px-10 lg:grid-cols-[1.15fr_0.85fr] lg:px-16 lg:py-16">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Premium experiences ecosystem</div>
+            <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Animalz Events</div>
             <div className="mt-4 font-display text-[3.6rem] font-semibold leading-[0.9] tracking-[-0.05em] text-text-primary">
               Animalz Events
             </div>
           <p className="mt-5 max-w-xl text-sm leading-7 md:text-base">
-            Uma camada para experiencias, cultura, lifestyle e hospitalidade com curadoria, venda, operacao, CRM e growth sob a mesma assinatura premium.
+            Os melhores eventos de cultura, gastronomia, musica e lifestyle. Compre ingressos com facilidade e garanta seu lugar.
           </p>
         </div>
 

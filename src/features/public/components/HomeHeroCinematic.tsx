@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, MapPin, Play, Sparkles, Users } from 'lucide-react'
+import { ArrowRight, CalendarDays, MapPin, Sparkles, Users } from 'lucide-react'
 import { EventHeroMedia, getEventAssetUrl } from '@/features/event-media'
 import type { PublicEventSummary } from '@/features/public/types/public.types'
 import { PublicReveal } from './PublicReveal'
@@ -13,7 +13,7 @@ interface HomeHeroCinematicProps {
 const fallbackHeroImage =
   'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=2200&q=80&fit=crop'
 
-export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHeroCinematicProps) {
+export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinematicProps) {
   const fallbackImage =
     getEventAssetUrl(heroEvent?.mediaPresentation.coverAsset) || heroEvent?.cover_url || fallbackHeroImage
 
@@ -52,19 +52,13 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHe
               <PublicReveal className="flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/82 backdrop-blur-md">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Curadoria premium
+                  Ingressos e experiencias
                 </span>
-                {heroEvent?.mediaPresentation.heroAsset ? (
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/82 backdrop-blur-md">
-                    <Play className="h-3.5 w-3.5" />
-                    Hero video ao vivo
-                  </span>
-                ) : null}
               </PublicReveal>
 
               {heroEvent ? (
                 <PublicReveal delayMs={120} className="hidden rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/74 backdrop-blur-md md:flex">
-                  {heroEvent.status === 'ongoing' ? 'Experiencia em andamento' : 'Proxima experiencia em destaque'}
+                  {heroEvent.status === 'ongoing' ? 'Evento em andamento' : 'Em destaque'}
                 </PublicReveal>
               ) : null}
             </div>
@@ -72,14 +66,11 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHe
             <div className="grid gap-10 xl:grid-cols-[minmax(0,1.12fr)_21rem] xl:items-end">
               <div className="max-w-4xl">
                 <PublicReveal>
-                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/62">
-                    Ecossistema premium para experiencias, cultura e lifestyle que precisam parecer desejadas antes da primeira compra
-                  </div>
-                  <h1 className="mt-6 max-w-5xl font-display text-[clamp(4.4rem,10vw,8.7rem)] font-semibold leading-[0.84] tracking-[-0.05em] text-white">
-                    Uma marca para experiencias que comecam antes da chegada.
+                  <h1 className="max-w-5xl font-display text-[clamp(4.4rem,10vw,8.7rem)] font-semibold leading-[0.84] tracking-[-0.05em] text-white">
+                    Descubra eventos que valem a experiencia.
                   </h1>
                   <p className="mt-6 max-w-2xl text-base leading-7 text-white/80 md:text-lg md:leading-8">
-                    Animalz Events transforma descoberta, presenca de marca e operacao em uma unica camada aspiracional. Nao e apenas sobre vender acesso. E sobre criar desejo, contexto e continuidade.
+                    Compre ingressos, garanta seu lugar e viva os melhores eventos de cultura, gastronomia, musica e lifestyle.
                   </p>
                 </PublicReveal>
 
@@ -88,21 +79,21 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHe
                     href="/events"
                     className="inline-flex items-center gap-3 rounded-full bg-[#f8f3ea] px-6 py-3 text-sm font-semibold text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(21,14,8,0.24)]"
                   >
-                    Explorar eventos
+                    Ver todos os eventos
                     <ArrowRight className="h-4 w-4" />
                   </a>
                   <a
                     href="/create-event"
                     className="inline-flex items-center gap-3 rounded-full border border-white/36 bg-white/6 px-6 py-3 text-sm font-medium text-white transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
                   >
-                    Criar evento
+                    Sou produtor
                   </a>
                   {heroEvent ? (
                     <a
                       href={`/e/${heroEvent.slug}`}
                       className="inline-flex items-center gap-3 rounded-full border border-white/24 bg-white/6 px-6 py-3 text-sm font-medium text-white/90 transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
                     >
-                      Ver experiencia em destaque
+                      Ver evento em destaque
                     </a>
                   ) : null}
                 </PublicReveal>
@@ -116,7 +107,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHe
                       {heroEvent.name}
                     </div>
                     <p className="mt-4 text-sm leading-6 text-white/74">
-                      {heroEvent.subtitle || heroEvent.short_description || 'Uma experiencia com midia real, desejo imediato e operacao preparada para sustentar conversao, acesso e pos-compra.'}
+                      {heroEvent.subtitle || heroEvent.short_description || 'Garanta seu ingresso e viva uma experiencia inesquecivel.'}
                     </p>
 
                     <div className="mt-6 grid gap-3">
@@ -137,8 +128,8 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHe
                         },
                         {
                           icon: Users,
-                          label: 'Demanda',
-                          value: `${heroEvent.sold_tickets.toLocaleString('pt-BR')} ingressos vendidos`,
+                          label: 'Ingressos vendidos',
+                          value: heroEvent.sold_tickets.toLocaleString('pt-BR'),
                         },
                       ].map((item) => {
                         const Icon = item.icon

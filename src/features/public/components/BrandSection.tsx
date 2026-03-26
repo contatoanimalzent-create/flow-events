@@ -4,18 +4,18 @@ import { PublicReveal } from './PublicReveal'
 const pillars = [
   {
     icon: Compass,
-    title: 'Curadoria como linguagem',
-    description: 'A plataforma nasce para apresentar experiencias com criterio, atmosfera e desejo, nao como um mural tecnico de datas.',
+    title: 'Eventos com criterio',
+    description: 'Curadoria de eventos de cultura, gastronomia, musica e lifestyle. So o que vale a sua presenca.',
   },
   {
     icon: Orbit,
-    title: 'Ecossistema continuo',
-    description: 'Da descoberta ao QR code, e do CRM ao retorno do publico, tudo vive no mesmo fluxo para sustentar relacao de longo prazo.',
+    title: 'Compra em segundos',
+    description: 'Da descoberta ao QR code em poucos cliques. Sem burocracia, sem complicacao.',
   },
   {
     icon: Gem,
-    title: 'Luxury operating layer',
-    description: 'Checkout, operacao, billing, growth e conteudo funcionam como uma camada premium capaz de elevar marca e receita ao mesmo tempo.',
+    title: 'Controle para produtores',
+    description: 'Venda ingressos, gerencie check-in, acompanhe receita e entenda seu publico em um unico lugar.',
   },
 ]
 
@@ -28,13 +28,13 @@ export function BrandSection() {
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#ddd0bc] bg-white/82 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-[#8b7c69]">
                 <Sparkles className="h-4 w-4" />
-                Brand position
+                Como funciona
               </div>
               <h2 className="mt-6 font-display text-[clamp(3rem,5vw,5rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-[#1f1a15]">
-                Mais do que operar eventos. Orquestrar desejo, acesso e presenca.
+                Para quem curte bons eventos. E para quem os cria.
               </h2>
               <p className="mt-6 max-w-lg text-base leading-8 text-[#5f5549] md:text-lg">
-                Animalz Events deixa de ser percebida como software utilitario e assume um lugar de marca: uma camada para experiencias premium, hospitalidade, cultura e lifestyle.
+                Animalz Events conecta compradores e produtores numa plataforma simples de usar, bonita de ver e confiavel na hora do acesso.
               </p>
             </div>
           </PublicReveal>

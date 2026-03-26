@@ -1,12 +1,21 @@
 import { useState } from 'react'
+import { ArrowLeft, Mail, Phone, Send } from 'lucide-react'
+import { PublicLayout } from '@/features/public'
+import { PublicReveal } from '@/features/public/components/PublicReveal'
+import { useSeoMeta } from '@/shared/lib'
 
-export function ContactPage() {
+export function ContactPage({ onLogin }: { onLogin?: () => void }) {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
 
+  useSeoMeta({
+    title: 'Contato | Animalz Events',
+    description: 'Entre em contato com a equipe Animalz Events. Tire duvidas, fale sobre parcerias ou solicite suporte.',
+    url: typeof window !== 'undefined' ? window.location.href : '/contact',
+  })
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send this to a backend
     console.log('Contact form submitted:', formData)
     setSubmitted(true)
     setTimeout(() => {
@@ -16,87 +25,132 @@ export function ContactPage() {
   }
 
   return (
-    <div style={{ background:'#080808',color:'#f5f5f0',minHeight:'100vh',padding:'60px 48px' }}>
-      <div style={{ maxWidth:600,margin:'0 auto' }}>
-        <h1 style={{ fontSize:32,fontWeight:700,marginBottom:12,color:'#d4ff00' }}>Contact Us</h1>
-        <p style={{ color:'#9a9a9a',marginBottom:48,fontSize:14 }}>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+    <PublicLayout onLogin={onLogin}>
+      <section className="px-5 pb-20 pt-12 md:px-10 lg:px-16 lg:pt-18">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+            <PublicReveal>
+              <div>
+                <a
+                  href="/"
+                  className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-[#8b7c69] transition-colors hover:text-[#1f1a15]"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  Voltar
+                </a>
+                <h1 className="mt-8 font-display text-[clamp(3.2rem,6vw,5.8rem)] font-semibold leading-[0.88] tracking-[-0.05em] text-[#1f1a15]">
+                  Fale com a gente.
+                </h1>
+                <p className="mt-6 max-w-lg text-base leading-8 text-[#5f5549] md:text-lg">
+                  Tem duvidas, quer saber mais sobre a plataforma ou precisa de ajuda? Envie uma mensagem e responderemos em breve.
+                </p>
 
-        {submitted ? (
-          <div style={{ background:'rgba(212,255,0,0.1)',border:'1px solid rgba(212,255,0,0.3)',borderRadius:4,padding:24,textAlign:'center' }}>
-            <h3 style={{ color:'#d4ff00',marginBottom:8 }}>Thank you!</h3>
-            <p style={{ color:'#9a9a9a',fontSize:14 }}>We've received your message and will get back to you soon.</p>
+                <div className="mt-10 grid gap-4">
+                  {[
+                    {
+                      icon: Mail,
+                      label: 'Suporte',
+                      value: 'support@animalz.events',
+                    },
+                    {
+                      icon: Mail,
+                      label: 'Parcerias',
+                      value: 'business@animalz.events',
+                    },
+                    {
+                      icon: Phone,
+                      label: 'Telefone',
+                      value: '+55 (11) 9999-9999',
+                    },
+                  ].map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <div
+                        key={item.label}
+                        className="flex items-center gap-4 rounded-[1.6rem] border border-[#e8dccb] bg-white/85 p-5"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3e8d6] text-[#816941]">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-[0.24em] text-[#8b7c69]">{item.label}</div>
+                          <div className="mt-0.5 text-sm font-medium text-[#1f1a15]">{item.value}</div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </PublicReveal>
+
+            <PublicReveal delayMs={100}>
+              <div className="rounded-[2.4rem] border border-[#e5d8c7] bg-white/88 p-7 shadow-[0_22px_65px_rgba(66,48,24,0.08)] md:p-9">
+                {submitted ? (
+                  <div className="flex min-h-[20rem] flex-col items-center justify-center gap-4 text-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#f3e8d6] text-[#4e6d4f]">
+                      <Send className="h-6 w-6" />
+                    </div>
+                    <h3 className="font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-[#1f1a15]">
+                      Mensagem enviada!
+                    </h3>
+                    <p className="max-w-sm text-sm leading-7 text-[#5f5549]">
+                      Recebemos sua mensagem e entraremos em contato em breve.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="grid gap-5">
+                    <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">Enviar mensagem</div>
+
+                    <div>
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">Nome</label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                        placeholder="Seu nome"
+                        className="w-full rounded-[1.2rem] border border-[#e5d8c7] bg-[#fbf7f1] px-4 py-3 text-sm text-[#1f1a15] outline-none placeholder:text-[#b0a090] focus:border-[#c9b08a] focus:ring-0"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">Email</label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        required
+                        placeholder="seu@email.com"
+                        className="w-full rounded-[1.2rem] border border-[#e5d8c7] bg-[#fbf7f1] px-4 py-3 text-sm text-[#1f1a15] outline-none placeholder:text-[#b0a090] focus:border-[#c9b08a] focus:ring-0"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">Mensagem</label>
+                      <textarea
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        required
+                        rows={5}
+                        placeholder="Como podemos ajudar?"
+                        className="w-full resize-none rounded-[1.2rem] border border-[#e5d8c7] bg-[#fbf7f1] px-4 py-3 text-sm text-[#1f1a15] outline-none placeholder:text-[#b0a090] focus:border-[#c9b08a] focus:ring-0"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f1a15] px-6 py-3 text-sm font-medium text-[#f8f3ea] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(31,26,21,0.22)]"
+                    >
+                      Enviar mensagem
+                      <Send className="h-4 w-4" />
+                    </button>
+                  </form>
+                )}
+              </div>
+            </PublicReveal>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} style={{ display:'flex',flexDirection:'column',gap:20 }}>
-            <div>
-              <label style={{ display:'block',fontSize:12,fontFamily:'DM Mono,monospace',letterSpacing:'0.1em',color:'#d4ff00',marginBottom:8,textTransform:'uppercase' }}>Name</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                required
-                style={{ width:'100%',padding:12,background:'#1a1a1a',border:'1px solid #242424',borderRadius:4,color:'#f5f5f0',fontSize:14,outline:'none',transition:'border-color 0.2s' }}
-                onFocus={(e) => e.currentTarget.style.borderColor='rgba(212,255,0,0.4)'}
-                onBlur={(e) => e.currentTarget.style.borderColor='#242424'}
-              />
-            </div>
-
-            <div>
-              <label style={{ display:'block',fontSize:12,fontFamily:'DM Mono,monospace',letterSpacing:'0.1em',color:'#d4ff00',marginBottom:8,textTransform:'uppercase' }}>Email</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                required
-                style={{ width:'100%',padding:12,background:'#1a1a1a',border:'1px solid #242424',borderRadius:4,color:'#f5f5f0',fontSize:14,outline:'none',transition:'border-color 0.2s' }}
-                onFocus={(e) => e.currentTarget.style.borderColor='rgba(212,255,0,0.4)'}
-                onBlur={(e) => e.currentTarget.style.borderColor='#242424'}
-              />
-            </div>
-
-            <div>
-              <label style={{ display:'block',fontSize:12,fontFamily:'DM Mono,monospace',letterSpacing:'0.1em',color:'#d4ff00',marginBottom:8,textTransform:'uppercase' }}>Message</label>
-              <textarea
-                value={formData.message}
-                onChange={(e) => setFormData({...formData, message: e.target.value})}
-                required
-                rows={6}
-                style={{ width:'100%',padding:12,background:'#1a1a1a',border:'1px solid #242424',borderRadius:4,color:'#f5f5f0',fontSize:14,outline:'none',resize:'vertical',transition:'border-color 0.2s',fontFamily:'inherit' }}
-                onFocus={(e) => e.currentTarget.style.borderColor='rgba(212,255,0,0.4)'}
-                onBlur={(e) => e.currentTarget.style.borderColor='#242424'}
-              />
-            </div>
-
-            <button
-              type="submit"
-              style={{ background:'#d4ff00',color:'#080808',padding:12,borderRadius:4,border:'none',fontWeight:600,fontSize:12,fontFamily:'DM Mono,monospace',letterSpacing:'0.1em',cursor:'pointer',transition:'box-shadow 0.2s,transform 0.1s',textTransform:'uppercase' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow='0 0 40px rgba(212,255,0,0.5)'
-                e.currentTarget.style.transform='scale(1.02)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow='none'
-                e.currentTarget.style.transform='scale(1)'
-              }}
-            >
-              Send Message
-            </button>
-          </form>
-        )}
-
-        <div style={{ marginTop:48,paddingTop:24,borderTop:'1px solid #1a1a1a' }}>
-          <a href="/" style={{ color:'#d4ff00',textDecoration:'none',fontSize:12,fontFamily:'DM Mono,monospace',letterSpacing:'0.1em' }}>← Back to Home</a>
         </div>
-
-        <div style={{ marginTop:32,paddingTop:32,borderTop:'1px solid #1a1a1a' }}>
-          <h3 style={{ color:'#f5f5f0',marginBottom:16 }}>Other Ways to Reach Us</h3>
-          <div style={{ color:'#9a9a9a',fontSize:14,lineHeight:1.8 }}>
-            <p>📧 Email: support@animalz.events</p>
-            <p>💼 Business: business@animalz.events</p>
-            <p>📱 Phone: +55 (11) 9999-9999</p>
-          </div>
-        </div>
-      </div>
-    </div>
+      </section>
+    </PublicLayout>
   )
 }

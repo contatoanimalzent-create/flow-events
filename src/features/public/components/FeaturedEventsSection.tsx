@@ -104,9 +104,9 @@ export function FeaturedEventsSection({ events }: FeaturedEventsSectionProps) {
 
   return (
     <PremiumSection
-      eyebrow="Experiencias em destaque"
-      title="Um calendario apresentado como curadoria de alto impacto."
-      description="Os destaques saem do grid comum e entram em uma composicao mais proxima de editorial de luxo: imagem dominante, narrativa visual e leitura imediata."
+      eyebrow="Em destaque"
+      title="Os eventos mais procurados do momento."
+      description="Garanta seu lugar antes que os ingressos esgotem."
     >
       {events.length === 0 ? (
         <EmptyState

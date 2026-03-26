@@ -66,9 +66,9 @@ function DiscoverCard({ event, index }: { event: PublicEventSummary; index: numb
 export function DiscoverSection({ events, categories }: DiscoverSectionProps) {
   return (
     <PremiumSection
-      eyebrow="Descoberta"
-      title="Explore por atmosfera, cidade ou nivel de acesso."
-      description="A navegacao convida para descobrir experiencias pela sensacao que elas prometem, nao apenas por filtros mecanicos."
+      eyebrow="Mais eventos"
+      title="Continue explorando."
+      description="Filtre por cidade, categoria ou data e encontre o proximo evento que vale a sua presenca."
     >
       <div className="flex flex-wrap gap-3">
         {categories.map((category, index) => (
@@ -83,8 +83,8 @@ export function DiscoverSection({ events, categories }: DiscoverSectionProps) {
       <div className="mt-8">
         {events.length === 0 ? (
           <EmptyState
-            title="Ainda nao ha uma segunda camada de descoberta"
-            description="Assim que novos eventos entrarem na curadoria publica, esta secao passara a sugerir novos caminhos de exploracao."
+            title="Nenhum evento encontrado"
+            description="Tente outros filtros ou volte em breve para conferir novidades."
             className="min-h-[18rem]"
           />
         ) : (

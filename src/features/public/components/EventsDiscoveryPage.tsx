@@ -110,22 +110,21 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
         <div className="mx-auto max-w-7xl">
           <PublicReveal>
             <div className="max-w-4xl">
-              <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Editorial discovery</div>
-              <h1 className="mt-5 font-display text-[clamp(3.5rem,7vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-[#1f1a15]">
-                Experiencias em curadoria
+              <h1 className="font-display text-[clamp(3.5rem,7vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-[#1f1a15]">
+                Todos os eventos
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-8 text-[#5f5549] md:text-lg">
-                Navegue por uma selecao viva de experiencias, cultura e lifestyle como quem percorre uma plataforma de descoberta global: destaque editorial, ritmo visual e leitura conduzida por desejo.
+                Encontre eventos por cidade, categoria ou data. Compre ingressos com facilidade e garanta seu lugar.
               </p>
             </div>
           </PublicReveal>
 
           <PublicReveal delayMs={80} className="mt-7 flex flex-wrap gap-3">
             <PremiumBadge tone="default" className="border-[#ddd1bf] bg-white/76 text-[#5f5549]">
-              Curadoria premium
+              Ingressos online
             </PremiumBadge>
             <PremiumBadge tone="accent" className="border-[#e1d0ab] bg-[#f7edd1] text-[#6d5324]">
-              Discovery em camadas
+              Acesso via QR code
             </PremiumBadge>
           </PublicReveal>
 
@@ -152,8 +151,8 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-24 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <LoadingState
-              title="Montando a jornada de descoberta"
-              description="Estamos reunindo os eventos, suas cidades, categorias e destaques para compor a experiencia completa."
+              title="Carregando eventos"
+              description="Buscando os eventos disponiveis."
               className="min-h-[18rem]"
             />
           </div>
@@ -162,8 +161,8 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-24 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <EmptyState
-              title="Nenhuma experiencia combina com a curadoria atual"
-              description="Ajuste cidade, data, categoria ou busca para descobrir outra selecao dentro do ambiente demo."
+              title="Nenhum evento encontrado"
+              description="Tente outros filtros ou limpe a busca para ver todos os eventos disponiveis."
               className="min-h-[20rem]"
             />
           </div>
@@ -173,27 +172,27 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
           <FeaturedEventBlock primaryEvent={featuredPrimary} secondaryEvents={featuredSecondary} />
           <EventsRowCarousel
             title="Destaques"
-            description="Uma primeira camada de experiencias escolhidas pelo impacto visual, valor percebido e forca cultural."
+            description="Os eventos com maior demanda e ingressos se esgotando."
             events={discoveryRows.highlights}
           />
           <EventsRowCarousel
             title="Proximos eventos"
-            description="Experiencias que entram primeiro no radar e pedem presenca desde ja."
+            description="Reserve com antecedencia e garanta seu lugar."
             events={discoveryRows.upcoming}
           />
           <EventsRowCarousel
-            title="Experiencias premium"
-            description="Selecao com maior valor percebido, atmosfera aspiracional e acesso elevado."
+            title="Eventos premium"
+            description="Experiencias exclusivas com acesso limitado."
             events={discoveryRows.premium}
           />
           <EventsRowCarousel
             title="Mais populares"
-            description="As experiencias com maior tracao, prova social e desejo acumulado no ambiente demo."
+            description="Os eventos preferidos de quem ja comprou."
             events={discoveryRows.popular}
           />
           <EventsRowCarousel
             title="Novidades"
-            description="Novas narrativas para quem quer continuar explorando alem da primeira selecao."
+            description="Eventos recentes adicionados a plataforma."
             events={discoveryRows.newArrivals}
           />
         </>

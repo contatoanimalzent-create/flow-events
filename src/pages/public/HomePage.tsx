@@ -53,13 +53,13 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
 
     return [
       {
-        label: 'Participantes em jornada',
+        label: 'Participantes',
         value: events.reduce((sum, event) => sum + event.sold_tickets, 0).toLocaleString('pt-BR'),
       },
-      { label: 'Experiencias publicas', value: String(events.length) },
-      { label: 'Cidades em curadoria', value: String(cityCount) },
+      { label: 'Eventos ativos', value: String(events.length) },
+      { label: 'Cidades', value: String(cityCount) },
       {
-        label: 'Capacidade combinada',
+        label: 'Vagas disponiveis',
         value: events.reduce((sum, event) => sum + (event.total_capacity ?? 0), 0).toLocaleString('pt-BR'),
       },
     ]
@@ -68,8 +68,8 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
   const seoImage = heroEvent?.mediaPresentation.heroAsset?.thumbnail_url ?? heroEvent?.mediaPresentation.coverAsset?.secure_url ?? heroEvent?.cover_url ?? null
 
   useSeoMeta({
-    title: 'Animalz Events | Premium experiences ecosystem',
-    description: 'Descubra experiencias premium, cultura e lifestyle em uma camada que une narrativa publica, operacao, monetizacao e crescimento.',
+    title: 'Animalz Events | Ingressos para eventos premium',
+    description: 'Descubra e compre ingressos para os melhores eventos de cultura, gastronomia, musica e lifestyle.',
     image: seoImage,
     url: typeof window !== 'undefined' ? window.location.href : '/',
   })
@@ -82,8 +82,8 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-20 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <LoadingState
-              title="Preparando a curadoria publica"
-              description="Estamos carregando as experiencias, seus assets e os sinais que sustentam a narrativa premium da homepage."
+              title="Carregando eventos"
+              description="Buscando os melhores eventos para voce."
               className="min-h-[18rem]"
             />
           </div>
@@ -92,23 +92,23 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
         <>
           <EditorialIntroSection />
           <SocialProofBlock
-            title="A prova do produto aparece na demanda, nao em promessas vazias."
-            description="Participantes, experiencias ativas e capacidade real mostram que a plataforma sustenta descoberta, conversao e operacao em escala."
+            title="Eventos reais. Experiencias que ficam na memoria."
+            description="Numeros que refletem a confianca de quem ja comprou, participou e voltou."
             items={[
               {
                 label: 'Participantes',
                 value: events.reduce((sum, event) => sum + event.sold_tickets, 0).toLocaleString('pt-BR'),
-                note: 'Pessoas que ja entraram em jornadas reais apoiadas pela base do produto.',
+                note: 'Pessoas que ja garantiram seu ingresso e viveram a experiencia.',
               },
               {
                 label: 'Eventos ativos',
                 value: events.length.toLocaleString('pt-BR'),
-                note: 'Curadoria viva para alimentar descoberta, social proof e compartilhamento organico.',
+                note: 'Eventos publicados e disponiveis para compra ou inscricao gratuita.',
               },
               {
-                label: 'Capacidade aberta',
+                label: 'Vagas disponiveis',
                 value: events.reduce((sum, event) => sum + (event.total_capacity ?? 0), 0).toLocaleString('pt-BR'),
-                note: 'Escala suficiente para parecer plataforma global, nao um catalogo pequeno.',
+                note: 'Capacidade total em eventos abertos — reserve antes que esgote.',
               },
             ]}
           />

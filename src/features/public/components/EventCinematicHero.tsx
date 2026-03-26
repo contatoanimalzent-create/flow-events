@@ -49,32 +49,22 @@ export function EventCinematicHero({
             <div className="flex flex-wrap items-center justify-between gap-4">
               <PublicReveal className="flex flex-wrap gap-3">
                 <PremiumBadge tone="default" className="border-white/16 bg-white/10 text-white">
-                  {event.category || 'Experiencia premium'}
+                  {event.category || 'Evento'}
                 </PremiumBadge>
                 <PremiumBadge tone="default" className="border-white/16 bg-black/12 text-white/80">
                   {getStatusLabel(event.status)}
                 </PremiumBadge>
-                {presentation.heroAsset ? (
-                  <PremiumBadge tone="default" className="border-white/16 bg-white/10 text-white">
-                    Hero video ativo
-                  </PremiumBadge>
-                ) : null}
-              </PublicReveal>
-
-              <PublicReveal delayMs={120} className="hidden rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/72 backdrop-blur-md md:flex">
-                Mini-site cinematografico com assets reais
               </PublicReveal>
             </div>
 
             <div className="grid gap-10 xl:grid-cols-[minmax(0,1.08fr)_22rem] xl:items-end">
               <div className="max-w-4xl">
                 <PublicReveal>
-                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/60">Experiencia publica</div>
-                  <h1 className="mt-6 max-w-5xl font-display text-[clamp(4.2rem,9vw,8.6rem)] font-semibold leading-[0.83] tracking-[-0.05em] text-white">
+                  <h1 className="max-w-5xl font-display text-[clamp(4.2rem,9vw,8.6rem)] font-semibold leading-[0.83] tracking-[-0.05em] text-white">
                     {event.name}
                   </h1>
                   <p className="mt-6 max-w-2xl text-base leading-8 text-white/80 md:text-lg">
-                    {event.subtitle || event.short_description || 'Uma pagina desenhada para traduzir presenca, desejo e conversao com a mesma elegancia do proprio evento.'}
+                    {event.subtitle || event.short_description || 'Garanta seu ingresso e viva uma experiencia inesquecivel.'}
                   </p>
                 </PublicReveal>
 
@@ -94,7 +84,7 @@ export function EventCinematicHero({
 
               <PublicReveal delayMs={180}>
                 <div className="rounded-[2rem] border border-white/14 bg-white/10 p-5 backdrop-blur-md">
-                  <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Em sintese</div>
+                  <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Informacoes</div>
                   <div className="mt-4 grid gap-4">
                     {[
                       {
@@ -118,8 +108,8 @@ export function EventCinematicHero({
                       },
                       {
                         icon: Sparkles,
-                        label: 'Convite',
-                        value: isFreeMode ? 'Acesso com inscricao e QR code digital' : `${event.sold_tickets.toLocaleString('pt-BR')} acessos ja vendidos`,
+                        label: 'Acesso',
+                        value: isFreeMode ? 'Inscricao gratuita com QR code' : `${event.sold_tickets.toLocaleString('pt-BR')} ingressos vendidos`,
                       },
                     ].map((item) => {
                       const Icon = item.icon

@@ -36,7 +36,7 @@ export function PublicRouteView({ route, onLogin, onBackToHome }: PublicRouteVie
       ) : route === 'privacy' ? (
         <PrivacyPage />
       ) : route === 'contact' ? (
-        <ContactPage />
+        <ContactPage onLogin={onLogin} />
       ) : route === 'about' ? (
         <AboutPage onLogin={onLogin} />
       ) : route === 'create-event' ? (

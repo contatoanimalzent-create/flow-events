@@ -11,8 +11,8 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
   const cities = new Set(events.map((event) => event.city).filter(Boolean)).size
 
   useSeoMeta({
-    title: 'About | Animalz Events',
-    description: 'Animalz Events e um ecossistema premium para experiencias, cultura, lifestyle e hospitalidade, com descoberta, operacao e crescimento na mesma camada.',
+    title: 'Sobre | Animalz Events',
+    description: 'Animalz Events conecta compradores a eventos de cultura, gastronomia, musica e lifestyle, com compra simples e acesso garantido.',
     image: events[0]?.mediaPresentation.coverAsset?.secure_url ?? events[0]?.cover_url ?? null,
     url: typeof window !== 'undefined' ? window.location.href : '/about',
   })
@@ -28,10 +28,10 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                 About Animalz Events
               </div>
               <h1 className="mt-6 font-display text-[clamp(4rem,7vw,7.2rem)] font-semibold leading-[0.86] tracking-[-0.05em] text-[#1f1a15]">
-                Uma marca para experiencias que precisam deixar rastro.
+                Eventos que valem a experiencia. Acesso simples e garantido.
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#5f5549] md:text-lg">
-                Reunimos narrativa publica, monetizacao, operacao, CRM e growth para que cada experiencia pareca desejada, organizada e inesquecivel antes, durante e depois do acesso.
+                Animalz Events conecta compradores aos melhores eventos de cultura, gastronomia, musica e lifestyle. Compre ingressos com facilidade, receba seu QR code e aproveite cada momento.
               </p>
             </div>
           </PublicReveal>
@@ -42,13 +42,13 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                 {[
                   {
                     icon: Layers3,
-                    label: 'Visao',
-                    text: 'Transformar software de eventos em camada cultural para experiencias premium, lifestyle e hospitalidade.',
+                    label: 'Para compradores',
+                    text: 'Descubra eventos com criterio, compre ingressos em segundos e garanta seu lugar com QR code.',
                   },
                   {
                     icon: Globe,
-                    label: 'Posicionamento',
-                    text: 'Mais perto de uma plataforma de curadoria global do que de um SaaS operacional tradicional.',
+                    label: 'Para produtores',
+                    text: 'Publique seu evento, venda ingressos, gerencie check-in e acompanhe resultados em um unico lugar.',
                   },
                 ].map((item) => {
                   const Icon = item.icon
@@ -76,31 +76,31 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-16 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <LoadingState
-              title="Preparando os sinais da marca"
-              description="Estamos consolidando prova social, escala e alcance para a camada institucional."
+              title="Carregando informacoes"
+              description="Buscando os dados mais recentes da plataforma."
               className="min-h-[18rem]"
             />
           </div>
         </div>
       ) : (
         <SocialProofSection
-          title="Os sinais importam porque a marca nasce da experiencia real."
-          description="A narrativa institucional fica mais forte quando o produto mostra experiencias ativas, publico presente e escala cultural em movimento."
+          title="Numeros reais de quem ja escolheu a plataforma."
+          description="Eventos publicados, ingressos vendidos e cidades alcancadas. Cada numero representa uma experiencia real vivida por pessoas reais."
           metrics={[
             {
-              label: 'Experiencias em circulacao',
+              label: 'Eventos publicados',
               value: events.length.toLocaleString('pt-BR'),
-              note: 'Eventos, festivais e jornadas premium ja publicados na camada publica.',
+              note: 'Eventos, festivais e experiencias disponiveis para compra na plataforma.',
             },
             {
-              label: 'Participantes',
+              label: 'Ingressos vendidos',
               value: participants.toLocaleString('pt-BR'),
-              note: 'Uma base viva que sustenta prova social, comunidade e remarketing.',
+              note: 'Compradores que garantiram seu lugar e viveram suas experiencias.',
             },
             {
-              label: 'Capacidade cultural',
+              label: 'Vagas disponiveis',
               value: capacity.toLocaleString('pt-BR'),
-              note: `${cities.toLocaleString('pt-BR')} cidades em curadoria dentro do ambiente demo.`,
+              note: `${cities.toLocaleString('pt-BR')} cidades com eventos ativos na plataforma.`,
             },
           ]}
         />
@@ -111,12 +111,12 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
           <PublicReveal>
             <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
               <div>
-                <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Next step</div>
+                <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Comece agora</div>
                 <div className="mt-4 font-display text-[clamp(2.8rem,4.5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-white">
-                  Para o publico, parece desejo. Para a operacao, parece controle.
+                  Encontre seu proximo evento ou publique o seu.
                 </div>
                 <p className="mt-5 max-w-2xl text-base leading-8 text-white/72">
-                  Esse e o ponto da marca: unir imaginario aspiracional e profundidade operacional na mesma experiencia.
+                  Compre ingressos com facilidade, garanta seu acesso com QR code, ou crie e gerencie seu proprio evento na plataforma.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-4">
@@ -124,14 +124,14 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                   href="/events"
                   className="inline-flex items-center gap-2 rounded-full bg-[#f2e6d6] px-6 py-3 text-sm font-medium text-[#1f1a15] transition-all hover:-translate-y-0.5"
                 >
-                  Explorar experiencias
+                  Ver todos os eventos
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
                   href="/create-event"
                   className="inline-flex items-center gap-2 rounded-full border border-white/18 px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/8"
                 >
-                  Trazer minha operacao
+                  Sou produtor
                 </a>
               </div>
             </div>

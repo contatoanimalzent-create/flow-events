@@ -4,18 +4,18 @@ import { PublicReveal } from './PublicReveal'
 const principles = [
   {
     icon: Sparkles,
-    title: 'Curadoria antes de volume',
-    text: 'A plataforma apresenta experiencias como objetos culturais com narrativa, ritmo visual e contexto, em vez de apenas empilhar datas.',
+    title: 'Eventos com criterio',
+    text: 'Cada evento e selecionado pelo que oferece — nao apenas pela data. Voce encontra experiencias que valem a presenca.',
   },
   {
     icon: Waves,
-    title: 'Operacao invisivelmente solida',
-    text: 'Por tras da superficie editorial, checkout, check-in, CRM, monetizacao e growth continuam operando como sistema real.',
+    title: 'Compra sem complicacao',
+    text: 'Reserve seu ingresso em minutos, receba a confirmacao no celular e acesse o evento com QR code digital.',
   },
   {
     icon: Star,
-    title: 'Presenca de marca',
-    text: 'Cada superficie foi desenhada para parecer uma marca premium global de experiencias, nao uma ferramenta generica.',
+    title: 'Do ingresso a lembranca',
+    text: 'A experiencia comeca na descoberta e continua depois do evento — com facilidade de acesso e atendimento direto.',
   },
 ]
 
@@ -41,18 +41,18 @@ export function EditorialIntroSection() {
         <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <PublicReveal>
             <div className="max-w-xl">
-              <div className="text-[11px] uppercase tracking-[0.34em] text-white/42">Uma camada publica com assinatura</div>
+              <div className="text-[11px] uppercase tracking-[0.34em] text-white/42">Como funciona</div>
               <h2 className="mt-5 font-display text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
-                O produto deixa de parecer sistema e passa a soar como ecossistema.
+                Eventos com identidade. Compra sem complicacao.
               </h2>
               <p className="mt-6 max-w-lg text-base leading-8 text-white/64 md:text-lg">
-                Animalz Events foi desenhado para posicionar experiencias premium, cultura e lifestyle com a mesma forca com que sustenta checkout, CRM, operacao e crescimento.
+                Cada evento e apresentado com atencao ao detalhe para que sua experiencia comece na descoberta — e termine com uma lembranca que vale o ingresso.
               </p>
               <div className="mt-8 flex items-center gap-3 text-sm font-medium text-white/78">
                 <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/14 bg-white/8 shadow-[0_12px_30px_rgba(0,0,0,0.3)]">
                   <ArrowUpRight className="h-4 w-4" />
                 </span>
-                Experiencias premium merecem uma linguagem propria, nao um template de software.
+                Mais de mil ingressos vendidos. Compra simples, acesso garantido.
               </div>
             </div>
           </PublicReveal>

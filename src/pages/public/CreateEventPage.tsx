@@ -11,8 +11,8 @@ export function CreateEventPage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 py-20 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <LoadingState
-              title="Preparando a jornada de produtor"
-              description="Estamos organizando sinais de venda, prova social e narrativa comercial para esta entrada."
+              title="Carregando"
+              description="Preparando as informacoes da plataforma."
               className="min-h-[18rem]"
             />
           </div>

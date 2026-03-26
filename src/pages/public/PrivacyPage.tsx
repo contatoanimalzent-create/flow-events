@@ -1,63 +1,185 @@
+import { ArrowLeft } from 'lucide-react'
+import { PublicLayout } from '@/features/public'
+import { PublicReveal } from '@/features/public/components/PublicReveal'
+import { useSeoMeta } from '@/shared/lib'
+
 export function PrivacyPage() {
+  useSeoMeta({
+    title: 'Política de Privacidade | Animalz Events',
+    description: 'Saiba como a Animalz Events coleta, usa e protege seus dados pessoais.',
+    url: typeof window !== 'undefined' ? window.location.href : '/privacy',
+  })
+
   return (
-    <div style={{ background:'#080808',color:'#f5f5f0',minHeight:'100vh',padding:'60px 48px' }}>
-      <div style={{ maxWidth:800,margin:'0 auto' }}>
-        <h1 style={{ fontSize:32,fontWeight:700,marginBottom:24,color:'#d4ff00' }}>Privacy Policy</h1>
-        
-        <div style={{ fontSize:14,lineHeight:1.8,color:'#9a9a9a' }}>
-          <section style={{ marginBottom:32 }}>
-            <h2 style={{ fontSize:20,fontWeight:600,color:'#f5f5f0',marginBottom:12 }}>1. Information We Collect</h2>
-            <p>We collect information you provide directly to us, such as when you create an account, create an event, or contact us for support. This includes:</p>
-            <ul style={{ marginLeft:20,marginTop:12,listStyle:'disc' }}>
-              <li>Name and email address</li>
-              <li>Event details and descriptions</li>
-              <li>Payment information</li>
-              <li>Communications and support requests</li>
-            </ul>
-          </section>
+    <PublicLayout>
+      <section className="px-5 pb-20 pt-12 md:px-10 lg:px-16 lg:pt-18">
+        <div className="mx-auto max-w-3xl">
+          <PublicReveal>
+            <a
+              href="/"
+              className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-[#8b7c69] transition-colors hover:text-[#1f1a15]"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Voltar
+            </a>
 
-          <section style={{ marginBottom:32 }}>
-            <h2 style={{ fontSize:20,fontWeight:600,color:'#f5f5f0',marginBottom:12 }}>2. How We Use Your Information</h2>
-            <p>We use the information we collect to:</p>
-            <ul style={{ marginLeft:20,marginTop:12,listStyle:'disc' }}>
-              <li>Provide, maintain, and improve our services</li>
-              <li>Process transactions and send notifications</li>
-              <li>Respond to your requests and inquiries</li>
-              <li>Send promotional communications (with your consent)</li>
-              <li>Comply with legal obligations</li>
-            </ul>
-          </section>
+            <h1 className="mt-8 font-display text-[clamp(3.2rem,6vw,5.2rem)] font-semibold leading-[0.88] tracking-[-0.05em] text-[#1f1a15]">
+              Sua privacidade importa.
+            </h1>
 
-          <section style={{ marginBottom:32 }}>
-            <h2 style={{ fontSize:20,fontWeight:600,color:'#f5f5f0',marginBottom:12 }}>3. Data Security</h2>
-            <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.</p>
-          </section>
+            <p className="mt-6 text-base leading-8 text-[#5f5549] md:text-lg">
+              Na Animalz Events, protegemos seus dados com seriedade. Esta política explica como coletamos, usamos e mantemos seguras suas informações.
+            </p>
+          </PublicReveal>
 
-          <section style={{ marginBottom:32 }}>
-            <h2 style={{ fontSize:20,fontWeight:600,color:'#f5f5f0',marginBottom:12 }}>4. Third-Party Services</h2>
-            <p>We may use third-party service providers (such as payment processors and analytics providers) to support our operations. These service providers are bound by confidentiality agreements and are only permitted to use your information as necessary to provide services to us.</p>
-          </section>
+          <div className="mt-16 space-y-12">
+            {[
+              {
+                title: '1. Sobre Esta Política',
+                content: [
+                  'Esta Política de Privacidade descreve como a Animalz Events ("nós", "nosso" ou "Animalz") coleta, usa, armazena e protege suas informações pessoais quando você utiliza nossa plataforma.',
+                ],
+              },
+              {
+                title: '2. Informações que Coletamos',
+                content: [
+                  'Coletamos informações de duas formas principais:',
+                  '• Informações fornecidas diretamente: nome, email, telefone, endereço e dados de pagamento quando você se cadastra, compra ingressos ou cria um evento.',
+                  '• Informações coletadas automaticamente: dados de uso da plataforma, endereço IP, tipo de navegador e cookies para melhorar sua experiência.',
+                ],
+              },
+              {
+                title: '3. Como Usamos Seus Dados',
+                content: [
+                  'Usamos suas informações para:',
+                  '• Processar transações e enviar confirmações de compra',
+                  '• Melhorar e personalizar sua experiência na plataforma',
+                  '• Enviar atualizações sobre seus eventos e ingressos',
+                  '• Garantir segurança e prevenir fraude',
+                  '• Cumprir obrigações legais',
+                  '• Com seu consentimento, enviar promoções e atualizações sobre novos eventos',
+                ],
+              },
+              {
+                title: '4. Base Legal para Processamento',
+                content: [
+                  'Processamos seus dados com base em:',
+                  '• Seu consentimento (para marketing)',
+                  '• Execução de contrato (para realizar transações)',
+                  '• Obrigações legais (para compliance)',
+                  '• Interesses legítimos (para melhorar o serviço)',
+                ],
+              },
+              {
+                title: '5. Compartilhamento de Dados',
+                content: [
+                  'Compartilhamos suas informações apenas quando necessário:',
+                  '• Com processadores de pagamento (Stripe, etc.) para processar pagamentos',
+                  '• Com produtores de eventos quando você compra ingressos',
+                  '• Com autoridades quando exigido por lei',
+                  '• Nunca vendemos seus dados para terceiros',
+                ],
+              },
+              {
+                title: '6. Segurança de Dados',
+                content: [
+                  'Implementamos medidas técnicas e organizacionais para proteger seus dados:',
+                  '• Criptografia SSL/TLS para dados em trânsito',
+                  '• Criptografia de dados sensíveis em repouso',
+                  '• Acesso restrito a dados pessoais',
+                  '• Monitoramento contínuo de segurança',
+                  'Porém, nenhum sistema é 100% seguro. Proteja sua senha e notifique-nos de acessos não autorizados imediatamente.',
+                ],
+              },
+              {
+                title: '7. Retenção de Dados',
+                content: [
+                  'Mantemos seus dados apenas pelo tempo necessário:',
+                  '• Dados de conta: enquanto sua conta estiver ativa',
+                  '• Dados de transações: 7 anos para conformidade fiscal',
+                  '• Cookies: até 1 ano',
+                  'Você pode solicitar exclusão de dados a qualquer momento (sujeito a obrigações legais).',
+                ],
+              },
+              {
+                title: '8. Seus Direitos (LGPD)',
+                content: [
+                  'Conforme a Lei Geral de Proteção de Dados (LGPD), você tem direito a:',
+                  '• Acessar seus dados pessoais',
+                  '• Corrigir informações imprecisas',
+                  '• Deletar seus dados ("direito ao esquecimento")',
+                  '• Portabilidade dos dados',
+                  '• Revogar consentimento de marketing',
+                  'Para exercer estes direitos, escreva para privacy@animalz.events',
+                ],
+              },
+              {
+                title: '9. Cookies',
+                content: [
+                  'Usamos cookies para:',
+                  '• Manter sua sessão ativa',
+                  '• Lembrar suas preferências',
+                  '• Analisar como você usa a plataforma',
+                  'Você pode desativar cookies no seu navegador, mas algumas funcionalidades podem ser afetadas.',
+                ],
+              },
+              {
+                title: '10. Transferências Internacionais',
+                content: [
+                  'Se você estiver fora do Brasil, seus dados podem ser transferidos para servidores em outros países. Implementamos salvaguardas apropriadas para protegê-los em conformidade com a lei.',
+                ],
+              },
+              {
+                title: '11. Dados de Menores',
+                content: [
+                  'Não coletamos dados de pessoas menores de 18 anos sem consentimento parental. Se descobrirmos coleta não autorizada, deletaremos os dados imediatamente.',
+                ],
+              },
+              {
+                title: '12. Contato e Reclamações',
+                content: [
+                  'Para dúvidas sobre privacidade:',
+                  '• Email: privacy@animalz.events',
+                  '• Página de contato: animalz.events/contact',
+                  'Se não estiver satisfeito com nossa resposta, você pode registrar reclamação junto à Autoridade Nacional de Proteção de Dados (ANPD).',
+                ],
+              },
+              {
+                title: '13. Atualizações desta Política',
+                content: [
+                  'Esta política pode ser atualizada sem aviso prévio. Mudanças significativas serão notificadas por email ou na plataforma. Seu uso contínuo representa aceitação das mudanças.',
+                ],
+              },
+            ].map((section, idx) => (
+              <PublicReveal key={idx} delayMs={idx * 30}>
+                <div>
+                  <h2 className="font-display text-[1.8rem] font-semibold leading-[1.1] tracking-[-0.02em] text-[#1f1a15]">
+                    {section.title}
+                  </h2>
+                  <div className="mt-4 space-y-3">
+                    {section.content.map((paragraph, pidx) => (
+                      <p key={pidx} className="text-base leading-7 text-[#5f5549]">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </PublicReveal>
+            ))}
+          </div>
 
-          <section style={{ marginBottom:32 }}>
-            <h2 style={{ fontSize:20,fontWeight:600,color:'#f5f5f0',marginBottom:12 }}>5. Cookies</h2>
-            <p>Our website uses cookies to enhance your experience. You can control cookie settings through your browser preferences at any time.</p>
-          </section>
-
-          <section style={{ marginBottom:32 }}>
-            <h2 style={{ fontSize:20,fontWeight:600,color:'#f5f5f0',marginBottom:12 }}>6. Your Rights</h2>
-            <p>You have the right to access, correct, or delete your personal information. To exercise these rights, please contact us at support@animalz.events.</p>
-          </section>
-
-          <section>
-            <h2 style={{ fontSize:20,fontWeight:600,color:'#f5f5f0',marginBottom:12 }}>7. Changes to This Policy</h2>
-            <p>We may update this privacy policy from time to time. We will notify you of any significant changes by posting the updated policy on our website.</p>
-          </section>
+          <PublicReveal delayMs={13 * 30}>
+            <div className="mt-16 rounded-[2.4rem] border border-[#e5d8c7] bg-[#fbf7f1] p-8">
+              <p className="text-sm leading-7 text-[#5f5549]">
+                <strong className="text-[#1f1a15]">Última atualização:</strong> Março de 2026{' '}
+                <br className="md:hidden" />
+                <span className="hidden md:inline">•</span>{' '}
+                <strong className="text-[#1f1a15]">Versão:</strong> 1.0
+              </p>
+            </div>
+          </PublicReveal>
         </div>
-
-        <div style={{ marginTop:48,paddingTop:24,borderTop:'1px solid #1a1a1a' }}>
-          <a href="/" style={{ color:'#d4ff00',textDecoration:'none',fontSize:12,fontFamily:'DM Mono,monospace',letterSpacing:'0.1em' }}>← Back to Home</a>
-        </div>
-      </div>
-    </div>
+      </section>
+    </PublicLayout>
   )
 }

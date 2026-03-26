@@ -319,8 +319,8 @@ export function PermissionBlockedState({ title, description, action, icon, class
 }
 
 export function LoadingState({
-  title = 'Carregando',
-  description = 'Estamos preparando esta experiencia para voce.',
+  title = 'Preparando',
+  description = 'Estamos montando tudo para você. Um momento, por favor.',
   className,
 }: Partial<BaseStateProps>) {
   return (

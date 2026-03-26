@@ -24,7 +24,7 @@ export function PublicHeader({ onLogin, actionSlot, compact = false, className }
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 border-b border-[rgba(255,255,255,0.07)] bg-[#0a0908]/92 backdrop-blur-xl',
+        'sticky top-0 z-40 border-b border-[rgba(255,255,255,0.07)] bg-[#0a0908]',
         className,
       )}
     >

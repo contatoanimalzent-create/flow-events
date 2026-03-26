@@ -66,7 +66,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
   return (
     <>
-      <header className="flex h-[72px] shrink-0 items-center gap-4 border-b border-[rgba(255,255,255,0.06)] bg-[#0d0c0b]/95 px-6 backdrop-blur-xl">
+      <header className="flex h-[72px] shrink-0 items-center gap-4 border-b border-[rgba(255,255,255,0.06)] bg-[#0d0c0b] px-6">
         <button
           onClick={onMenuToggle}
           className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-2 text-[#6a6058] transition-all hover:bg-[rgba(255,255,255,0.08)] hover:text-[#f0ebe2]"

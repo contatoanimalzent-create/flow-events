@@ -122,7 +122,7 @@ export function StickyPurchaseCTA({
 }) {
   return (
     <div className="fixed inset-x-4 bottom-4 z-40 md:hidden">
-      <div className="flex items-center justify-between gap-4 rounded-full border border-white/60 bg-[rgba(31,26,21,0.92)] px-5 py-3 text-white shadow-[0_24px_70px_rgba(20,12,3,0.28)] backdrop-blur-xl">
+      <div className="flex items-center justify-between gap-4 rounded-full border border-white/60 bg-[rgba(31,26,21,0.98)] px-5 py-3 text-white shadow-[0_24px_70px_rgba(20,12,3,0.28)]">
         <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/54">
             {cartQty > 0 ? `${cartQty} selecionado${cartQty > 1 ? 's' : ''}` : 'Acesso'}

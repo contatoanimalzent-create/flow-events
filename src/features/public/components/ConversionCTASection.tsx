@@ -25,7 +25,7 @@ export function ConversionCTASection({ onLogin }: ConversionCTASectionProps) {
 
       <div className="relative mx-auto max-w-7xl">
         <PublicReveal>
-          <div className="relative overflow-hidden rounded-[2.4rem] border border-white/10 bg-white/5 px-8 py-12 shadow-float-dark backdrop-blur-sm md:px-12 md:py-14 lg:px-16 lg:py-18">
+          <div className="relative overflow-hidden rounded-[2.4rem] border border-white/10 bg-white/5 px-8 py-12 shadow-float-dark md:px-12 md:py-14 lg:px-16 lg:py-18">
             {/* Inner glow */}
             <div className="absolute right-[-3rem] top-[-3rem] h-40 w-40 rounded-full bg-[#f4ede0]/6 blur-3xl" />
             <div className="absolute bottom-[-3rem] left-[-2rem] h-40 w-40 rounded-full bg-white/4 blur-3xl" />

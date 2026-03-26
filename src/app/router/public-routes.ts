@@ -1,6 +1,7 @@
 export type PublicRoute =
   | 'home'
   | 'events'
+  | 'about'
   | 'create-event'
   | 'account'
   | 'login'
@@ -15,6 +16,7 @@ export function getInitialPublicRoute(): PublicRoute {
   if (path === '/terms') return 'terms'
   if (path === '/privacy') return 'privacy'
   if (path === '/contact') return 'contact'
+  if (path === '/about') return 'about'
   if (path === '/events') return 'events'
   if (path === '/create-event') return 'create-event'
   if (path === '/me' || path === '/account') return 'account'
@@ -28,5 +30,5 @@ export function getInitialPublicRoute(): PublicRoute {
 }
 
 export function isImmediatePublicRoute(route: PublicRoute) {
-  return typeof route === 'object' || route === 'events' || route === 'create-event' || route === 'account' || route === 'terms' || route === 'privacy' || route === 'contact'
+  return typeof route === 'object' || route === 'events' || route === 'about' || route === 'create-event' || route === 'account' || route === 'terms' || route === 'privacy' || route === 'contact'
 }

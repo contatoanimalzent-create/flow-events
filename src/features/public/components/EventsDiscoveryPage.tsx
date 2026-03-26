@@ -110,12 +110,12 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
         <div className="mx-auto max-w-7xl">
           <PublicReveal>
             <div className="max-w-4xl">
-              <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Discovery experience</div>
+              <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Editorial discovery</div>
               <h1 className="mt-5 font-display text-[clamp(3.5rem,7vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-[#1f1a15]">
-                Experiencias
+                Experiencias em curadoria
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-8 text-[#5f5549] md:text-lg">
-                Navegue por uma curadoria viva de eventos como quem percorre uma plataforma de descoberta: destaque editorial, fileiras em movimento e selecao visualmente guiada.
+                Navegue por uma selecao viva de experiencias, cultura e lifestyle como quem percorre uma plataforma de descoberta global: destaque editorial, ritmo visual e leitura conduzida por desejo.
               </p>
             </div>
           </PublicReveal>
@@ -125,7 +125,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
               Curadoria premium
             </PremiumBadge>
             <PremiumBadge tone="accent" className="border-[#e1d0ab] bg-[#f7edd1] text-[#6d5324]">
-              Scroll horizontal suave
+              Discovery em camadas
             </PremiumBadge>
           </PublicReveal>
 
@@ -173,22 +173,22 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
           <FeaturedEventBlock primaryEvent={featuredPrimary} secondaryEvents={featuredSecondary} />
           <EventsRowCarousel
             title="Destaques"
-            description="Uma primeira fileira de experiencias escolhidas pelo impacto visual e pela forca de venda."
+            description="Uma primeira camada de experiencias escolhidas pelo impacto visual, valor percebido e forca cultural."
             events={discoveryRows.highlights}
           />
           <EventsRowCarousel
             title="Proximos eventos"
-            description="Experiencias que chegam primeiro e merecem entrar no radar agora."
+            description="Experiencias que entram primeiro no radar e pedem presenca desde ja."
             events={discoveryRows.upcoming}
           />
           <EventsRowCarousel
             title="Experiencias premium"
-            description="Selecao com maior valor percebido, desenho mais aspiracional e acesso elevado."
+            description="Selecao com maior valor percebido, atmosfera aspiracional e acesso elevado."
             events={discoveryRows.premium}
           />
           <EventsRowCarousel
             title="Mais populares"
-            description="Os eventos com maior tracao, prova social e demanda acumulada no demo."
+            description="As experiencias com maior tracao, prova social e desejo acumulado no ambiente demo."
             events={discoveryRows.popular}
           />
           <EventsRowCarousel

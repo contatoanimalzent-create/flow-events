@@ -5,18 +5,18 @@ import { PublicReveal } from './PublicReveal'
 const principles = [
   {
     icon: Sparkles,
-    title: 'Curadoria antes de catalogo',
-    text: 'A plataforma apresenta experiencias como objetos de desejo, com narrativa, ritmo visual e contexto.',
+    title: 'Curadoria antes de volume',
+    text: 'A plataforma apresenta experiencias como objetos culturais com narrativa, ritmo visual e contexto, em vez de apenas empilhar datas.',
   },
   {
     icon: Waves,
     title: 'Operacao invisivelmente solida',
-    text: 'Por tras da camada editorial, checkout, check-in, CRM e campanhas continuam trabalhando como sistema real.',
+    text: 'Por tras da superficie editorial, checkout, check-in, CRM, monetizacao e growth continuam operando como sistema real.',
   },
   {
     icon: Star,
     title: 'Presenca de marca',
-    text: 'Cada superficie foi desenhada para parecer uma marca premium global, nao uma ferramenta improvisada.',
+    text: 'Cada superficie foi desenhada para parecer uma marca premium global de experiencias, nao uma ferramenta generica.',
   },
 ]
 
@@ -28,16 +28,16 @@ export function EditorialIntroSection() {
           <div className="max-w-xl">
             <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Uma camada publica com assinatura</div>
             <h2 className="mt-5 font-display text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-[#1f1a15]">
-              O produto deixa de explicar e passa a seduzir.
+              O produto deixa de parecer sistema e passa a soar como ecossistema.
             </h2>
             <p className="mt-6 max-w-lg text-base leading-8 text-[#5f5549] md:text-lg">
-              Animalz Events foi desenhado para posicionar experiencias, nao apenas listar datas. A homepage funciona como convite, manifesto e prova de sofisticacao operacional ao mesmo tempo.
+              Animalz Events foi desenhado para posicionar experiencias premium, cultura e lifestyle com a mesma forca com que sustenta checkout, CRM, operacao e crescimento.
             </p>
             <div className="mt-8 flex items-center gap-3 text-sm font-medium text-[#1f1a15]">
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#d9cfbf] bg-white/70 shadow-[0_12px_30px_rgba(48,35,18,0.08)]">
                 <ArrowUpRight className="h-4 w-4" />
               </span>
-              Experiencias premium merecem uma superficie com presenca propria.
+              Experiencias premium merecem uma linguagem propria, nao um template de software.
             </div>
           </div>
         </PublicReveal>

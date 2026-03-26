@@ -29,13 +29,13 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#ddd0bc] bg-white/82 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">
                 <Sparkles className="h-4 w-4" />
-                Producer acquisition
+                Producer positioning
               </div>
               <h1 className="mt-6 font-display text-[clamp(4rem,7vw,7rem)] font-semibold leading-[0.86] tracking-[-0.05em] text-[#1f1a15]">
-                Crie experiencias que vendem, operam e crescem no mesmo ritmo.
+                Traga sua marca para uma camada onde experiencia, desejo e receita se reforcam.
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#5f5549] md:text-lg">
-                A Animalz Events une venda, operacao, CRM, midia e loops de aquisicao em uma camada que parece premium para o publico e clara para a operacao.
+                A Animalz Events reposiciona a sua operacao como ecossistema premium de experiencias. A marca ganha presenca publica, o publico percebe valor antes da compra e a operacao mantem controle de ponta a ponta.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -60,13 +60,13 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
             <div className="rounded-[2.6rem] border border-[#e3d6c3] bg-white/88 p-7 shadow-[0_22px_65px_rgba(66,48,24,0.08)] md:p-9">
               <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">Potencial de ganho</div>
               <div className="mt-4 font-display text-[3rem] font-semibold leading-[0.92] tracking-[-0.05em] text-[#1f1a15]">
-                Revenue, operacao e retencao sob o mesmo teto.
+                Revenue, posicionamento e retencao sob a mesma assinatura.
               </div>
               <div className="mt-8 space-y-4">
                 {[
-                  'Checkout premium com fee configuravel e preview em tempo real.',
-                  'Growth loops com sharing, referral, campanhas e remarketing interno.',
-                  'CRM, check-in, financeiro e command center ja conectados a mesma base.',
+                  'Checkout premium com percepcao de marca e preview de receita em tempo real.',
+                  'Growth loops com sharing, referral, campanhas e remarketing sem depender de ferramentas espalhadas.',
+                  'CRM, check-in, financeiro e operacao conectados a mesma base para sustentar recorrencia e escala.',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-3 rounded-[1.5rem] border border-[#eee2cf] bg-[#fbf7f1] p-4">
                     <Check className="mt-1 h-4 w-4 text-[#4e6d4f]" />
@@ -96,22 +96,22 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
 
       <SocialProofBlock
         title="A prova social nao fica em depoimento. Ela aparece nos sinais reais do produto."
-        description="A camada publica vende melhor quando o produtor enxerga demanda, receita, prova de operacao e espaco claro para crescer sem improviso."
+        description="O produtor percebe valor mais rapido quando ve demanda, escala e sofisticacao operacional ja materializadas na mesma plataforma."
         items={[
           {
             label: 'Experiencias ativas',
             value: events.length.toLocaleString('pt-BR'),
-            note: 'Eventos publicados e prontos para captar audiencia com links compartilhaveis e midia premium.',
+            note: 'Experiencias publicadas e prontas para captar audiencia com midia real e descoberta editorial.',
           },
           {
             label: 'Participantes',
             value: ticketsSold.toLocaleString('pt-BR'),
-            note: 'Base que alimenta CRM, remarketing e novos ciclos de conversao organica.',
+            note: 'Base viva que alimenta CRM, remarketing e novos ciclos de relacionamento.',
           },
           {
             label: 'Curadoria viva',
             value: Math.max(events.filter((event) => event.minPrice !== null).length, 1).toLocaleString('pt-BR'),
-            note: 'Operacoes com venda, fee, campanhas e dados fluindo na mesma camada enterprise.',
+            note: 'Operacoes com venda, fee, campanhas e dados fluindo na mesma camada premium.',
           },
         ]}
       />
@@ -122,10 +122,10 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
             <div>
               <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Launch path</div>
               <div className="mt-4 font-display text-[clamp(2.8rem,4.5vw,4.6rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-white">
-                O proximo evento pode nascer aqui com menos friccao e mais margem.
+                O proximo capitulo da sua marca pode nascer aqui com mais margem e mais presenca.
               </div>
               <p className="mt-5 max-w-2xl text-base leading-8 text-white/72">
-                Entre na plataforma, configure taxa, publique a landing, ative referrals e acompanhe vendas, CRM e operacao no mesmo software.
+                Entre na plataforma, publique uma experiencia com presenca de marca, ative monetizacao e growth, e acompanhe vendas, CRM e operacao no mesmo fluxo.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-4">

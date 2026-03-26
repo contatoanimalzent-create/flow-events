@@ -18,10 +18,10 @@ export function ConversionCTASection({ onLogin }: ConversionCTASectionProps) {
             <div className="max-w-3xl">
               <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Pronto para a proxima camada</div>
               <h2 className="mt-5 font-display text-[clamp(2.8rem,5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-[#1f1a15]">
-                Entre para descobrir, vender e operar experiencias com presenca de marca.
+                Descubra, publique e sustente experiencias com linguagem de marca global.
               </h2>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#5f5549] md:text-lg">
-                A mesma plataforma que apresenta eventos com sofisticacao tambem sustenta vendas, CRM, campanhas, check-in e inteligencia em tempo real.
+                A mesma camada que posiciona experiencias com sofisticacao tambem sustenta vendas, CRM, campanhas, check-in, monetizacao e growth com profundidade real.
               </p>
             </div>
 
@@ -30,7 +30,7 @@ export function ConversionCTASection({ onLogin }: ConversionCTASectionProps) {
                 href="/events"
                 className="inline-flex items-center gap-3 rounded-full bg-[#1f1a15] px-6 py-3 text-sm font-semibold text-[#f8f3ea] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(31,26,21,0.22)]"
               >
-                Explorar eventos
+                Explorar experiencias
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a

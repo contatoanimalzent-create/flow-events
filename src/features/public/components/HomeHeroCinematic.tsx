@@ -73,13 +73,13 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHe
               <div className="max-w-4xl">
                 <PublicReveal>
                   <div className="text-[11px] uppercase tracking-[0.34em] text-white/62">
-                    Plataforma premium para experiencias que precisam parecer desejadas antes da primeira compra
+                    Ecossistema premium para experiencias, cultura e lifestyle que precisam parecer desejadas antes da primeira compra
                   </div>
                   <h1 className="mt-6 max-w-5xl font-display text-[clamp(4.4rem,10vw,8.7rem)] font-semibold leading-[0.84] tracking-[-0.05em] text-white">
-                    Experiencias que comecam no primeiro frame.
+                    Uma marca para experiencias que comecam antes da chegada.
                   </h1>
                   <p className="mt-6 max-w-2xl text-base leading-7 text-white/80 md:text-lg md:leading-8">
-                    Animalz Events une descoberta, narrativa visual e operacao real em uma camada unica. A homepage deixa de parecer marketplace e passa a parecer convite.
+                    Animalz Events transforma descoberta, presenca de marca e operacao em uma unica camada aspiracional. Nao e apenas sobre vender acesso. E sobre criar desejo, contexto e continuidade.
                   </p>
                 </PublicReveal>
 
@@ -116,7 +116,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats, onLogin }: HomeHe
                       {heroEvent.name}
                     </div>
                     <p className="mt-4 text-sm leading-6 text-white/74">
-                      {heroEvent.subtitle || heroEvent.short_description || 'Landing page com assets reais, lotes ativos e operacao pronta para conversao.'}
+                      {heroEvent.subtitle || heroEvent.short_description || 'Uma experiencia com midia real, desejo imediato e operacao preparada para sustentar conversao, acesso e pos-compra.'}
                     </p>
 
                     <div className="mt-6 grid gap-3">

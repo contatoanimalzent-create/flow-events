@@ -53,7 +53,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
 
     return [
       {
-        label: 'Ingressos vendidos',
+        label: 'Participantes em jornada',
         value: events.reduce((sum, event) => sum + event.sold_tickets, 0).toLocaleString('pt-BR'),
       },
       { label: 'Experiencias publicas', value: String(events.length) },
@@ -68,8 +68,8 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
   const seoImage = heroEvent?.mediaPresentation.heroAsset?.thumbnail_url ?? heroEvent?.mediaPresentation.coverAsset?.secure_url ?? heroEvent?.cover_url ?? null
 
   useSeoMeta({
-    title: 'Animalz Events | Experiencias e operacao premium',
-    description: 'Descubra experiencias premium, eventos vivos e uma camada completa de checkout, CRM, check-in e growth em um unico produto.',
+    title: 'Animalz Events | Premium experiences ecosystem',
+    description: 'Descubra experiencias premium, cultura e lifestyle em uma camada que une narrativa publica, operacao, monetizacao e crescimento.',
     image: seoImage,
     url: typeof window !== 'undefined' ? window.location.href : '/',
   })

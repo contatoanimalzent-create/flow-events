@@ -13,6 +13,7 @@ interface PublicHeaderProps {
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Eventos', href: '/events' },
+  { label: 'Sobre', href: '/about' },
   { label: 'Criar evento', href: '/create-event' },
   { label: 'Contato', href: '/contact' },
 ]
@@ -35,7 +36,7 @@ export function PublicHeader({ onLogin, actionSlot, compact = false, className }
           <div>
             <div className="font-display text-[2rem] font-semibold leading-none tracking-[-0.04em] text-text-primary">Animalz Events</div>
             <div className="mt-1 text-[10px] uppercase tracking-[0.32em] text-text-muted">
-              Luxury Event Operating System
+              Premium Experiences Ecosystem
             </div>
           </div>
         </a>

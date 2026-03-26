@@ -216,13 +216,13 @@
   .input-label { @apply block text-[11px] font-medium text-text-muted mb-2 tracking-[0.22em] uppercase; }
 
   .badge { @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium tracking-wide; }
-  .badge-success { @apply badge bg-status-success/12 text-status-success; }
-  .badge-warning { @apply badge bg-status-warning/12 text-status-warning; }
-  .badge-error   { @apply badge bg-status-error/12 text-status-error; }
-  .badge-info    { @apply badge bg-status-info/12 text-status-info; }
-  .badge-purple  { @apply badge bg-brand-purple/12 text-brand-purple; }
-  .badge-teal    { @apply badge bg-brand-teal/12 text-brand-teal; }
-  .badge-acid    { @apply badge bg-brand-acid/12 text-brand-acid; }
+  .badge-success { @apply badge bg-status-success/10 text-status-success; }
+  .badge-warning { @apply badge bg-status-warning/10 text-status-warning; }
+  .badge-error   { @apply badge bg-status-error/10 text-status-error; }
+  .badge-info    { @apply badge bg-status-info/10 text-status-info; }
+  .badge-purple  { @apply badge bg-brand-purple/10 text-brand-purple; }
+  .badge-teal    { @apply badge bg-brand-teal/10 text-brand-teal; }
+  .badge-acid    { @apply badge bg-brand-acid/10 text-brand-acid; }
   .badge-muted   { @apply badge bg-bg-elevated text-text-secondary; }
 
   .stat-card   { @apply card p-5 flex flex-col gap-2; }
@@ -315,7 +315,7 @@
     @apply rounded-[30px] p-6;
   }
   .metric-icon {
-    @apply flex h-11 w-11 items-center justify-center rounded-full bg-brand-acid/12 text-brand-acid;
+    @apply flex h-11 w-11 items-center justify-center rounded-full bg-brand-acid/10 text-brand-acid;
   }
   .metric-helper { @apply text-text-muted; }
   .metric-trend  { @apply text-brand-acid; }

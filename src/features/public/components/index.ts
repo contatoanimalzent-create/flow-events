@@ -11,6 +11,7 @@ export { EventsFilterBar } from './EventsFilterBar'
 export { EventsRowCarousel } from './EventsRowCarousel'
 export { EventsSearchInput } from './EventsSearchInput'
 export { EventInformationHighlights } from './EventInformationHighlights'
+export { EventChaptersShowcase } from './EventChaptersShowcase'
 export { EventManifestSection } from './EventManifestSection'
 export {
   EventMediaGalleryPremium,

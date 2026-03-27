@@ -1,10 +1,26 @@
-import { ArrowRight, Mail, MapPin, Phone } from 'lucide-react'
+import { ArrowRight, Globe, Headphones, Mail, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { usePublicLocale } from '../lib/public-locale'
 
 interface EventsPublicFooterProps {
   categories?: string[]
   onCategoryClick?: (category: string) => void
+}
+
+function FooterMark() {
+  return (
+    <div className="inline-flex items-start gap-3 text-white">
+      <div className="relative flex flex-col leading-none">
+        <span className="font-display text-[2.5rem] font-semibold uppercase tracking-[-0.08em]">A</span>
+        <span className="-mt-2.5 ml-6 font-display text-[3rem] font-semibold uppercase tracking-[-0.1em]">E</span>
+        <span className="absolute bottom-[0.6rem] left-0 h-[2px] w-[4.6rem] bg-white/90" />
+      </div>
+      <div className="pt-1">
+        <div className="text-[10px] uppercase tracking-[0.42em] text-white/38">Animalz</div>
+        <div className="mt-1 text-[12px] font-medium uppercase tracking-[0.28em] text-white/78">Experiences</div>
+      </div>
+    </div>
+  )
 }
 
 export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsPublicFooterProps) {
@@ -25,60 +41,71 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
   }
 
   return (
-    <footer className="border-t border-[rgba(255,255,255,0.06)] bg-[linear-gradient(180deg,#090c11_0%,#05070a_100%)]">
-      <div className="px-5 py-14 md:px-10 lg:px-16 lg:py-18">
-        <div className="mx-auto max-w-7xl">
-          <div className="rounded-[2.4rem] border border-[rgba(255,255,255,0.06)] bg-[linear-gradient(135deg,rgba(17,20,26,0.96),rgba(11,14,19,0.92))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.34)] md:p-10">
-            <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-end">
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.34em] text-[#ff6a5c]">
-                  {isPortuguese ? 'Acesso prioritario' : 'Priority access'}
-                </div>
-                <h3 className="mt-4 max-w-xl font-display text-[clamp(2.4rem,4vw,4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f5f7fa]">
-                  {isPortuguese
-                    ? 'Receba novas experiencias, aberturas e acessos antes do restante do publico.'
-                    : 'Receive new experiences, launches and access windows before the wider public.'}
-                </h3>
-                <p className="mt-4 max-w-xl text-sm leading-7 text-[#a9b0bc] md:text-base">
-                  {isPortuguese
-                    ? 'Uma camada editorial para quem quer descobrir experiencias com mais contexto, mais clareza e melhor timing.'
-                    : 'An editorial layer for people who want to discover experiences with better context, clarity and timing.'}
-                </p>
+    <footer className="bg-[linear-gradient(180deg,#02050a_0%,#04070d_100%)] text-white">
+      <div className="px-4 py-12 md:px-8 lg:px-12 lg:py-16">
+        <div className="mx-auto max-w-[1920px]">
+          <div className="grid gap-8 border-t border-white/10 pt-8 lg:grid-cols-[0.95fr_1.05fr]">
+            <div className="max-w-xl">
+              <div className="text-[11px] uppercase tracking-[0.36em] text-white/38">
+                {isPortuguese ? 'Entrar na lista' : 'Join the list'}
               </div>
+              <h3 className="mt-5 font-display text-[clamp(2.8rem,4.4vw,5rem)] font-semibold uppercase leading-[0.86] tracking-[-0.05em] text-white">
+                {isPortuguese
+                  ? 'Receba novas experiencias antes da abertura publica.'
+                  : 'Receive new experiences before the public release.'}
+              </h3>
+              <p className="mt-5 max-w-lg text-base leading-8 text-white/60">
+                {isPortuguese
+                  ? 'Uma camada de descoberta pensada para quem acompanha cultura, hospitalidade e eventos como lifestyle.'
+                  : 'A discovery layer built for people who follow culture, hospitality and events as lifestyle.'}
+              </p>
+            </div>
 
-              <form onSubmit={handleSubscribe} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="rounded-[2.1rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <form onSubmit={handleSubscribe} className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
                 <label className="relative block">
                   <input
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder={isPortuguese ? 'Seu melhor e-mail' : 'Your best email'}
-                    className="w-full rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-5 py-4 pr-12 text-sm text-[#f5f7fa] outline-none transition-all duration-300 placeholder:text-[#6f7785] focus:border-[#ff2d2d]/40 focus:shadow-[0_14px_28px_rgba(0,0,0,0.16)]"
+                    className="w-full rounded-full border border-white/10 bg-white/[0.04] px-5 py-4 pr-12 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/36 focus:border-white/24"
                     required
                   />
-                  <Mail className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7b8390]" />
+                  <Mail className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/38" />
                 </label>
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-4 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(255,45,45,0.32)]"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#9ec9fb] px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-[#09131c] transition-all duration-300 hover:-translate-y-0.5"
                 >
-                  {subscribed
-                    ? isPortuguese
-                      ? 'Acesso confirmado'
-                      : 'Access confirmed'
-                    : isPortuguese
-                      ? 'Receber novidades'
-                      : 'Get updates'}
+                  {subscribed ? (isPortuguese ? 'Confirmado' : 'Confirmed') : isPortuguese ? 'Receber capitulos' : 'Get chapters'}
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href="tel:+14698629040"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/78 transition-colors hover:text-white"
+                >
+                  <Headphones className="h-4 w-4" />
+                  +1 469 862 9040
+                </a>
+                <a
+                  href="mailto:contato@animalzevents.com"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/78 transition-colors hover:text-white"
+                >
+                  <Mail className="h-4 w-4" />
+                  contato@animalzevents.com
+                </a>
+              </div>
             </div>
           </div>
 
           {categories.length > 0 ? (
-            <div className="mt-10">
-              <div className="text-[11px] uppercase tracking-[0.32em] text-[#7b8390]">
-                {isPortuguese ? 'Explore por categoria' : 'Explore by category'}
+            <div className="mt-12 border-t border-white/10 pt-8">
+              <div className="text-[11px] uppercase tracking-[0.36em] text-white/38">
+                {isPortuguese ? 'Curadoria por categoria' : 'Curated by category'}
               </div>
               <div className="mt-4 flex flex-wrap gap-3">
                 {categories.map((category) => (
@@ -86,7 +113,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                     key={category}
                     type="button"
                     onClick={() => onCategoryClick?.(category)}
-                    className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 py-2 text-sm text-[#a9b0bc] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#ff2d2d]/30 hover:text-[#f5f7fa]"
+                    className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/66 transition-all duration-300 hover:border-white/22 hover:text-white"
                   >
                     {category}
                   </button>
@@ -95,22 +122,22 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             </div>
           ) : null}
 
-          <div className="mt-12 grid gap-10 border-t border-[rgba(255,255,255,0.06)] pt-10 lg:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]">
+          <div className="mt-12 grid gap-10 border-t border-white/10 pt-8 lg:grid-cols-[0.95fr_0.7fr_0.7fr_0.7fr]">
             <div>
-              <img src="/logo.png" alt="Animalz Events" className="h-16 w-auto object-contain" />
-              <p className="mt-5 max-w-sm text-sm leading-7 text-[#a9b0bc]">
+              <FooterMark />
+              <p className="mt-5 max-w-sm text-sm leading-7 text-white/58">
                 {isPortuguese
-                  ? 'Animalz Events organiza descoberta, conversao e operacao em uma camada de experiencias com ambicao global.'
-                  : 'Animalz Events organizes discovery, conversion and operations in a global premium experiences layer.'}
+                  ? 'Animalz Experiences organiza descoberta, compra e operacao em uma linguagem premium inspirada por cultura, velocidade e presenca de marca.'
+                  : 'Animalz Experiences organizes discovery, purchase and operations through a premium language inspired by culture, speed and brand presence.'}
               </p>
-              <div className="mt-5 space-y-2 text-sm text-[#a9b0bc]">
+              <div className="mt-5 space-y-2 text-sm text-white/54">
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-[#ff6a5c]" />
-                  {isPortuguese ? 'Sao Paulo, Brasil' : 'Sao Paulo, Brazil'}
+                  <Globe className="h-4 w-4 text-white/42" />
+                  animalz.events
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-[#ff6a5c]" />
-                  contato@animalzevents.com
+                  <Phone className="h-4 w-4 text-white/42" />
+                  +1 469 862 9040
                 </div>
               </div>
             </div>
@@ -119,37 +146,32 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               {
                 title: isPortuguese ? 'Experiencias' : 'Experiences',
                 links: [
-                  { label: isPortuguese ? 'Agenda completa' : 'Full calendar', href: '/events' },
+                  { label: isPortuguese ? 'Home' : 'Home', href: '/' },
+                  { label: isPortuguese ? 'Agenda' : 'Calendar', href: '/events' },
                   { label: isPortuguese ? 'Minha conta' : 'My account', href: '/me' },
-                  { label: isPortuguese ? 'Sobre a plataforma' : 'About the platform', href: '/about' },
                 ],
               },
               {
-                title: isPortuguese ? 'Produtores' : 'Producers',
+                title: isPortuguese ? 'Produtores' : 'Creators',
                 links: [
-                  { label: isPortuguese ? 'Publicar experiencia' : 'Publish experience', href: '/create-event' },
-                  { label: isPortuguese ? 'Monetizacao' : 'Monetization', href: '/billing' },
-                  { label: isPortuguese ? 'Crescimento' : 'Growth', href: '/growth' },
-                ],
-              },
-              {
-                title: isPortuguese ? 'Institucional' : 'Company',
-                links: [
+                  { label: isPortuguese ? 'Criar evento' : 'Create event', href: '/create-event' },
+                  { label: isPortuguese ? 'Sobre' : 'About', href: '/about' },
                   { label: isPortuguese ? 'Ajuda' : 'Help', href: '/help' },
+                ],
+              },
+              {
+                title: isPortuguese ? 'Base legal' : 'Legal',
+                links: [
                   { label: isPortuguese ? 'Privacidade' : 'Privacy', href: '/privacy' },
                   { label: isPortuguese ? 'Termos' : 'Terms', href: '/terms' },
                 ],
               },
             ].map((section) => (
               <div key={section.title}>
-                <div className="text-[11px] uppercase tracking-[0.32em] text-[#7b8390]">{section.title}</div>
+                <div className="text-[11px] uppercase tracking-[0.36em] text-white/38">{section.title}</div>
                 <div className="mt-4 grid gap-3">
                   {section.links.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      className="text-sm text-[#a9b0bc] transition-colors duration-300 hover:text-[#f5f7fa]"
-                    >
+                    <a key={link.label} href={link.href} className="text-sm text-white/62 transition-colors duration-300 hover:text-white">
                       {link.label}
                     </a>
                   ))}
@@ -158,12 +180,12 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             ))}
           </div>
 
-          <div className="mt-10 flex flex-col gap-3 border-t border-[rgba(255,255,255,0.06)] pt-6 text-xs text-[#6f7785] md:flex-row md:items-center md:justify-between">
-            <p>&copy; {new Date().getFullYear()} Animalz Events. All rights reserved.</p>
+          <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white/34 md:flex-row md:items-center md:justify-between">
+            <p>&copy; {new Date().getFullYear()} Animalz Experiences.</p>
             <p>
               {isPortuguese
-                ? 'Plataforma premium de experiencias para descoberta, ticketing e operacao real.'
-                : 'Premium experiences platform for discovery, ticketing and real operations.'}
+                ? 'Descoberta premium, ticketing e operacao real em uma unica camada.'
+                : 'Premium discovery, ticketing and real operations in one layer.'}
             </p>
           </div>
         </div>

@@ -1,26 +1,27 @@
-import { ArrowRight, CalendarDays, MapPin, Sparkles, Users } from 'lucide-react'
+import { ArrowRight, Plus } from 'lucide-react'
 import { EventHeroMedia, getEventAssetUrl } from '@/features/event-media'
 import type { PublicEventSummary } from '@/features/public/types/public.types'
+import { usePublicLocale } from '../lib/public-locale'
 import { PublicReveal } from './PublicReveal'
 
 interface HomeHeroCinematicProps {
   heroEvent: PublicEventSummary | null
   scrollY: number
   stats: Array<{ label: string; value: string }>
-  onLogin?: () => void
 }
 
 const fallbackHeroImage =
   'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=2200&q=80&fit=crop'
 
 export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinematicProps) {
+  const { isPortuguese } = usePublicLocale()
   const fallbackImage =
     getEventAssetUrl(heroEvent?.mediaPresentation.coverAsset) || heroEvent?.cover_url || fallbackHeroImage
 
   return (
-    <section className="px-5 pb-8 pt-6 md:px-10 md:pb-10 lg:px-16 lg:pb-12 lg:pt-8">
-      <div className="mx-auto">
-        <div className="relative min-h-[calc(100svh-7.5rem)] overflow-hidden rounded-[2.5rem] border border-white/70 bg-[#221b15] shadow-[0_32px_120px_rgba(41,29,15,0.18)]">
+    <section className="px-4 pb-8 pt-4 md:px-8 lg:px-12 lg:pb-10 lg:pt-5">
+      <div className="mx-auto max-w-[1920px]">
+        <div className="relative min-h-[calc(100svh-2rem)] overflow-hidden rounded-[2.9rem] border border-white/10 bg-[#05080d] shadow-[0_36px_120px_rgba(0,0,0,0.4)]">
           {heroEvent ? (
             <>
               <EventHeroMedia
@@ -30,144 +31,104 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
                 fallbackImage={fallbackImage}
                 scrollY={scrollY}
               />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(243,230,205,0.22),transparent_28%),linear-gradient(112deg,rgba(21,14,8,0.88)_0%,rgba(21,14,8,0.46)_42%,rgba(21,14,8,0.2)_62%,rgba(21,14,8,0.72)_100%)]" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,13,9,0.18)_0%,rgba(18,13,9,0)_24%,rgba(18,13,9,0.68)_100%)]" />
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,7,12,0.24)_0%,rgba(4,7,12,0.05)_28%,rgba(4,7,12,0.06)_70%,rgba(4,7,12,0.42)_100%)]" />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,7,12,0.16)_0%,rgba(4,7,12,0)_22%,rgba(4,7,12,0.64)_100%)]" />
             </>
           ) : (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(196,154,80,0.12),transparent_30%),radial-gradient(circle_at_80%_18%,rgba(106,134,173,0.08),transparent_24%),linear-gradient(135deg,#141210_0%,#0e0c0a_45%,#121010_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,#05080d_0%,#0b111a_100%)]" />
           )}
 
           <div
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-25"
             style={{
               backgroundImage:
-                'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
-              backgroundSize: '140px 140px',
-              maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.95))',
+                'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)',
+              backgroundSize: '120px 120px',
             }}
           />
 
-          <div className="relative z-10 flex min-h-[calc(100svh-7.5rem)] flex-col justify-between p-7 text-white md:p-10 lg:p-14">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <PublicReveal className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/82 backdrop-blur-md">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Tickets and experiences
-                </span>
-              </PublicReveal>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_14%,rgba(255,255,255,0.24),transparent_28%),radial-gradient(circle_at_12%_78%,rgba(255,45,45,0.18),transparent_24%)]" />
 
+          <div className="relative z-10 flex min-h-[calc(100svh-2rem)] flex-col justify-between p-6 text-white md:p-10 lg:p-12">
+            <div className="flex items-start justify-end">
               {heroEvent ? (
-                <PublicReveal delayMs={120} className="hidden rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/74 backdrop-blur-md md:flex">
-                  {heroEvent.status === 'ongoing' ? 'Live now' : 'Featured'}
+                <PublicReveal delayMs={120}>
+                  <a
+                    href={`/e/${heroEvent.slug}`}
+                    className="inline-flex items-center gap-3 rounded-[1.2rem] border border-white/12 bg-[#9ec9fb] px-5 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-[#07101a] transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <Plus className="h-4 w-4" />
+                    {isPortuguese ? 'Conhecer o evento' : 'Know the event'}
+                  </a>
                 </PublicReveal>
               ) : null}
             </div>
 
-            <div className="grid gap-10 xl:grid-cols-[minmax(0,1.12fr)_21rem] xl:items-end">
-              <div className="max-w-4xl">
-                <PublicReveal>
-                  <h1 className="max-w-5xl font-display text-[clamp(4.4rem,10vw,8.7rem)] font-semibold leading-[0.84] tracking-[-0.05em] text-white">
-                    Discover events worth showing up for.
+            <div className="pb-8">
+              <PublicReveal>
+                <div className="max-w-6xl">
+                  <div className="text-[11px] uppercase tracking-[0.38em] text-white/46">
+                    {heroEvent?.category || (isPortuguese ? 'Animalz experiences' : 'Animalz experiences')}
+                  </div>
+                  <h1 className="mt-4 font-display text-[clamp(5rem,13vw,12rem)] font-semibold uppercase leading-[0.82] tracking-[-0.08em] text-white">
+                    {isPortuguese ? 'BEYOND ACCESS' : 'BEYOND ACCESS'}
                   </h1>
-                  <p className="mt-6 max-w-2xl text-base leading-7 text-white/80 md:text-lg md:leading-8">
-                    Buy tickets, secure your place and move through standout experiences in culture, gastronomy, music and lifestyle.
+                  <p className="mt-5 max-w-2xl text-base leading-8 text-white/72 md:text-lg">
+                    {isPortuguese
+                      ? 'Uma camada premium para descobrir, comprar e viver eventos com linguagem de marca, ritmo comercial e atmosfera real.'
+                      : 'A premium layer for discovering, buying and living events with brand-led storytelling, stronger commercial rhythm and real atmosphere.'}
                   </p>
-                </PublicReveal>
+                </div>
+              </PublicReveal>
 
-                <PublicReveal className="mt-8 flex flex-wrap items-center gap-4" delayMs={120}>
+              <PublicReveal delayMs={140}>
+                <div className="mt-8 flex flex-wrap items-center gap-4">
                   <a
                     href="/events"
-                    className="inline-flex items-center gap-3 rounded-full bg-[#f8f3ea] px-6 py-3 text-sm font-semibold text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(21,14,8,0.24)]"
+                    className="inline-flex items-center gap-3 rounded-full border border-white/14 bg-white/[0.06] px-6 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.1]"
                   >
-                    Explore experiences
+                    {isPortuguese ? 'Explorar capitulos' : 'Explore chapters'}
                     <ArrowRight className="h-4 w-4" />
                   </a>
                   <a
                     href="/create-event"
-                    className="inline-flex items-center gap-3 rounded-full border border-white/36 bg-white/6 px-6 py-3 text-sm font-medium text-white transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
+                    className="inline-flex items-center gap-3 rounded-full border border-white/14 bg-transparent px-6 py-3 text-sm font-medium uppercase tracking-[0.16em] text-white/82 transition-all duration-300 hover:-translate-y-1 hover:border-white/24 hover:text-white"
                   >
-                    Publish my event
+                    {isPortuguese ? 'Publicar experiencia' : 'Launch an experience'}
                   </a>
-                  {heroEvent ? (
-                    <a
-                      href={`/e/${heroEvent.slug}`}
-                      className="inline-flex items-center gap-3 rounded-full border border-white/24 bg-white/6 px-6 py-3 text-sm font-medium text-white/90 transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
-                    >
-                      View featured experience
-                    </a>
-                  ) : null}
-                </PublicReveal>
-              </div>
-
-              {heroEvent ? (
-                <PublicReveal delayMs={180}>
-                  <div className="rounded-[2rem] border border-white/14 bg-white/10 p-5 backdrop-blur-md">
-                    <div className="text-[11px] uppercase tracking-[0.3em] text-white/56">Featured</div>
-                    <div className="mt-4 font-display text-4xl font-semibold leading-[0.92] text-white">
-                      {heroEvent.name}
-                    </div>
-                    <p className="mt-4 text-sm leading-6 text-white/74">
-                      {heroEvent.subtitle || heroEvent.short_description || 'Secure your place and enter an experience designed to be remembered.'}
-                    </p>
-
-                    <div className="mt-6 grid gap-3">
-                      {[
-                        {
-                          icon: CalendarDays,
-                          label: 'Date',
-                          value: new Date(heroEvent.starts_at).toLocaleDateString('en-US', {
-                            day: '2-digit',
-                            month: 'long',
-                            year: 'numeric',
-                          }),
-                        },
-                        {
-                          icon: MapPin,
-                          label: 'Location',
-                          value: [heroEvent.venue_name, heroEvent.city].filter(Boolean).join(' / '),
-                        },
-                        {
-                          icon: Users,
-                          label: 'Tickets sold',
-                          value: heroEvent.sold_tickets.toLocaleString('en-US'),
-                        },
-                      ].map((item) => {
-                        const Icon = item.icon
-
-                        return (
-                          <div key={item.label} className="flex items-center gap-3 rounded-[1.4rem] border border-white/10 bg-black/10 px-4 py-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/10">
-                              <Icon className="h-4 w-4 text-white/84" />
-                            </div>
-                            <div>
-                              <div className="text-[10px] uppercase tracking-[0.24em] text-white/48">{item.label}</div>
-                              <div className="mt-1 text-sm font-medium text-white">{item.value}</div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </PublicReveal>
-              ) : null}
+                </div>
+              </PublicReveal>
             </div>
 
-            <PublicReveal delayMs={220}>
-              <div className="grid gap-3 border-t border-white/12 pt-5 md:grid-cols-4">
-                {stats.map((stat, index) => (
-                  <div
-                    key={stat.label}
-                    className="rounded-[1.5rem] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur-md"
-                    style={{ transitionDelay: `${index * 70}ms` }}
-                  >
-                    <div className="text-[10px] uppercase tracking-[0.28em] text-white/68">{stat.label}</div>
-                    <div className="mt-3 font-display text-3xl font-semibold leading-none text-white">
-                      {stat.value}
+            <div className="grid gap-5 md:grid-cols-[1fr_auto_1fr] md:items-end">
+              <PublicReveal delayMs={200}>
+                <div className="text-sm uppercase tracking-[0.28em] text-white/54">
+                  {heroEvent?.name || (isPortuguese ? 'Curadoria em andamento' : 'Curated selection in motion')}
+                </div>
+              </PublicReveal>
+
+              <PublicReveal delayMs={240}>
+                <div className="flex flex-col items-center gap-3 text-white/72">
+                  <span className="text-sm font-medium uppercase tracking-[0.22em]">
+                    {isPortuguese ? 'Role para explorar' : 'Scroll to explore'}
+                  </span>
+                  <span className="h-16 w-px bg-white/32" />
+                </div>
+              </PublicReveal>
+
+              <PublicReveal delayMs={280}>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {stats.map((stat) => (
+                    <div key={stat.label} className="rounded-[1.4rem] border border-white/10 bg-black/18 px-4 py-4 text-right backdrop-blur-sm">
+                      <div className="text-[10px] uppercase tracking-[0.28em] text-white/48">{stat.label}</div>
+                      <div className="mt-2 font-display text-[2rem] font-semibold leading-none tracking-[-0.04em] text-white">
+                        {stat.value}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </PublicReveal>
+                  ))}
+                </div>
+              </PublicReveal>
+            </div>
           </div>
         </div>
       </div>

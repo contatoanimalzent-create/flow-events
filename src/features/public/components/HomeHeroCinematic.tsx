@@ -79,21 +79,21 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
                     href="/events"
                     className="inline-flex items-center gap-3 rounded-full bg-[#f8f3ea] px-6 py-3 text-sm font-semibold text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(21,14,8,0.24)]"
                   >
-                    Ver todos os eventos
+                    Explorar experiências
                     <ArrowRight className="h-4 w-4" />
                   </a>
                   <a
                     href="/create-event"
                     className="inline-flex items-center gap-3 rounded-full border border-white/36 bg-white/6 px-6 py-3 text-sm font-medium text-white transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
                   >
-                    Sou produtor
+                    Publicar meu evento
                   </a>
                   {heroEvent ? (
                     <a
                       href={`/e/${heroEvent.slug}`}
                       className="inline-flex items-center gap-3 rounded-full border border-white/24 bg-white/6 px-6 py-3 text-sm font-medium text-white/90 transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
                     >
-                      Ver evento em destaque
+                      Ver experiência em destaque
                     </a>
                   ) : null}
                 </PublicReveal>
@@ -160,7 +160,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
                     className="rounded-[1.5rem] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur-md"
                     style={{ transitionDelay: `${index * 70}ms` }}
                   >
-                    <div className="text-[10px] uppercase tracking-[0.28em] text-white/46">{stat.label}</div>
+                    <div className="text-[10px] uppercase tracking-[0.28em] text-white/68">{stat.label}</div>
                     <div className="mt-3 font-display text-3xl font-semibold leading-none text-white">
                       {stat.value}
                     </div>

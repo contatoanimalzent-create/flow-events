@@ -1,21 +1,21 @@
-import { ArrowUpRight, Sparkles, Star, Waves } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { PublicReveal } from './PublicReveal'
 
 const principles = [
   {
-    icon: Sparkles,
-    title: 'Eventos com criterio',
-    text: 'Cada evento e selecionado pelo que oferece — nao apenas pela data. Voce encontra experiencias que valem a presenca.',
+    number: '01',
+    title: 'Curadoria com critério',
+    text: 'Cada evento passa por uma seleção editorial. Você não procura um evento. Você descobre uma experiência.',
   },
   {
-    icon: Waves,
-    title: 'Compra sem complicacao',
-    text: 'Reserve seu ingresso em minutos, receba a confirmacao no celular e acesse o evento com QR code digital.',
+    number: '02',
+    title: 'Compra em minutos',
+    text: 'Selecione, pague e receba seu ingresso digital. Do desejo à confirmação sem atrito desnecessário.',
   },
   {
-    icon: Star,
-    title: 'Do ingresso a lembranca',
-    text: 'A experiencia comeca na descoberta e continua depois do evento — com facilidade de acesso e atendimento direto.',
+    number: '03',
+    title: 'Da chegada à memória',
+    text: 'A experiência começa na descoberta e não termina no check-in. Curadoria do primeiro clique ao último momento.',
   },
 ]
 
@@ -41,7 +41,7 @@ export function EditorialIntroSection() {
         <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <PublicReveal>
             <div className="max-w-xl">
-              <div className="text-[11px] uppercase tracking-[0.34em] text-white/48">O caminho da experiência</div>
+              <div className="text-[11px] uppercase tracking-[0.34em] text-[#c49a50]">Plataforma de experiências</div>
               <h2 className="mt-5 font-display text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
                 Descubra. Compre. Viva.
               </h2>
@@ -58,23 +58,19 @@ export function EditorialIntroSection() {
           </PublicReveal>
 
           <div className="grid gap-4 md:grid-cols-3 lg:pt-10">
-            {principles.map((principle, index) => {
-              const Icon = principle.icon
-
-              return (
-                <PublicReveal key={principle.title} delayMs={index * 90}>
-                  <div className="card-dark-hover group h-full p-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-white/8 text-white/80 transition-transform duration-500 group-hover:scale-105 group-hover:bg-white/12">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="mt-6 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-white">
-                      {principle.title}
-                    </div>
-                    <p className="mt-4 text-sm leading-7 text-white/58">{principle.text}</p>
+            {principles.map((principle, index) => (
+              <PublicReveal key={principle.number} delayMs={index * 90}>
+                <div className="card-dark-hover group h-full p-6">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[#c49a50]/30 bg-[#c49a50]/10 font-display text-2xl font-semibold text-[#c49a50] transition-all duration-500 group-hover:border-[#c49a50]/60 group-hover:bg-[#c49a50]/20">
+                    {principle.number}
                   </div>
-                </PublicReveal>
-              )
-            })}
+                  <div className="mt-6 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-white">
+                    {principle.title}
+                  </div>
+                  <p className="mt-4 text-sm leading-7 text-white/72">{principle.text}</p>
+                </div>
+              </PublicReveal>
+            ))}
           </div>
         </div>
       </div>

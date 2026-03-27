@@ -17,12 +17,12 @@ export function EventFinalCTA({ event, isFreeMode }: EventFinalCTAProps) {
             <div className="absolute bottom-[-5rem] left-[-3rem] h-52 w-52 rounded-full bg-[#d4b98e]/12 blur-3xl" />
             <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
               <div className="max-w-3xl">
-                <div className="text-[11px] uppercase tracking-[0.34em] text-white/52">Sua entrada ja era</div>
+                <div className="text-[11px] uppercase tracking-[0.34em] text-white/52">Your access starts here</div>
                 <h2 className="mt-5 font-display text-[clamp(2.8rem,4.5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
-                  Garanta {event.name}
+                  Secure {event.name}
                 </h2>
                 <p className="mt-6 text-base leading-8 text-white/72 md:text-lg">
-                  Vagas limitadas. Demanda real. Experiencias como essa nao esperam.
+                  Limited availability. Real demand. Experiences like this do not wait.
                 </p>
               </div>
 
@@ -30,7 +30,7 @@ export function EventFinalCTA({ event, isFreeMode }: EventFinalCTAProps) {
                 href="#tickets"
                 className="inline-flex items-center gap-3 rounded-full bg-[#f8f3ea] px-6 py-3 text-sm font-semibold text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(21,14,8,0.24)]"
               >
-                {isFreeMode ? 'Garantir inscricao' : 'Selecionar ingresso'}
+                {isFreeMode ? 'Reserve registration' : 'Select ticket'}
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>

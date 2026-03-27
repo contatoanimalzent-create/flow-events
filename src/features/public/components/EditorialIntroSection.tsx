@@ -4,25 +4,24 @@ import { PublicReveal } from './PublicReveal'
 const principles = [
   {
     number: '01',
-    title: 'Curadoria com critério',
-    text: 'Cada evento passa por uma seleção editorial. Você não procura um evento. Você descobre uma experiência.',
+    title: 'Curated with intent',
+    text: 'Every event passes through an editorial selection. You are not simply browsing listings. You are discovering an experience.',
   },
   {
     number: '02',
-    title: 'Compra em minutos',
-    text: 'Selecione, pague e receba seu ingresso digital. Do desejo à confirmação sem atrito desnecessário.',
+    title: 'Purchase in minutes',
+    text: 'Select, pay and receive your digital ticket. From desire to confirmation without unnecessary friction.',
   },
   {
     number: '03',
-    title: 'Da chegada à memória',
-    text: 'A experiência começa na descoberta e não termina no check-in. Curadoria do primeiro clique ao último momento.',
+    title: 'From arrival to memory',
+    text: 'The experience begins at discovery and does not end at check-in. Curated from the first click to the final moment.',
   },
 ]
 
 export function EditorialIntroSection() {
   return (
     <section className="section-dark relative overflow-hidden px-5 py-20 md:px-10 lg:px-16 lg:py-28">
-      {/* Atmospheric depth */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-6rem] top-[-6rem] h-[30rem] w-[30rem] rounded-full bg-[#7d6d52]/10 blur-[80px]" />
         <div className="absolute bottom-[-8rem] right-[-4rem] h-[28rem] w-[28rem] rounded-full bg-[#6a86ad]/8 blur-[80px]" />
@@ -41,18 +40,18 @@ export function EditorialIntroSection() {
         <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <PublicReveal>
             <div className="max-w-xl">
-              <div className="text-[11px] uppercase tracking-[0.34em] text-[#c49a50]">Plataforma de experiências</div>
+              <div className="text-[11px] uppercase tracking-[0.34em] text-[#c49a50]">Experience platform</div>
               <h2 className="mt-5 font-display text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
-                Descubra. Compre. Viva.
+                Discover. Purchase. Arrive.
               </h2>
               <p className="mt-6 max-w-lg text-base leading-8 text-white/72 md:text-lg">
-                Cada detalhe foi desenhado para que sua jornada comece com desejo real e termine com uma lembrança que justifica o investimento.
+                Every detail is designed so the journey begins with real desire and ends with a memory that justifies the investment.
               </p>
               <div className="mt-8 flex items-center gap-3 text-sm font-medium text-white/78">
                 <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/14 bg-white/8 shadow-[0_12px_30px_rgba(0,0,0,0.3)]">
                   <ArrowUpRight className="h-4 w-4" />
                 </span>
-                Mais de mil ingressos vendidos. Compra simples, acesso garantido.
+                Thousands of tickets sold. Frictionless purchase. Access secured.
               </div>
             </div>
           </PublicReveal>

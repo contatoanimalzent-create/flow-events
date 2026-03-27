@@ -44,50 +44,50 @@ interface NavGroup {
 
 const navGroups: NavGroup[] = [
   {
-    label: 'Visao Geral',
+    label: 'Overview',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { id: 'events', label: 'Eventos', icon: CalendarDays },
+      { id: 'events', label: 'Events', icon: CalendarDays },
     ],
   },
   {
-    label: 'Vendas & Ingressos',
+    label: 'Sales & Ticketing',
     items: [
-      { id: 'tickets', label: 'Ingressos', icon: Ticket },
-      { id: 'sales', label: 'Vendas', icon: TrendingUp },
+      { id: 'tickets', label: 'Tickets', icon: Ticket },
+      { id: 'sales', label: 'Sales', icon: TrendingUp },
       { id: 'crm', label: 'CRM', icon: Users },
     ],
   },
   {
-    label: 'Operacoes',
+    label: 'Operations',
     items: [
       { id: 'checkin', label: 'Check-in', icon: ScanLine },
       { id: 'staff', label: 'Staff', icon: Users },
-      { id: 'suppliers', label: 'Fornecedores', icon: Truck },
+      { id: 'suppliers', label: 'Suppliers', icon: Truck },
     ],
   },
   {
-    label: 'Loja & Estoque',
+    label: 'Commerce & Inventory',
     items: [
-      { id: 'products', label: 'Produtos & PDV', icon: ShoppingBag },
-      { id: 'inventory', label: 'Estoque', icon: Package },
+      { id: 'products', label: 'Products & POS', icon: ShoppingBag },
+      { id: 'inventory', label: 'Inventory', icon: Package },
     ],
   },
   {
-    label: 'Crescimento',
+    label: 'Growth',
     items: [
       { id: 'intelligence', label: 'Intelligence', icon: BrainCircuit },
-      { id: 'communication', label: 'Comunicacao', icon: MessageSquare },
-      { id: 'financial', label: 'Financeiro', icon: DollarSign },
+      { id: 'communication', label: 'Communications', icon: MessageSquare },
+      { id: 'financial', label: 'Financial', icon: DollarSign },
       { id: 'billing', label: 'Billing', icon: WalletCards },
       { id: 'growth', label: 'Growth AI', icon: Zap },
     ],
   },
   {
-    label: 'Sistema',
+    label: 'System',
     items: [
-      { id: 'settings', label: 'Configuracoes', icon: Settings },
-      { id: 'help', label: 'Ajuda', icon: HelpCircle },
+      { id: 'settings', label: 'Settings', icon: Settings },
+      { id: 'help', label: 'Help', icon: HelpCircle },
     ],
   },
 ]
@@ -126,7 +126,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
               style={{ filter: 'drop-shadow(0 0 12px rgba(255,45,45,0.22))' }}
             />
             <div className="truncate text-[10px] uppercase tracking-[0.26em] text-[#6f7785]">
-              {organization?.name ?? 'Plataforma'}
+              {organization?.name ?? 'Platform'}
             </div>
           </div>
         ) : (

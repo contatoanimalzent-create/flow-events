@@ -1,46 +1,48 @@
+const topics = [
+  {
+    title: 'Getting started',
+    description: 'Start using the platform in five minutes. Create your account, configure your profile and publish your first event.',
+    icon: '🚀',
+  },
+  {
+    title: 'Creating events',
+    description: 'Learn how to create, configure and manage your events, from free registrations to premium VIP experiences.',
+    icon: '📅',
+  },
+  {
+    title: 'Ticket sales',
+    description: 'Master revenue strategy, fees, releases, promotions and the commercial details that drive conversion.',
+    icon: '🎫',
+  },
+  {
+    title: 'Check-in and operations',
+    description: 'Run event-day check-in, staff control, ticket validation and operational integrations with confidence.',
+    icon: '✅',
+  },
+  {
+    title: 'Reports and data',
+    description: 'Understand your numbers with analytics, sales reporting, attendance data and audience insights.',
+    icon: '📊',
+  },
+  {
+    title: 'Payments and finance',
+    description: 'See how fees work, when payouts arrive and how to manage your financial flow end to end.',
+    icon: '💰',
+  },
+]
+
 export function HelpPage() {
   return (
     <div className="p-6 md:p-8">
       <div className="mb-6">
         <h1 className="font-display text-4xl text-text-primary leading-none mb-1">
-          CENTRAL DE AJUDA<span className="text-brand-acid">.</span>
+          HELP CENTER<span className="text-brand-acid">.</span>
         </h1>
-        <p className="text-text-muted text-xs font-mono tracking-wider">Documentação, guias e suporte</p>
+        <p className="text-text-muted text-xs font-mono tracking-wider">Documentation, guides and support</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {[
-          {
-            title: 'Guia de Inicio',
-            description: 'Comece a usar a plataforma em 5 minutos. Crie sua conta, configure seu perfil e publique seu primeiro evento.',
-            icon: '🚀',
-          },
-          {
-            title: 'Criar Eventos',
-            description: 'Aprenda como criar, configurar e gerenciar seus eventos. De eventos gratuitos a experiências VIP.',
-            icon: '📅',
-          },
-          {
-            title: 'Vendas de Ingressos',
-            description: 'Domine as estrategias de venda. Taxas, batches, promocoes e tudo que voce precisa saber.',
-            icon: '🎫',
-          },
-          {
-            title: 'Check-in e Operacao',
-            description: 'Gerencie o check-in no dia do evento, controle de staff, validacao de ingressos e integrações.',
-            icon: '✅',
-          },
-          {
-            title: 'Relatorios e Dados',
-            description: 'Entenda seus numeros. Analytics, relatorios de vendas, dados de presenca e insights de publico.',
-            icon: '📊',
-          },
-          {
-            title: 'Pagamentos e Financeiro',
-            description: 'Como funcionam as taxas, quando voce recebe seu dinheiro, e como gerenciar seu fluxo financeiro.',
-            icon: '💰',
-          },
-        ].map((item) => (
+        {topics.map((item) => (
           <div
             key={item.title}
             className="card p-6 hover:shadow-card-deep transition-shadow cursor-pointer"
@@ -53,16 +55,16 @@ export function HelpPage() {
       </div>
 
       <div className="mt-12 card p-8 border border-bg-border bg-bg-elevated">
-        <h2 className="font-display text-2xl text-text-primary mb-4">Nao encontrou o que procurava?</h2>
+        <h2 className="font-display text-2xl text-text-primary mb-4">Still need help?</h2>
         <p className="text-text-secondary mb-6">
-          Nossa equipe de suporte esta aqui para ajudar. Envie sua pergunta ou acesse nossa documentacao completa.
+          Our support team is here to help. Send your question or open the full documentation library.
         </p>
         <div className="flex flex-wrap gap-3">
           <a
             href="/contact"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-brand-acid text-bg-primary font-medium text-sm transition-all hover:-translate-y-0.5"
           >
-            Fale com o Suporte
+            Contact support
           </a>
           <a
             href="https://docs.animalz.events"
@@ -70,7 +72,7 @@ export function HelpPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-bg-border text-text-primary font-medium text-sm transition-all hover:bg-bg-border"
           >
-            Documentacao Completa →
+            Full documentation →
           </a>
         </div>
       </div>

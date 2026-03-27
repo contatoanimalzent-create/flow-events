@@ -4,18 +4,18 @@ import { PublicReveal } from './PublicReveal'
 const pillars = [
   {
     icon: Compass,
-    title: 'Eventos com criterio',
-    description: 'Curadoria de eventos de cultura, gastronomia, musica e lifestyle. So o que vale a sua presenca.',
+    title: 'Events with intent',
+    description: 'Curated events across culture, gastronomy, music and lifestyle. Only what deserves your presence.',
   },
   {
     icon: Orbit,
-    title: 'Compra em segundos',
-    description: 'Da descoberta ao QR code em poucos cliques. Sem burocracia, sem complicacao.',
+    title: 'Purchase in seconds',
+    description: 'From discovery to QR code in a few clicks. No bureaucracy. No unnecessary friction.',
   },
   {
     icon: Gem,
-    title: 'Controle para produtores',
-    description: 'Venda ingressos, gerencie check-in, acompanhe receita e entenda seu publico em um unico lugar.',
+    title: 'Control for producers',
+    description: 'Sell tickets, manage check-in, track revenue and understand your audience in one place.',
   },
 ]
 
@@ -28,13 +28,13 @@ export function BrandSection() {
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.06)] px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-[#6a6058]">
                 <Sparkles className="h-4 w-4" />
-                Como funciona
+                How it works
               </div>
               <h2 className="mt-6 font-display text-[clamp(3rem,5vw,5rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-[#f0ebe2]">
-                Para quem curte bons eventos. E para quem os cria.
+                For people who chase great events. And for the teams who build them.
               </h2>
               <p className="mt-6 max-w-lg text-base leading-8 text-[#9a9088] md:text-lg">
-                Animalz Events conecta compradores e produtores numa plataforma simples de usar, bonita de ver e confiavel na hora do acesso.
+                Animalz Events connects buyers and producers through a platform that is easy to use, strong to present and reliable when access matters.
               </p>
             </div>
           </PublicReveal>

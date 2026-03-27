@@ -11,7 +11,7 @@ interface RelatedExperiencesGridProps {
 
 export function RelatedExperiencesGrid({
   events,
-  title = 'Experiencias relacionadas',
+  title = 'Related experiences',
 }: RelatedExperiencesGridProps) {
   const { isPortuguese } = usePublicLocale()
   const visibleEvents = events.slice(0, 4)

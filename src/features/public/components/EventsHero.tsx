@@ -42,7 +42,7 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
 
             <PublicReveal delayMs={140}>
               <p className="mt-6 max-w-2xl text-base leading-8 text-white/70 md:text-lg">
-                Uma camada publica mais direta, mais comercial e muito mais forte para descobrir datas, venues, acessos e proximos eventos.
+                A public layer built for faster discovery, clearer commercial rhythm and a stronger path from event calendar to purchase.
               </p>
             </PublicReveal>
 
@@ -52,14 +52,14 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
                   href="/events"
                   className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ff4133]"
                 >
-                  Ver agenda completa
+                  View full calendar
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
                   href="/create-event"
                   className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-medium uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-[#ff2d2d]/36 hover:bg-white/[0.08]"
                 >
-                  Publicar um evento premium
+                  Publish a premium event
                 </a>
               </div>
             </PublicReveal>
@@ -85,9 +85,9 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
           <PublicReveal delayMs={240}>
             <div className="grid gap-4 self-end">
               {[
-                { label: 'Eventos publicados', value: eventCount.toString(), icon: CalendarDays },
-                { label: 'Cidades ativas', value: cityCount.toString(), icon: MapPin },
-                { label: 'Categorias em curadoria', value: categories.length.toString(), icon: Sparkles },
+                { label: 'Published events', value: eventCount.toString(), icon: CalendarDays },
+                { label: 'Active cities', value: cityCount.toString(), icon: MapPin },
+                { label: 'Curated categories', value: categories.length.toString(), icon: Sparkles },
               ].map((stat) => {
                 const Icon = stat.icon
 

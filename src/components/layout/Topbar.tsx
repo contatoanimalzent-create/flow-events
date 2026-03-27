@@ -11,22 +11,22 @@ import { logError } from '@/shared/lib'
 
 const sectionTitles: Record<NavSection, string> = {
   dashboard: 'Dashboard',
-  events: 'Eventos',
-  tickets: 'Ingressos & Lotes',
-  sales: 'Vendas',
+  events: 'Events',
+  tickets: 'Tickets & Releases',
+  sales: 'Sales',
   crm: 'CRM & Customers',
-  checkin: 'Check-in Operacional',
-  staff: 'Staff & Equipe',
-  suppliers: 'Fornecedores',
-  products: 'Produtos & PDV',
-  inventory: 'Estoque & Insumos',
+  checkin: 'Operational Check-in',
+  staff: 'Staff & Crew',
+  suppliers: 'Suppliers',
+  products: 'Products & POS',
+  inventory: 'Inventory & Stock',
   intelligence: 'Intelligence',
-  communication: 'Comunicacao',
-  financial: 'Financeiro',
-  billing: 'Billing & Monetizacao',
+  communication: 'Communications',
+  financial: 'Financial',
+  billing: 'Billing & Monetization',
   growth: 'Growth Services',
-  help: 'Ajuda & Treinamento',
-  settings: 'Configuracoes',
+  help: 'Help & Training',
+  settings: 'Settings',
 }
 
 interface TopbarProps {
@@ -88,7 +88,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
           className="hidden items-center gap-2 rounded-full border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-4 py-2 text-sm text-[#7b8390] transition-all hover:border-[#ff2d2d]/30 hover:text-[#f5f7fa] md:flex"
         >
           <Search className="h-4 w-4" />
-          <span>Buscar...</span>
+          <span>Search...</span>
           <span className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-2 py-0.5 text-[11px]">
             Ctrl K
           </span>
@@ -107,7 +107,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
         <button
           onClick={signOut}
           className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2.5 text-[#7b8390] transition-all hover:border-[#ff453a]/25 hover:text-[#ff453a]"
-          title="Sair"
+          title="Sign out"
         >
           <LogOut className="h-5 w-5" />
         </button>
@@ -124,7 +124,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
                 onChange={(event) => setSearchQuery(event.target.value)}
                 onKeyDown={(event) => { if (event.key === 'Enter') handleSearch() }}
                 type="text"
-                placeholder="Buscar eventos, ingressos, clientes..."
+                placeholder="Search events, tickets, customers..."
                 className="flex-1 bg-transparent text-[#f5f7fa] outline-none placeholder:text-[#596271]"
               />
               <button
@@ -135,7 +135,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
               </button>
             </div>
             <div className="p-5 text-center text-sm text-[#7b8390]">
-              {searchQuery ? 'Pesquisa registrada para integracao futura.' : 'Digite para buscar'}
+              {searchQuery ? 'Search captured for future integration.' : 'Type to search'}
             </div>
           </div>
         </div>
@@ -147,7 +147,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
             <div>
               <div className="text-[10px] uppercase tracking-[0.3em] text-[#ff6a5c]">{access.role}</div>
               <h3 className="mt-1 font-display text-2xl font-semibold leading-none tracking-[-0.03em] text-[#f5f7fa]">
-                Centro interno
+                Internal center
               </h3>
             </div>
             <button
@@ -166,7 +166,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
                   : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]'
               }`}
             >
-              Notificacoes
+              Notifications
             </button>
             <button
               onClick={() => setPanelTab('activity')}
@@ -176,7 +176,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
                   : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]'
               }`}
             >
-              Atividade
+              Activity
             </button>
           </div>
           <div className="max-h-[28rem] overflow-y-auto p-4">

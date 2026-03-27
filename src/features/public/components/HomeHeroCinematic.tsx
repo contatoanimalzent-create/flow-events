@@ -52,13 +52,13 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
               <PublicReveal className="flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/82 backdrop-blur-md">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Ingressos e experiencias
+                  Tickets and experiences
                 </span>
               </PublicReveal>
 
               {heroEvent ? (
                 <PublicReveal delayMs={120} className="hidden rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/74 backdrop-blur-md md:flex">
-                  {heroEvent.status === 'ongoing' ? 'Evento em andamento' : 'Em destaque'}
+                  {heroEvent.status === 'ongoing' ? 'Live now' : 'Featured'}
                 </PublicReveal>
               ) : null}
             </div>
@@ -67,10 +67,10 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
               <div className="max-w-4xl">
                 <PublicReveal>
                   <h1 className="max-w-5xl font-display text-[clamp(4.4rem,10vw,8.7rem)] font-semibold leading-[0.84] tracking-[-0.05em] text-white">
-                    Descubra eventos que valem a experiencia.
+                    Discover events worth showing up for.
                   </h1>
                   <p className="mt-6 max-w-2xl text-base leading-7 text-white/80 md:text-lg md:leading-8">
-                    Compre ingressos, garanta seu lugar e viva os melhores eventos de cultura, gastronomia, musica e lifestyle.
+                    Buy tickets, secure your place and move through standout experiences in culture, gastronomy, music and lifestyle.
                   </p>
                 </PublicReveal>
 
@@ -79,21 +79,21 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
                     href="/events"
                     className="inline-flex items-center gap-3 rounded-full bg-[#f8f3ea] px-6 py-3 text-sm font-semibold text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(21,14,8,0.24)]"
                   >
-                    Explorar experiências
+                    Explore experiences
                     <ArrowRight className="h-4 w-4" />
                   </a>
                   <a
                     href="/create-event"
                     className="inline-flex items-center gap-3 rounded-full border border-white/36 bg-white/6 px-6 py-3 text-sm font-medium text-white transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
                   >
-                    Publicar meu evento
+                    Publish my event
                   </a>
                   {heroEvent ? (
                     <a
                       href={`/e/${heroEvent.slug}`}
                       className="inline-flex items-center gap-3 rounded-full border border-white/24 bg-white/6 px-6 py-3 text-sm font-medium text-white/90 transition-all duration-500 hover:-translate-y-1 hover:bg-white/14"
                     >
-                      Ver experiência em destaque
+                      View featured experience
                     </a>
                   ) : null}
                 </PublicReveal>
@@ -102,20 +102,20 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
               {heroEvent ? (
                 <PublicReveal delayMs={180}>
                   <div className="rounded-[2rem] border border-white/14 bg-white/10 p-5 backdrop-blur-md">
-                    <div className="text-[11px] uppercase tracking-[0.3em] text-white/56">Em destaque</div>
+                    <div className="text-[11px] uppercase tracking-[0.3em] text-white/56">Featured</div>
                     <div className="mt-4 font-display text-4xl font-semibold leading-[0.92] text-white">
                       {heroEvent.name}
                     </div>
                     <p className="mt-4 text-sm leading-6 text-white/74">
-                      {heroEvent.subtitle || heroEvent.short_description || 'Garanta seu ingresso e viva uma experiencia inesquecivel.'}
+                      {heroEvent.subtitle || heroEvent.short_description || 'Secure your place and enter an experience designed to be remembered.'}
                     </p>
 
                     <div className="mt-6 grid gap-3">
                       {[
                         {
                           icon: CalendarDays,
-                          label: 'Data',
-                          value: new Date(heroEvent.starts_at).toLocaleDateString('pt-BR', {
+                          label: 'Date',
+                          value: new Date(heroEvent.starts_at).toLocaleDateString('en-US', {
                             day: '2-digit',
                             month: 'long',
                             year: 'numeric',
@@ -123,13 +123,13 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
                         },
                         {
                           icon: MapPin,
-                          label: 'Local',
+                          label: 'Location',
                           value: [heroEvent.venue_name, heroEvent.city].filter(Boolean).join(' / '),
                         },
                         {
                           icon: Users,
-                          label: 'Ingressos vendidos',
-                          value: heroEvent.sold_tickets.toLocaleString('pt-BR'),
+                          label: 'Tickets sold',
+                          value: heroEvent.sold_tickets.toLocaleString('en-US'),
                         },
                       ].map((item) => {
                         const Icon = item.icon

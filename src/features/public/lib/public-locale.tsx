@@ -8,7 +8,7 @@ interface PublicLocaleContextValue {
   isPortuguese: boolean
 }
 
-const STORAGE_KEY = 'animalz-public-locale'
+const STORAGE_KEY = 'animalz-public-locale-v2'
 
 const PublicLocaleContext = createContext<PublicLocaleContextValue | null>(null)
 

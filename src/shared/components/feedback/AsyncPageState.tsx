@@ -9,7 +9,10 @@ interface AsyncPageStateProps {
   icon?: ReactNode
 }
 
-export function PageLoadingState({ title = 'Carregando', description = 'Estamos organizando os dados para você. Um momento, por favor.' }: Partial<AsyncPageStateProps>) {
+export function PageLoadingState({
+  title = 'Loading',
+  description = 'We are organizing the data for you. One moment, please.',
+}: Partial<AsyncPageStateProps>) {
   return <LoadingState title={title} description={description} icon={<Loader2 className="h-8 w-8 animate-spin" />} />
 }
 

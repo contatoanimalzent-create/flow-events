@@ -40,13 +40,13 @@ export function PremiumEventCard({
     <PublicReveal delayMs={index * 70} className={className}>
       <a
         href={`/e/${event.slug}`}
+        aria-label={event.name}
         className="group relative block h-full min-h-[31rem] overflow-hidden rounded-[2rem] border border-white/10 bg-[#05080d] shadow-[0_26px_82px_rgba(0,0,0,0.34)] transition-all duration-500 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_34px_100px_rgba(0,0,0,0.46)]"
       >
-        <img
-          src={coverImage}
-          alt={event.name}
-          loading={priority ? 'eager' : 'lazy'}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-[1.05]"
+          style={{ backgroundImage: `url("${coverImage}")` }}
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,7,12,0.1)_0%,rgba(4,7,12,0.18)_34%,rgba(4,7,12,0.9)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(255,45,45,0.14),transparent_22%)]" />

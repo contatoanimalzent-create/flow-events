@@ -21,17 +21,22 @@ export function RelatedExperiencesGrid({
   }
 
   return (
-    <section className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
-      <div className="mx-auto max-w-7xl">
+    <section className="px-5 py-12 md:px-10 lg:px-16 lg:py-16">
+      <div className="mx-auto max-w-[1920px]">
         <PublicReveal>
-          <div className="flex items-center justify-between gap-4 border-b border-white/8 pb-8">
-            <div className="max-w-2xl">
-              <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">
-                {isPortuguese ? 'Proxima selecao' : 'Recommended next'}
+          <div className="flex items-end justify-between gap-6 border-b border-white/8 pb-8 pt-2">
+            <div className="max-w-3xl">
+              <div className="text-[11px] uppercase tracking-[0.34em] text-white/40">
+                {isPortuguese ? 'Selecao recomendada' : 'Recommended next'}
               </div>
-              <h2 className="mt-4 font-display text-[clamp(2.4rem,3vw,3.6rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
+              <h2 className="mt-4 font-display text-[clamp(2rem,3vw,3.15rem)] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white">
                 {title}
               </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/58 md:text-base">
+                {isPortuguese
+                  ? 'Uma camada secundaria para continuar descobrindo eventos com o mesmo ritmo visual da home.'
+                  : 'A second discovery layer to keep exploring events with the same cinematic rhythm as the home page.'}
+              </p>
             </div>
             <a
               href="/events"
@@ -43,7 +48,7 @@ export function RelatedExperiencesGrid({
           </div>
         </PublicReveal>
 
-        <div className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr_0.8fr]">
+        <div className="mt-10 grid gap-6 xl:grid-cols-[1.05fr_0.95fr_0.95fr]">
           {visibleEvents[0] ? (
             <PremiumEventCard event={visibleEvents[0]} priority className="xl:row-span-2" />
           ) : null}

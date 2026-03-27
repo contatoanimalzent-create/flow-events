@@ -95,7 +95,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           <FeaturedEventsSection events={featuredCollection} />
           <RelatedExperiencesGrid
             events={featuredCollection}
-            title={isPortuguese ? 'Explore recommended chapters' : 'Explore recommended chapters'}
+            title={isPortuguese ? 'Capitulos recomendados' : 'Recommended chapters'}
           />
           <ExploreMoreSection currentEventId={heroEvent?.id ?? ''} events={events} />
         </>

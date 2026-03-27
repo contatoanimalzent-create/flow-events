@@ -18,6 +18,8 @@ export function EventsPublicHeader({
   compact = false,
   className,
 }: EventsPublicHeaderProps) {
+  const conciergeNumber = '+1 469 862 9040'
+  const conciergeHref = 'tel:+14698629040'
   const user = useAuthStore((state) => state.user)
   const { locale, setLocale, isPortuguese } = usePublicLocale()
   const [isScrolled, setIsScrolled] = useState(false)
@@ -89,11 +91,12 @@ export function EventsPublicHeader({
             </span>
           </div>
           <a
-            href="/help"
-            className="hidden shrink-0 items-center gap-2 rounded-full border border-white/8 bg-white/[0.04] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/76 transition-all duration-300 hover:border-[#ff2d2d]/30 hover:bg-white/[0.08] hover:text-white md:inline-flex"
+            href={conciergeHref}
+            className="hidden shrink-0 items-center gap-2 rounded-full border border-white/8 bg-white/[0.04] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/88 transition-all duration-300 hover:border-[#ff2d2d]/30 hover:bg-white/[0.08] hover:text-white md:inline-flex"
           >
             <Headphones className="h-3.5 w-3.5" />
-            {isPortuguese ? 'Concierge e suporte' : 'Concierge and support'}
+            <span>{isPortuguese ? 'Concierge' : 'Concierge'}</span>
+            <span className="text-white/62">{conciergeNumber}</span>
           </a>
         </div>
       </div>
@@ -216,6 +219,14 @@ export function EventsPublicHeader({
               </div>
             </div>
             {actionSlot ? <div className="mb-3">{actionSlot}</div> : null}
+            <a
+              href={conciergeHref}
+              className="mb-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-medium text-[#f5f7fa]"
+            >
+              <Headphones className="h-4 w-4" />
+              <span>{isPortuguese ? 'Concierge' : 'Concierge'}</span>
+              <span className="text-white/66">{conciergeNumber}</span>
+            </a>
             {user ? (
               <a
                 href="/me"

@@ -61,7 +61,7 @@ export function EventCinematicHero({
             <div className="grid gap-10 xl:grid-cols-[minmax(0,1.08fr)_23rem] xl:items-end">
               <div className="max-w-4xl">
                 <PublicReveal>
-                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/54">
+                  <div className="text-[12px] uppercase tracking-[0.3em] text-white/74">
                     {isPortuguese ? 'Experiencia em destaque' : 'Featured experience'}
                   </div>
                   <h1 className="mt-5 max-w-5xl font-display text-[clamp(4rem,9vw,8.4rem)] font-semibold uppercase leading-[0.83] tracking-[-0.04em] text-white">

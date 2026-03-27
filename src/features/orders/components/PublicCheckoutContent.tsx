@@ -333,27 +333,27 @@ export function PublicCheckoutContent({
 
   const introTitle =
     currentStep === 1
-      ? 'Escolha como quer viver este evento.'
+      ? 'Escolha seu acesso com clareza.'
       : currentStep === 2
-        ? 'Confirme quem vai receber o acesso.'
+        ? 'Confirme quem recebe a experiencia.'
         : currentStep === 3
           ? phase === 'payment'
-            ? 'Finalize o pagamento com clareza.'
+            ? 'Finalize a compra com seguranca.'
             : phase === 'processing'
-              ? 'Sua transacao esta em analise.'
+              ? 'Sua transacao esta em processamento.'
               : 'Sua reserva esta pronta para avancar.'
           : 'Compra concluida.'
 
   const introDescription =
     currentStep === 1
-      ? 'Selecione os lotes em um fluxo direto, com disponibilidade validada em tempo real e sem friccao visual.'
+      ? 'Compare lotes, disponibilidade e valor em um fluxo direto, com inventario validado em tempo real.'
       : currentStep === 2
         ? 'Mantivemos apenas os campos essenciais para reservar, pagar e emitir os ingressos com confianca.'
-        : phase === 'processing'
+      : phase === 'processing'
           ? 'O gateway esta processando a transacao. Assim que a confirmacao chegar, os ingressos digitais serao emitidos automaticamente.'
-          : event.absorb_fee
+      : event.absorb_fee
             ? 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional, com fee absorvida pelo produtor para manter o total limpo ao comprador.'
-            : 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional do produto, agora com uma experiencia publica muito mais refinada.'
+            : 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional do produto, agora com apresentacao mais clara e comercial.'
 
   return (
     <PublicLayout
@@ -361,7 +361,7 @@ export function PublicCheckoutContent({
       compactHeader
       headerActionSlot={
         phase !== 'form' && countdown ? (
-          <PremiumBadge tone="accent">Reserva ativa · {countdown}</PremiumBadge>
+          <PremiumBadge tone="accent">Reserva ativa - {countdown}</PremiumBadge>
         ) : null
       }
     >
@@ -395,8 +395,8 @@ export function PublicCheckoutContent({
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_26rem]">
             <div className="space-y-6">
               <PublicReveal>
-                <div className="rounded-[2.2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,242,234,0.8))] p-7 shadow-[0_18px_60px_rgba(48,35,18,0.06)] md:p-9">
-                  <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Checkout premium</div>
+                <div className="rounded-[2.2rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(246,239,229,0.82))] p-7 shadow-[0_22px_70px_rgba(48,35,18,0.08)] md:p-9">
+                  <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Event checkout</div>
                   <h1 className="mt-4 font-display text-[clamp(3rem,5vw,5.3rem)] font-semibold leading-[0.92] tracking-[-0.05em] text-[#1f1a15]">
                     {introTitle}
                   </h1>

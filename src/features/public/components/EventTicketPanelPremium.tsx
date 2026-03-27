@@ -44,7 +44,7 @@ export function TicketOptionCard({
   const isDisabled = available === 0 || selectedQuantity >= maxPerOrder
 
   return (
-    <div className="rounded-[1.9rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(250,244,236,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
+    <div className="rounded-[1.9rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,242,234,0.8))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
@@ -55,7 +55,7 @@ export function TicketOptionCard({
             {batch.name}
           </div>
           <p className="mt-3 max-w-xl text-sm leading-7 text-[#5f5549]">
-            {ticketType.description || 'Acesso pensado para uma experiencia mais bem resolvida, com regras de disponibilidade e entrada refletidas em tempo real.'}
+            {ticketType.description || 'Acesso pensado para uma experiencia bem resolvida, com disponibilidade e operacao refletidas em tempo real.'}
           </p>
         </div>
 
@@ -65,20 +65,20 @@ export function TicketOptionCard({
       {ticketType.benefits?.length ? (
         <div className="mt-5 flex flex-wrap gap-2">
           {ticketType.benefits.slice(0, 4).map((benefit) => (
-            <span key={benefit} className="rounded-full border border-[#eee2cf] bg-[#fbf7f1] px-3 py-1.5 text-xs text-[#6e6253]">
+            <span key={benefit} className="rounded-full border border-[#e5d8c4] bg-white px-3 py-1.5 text-xs text-[#5f5549]">
               {benefit}
             </span>
           ))}
         </div>
       ) : null}
 
-      <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-[#eee2cf] pt-5">
+      <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-[rgba(120,98,68,0.08)] pt-5">
         <div>
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#8e7f68]">Valor</div>
           <div className="mt-2 font-display text-[2.6rem] font-semibold leading-none tracking-[-0.04em] text-[#1f1a15]">
             {batch.price === 0 ? 'Gratuito' : formatCurrency(batch.price)}
           </div>
-          <div className="mt-2 text-xs text-[#7c6f60]">
+          <div className="mt-2 text-xs text-[#6b5f51]">
             {available.toLocaleString('pt-BR')} disponiveis / max {maxPerOrder} por pedido
           </div>
         </div>
@@ -182,12 +182,12 @@ export function EventTicketPanelPremium({
       <div className="mx-auto max-w-7xl">
         <PublicReveal>
           <div className="max-w-3xl">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Acessos e ingressos</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Ticket options</div>
             <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.3rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
-              Um painel de compra desenhado para decidir com confianca.
+              Um painel de compra desenhado para decidir com clareza e avancar sem friccao.
             </h2>
             <p className="mt-4 text-base leading-8 text-[#5f5549] md:text-lg">
-              Cada opcao abaixo reflete disponibilidade, regras e estoque reais. O visual ficou premium; a operacao continua a mesma.
+              Cada opcao abaixo reflete disponibilidade, regras e inventario reais. A apresentacao ficou premium; a operacao continua precisa.
             </p>
           </div>
         </PublicReveal>
@@ -226,37 +226,37 @@ export function EventTicketPanelPremium({
 
           <div className="lg:sticky lg:top-28 lg:self-start">
             <PublicReveal delayMs={140}>
-              <div className="rounded-[2.1rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(250,244,236,0.78))] p-7 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
+              <div className="rounded-[2.1rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,242,234,0.82))] p-7 shadow-[0_18px_55px_rgba(48,35,18,0.08)]">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f2e6d5] text-[#7b6440]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f5ecdd] text-[#6d5324]">
                     <Ticket className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="text-[11px] uppercase tracking-[0.28em] text-[#8e7f68]">Seu acesso</div>
+                    <div className="text-[11px] uppercase tracking-[0.28em] text-[#8e7f68]">Seu pedido</div>
                     <div className="mt-2 font-display text-[2.2rem] font-semibold leading-[0.92] tracking-[-0.03em] text-[#1f1a15]">
-                      {cartQty > 0 ? `${cartQty} selecionado${cartQty > 1 ? 's' : ''}` : 'Escolha sua combinacao'}
+                      {cartQty > 0 ? `${cartQty} selecionado${cartQty > 1 ? 's' : ''}` : 'Escolha seu acesso'}
                     </div>
                   </div>
                 </div>
 
                 <p className="mt-5 text-sm leading-7 text-[#5f5549]">
                   {cartQty > 0
-                    ? 'Revise as selecoes e siga para o checkout premium. A reserva de inventario acontece no proximo passo.'
+                    ? 'Revise a selecao e siga para o checkout. A reserva de inventario acontece no passo seguinte.'
                     : 'Adicione uma ou mais opcoes ao carrinho para liberar o checkout e reservar o inventario no momento certo.'}
                 </p>
 
                 <div className="mt-6 space-y-3">
                   {cart.length > 0 ? (
                     cart.map((item) => (
-                      <div key={item.batchId} className="rounded-[1.5rem] border border-[#eee2cf] bg-[#fbf7f1] p-4">
+                      <div key={item.batchId} className="rounded-[1.5rem] border border-[#eadcc8] bg-white/86 p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div>
                             <div className="text-sm font-semibold text-[#1f1a15]">{item.ticketName}</div>
-                            <div className="mt-1 text-xs text-[#7c6f60]">{item.batchName}</div>
+                            <div className="mt-1 text-xs text-[#6b5f51]">{item.batchName}</div>
                           </div>
                           <div className="text-right">
                             <div className="text-sm font-medium text-[#1f1a15]">{item.qty}x</div>
-                            <div className="mt-1 text-xs text-[#7c6f60]">
+                            <div className="mt-1 text-xs text-[#6b5f51]">
                               {item.price === 0 ? 'Gratuito' : formatCurrency(item.price * item.qty)}
                             </div>
                           </div>
@@ -264,18 +264,18 @@ export function EventTicketPanelPremium({
                       </div>
                     ))
                   ) : (
-                    <div className="rounded-[1.5rem] border border-dashed border-[#ddd1bf] bg-[#fbf7f1] p-5 text-sm leading-7 text-[#7c6f60]">
+                    <div className="rounded-[1.5rem] border border-dashed border-[#e5d8c4] bg-white/72 p-5 text-sm leading-7 text-[#5f5549]">
                       Nenhuma opcao selecionada ainda.
                     </div>
                   )}
                 </div>
 
-                <div className="mt-6 rounded-[1.7rem] border border-[#eee2cf] bg-[#fbf7f1] p-5">
-                  <div className="flex items-center justify-between text-sm text-[#7c6f60]">
+                <div className="mt-6 rounded-[1.7rem] border border-[#eadcc8] bg-white/84 p-5">
+                  <div className="flex items-center justify-between text-sm text-[#6b5f51]">
                     <span>Subtotal</span>
                     <span>{cartTotal === 0 ? 'Gratuito' : formatCurrency(cartTotal)}</span>
                   </div>
-                  <div className="mt-4 flex items-center justify-between border-t border-[#eee2cf] pt-4">
+                  <div className="mt-4 flex items-center justify-between border-t border-[rgba(120,98,68,0.08)] pt-4">
                     <span className="text-sm font-medium text-[#1f1a15]">Total da selecao</span>
                     <span className="font-display text-[2.5rem] font-semibold leading-none tracking-[-0.04em] text-[#1f1a15]">
                       {cartTotal === 0 ? 'Gratuito' : formatCurrency(cartTotal)}
@@ -300,7 +300,7 @@ export function EventTicketPanelPremium({
                     isFreeMode ? 'Inscricao validada por QR code' : 'Entrada sustentada por QR code antifraude',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-3">
-                      <Sparkles className="mt-1 h-4 w-4 text-[#7b6440]" />
+                      <Sparkles className="mt-1 h-4 w-4 text-[#6d5324]" />
                       <span>{item}</span>
                     </div>
                   ))}

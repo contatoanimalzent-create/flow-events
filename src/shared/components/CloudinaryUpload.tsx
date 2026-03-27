@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { Upload, Check, AlertCircle } from 'lucide-react'
 
 interface CloudinaryUploadProps {
@@ -10,9 +10,9 @@ interface CloudinaryUploadProps {
 export function CloudinaryUpload({ onUpload, label = 'Upload Image', className = '' }: CloudinaryUploadProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const fileInputRef: React.RefObject<HTMLInputElement> = React.useRef(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -40,7 +40,6 @@ export function CloudinaryUpload({ onUpload, label = 'Upload Image', className =
       onUpload(data.secure_url)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload error')
-      console.error('Upload error:', err)
     } finally {
       setLoading(false)
     }

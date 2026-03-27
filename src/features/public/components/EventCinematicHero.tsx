@@ -1,7 +1,7 @@
 import { ArrowRight, CalendarDays, MapPin, Sparkles, Users } from 'lucide-react'
-import type { PublicEventRecord } from '@/features/public/types/public.types'
 import type { EventMediaPresentation } from '@/features/event-media/types'
 import { EventHeroMedia } from '@/features/event-media'
+import type { PublicEventRecord } from '@/features/public/types/public.types'
 import { formatCurrency } from '@/shared/lib'
 import { PremiumBadge } from './PremiumBadge'
 import { PublicReveal } from './PublicReveal'
@@ -17,7 +17,7 @@ interface EventCinematicHeroProps {
 
 function getStatusLabel(status: string) {
   if (status === 'ongoing') return 'Ao vivo'
-  if (status === 'published') return 'Proxima edicao'
+  if (status === 'published') return 'Proxima data'
   return 'Experiencia'
 }
 
@@ -34,7 +34,7 @@ export function EventCinematicHero({
   return (
     <section className="px-5 pb-8 pt-6 md:px-10 lg:px-16 lg:pb-10 lg:pt-8">
       <div className="mx-auto">
-        <div className="relative min-h-[calc(100svh-7.25rem)] overflow-hidden rounded-[2.6rem] border border-white/70 bg-[#1f1813] shadow-[0_36px_120px_rgba(41,29,15,0.18)]">
+        <div className="relative min-h-[calc(100svh-7.25rem)] overflow-hidden rounded-[2.8rem] border border-white/70 bg-[#1f1813] shadow-[0_36px_120px_rgba(41,29,15,0.18)]">
           <EventHeroMedia
             eventName={event.name}
             coverAsset={presentation.coverAsset}
@@ -42,8 +42,8 @@ export function EventCinematicHero({
             fallbackImage={fallbackImage}
             scrollY={scrollY}
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(243,230,205,0.2),transparent_28%),linear-gradient(108deg,rgba(18,13,9,0.86)_0%,rgba(18,13,9,0.46)_42%,rgba(18,13,9,0.26)_64%,rgba(18,13,9,0.82)_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,13,9,0.14)_0%,rgba(18,13,9,0)_24%,rgba(18,13,9,0.78)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(243,230,205,0.22),transparent_28%),linear-gradient(104deg,rgba(18,13,9,0.84)_0%,rgba(18,13,9,0.54)_40%,rgba(18,13,9,0.18)_66%,rgba(18,13,9,0.74)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,13,9,0.08)_0%,rgba(18,13,9,0)_28%,rgba(18,13,9,0.82)_100%)]" />
 
           <div className="relative z-10 flex min-h-[calc(100svh-7.25rem)] flex-col justify-between p-7 text-white md:p-10 lg:p-14">
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -51,20 +51,21 @@ export function EventCinematicHero({
                 <PremiumBadge tone="default" className="border-white/16 bg-white/10 text-white">
                   {event.category || 'Evento'}
                 </PremiumBadge>
-                <PremiumBadge tone="default" className="border-white/16 bg-black/12 text-white/80">
+                <PremiumBadge tone="default" className="border-white/16 bg-black/12 text-white/84">
                   {getStatusLabel(event.status)}
                 </PremiumBadge>
               </PublicReveal>
             </div>
 
-            <div className="grid gap-10 xl:grid-cols-[minmax(0,1.08fr)_22rem] xl:items-end">
+            <div className="grid gap-10 xl:grid-cols-[minmax(0,1.08fr)_23rem] xl:items-end">
               <div className="max-w-4xl">
                 <PublicReveal>
-                  <h1 className="max-w-5xl font-display text-[clamp(4.2rem,9vw,8.6rem)] font-semibold leading-[0.83] tracking-[-0.05em] text-white">
+                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/58">Premium event access</div>
+                  <h1 className="mt-5 max-w-5xl font-display text-[clamp(4rem,9vw,8.4rem)] font-semibold leading-[0.83] tracking-[-0.05em] text-white">
                     {event.name}
                   </h1>
                   <p className="mt-6 max-w-2xl text-base leading-8 text-white/80 md:text-lg">
-                    {event.subtitle || event.short_description || 'Garanta seu ingresso e viva uma experiencia inesquecivel.'}
+                    {event.subtitle || event.short_description || 'Garanta seu acesso em uma jornada de compra desenhada para grandes experiencias.'}
                   </p>
                 </PublicReveal>
 
@@ -73,7 +74,7 @@ export function EventCinematicHero({
                     href="#tickets"
                     className="inline-flex items-center gap-3 rounded-full bg-[#f8f3ea] px-6 py-3 text-sm font-semibold text-[#1f1a15] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(21,14,8,0.24)]"
                   >
-                    {isFreeMode ? 'Garantir inscricao' : 'Selecionar ingressos'}
+                    {isFreeMode ? 'Garantir inscricao' : 'Comprar ingressos'}
                     <ArrowRight className="h-4 w-4" />
                   </a>
                   <div className="text-sm text-white/78">
@@ -84,7 +85,7 @@ export function EventCinematicHero({
 
               <PublicReveal delayMs={180}>
                 <div className="rounded-[2rem] border border-white/14 bg-white/10 p-5 backdrop-blur-md">
-                  <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Informacoes</div>
+                  <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Purchase highlights</div>
                   <div className="mt-4 grid gap-4">
                     {[
                       {
@@ -103,7 +104,7 @@ export function EventCinematicHero({
                       },
                       {
                         icon: Users,
-                        label: 'Procura',
+                        label: 'Demanda',
                         value: `${occupancy}% da capacidade ocupada`,
                       },
                       {

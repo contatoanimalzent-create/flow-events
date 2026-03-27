@@ -23,13 +23,13 @@ export function OrderSummaryPanel({
 }: OrderSummaryPanelProps) {
   return (
     <aside className="lg:sticky lg:top-28 lg:self-start">
-      <div className="rounded-[2.1rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(250,244,236,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)] md:p-7">
-        <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Resumo do pedido</div>
+      <div className="rounded-[2.1rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,242,234,0.82))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.08)] md:p-7">
+        <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Order summary</div>
         <div className="mt-4 font-display text-[2.5rem] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
           {eventName}
         </div>
         <p className="mt-3 text-sm leading-7 text-[#5f5549]">
-          Resumo sempre visivel, atualizado em tempo real enquanto voce ajusta a selecao, preenche os dados e confirma o pagamento.
+          Resumo sempre visivel, atualizado em tempo real enquanto voce ajusta a selecao, confirma os dados e conclui o pagamento.
         </p>
 
         {reserveCountdown ? (
@@ -40,7 +40,7 @@ export function OrderSummaryPanel({
 
         <div className="mt-6 space-y-3">
           {cart.map((item) => (
-            <div key={item.batch_id} className="rounded-[1.5rem] border border-[#eee2cf] bg-[#fbf7f1] p-4">
+            <div key={item.batch_id} className="rounded-[1.5rem] border border-[#eee2cf] bg-white/82 p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
@@ -80,13 +80,13 @@ export function OrderSummaryPanel({
           ))}
         </div>
 
-        <div className="mt-6 rounded-[1.7rem] border border-[#eee2cf] bg-[#fbf7f1] p-5">
+        <div className="mt-6 rounded-[1.7rem] border border-[#eee2cf] bg-white/84 p-5">
           <div className="flex items-center justify-between text-sm text-[#7c6f60]">
             <span>Subtotal</span>
             <span>{summary.subtotal === 0 ? 'Gratuito' : formatCurrency(summary.subtotal)}</span>
           </div>
           <div className="mt-3 flex items-center justify-between text-sm text-[#7c6f60]">
-            <span>{summary.absorb_fee ? 'Taxa absorvida' : 'Taxa no checkout'}</span>
+            <span>{summary.absorb_fee ? 'Taxa absorvida' : 'Taxa aplicada'}</span>
             <span>
               {summary.absorb_fee
                 ? summary.absorbed_fee_amount === 0
@@ -117,6 +117,7 @@ export function OrderSummaryPanel({
             { icon: Check, text: 'Emissao automatica apos confirmacao' },
           ].map((item) => {
             const Icon = item.icon
+
             return (
               <div key={item.text} className="flex items-start gap-3 text-sm text-[#5f5549]">
                 <Icon className="mt-0.5 h-4 w-4 text-[#7b6440]" />

@@ -22,18 +22,18 @@ export function EventImagePreviewCard({
     <button
       type="button"
       onClick={onClick}
-      className={`group relative overflow-hidden rounded-[1.8rem] border border-white/70 bg-white/80 shadow-[0_18px_55px_rgba(48,35,18,0.08)] ${className ?? ''}`}
+      className={`group relative overflow-hidden rounded-[1.8rem] border border-white/70 shadow-[0_18px_55px_rgba(48,35,18,0.08)] ${className ?? ''}`}
     >
       <img
         src={getEventAssetUrl(asset)}
         alt={asset.alt_text ?? asset.caption ?? 'Imagem do evento'}
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(19,14,10,0.04)_0%,rgba(19,14,10,0.14)_40%,rgba(19,14,10,0.82)_100%)]" />
-      {(asset.caption || asset.alt_text) ? (
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(19,14,10,0.04)_0%,rgba(19,14,10,0.1)_40%,rgba(19,14,10,0.72)_100%)]" />
+      {asset.caption || asset.alt_text ? (
         <div className="absolute inset-x-0 bottom-0 p-5 text-left text-white">
           {asset.caption ? <div className="font-display text-[1.8rem] font-semibold leading-[0.92] tracking-[-0.03em]">{asset.caption}</div> : null}
-          {asset.alt_text ? <div className="mt-2 text-sm text-white/74">{asset.alt_text}</div> : null}
+          {asset.alt_text ? <div className="mt-2 text-sm text-white/78">{asset.alt_text}</div> : null}
         </div>
       ) : null}
     </button>
@@ -62,15 +62,15 @@ export function EventVideoPreviewCard({
         alt={asset.alt_text ?? asset.caption ?? 'Video do evento'}
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(19,14,10,0.06)_0%,rgba(19,14,10,0.18)_40%,rgba(19,14,10,0.82)_100%)]" />
-      <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/82 backdrop-blur-md">
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(19,14,10,0.06)_0%,rgba(19,14,10,0.16)_40%,rgba(19,14,10,0.8)_100%)]" />
+      <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/86 backdrop-blur-md">
         <Play className="h-3.5 w-3.5" />
         Video
       </div>
-      {(asset.caption || asset.alt_text) ? (
+      {asset.caption || asset.alt_text ? (
         <div className="absolute inset-x-0 bottom-0 p-5 text-left text-white">
           {asset.caption ? <div className="font-display text-[1.8rem] font-semibold leading-[0.92] tracking-[-0.03em]">{asset.caption}</div> : null}
-          {asset.alt_text ? <div className="mt-2 text-sm text-white/74">{asset.alt_text}</div> : null}
+          {asset.alt_text ? <div className="mt-2 text-sm text-white/78">{asset.alt_text}</div> : null}
         </div>
       ) : null}
     </button>
@@ -121,7 +121,7 @@ export function EventGalleryLightbox({
       <div className="mx-auto flex h-full max-w-6xl flex-col">
         <div className="flex items-center justify-between gap-4 text-white">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.28em] text-white/54">Galeria premium</div>
+            <div className="text-[11px] uppercase tracking-[0.28em] text-white/54">Event gallery</div>
             <div className="mt-2 font-display text-3xl font-semibold leading-none tracking-[-0.04em]">
               {asset.caption || asset.alt_text || eventName}
             </div>
@@ -188,9 +188,9 @@ export function EventMediaGalleryPremium({ presentation, eventName }: EventMedia
       <div className="mx-auto max-w-7xl">
         <PublicReveal>
           <div className="max-w-3xl">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Momentos</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Gallery</div>
             <h2 className="mt-4 font-display text-[clamp(2.7rem,4vw,4.2rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
-              Uma galeria viva, alimentada pelos assets reais do evento.
+              Midia real do evento, organizada como uma vitrine premium.
             </h2>
           </div>
         </PublicReveal>

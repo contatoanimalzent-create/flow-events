@@ -42,3 +42,19 @@ export { PublicHero } from './PublicHero'
 export { PublicLayout } from './PublicLayout'
 export { PublicReveal } from './PublicReveal'
 export { SocialProofSection } from './SocialProofSection'
+
+// New event components
+export { ExploreMoreSection } from './ExploreMoreSection'
+export { EventsHero } from './EventsHero'
+export { EventScheduleCard } from './EventScheduleCard'
+export { EventsScheduleList } from './EventsScheduleList'
+export { EventsPublicHeader } from './EventsPublicHeader'
+export { FeaturedEventBanner } from './FeaturedEventBanner'
+export { RelatedExperiencesGrid } from './RelatedExperiencesGrid'
+export { EventsPublicFooter } from './EventsPublicFooter'
+
+// Re-export aliases for consistency
+export { EventCinematicHero as EventLandingHero } from './EventCinematicHero'
+export { EventInformationHighlights as EventLandingInfo } from './EventInformationHighlights'
+export { EventMediaGalleryPremium as EventLandingGallery } from './EventMediaGalleryPremium'
+export { EventTicketPanelPremium as EventLandingTicketPanel } from './EventTicketPanelPremium'

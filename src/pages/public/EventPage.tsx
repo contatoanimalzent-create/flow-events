@@ -1,19 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, Heart, Ticket } from 'lucide-react'
+import { ArrowRight, Heart, MapPin, ShieldCheck, Ticket } from 'lucide-react'
 import type { EventMediaAsset } from '@/features/event-media/types'
-import { ReferralTracker, ShareButtons, SocialProofBlock } from '@/features/growth'
+import { ReferralTracker, ShareButtons } from '@/features/growth'
 import { CheckoutSuccessPage, PublicCheckoutContent } from '@/features/orders'
 import {
   EventCinematicHero,
-  EventFinalCTA,
   EventInformationHighlights,
-  EventManifestSection,
   EventMediaGalleryPremium,
-  EventStorySection,
   EventTicketPanelPremium,
+  ExploreMoreSection,
   PublicLayout,
+  PublicReveal,
+  RelatedExperiencesGrid,
   StickyPurchaseCTA,
   usePublicEvent,
+  usePublicEvents,
 } from '@/features/public'
 import { formatCurrency, useSeoMeta } from '@/shared/lib'
 
@@ -83,6 +84,7 @@ function NotFoundState() {
 
 export function EventPage({ slug }: { slug: string }) {
   const publicEventQuery = usePublicEvent(slug)
+  const publicEventsQuery = usePublicEvents()
   const detail = publicEventQuery.data
   const event = detail?.event ?? null
   const ticketTypes = detail?.ticketTypes ?? []
@@ -106,6 +108,7 @@ export function EventPage({ slug }: { slug: string }) {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
   const isFreeMode = event ? event.is_free || event.registration_mode === 'registration' : false
   const isFreeOrder = cartTotal === 0
+
   const activeBatches = useMemo(
     () =>
       ticketTypes.flatMap((ticketType) =>
@@ -115,6 +118,7 @@ export function EventPage({ slug }: { slug: string }) {
       ),
     [ticketTypes],
   )
+
   const minPrice = useMemo(() => {
     const prices = activeBatches.filter((price) => price > 0)
     return prices.length > 0 ? Math.min(...prices) : 0
@@ -138,7 +142,7 @@ export function EventPage({ slug }: { slug: string }) {
     }
 
     if (existing) {
-      setCart((current) => current.map((item) => item.batchId === batch.id ? { ...item, qty: item.qty + 1 } : item))
+      setCart((current) => current.map((item) => (item.batchId === batch.id ? { ...item, qty: item.qty + 1 } : item)))
       return
     }
 
@@ -168,7 +172,7 @@ export function EventPage({ slug }: { slug: string }) {
         return current.filter((item) => item.batchId !== batchId)
       }
 
-      return current.map((item) => item.batchId === batchId ? { ...item, qty: item.qty - 1 } : item)
+      return current.map((item) => (item.batchId === batchId ? { ...item, qty: item.qty - 1 } : item))
     })
   }
 
@@ -190,7 +194,7 @@ export function EventPage({ slug }: { slug: string }) {
     description:
       event?.short_description ||
       event?.full_description ||
-      'Experiencias premium com narrativa visual, checkout refinado e operacao real conectada ao mesmo produto.',
+      'Experiencias premium com narrativa forte, agenda clara e checkout refinado.',
     image:
       mediaPresentation?.heroAsset?.thumbnail_url ||
       mediaPresentation?.heroAsset?.secure_url ||
@@ -254,50 +258,25 @@ export function EventPage({ slug }: { slug: string }) {
   }
 
   const fallbackImage = getFallbackImage(event.category, event.cover_url)
+  const relatedEvents = (publicEventsQuery.data ?? []).filter((item) => item.id !== event.id)
   const storySections = [
     {
-      eyebrow: 'A experiencia',
-      title: 'Uma narrativa pensada para criar expectativa antes da primeira entrada.',
+      eyebrow: 'The experience',
+      title: 'Uma pagina de evento pensada para vender atmosfera antes de vender acesso.',
       description:
         event.full_description ||
-        `${event.name} combina ritmo visual, presenca de marca e uma operacao pronta para sustentar uma experiencia de alto nivel do primeiro clique ao ultimo check-in.`,
+        `${event.name} combina narrativa visual, descoberta premium e uma camada de compra pronta para converter sem perder clareza.`,
       asset: storyAssets[0] ?? mediaPresentation.coverAsset,
-      highlights: [
-        { label: 'Abertura', value: event.doors_open_at ? new Date(event.doors_open_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Horario confirmado por e-mail' },
-        { label: 'Cidade', value: event.venue_address?.city || event.venue_name || 'Local em curadoria' },
-        { label: 'Capacidade', value: `${event.total_capacity.toLocaleString('pt-BR')} pessoas` },
-        { label: 'Status', value: event.status === 'ongoing' ? 'Experiencia em andamento' : 'Experiencia com acesso publico' },
-      ],
+      reverse: false,
     },
     {
-      eyebrow: 'O ambiente',
-      title: 'Um contexto visual que faz o evento parecer inevitavel.',
+      eyebrow: 'The venue and journey',
+      title: 'Venue, chegada e beneficios apresentados como parte da experiencia comercial.',
       description:
-        `${event.venue_name || 'O venue'} recebe ${event.name} como um espaco de atmosfera controlada, pensado para destacar luz, escala, chegada e memorabilidade.` +
-        ` A pagina traduz isso com composicao editorial e assets reais da media library.`,
+        `${event.venue_name || 'O venue'} entra como parte da promessa da pagina: local, horario, capacidade e regras aparecem com leitura rapida, sem cara de ficha tecnica.` +
+        ` O resultado e uma landing mais proxima de um mini-site de evento do que de uma pagina utilitaria.`,
       asset: storyAssets[1] ?? mediaPresentation.galleryImages[0] ?? mediaPresentation.coverAsset,
       reverse: true,
-      highlights: [
-        { label: 'Venue', value: event.venue_name || 'Venue principal' },
-        { label: 'Categoria', value: event.category || 'Experiencia premium' },
-        { label: 'Demanda', value: `${event.sold_tickets.toLocaleString('pt-BR')} acessos vendidos` },
-        { label: 'Classificacao', value: event.age_rating || 'Consulte politicas de acesso' },
-      ],
-    },
-    {
-      eyebrow: 'A jornada',
-      title: 'Do acesso ao QR code, a experiencia continua organizada ate a ultima etapa.',
-      description:
-        isFreeMode
-          ? 'Inscricao, confirmacao e entrada foram pensadas para transmitir clareza e exclusividade, sem friccao desnecessaria.'
-          : 'Selecao de lotes, checkout refinado e emissao automatica de tickets digitais sustentam a jornada com a mesma elegancia do restante da pagina.',
-      asset: storyAssets[2] ?? mediaPresentation.galleryVideos[0] ?? mediaPresentation.galleryImages[1] ?? mediaPresentation.coverAsset,
-      highlights: [
-        { label: 'Acesso', value: isFreeMode ? 'Inscricao com QR code digital' : 'Ingresso digital com validacao antifraude' },
-        { label: 'Check-ins', value: `${event.checked_in_count.toLocaleString('pt-BR')} registros operacionais` },
-        { label: 'Conversao', value: minPrice > 0 ? `a partir de ${formatCurrency(minPrice)}` : 'Acesso gratuito' },
-        { label: 'Fluxo', value: 'Compra, pagamento e emissao sustentados pelo sistema real' },
-      ],
     },
   ]
 
@@ -348,7 +327,13 @@ export function EventPage({ slug }: { slug: string }) {
       />
 
       <div className="px-5 pt-6 md:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,242,234,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
+          <div className="max-w-2xl">
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Share and plan</div>
+            <p className="mt-3 text-sm leading-7 text-[#5f5549]">
+              Compartilhe o link do evento, convide seu grupo e avance para a compra quando estiver pronto.
+            </p>
+          </div>
           <ShareButtons
             organizationId={event.organization_id}
             eventId={event.id}
@@ -360,42 +345,59 @@ export function EventPage({ slug }: { slug: string }) {
         </div>
       </div>
 
-      <EventManifestSection event={event} />
-      <SocialProofBlock
-        eyebrow="Social proof"
-        title="A demanda aparece antes do primeiro QR code ser lido."
-        description="Cada sinal reforca a sensacao de evento desejado, prova social viva e urgencia elegante para quem ainda esta decidindo."
-        items={[
-          {
-            label: 'Participantes',
-            value: event.sold_tickets.toLocaleString('pt-BR'),
-            note: 'Acessos vendidos e convertidos a partir de uma pagina publica com midia real e checkout premium.',
-          },
-          {
-            label: 'Capacidade aberta',
-            value: event.total_capacity.toLocaleString('pt-BR'),
-            note: 'Escala mapeada para sustentar vendas, check-in, CRM e relacao continua com o publico.',
-          },
-          {
-            label: 'Check-ins operados',
-            value: event.checked_in_count.toLocaleString('pt-BR'),
-            note: 'Prova de que a camada publica conecta conversao e operacao real no mesmo produto.',
-          },
-        ]}
-      />
       <EventInformationHighlights event={event} isFreeMode={isFreeMode} />
 
-      {storySections.map((section) => (
-        <EventStorySection
-          key={section.eyebrow}
-          eyebrow={section.eyebrow}
-          title={section.title}
-          description={section.description}
-          asset={section.asset}
-          reverse={Boolean(section.reverse)}
-          highlights={section.highlights}
-        />
-      ))}
+      <section className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
+        <div className="mx-auto max-w-7xl space-y-8">
+          {storySections.map((section, index) => {
+            const assetUrl =
+              section.asset?.thumbnail_url ||
+              section.asset?.secure_url ||
+              fallbackImage
+
+            return (
+              <PublicReveal key={section.eyebrow} delayMs={index * 80}>
+                <div className="grid gap-6 overflow-hidden rounded-[2.4rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,242,234,0.8))] shadow-[0_20px_60px_rgba(48,35,18,0.06)] lg:grid-cols-2">
+                  <div className={section.reverse ? 'order-2 p-8 md:p-10 lg:order-1 lg:p-12' : 'p-8 md:p-10 lg:p-12'}>
+                    <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">{section.eyebrow}</div>
+                    <h2 className="mt-4 font-display text-[clamp(2.4rem,4vw,3.8rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
+                      {section.title}
+                    </h2>
+                    <p className="mt-5 text-base leading-8 text-[#5f5549]">{section.description}</p>
+
+                    <div className="mt-6 grid gap-3 md:grid-cols-2">
+                      {[
+                        { icon: MapPin, label: 'Venue', value: event.venue_name || 'Venue em curadoria' },
+                        {
+                          icon: ShieldCheck,
+                          label: 'Acesso',
+                          value: isFreeMode ? 'Inscricao digital' : 'Ingresso digital e check-in via QR',
+                        },
+                      ].map((item) => {
+                        const Icon = item.icon
+
+                        return (
+                          <div key={item.label} className="rounded-[1.4rem] border border-[#eadcc8] bg-white/82 p-4">
+                            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.26em] text-[#8e7f68]">
+                              <Icon className="h-4 w-4 text-[#6d5324]" />
+                              {item.label}
+                            </div>
+                            <div className="mt-3 text-sm font-medium text-[#1f1a15]">{item.value}</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className={section.reverse ? 'order-1 min-h-[22rem] lg:order-2' : 'min-h-[22rem]'}>
+                    <img src={assetUrl} alt={event.name} className="h-full w-full object-cover" />
+                  </div>
+                </div>
+              </PublicReveal>
+            )
+          })}
+        </div>
+      </section>
 
       <EventMediaGalleryPremium presentation={mediaPresentation} eventName={event.name} />
 
@@ -410,7 +412,47 @@ export function EventPage({ slug }: { slug: string }) {
         onCheckout={() => setStep('checkout')}
       />
 
-      <EventFinalCTA event={event} isFreeMode={isFreeMode} />
+      <section className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
+        <div className="mx-auto max-w-7xl">
+          <PublicReveal>
+            <div className="rounded-[2.5rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(246,239,229,0.82))] px-8 py-10 shadow-[0_22px_70px_rgba(48,35,18,0.08)] md:px-10 md:py-12">
+              <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                <div className="max-w-3xl">
+                  <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Final call</div>
+                  <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.2rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
+                    {isFreeMode ? 'Confirme sua inscricao enquanto o acesso ainda esta aberto.' : 'Garanta seu lugar antes que os lotes avancem.'}
+                  </h2>
+                  <p className="mt-4 text-base leading-8 text-[#5f5549] md:text-lg">
+                    {isFreeMode
+                      ? 'A confirmacao acontece em poucos passos e o QR code chega assim que a inscricao for concluida.'
+                      : minPrice > 0
+                        ? `Os acessos comecam em ${formatCurrency(minPrice)} e o checkout segue a mesma base operacional do restante da plataforma.`
+                        : 'O checkout foi refinado para manter clareza, velocidade e confianca na ultima etapa da compra.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (cartQty > 0) {
+                      setStep('checkout')
+                      return
+                    }
+
+                    document.getElementById('tickets')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f1a15] px-6 py-3.5 text-sm font-semibold text-[#f8f3ea]"
+                >
+                  {cartQty > 0 ? 'Ir para checkout' : 'Selecionar ingressos'}
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </PublicReveal>
+        </div>
+      </section>
+
+      <RelatedExperiencesGrid events={relatedEvents.slice(0, 4)} title="Continue explorando" />
+      <ExploreMoreSection currentEventId={event.id} events={publicEventsQuery.data ?? []} />
     </PublicLayout>
   )
 }

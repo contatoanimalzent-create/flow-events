@@ -1,9 +1,9 @@
 import { Minus, Plus, Sparkles } from 'lucide-react'
-import type { CheckoutCartItem } from '@/features/orders/types'
-import type { PublicTicketType } from '@/features/public/types/public.types'
-import { formatCurrency } from '@/shared/lib'
 import { PremiumBadge } from '@/features/public'
 import { PublicReveal } from '@/features/public/components/PublicReveal'
+import type { PublicTicketType } from '@/features/public/types/public.types'
+import type { CheckoutCartItem } from '@/features/orders/types'
+import { formatCurrency } from '@/shared/lib'
 
 interface TicketSelectorProps {
   ticketTypes: PublicTicketType[]
@@ -24,7 +24,7 @@ export function TicketSelector({ ticketTypes, cart, onAdd, onRemove }: TicketSel
 
         return (
           <PublicReveal key={ticketType.id} delayMs={ticketTypeIndex * 60}>
-            <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(250,244,236,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
+            <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,242,234,0.8))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="text-[11px] uppercase tracking-[0.26em] text-[#8e7f68]">{ticketType.name}</div>
@@ -47,7 +47,7 @@ export function TicketSelector({ ticketTypes, cart, onAdd, onRemove }: TicketSel
                   const isDisabled = available === 0 || selectedQuantity >= maxPerOrder
 
                   return (
-                    <div key={batch.id} className="rounded-[1.6rem] border border-[#eee2cf] bg-[#fbf7f1] p-5">
+                    <div key={batch.id} className="rounded-[1.7rem] border border-[#eadcc8] bg-white/84 p-5">
                       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
                           <div className="flex items-center gap-2">

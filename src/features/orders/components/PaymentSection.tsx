@@ -10,9 +10,9 @@ import {
   Ticket,
   XCircle,
 } from 'lucide-react'
+import { PremiumBadge } from '@/features/public'
 import { ORDER_PAYMENT_METHOD_CONFIG } from '@/features/orders/types'
 import type { OrderPaymentMethod } from '@/features/orders/types'
-import { PremiumBadge } from '@/features/public'
 import { cn } from '@/shared/lib'
 import { PublicCheckoutPaymentStep } from './PublicCheckoutPaymentStep'
 
@@ -65,8 +65,8 @@ export function PaymentSection({
 }: PaymentSectionProps) {
   return (
     <div className="space-y-5">
-      <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(250,244,236,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)] md:p-7">
-        <div className="text-[11px] uppercase tracking-[0.3em] text-[#8e7f68]">Pagamento</div>
+      <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,242,234,0.8))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)] md:p-7">
+        <div className="text-[11px] uppercase tracking-[0.3em] text-[#8e7f68]">Payment</div>
         <div className="mt-4 font-display text-[2.4rem] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
           {phase === 'review' ? 'Escolha o metodo e confirme a reserva.' : phase === 'payment' ? 'Finalize com seguranca.' : 'Aguardando aprovacao.'}
         </div>
@@ -74,18 +74,18 @@ export function PaymentSection({
           {phase === 'review'
             ? 'Seu pedido ja esta reservado temporariamente. Agora e so escolher como deseja concluir.'
             : phase === 'payment'
-              ? 'A camada de pagamento foi refinada para ficar mais limpa e confiavel, sem alterar a integracao existente.'
-              : 'O gateway esta processando a transacao. Assim que a aprovacao chegar, o pedido avanca para emissao.'}
+              ? 'A etapa de pagamento foi simplificada para aumentar confianca, reduzir atrito e manter a leitura limpa.'
+              : 'O gateway esta processando a transacao. Assim que a aprovacao chegar, o pedido avanca para emissao automatica.'}
         </p>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          {countdown ? <PremiumBadge tone="accent">Reserva ativa · {countdown}</PremiumBadge> : null}
+          {countdown ? <PremiumBadge tone="accent">Reserva ativa - {countdown}</PremiumBadge> : null}
           {draftOrderId ? <PremiumBadge tone="default">Pedido {draftOrderId.slice(0, 8)}</PremiumBadge> : null}
         </div>
       </div>
 
       {phase !== 'processing' ? (
-        <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(250,244,236,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)] md:p-7">
+        <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,242,234,0.8))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)] md:p-7">
           <div className="text-[11px] uppercase tracking-[0.3em] text-[#8e7f68]">Metodo</div>
           <div className={cn('mt-5 grid gap-3', isFreeOrder ? 'grid-cols-1' : 'grid-cols-2 xl:grid-cols-5')}>
             {paymentOptions.map((method) => {
@@ -101,7 +101,7 @@ export function PaymentSection({
                     'rounded-[1.5rem] border p-4 text-left transition-all duration-300',
                     selected
                       ? 'border-[#1f1a15] bg-[#1f1a15] text-[#f8f3ea] shadow-[0_14px_26px_rgba(31,26,21,0.12)]'
-                      : 'border-[#ddd1bf] bg-[#fbf7f1] text-[#5f5549] hover:-translate-y-0.5 hover:border-[#b79e74]',
+                      : 'border-[#ddd1bf] bg-white/82 text-[#5f5549] hover:-translate-y-0.5 hover:border-[#b79e74]',
                   )}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -144,14 +144,20 @@ export function PaymentSection({
             disabled={isBusy}
             className="flex w-full items-center justify-center gap-3 rounded-full bg-[#1f1a15] px-5 py-4 text-sm font-semibold text-[#f8f3ea] transition-all duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {startingPayment || confirmingDraft ? <Loader2 className="h-4 w-4 animate-spin" /> : phase === 'review' && isFreeOrder ? <Check className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+            {startingPayment || confirmingDraft ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : phase === 'review' && isFreeOrder ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <ArrowRight className="h-4 w-4" />
+            )}
             {isFreeOrder ? 'Confirmar pedido' : 'Ir para pagamento'}
           </button>
 
           <button
             onClick={() => void onCancelDraft()}
             disabled={isBusy}
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-[#ddd1bf] bg-[#fbf7f1] px-5 py-4 text-sm font-medium text-[#5f5549] transition-colors hover:border-[#b79e74] hover:text-[#1f1a15] disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-[#ddd1bf] bg-white/82 px-5 py-4 text-sm font-medium text-[#5f5549] transition-colors hover:border-[#b79e74] hover:text-[#1f1a15] disabled:opacity-50"
           >
             Cancelar reserva
           </button>
@@ -170,7 +176,7 @@ export function PaymentSection({
       ) : null}
 
       {phase === 'processing' ? (
-        <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(250,244,236,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)] md:p-7">
+        <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,242,234,0.8))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)] md:p-7">
           <div className="flex items-start gap-3">
             <Loader2 className="mt-1 h-5 w-5 animate-spin text-[#7b6440]" />
             <div>
@@ -184,14 +190,14 @@ export function PaymentSection({
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <button
               onClick={() => void onRefreshStatus()}
-              className="inline-flex items-center gap-2 rounded-full border border-[#ddd1bf] bg-[#fbf7f1] px-4 py-2.5 text-sm font-medium text-[#5f5549]"
+              className="inline-flex items-center gap-2 rounded-full border border-[#ddd1bf] bg-white/82 px-4 py-2.5 text-sm font-medium text-[#5f5549]"
             >
               <RefreshCw className="h-4 w-4" />
               Atualizar status
             </button>
             <button
               onClick={onPaymentBack}
-              className="inline-flex items-center gap-2 rounded-full border border-[#ddd1bf] bg-[#fbf7f1] px-4 py-2.5 text-sm font-medium text-[#5f5549]"
+              className="inline-flex items-center gap-2 rounded-full border border-[#ddd1bf] bg-white/82 px-4 py-2.5 text-sm font-medium text-[#5f5549]"
             >
               <Lock className="h-4 w-4" />
               Voltar para a reserva

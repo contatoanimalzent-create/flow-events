@@ -16,7 +16,7 @@ export function PublicFooter() {
 
         <div className="grid gap-8 sm:grid-cols-2">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.28em] text-[#4a4540]">Explorar</div>
+            <div className="text-[10px] uppercase tracking-[0.28em] text-[#c49a50]">Explorar</div>
             <div className="mt-4 grid gap-3 text-sm">
               <a href="/events" className="text-[#6a6058] transition-colors hover:text-[#f0ebe2]">Eventos</a>
               <a href="/about" className="text-[#6a6058] transition-colors hover:text-[#f0ebe2]">Sobre</a>
@@ -28,7 +28,7 @@ export function PublicFooter() {
           </div>
 
           <div>
-            <div className="text-[10px] uppercase tracking-[0.28em] text-[#4a4540]">Produtores</div>
+            <div className="text-[10px] uppercase tracking-[0.28em] text-[#c49a50]">Produtores</div>
             <div className="mt-4 grid gap-3 text-sm">
               <a href="/create-event" className="text-[#6a6058] transition-colors hover:text-[#f0ebe2]">Publicar evento</a>
               <a href="/contact" className="text-[#6a6058] transition-colors hover:text-[#f0ebe2]">Parcerias</a>
@@ -40,9 +40,9 @@ export function PublicFooter() {
 
       <div className="border-t border-[rgba(255,255,255,0.05)] px-5 py-6 md:px-10 lg:px-16">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <p className="text-[11px] text-[#3a3530]">© 2025 Animalz Events. Todos os direitos reservados.</p>
+          <p className="text-[11px] text-[#6a6058]">© 2025 Animalz Events. Todos os direitos reservados.</p>
           <div className="flex items-center gap-1">
-            <span className="text-[11px] text-[#3a3530]">Feito com</span>
+            <span className="text-[11px] text-[#6a6058]">Feito com</span>
             <span className="text-[#c49a50]">♦</span>
           </div>
         </div>

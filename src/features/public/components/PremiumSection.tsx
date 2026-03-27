@@ -30,7 +30,7 @@ export function PremiumSection({
               </div>
             ) : null}
             {title ? (
-              <h2 className="font-serif text-4xl font-semibold leading-none text-[#f0ebe2] md:text-6xl">
+              <h2 className="font-display text-[clamp(2.8rem,4.5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-[#f0ebe2]">
                 {title}
               </h2>
             ) : null}

@@ -35,8 +35,8 @@ export function FeaturedEventBlock({ primaryEvent, secondaryEvents }: FeaturedEv
         <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
           <PublicReveal>
             <div>
-              <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Curadoria editorial</div>
-              <h2 className="mt-4 font-display text-[clamp(2.7rem,4vw,4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
+              <div className="text-[11px] uppercase tracking-[0.32em] text-[#c49a50]">Curadoria editorial</div>
+              <h2 className="mt-4 font-display text-[clamp(2.7rem,4vw,4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f0ebe2]">
                 Um destaque principal para abrir a descoberta com presenca.
               </h2>
             </div>

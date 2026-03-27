@@ -30,10 +30,10 @@ export function EventsRowCarousel({ title, description, events }: EventsRowCarou
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <PublicReveal>
             <div className="max-w-2xl">
-              <div className="font-display text-[2.35rem] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
+              <div className="font-display text-[2.35rem] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f0ebe2]">
                 {title}
               </div>
-              {description ? <p className="mt-2 text-sm leading-7 text-[#5f5549]">{description}</p> : null}
+              {description ? <p className="mt-2 text-sm leading-7 text-[#9a9088]">{description}</p> : null}
             </div>
           </PublicReveal>
 
@@ -41,14 +41,14 @@ export function EventsRowCarousel({ title, description, events }: EventsRowCarou
             <button
               type="button"
               onClick={() => scrollByAmount('left')}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#ddd1bf] bg-white/78 text-[#5f5549] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/8 text-white/70 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/14 hover:text-white"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               type="button"
               onClick={() => scrollByAmount('right')}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#ddd1bf] bg-white/78 text-[#5f5549] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/8 text-white/70 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/14 hover:text-white"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -56,8 +56,8 @@ export function EventsRowCarousel({ title, description, events }: EventsRowCarou
         </div>
 
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-12 bg-gradient-to-r from-[#f6f1e8] to-transparent md:block" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-12 bg-gradient-to-l from-[#f6f1e8] to-transparent md:block" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-12 bg-gradient-to-r from-[#0a0908] to-transparent md:block" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-12 bg-gradient-to-l from-[#0a0908] to-transparent md:block" />
           <div
             ref={scrollerRef}
             className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

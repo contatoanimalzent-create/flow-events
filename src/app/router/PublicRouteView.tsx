@@ -4,6 +4,7 @@ import { AuthLoadingGate, useAuthStore } from '@/features/auth'
 import { LoadingState } from '@/shared/components'
 
 const AboutPage = lazy(() => import('@/pages/public/AboutPage').then((m) => ({ default: m.AboutPage })))
+const CapitalStrikeLanding = lazy(() => import('@/pages/public/CapitalStrikeLanding').then((m) => ({ default: m.CapitalStrikeLanding })))
 const ContactPage = lazy(() => import('@/pages/public/ContactPage').then((m) => ({ default: m.ContactPage })))
 const AccountPage = lazy(() => import('@/pages/public/AccountPage').then((m) => ({ default: m.AccountPage })))
 const CreateEventPage = lazy(() => import('@/pages/public/CreateEventPage').then((m) => ({ default: m.CreateEventPage })))
@@ -41,6 +42,8 @@ export function PublicRouteView({ route, onLogin, onBackToHome }: PublicRouteVie
         <AboutPage onLogin={onLogin} />
       ) : route === 'create-event' ? (
         <CreateEventPage onLogin={onLogin} />
+      ) : route === 'capital-strike' ? (
+        <CapitalStrikeLanding />
       ) : route === 'account' ? (
         <AuthLoadingGate>
           {user ? <AccountPage /> : <LoginPage onBack={onBackToHome} />}

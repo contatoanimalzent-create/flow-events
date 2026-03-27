@@ -14,11 +14,21 @@ export function EventHeroMedia({ eventName, coverAsset, heroAsset, fallbackImage
   const heroVideoUrl = getEventAssetUrl(heroAsset)
   const resolvedCoverUrl = getEventAssetUrl(coverAsset) || fallbackImage
   const [videoFailed, setVideoFailed] = useState(false)
-  const [imageSrc, setImageSrc] = useState(resolvedCoverUrl)
+  const [displayImageSrc, setDisplayImageSrc] = useState(fallbackImage)
 
   useEffect(() => {
     setVideoFailed(false)
-    setImageSrc(resolvedCoverUrl)
+    setDisplayImageSrc(fallbackImage)
+
+    if (!resolvedCoverUrl) {
+      return
+    }
+
+    const image = new window.Image()
+    image.decoding = 'async'
+    image.onload = () => setDisplayImageSrc(resolvedCoverUrl)
+    image.onerror = () => setDisplayImageSrc(fallbackImage)
+    image.src = resolvedCoverUrl
   }, [resolvedCoverUrl, heroVideoUrl, eventName])
 
   if (heroVideoUrl && !videoFailed) {
@@ -41,20 +51,14 @@ export function EventHeroMedia({ eventName, coverAsset, heroAsset, fallbackImage
   }
 
   return (
-    <img
-      src={imageSrc}
-      alt=""
+    <div
       aria-hidden="true"
-      loading="eager"
-      decoding="async"
-      fetchPriority="high"
-      className="absolute inset-0 h-full w-full object-cover"
-      onError={() => {
-        if (imageSrc !== fallbackImage) {
-          setImageSrc(fallbackImage)
-        }
+      className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url("${displayImageSrc}")`,
+        transform: `scale(1.1) translateY(${scrollY * 0.15}px)`,
+        transition: 'transform 0.1s ease-out',
       }}
-      style={{ transform: `scale(1.1) translateY(${scrollY * 0.15}px)`, transition: 'transform 0.1s ease-out' }}
     />
   )
 }

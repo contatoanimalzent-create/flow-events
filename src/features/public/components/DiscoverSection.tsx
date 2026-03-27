@@ -28,7 +28,7 @@ function DiscoverCard({ event, index }: { event: PublicEventSummary; index: numb
     <PublicReveal delayMs={index * 80}>
       <a
         href={`/e/${event.slug}`}
-        className={`group relative block overflow-hidden rounded-[2rem] border border-white/70 bg-[#201913] shadow-[0_20px_70px_rgba(46,34,17,0.1)] ${layoutClassName}`}
+        className={`group relative block overflow-hidden rounded-[2rem] border border-white/10 bg-[#201913] shadow-[0_20px_70px_rgba(0,0,0,0.2)] ${layoutClassName}`}
       >
         <img
           src={imageUrl}
@@ -73,7 +73,7 @@ export function DiscoverSection({ events, categories }: DiscoverSectionProps) {
       <div className="flex flex-wrap gap-3">
         {categories.map((category, index) => (
           <PublicReveal key={category} delayMs={index * 60}>
-            <span className="inline-flex rounded-full border border-[#d8cec0] bg-white/75 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-[#6e604c] shadow-[0_10px_22px_rgba(48,35,18,0.04)]">
+            <span className="inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-white/70">
               {category}
             </span>
           </PublicReveal>

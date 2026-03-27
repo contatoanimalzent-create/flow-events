@@ -24,7 +24,7 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
   return (
     <a
       href={`/e/${event.slug}`}
-      className="group relative block overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,240,230,0.82))] shadow-[0_18px_55px_rgba(48,35,18,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(48,35,18,0.1)]"
+      className="group relative block overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] shadow-[0_18px_55px_rgba(0,0,0,0.26)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(0,0,0,0.34)]"
     >
       <div className="grid gap-0 lg:grid-cols-[13rem_minmax(0,1fr)_12rem]">
         <div className="relative min-h-[15rem] overflow-hidden lg:min-h-full">
@@ -33,35 +33,35 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
             alt={event.name}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(19,14,10,0.16)_0%,rgba(19,14,10,0.72)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,4,6,0.18)_0%,rgba(3,4,6,0.82)_100%)]" />
           <div className="absolute inset-x-5 bottom-5 text-white">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-white/68">{month} {year}</div>
-            <div className="mt-2 font-display text-[3rem] font-semibold leading-none">{day}</div>
+            <div className="text-[10px] uppercase tracking-[0.28em] text-white/56">{month} {year}</div>
+            <div className="mt-2 font-display text-[3.2rem] font-semibold leading-none">{day}</div>
           </div>
         </div>
 
         <div className="flex min-w-0 flex-col justify-between p-6 md:p-7">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-[#e0d1b9] bg-white px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#8e7f68]">
-              {index < 3 ? 'High demand' : 'Agenda aberta'}
+            <span className="rounded-full border border-[#ff2d2d]/24 bg-[#ff2d2d]/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white">
+              {index < 3 ? 'High demand' : 'Now selling'}
             </span>
             {event.category ? (
-              <span className="rounded-full border border-[#e0d1b9] bg-[#fbf6ee] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#8e7f68]">
+              <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/58">
                 {event.category}
               </span>
             ) : null}
           </div>
 
-          <h3 className="mt-5 font-display text-[clamp(2.2rem,3vw,3.2rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-[#1f1a15]">
+          <h3 className="mt-5 font-display text-[clamp(2.2rem,3vw,3.2rem)] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white">
             {event.name}
           </h3>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5f5549] md:text-base">
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68 md:text-base">
             {event.subtitle || event.short_description || 'Uma experiencia pensada para transformar data, venue e narrativa em desejo imediato.'}
           </p>
 
-          <div className="mt-6 grid gap-3 text-sm text-[#5f5549] md:grid-cols-2">
+          <div className="mt-6 grid gap-3 text-sm text-white/68 md:grid-cols-2">
             <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-[#8e7f68]" />
+              <CalendarDays className="h-4 w-4 text-[#ff6a5c]" />
               <span>
                 {eventDate.toLocaleDateString('pt-BR', {
                   day: '2-digit',
@@ -71,27 +71,27 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-[#8e7f68]" />
+              <MapPin className="h-4 w-4 text-[#ff6a5c]" />
               <span>{[event.venue_name, event.city].filter(Boolean).join(' / ')}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col justify-between border-t border-[rgba(120,98,68,0.08)] bg-white/52 p-6 lg:border-l lg:border-t-0">
+        <div className="flex flex-col justify-between border-t border-white/8 bg-black/16 p-6 lg:border-l lg:border-t-0">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.26em] text-[#8e7f68]">Ticketing</div>
-            <div className="mt-3 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-[#1f1a15]">
+            <div className="text-[10px] uppercase tracking-[0.26em] text-white/44">Ticketing</div>
+            <div className="mt-3 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-white">
               {priceLabel}
             </div>
-            <div className="mt-3 flex items-center gap-2 text-sm text-[#5f5549]">
-              <Ticket className="h-4 w-4 text-[#8e7f68]" />
+            <div className="mt-3 flex items-center gap-2 text-sm text-white/62">
+              <Ticket className="h-4 w-4 text-[#ff6a5c]" />
               {event.sold_tickets.toLocaleString('pt-BR')} acessos vendidos
             </div>
           </div>
 
-          <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#1f1a15]">
+          <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em] text-white">
             Ver detalhes
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#d9ccb8] bg-white transition-transform duration-300 group-hover:translate-x-1">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] transition-transform duration-300 group-hover:translate-x-1">
               <ArrowRight className="h-4 w-4" />
             </span>
           </div>

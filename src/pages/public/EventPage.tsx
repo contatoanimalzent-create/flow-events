@@ -54,7 +54,7 @@ function LoadingState() {
   return (
     <PublicLayout showFooter={false}>
       <div className="px-5 py-8 md:px-10 lg:px-16">
-        <div className="mx-auto h-[82svh] max-w-7xl animate-pulse rounded-[2.6rem] bg-white/75" />
+        <div className="mx-auto h-[82svh] max-w-7xl animate-pulse rounded-[2.6rem] bg-white/5" />
       </div>
     </PublicLayout>
   )
@@ -64,14 +64,14 @@ function NotFoundState() {
   return (
     <PublicLayout showFooter={false}>
       <div className="flex min-h-[70svh] items-center justify-center px-5 text-center md:px-10 lg:px-16">
-        <div className="rounded-[2.2rem] border border-white/70 bg-white/80 px-10 py-12 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
-          <div className="font-display text-[3.4rem] font-semibold leading-[0.9] tracking-[-0.04em] text-[#1f1a15]">Evento nao encontrado</div>
-          <p className="mt-4 text-sm leading-7 text-[#5f5549]">
+        <div className="rounded-[2.2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] px-10 py-12 shadow-[0_18px_55px_rgba(0,0,0,0.24)]">
+          <div className="font-display text-[3.4rem] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white">Evento nao encontrado</div>
+          <p className="mt-4 text-sm leading-7 text-white/66">
             O link pode ter expirado ou a experiencia nao esta mais publica.
           </p>
           <a
             href="/events"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-5 py-3 text-sm font-medium text-[#f8f3ea]"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-5 py-3 text-sm font-medium uppercase tracking-[0.12em] text-white"
           >
             Voltar para experiencias
             <ArrowRight className="h-4 w-4" />
@@ -290,7 +290,7 @@ export function EventPage({ slug }: { slug: string }) {
             onClick={() => setLiked((current) => !current)}
             className={[
               'flex h-11 w-11 items-center justify-center rounded-full border transition-colors',
-              liked ? 'border-[#f0c7cc] bg-[#fff4f5] text-[#a5505b]' : 'border-[#ddd1bf] bg-white/85 text-[#5f5549]',
+              liked ? 'border-[#ff2d2d]/28 bg-[#ff2d2d]/14 text-white' : 'border-white/10 bg-white/[0.06] text-white',
             ].join(' ')}
           >
             <Heart className={['h-4 w-4', liked ? 'fill-current' : ''].join(' ')} />
@@ -299,7 +299,7 @@ export function EventPage({ slug }: { slug: string }) {
             <button
               type="button"
               onClick={() => setStep('checkout')}
-              className="inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-4 py-2.5 text-sm font-medium text-[#f8f3ea]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-4 py-2.5 text-sm font-medium uppercase tracking-[0.12em] text-white"
             >
               <Ticket className="h-4 w-4" />
               {cartQty} selecionado{cartQty > 1 ? 's' : ''}
@@ -327,10 +327,10 @@ export function EventPage({ slug }: { slug: string }) {
       />
 
       <div className="px-5 pt-6 md:px-10 lg:px-16">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,242,234,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.24)]">
           <div className="max-w-2xl">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Share and plan</div>
-            <p className="mt-3 text-sm leading-7 text-[#5f5549]">
+            <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">Share and plan</div>
+            <p className="mt-3 text-sm leading-7 text-white/66">
               Compartilhe o link do evento, convide seu grupo e avance para a compra quando estiver pronto.
             </p>
           </div>
@@ -340,7 +340,7 @@ export function EventPage({ slug }: { slug: string }) {
             eventName={event.name}
             eventSlug={event.slug}
             description={event.short_description}
-            tone="light"
+            tone="dark"
           />
         </div>
       </div>
@@ -357,13 +357,13 @@ export function EventPage({ slug }: { slug: string }) {
 
             return (
               <PublicReveal key={section.eyebrow} delayMs={index * 80}>
-                <div className="grid gap-6 overflow-hidden rounded-[2.4rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,242,234,0.8))] shadow-[0_20px_60px_rgba(48,35,18,0.06)] lg:grid-cols-2">
+                <div className="grid gap-6 overflow-hidden rounded-[2.4rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] shadow-[0_20px_60px_rgba(0,0,0,0.24)] lg:grid-cols-2">
                   <div className={section.reverse ? 'order-2 p-8 md:p-10 lg:order-1 lg:p-12' : 'p-8 md:p-10 lg:p-12'}>
-                    <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">{section.eyebrow}</div>
-                    <h2 className="mt-4 font-display text-[clamp(2.4rem,4vw,3.8rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
+                    <div className="text-[11px] uppercase tracking-[0.34em] text-white/48">{section.eyebrow}</div>
+                    <h2 className="mt-4 font-display text-[clamp(2.4rem,4vw,3.8rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
                       {section.title}
                     </h2>
-                    <p className="mt-5 text-base leading-8 text-[#5f5549]">{section.description}</p>
+                    <p className="mt-5 text-base leading-8 text-white/66">{section.description}</p>
 
                     <div className="mt-6 grid gap-3 md:grid-cols-2">
                       {[
@@ -377,12 +377,12 @@ export function EventPage({ slug }: { slug: string }) {
                         const Icon = item.icon
 
                         return (
-                          <div key={item.label} className="rounded-[1.4rem] border border-[#eadcc8] bg-white/82 p-4">
-                            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.26em] text-[#8e7f68]">
-                              <Icon className="h-4 w-4 text-[#6d5324]" />
+                          <div key={item.label} className="rounded-[1.4rem] border border-white/8 bg-white/[0.05] p-4">
+                            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.26em] text-white/46">
+                              <Icon className="h-4 w-4 text-[#ff6a5c]" />
                               {item.label}
                             </div>
-                            <div className="mt-3 text-sm font-medium text-[#1f1a15]">{item.value}</div>
+                            <div className="mt-3 text-sm font-medium text-white">{item.value}</div>
                           </div>
                         )
                       })}
@@ -415,14 +415,14 @@ export function EventPage({ slug }: { slug: string }) {
       <section className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
         <div className="mx-auto max-w-7xl">
           <PublicReveal>
-            <div className="rounded-[2.5rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(246,239,229,0.82))] px-8 py-10 shadow-[0_22px_70px_rgba(48,35,18,0.08)] md:px-10 md:py-12">
+            <div className="rounded-[2.5rem] border border-white/8 bg-[linear-gradient(135deg,#0d1117_0%,#121823_100%)] px-8 py-10 shadow-[0_22px_70px_rgba(0,0,0,0.26)] md:px-10 md:py-12">
               <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                 <div className="max-w-3xl">
-                  <div className="text-[11px] uppercase tracking-[0.34em] text-[#8e7f68]">Final call</div>
-                  <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.2rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
+                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/48">Final call</div>
+                  <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.2rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
                     {isFreeMode ? 'Confirme sua inscricao enquanto o acesso ainda esta aberto.' : 'Garanta seu lugar antes que os lotes avancem.'}
                   </h2>
-                  <p className="mt-4 text-base leading-8 text-[#5f5549] md:text-lg">
+                  <p className="mt-4 text-base leading-8 text-white/66 md:text-lg">
                     {isFreeMode
                       ? 'A confirmacao acontece em poucos passos e o QR code chega assim que a inscricao for concluida.'
                       : minPrice > 0
@@ -440,7 +440,7 @@ export function EventPage({ slug }: { slug: string }) {
 
                     document.getElementById('tickets')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f1a15] px-6 py-3.5 text-sm font-semibold text-[#f8f3ea]"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white"
                 >
                   {cartQty > 0 ? 'Ir para checkout' : 'Selecionar ingressos'}
                   <ArrowRight className="h-4 w-4" />

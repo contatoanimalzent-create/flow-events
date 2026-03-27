@@ -333,20 +333,20 @@ export function PublicCheckoutContent({
 
   const introTitle =
     currentStep === 1
-      ? 'Escolha seu acesso com clareza.'
+      ? 'Escolha seu acesso.'
       : currentStep === 2
         ? 'Confirme quem recebe a experiencia.'
         : currentStep === 3
           ? phase === 'payment'
-            ? 'Finalize a compra com seguranca.'
+            ? 'Finalize a compra.'
             : phase === 'processing'
               ? 'Sua transacao esta em processamento.'
-              : 'Sua reserva esta pronta para avancar.'
+              : 'Sua reserva esta pronta.'
           : 'Compra concluida.'
 
   const introDescription =
     currentStep === 1
-      ? 'Compare lotes, disponibilidade e valor em um fluxo direto, com inventario validado em tempo real.'
+      ? 'Compare acessos, disponibilidade e valor em um fluxo direto, com inventario validado em tempo real.'
       : currentStep === 2
         ? 'Mantivemos apenas os campos essenciais para reservar, pagar e emitir os ingressos com confianca.'
       : phase === 'processing'
@@ -372,7 +372,7 @@ export function PublicCheckoutContent({
               type="button"
               onClick={() => void handleBack()}
               disabled={isBusy}
-              className="inline-flex items-center gap-2 text-sm font-medium text-[#5f5549] transition-colors hover:text-[#1f1a15] disabled:opacity-50"
+              className="inline-flex items-center gap-2 text-sm font-medium text-white/64 transition-colors hover:text-white disabled:opacity-50"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar
@@ -395,20 +395,20 @@ export function PublicCheckoutContent({
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_26rem]">
             <div className="space-y-6">
               <PublicReveal>
-                <div className="rounded-[2.2rem] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(246,239,229,0.82))] p-7 shadow-[0_22px_70px_rgba(48,35,18,0.08)] md:p-9">
-                  <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Event checkout</div>
-                  <h1 className="mt-4 font-display text-[clamp(3rem,5vw,5.3rem)] font-semibold leading-[0.92] tracking-[-0.05em] text-[#1f1a15]">
+                <div className="rounded-[2.2rem] border border-white/8 bg-[linear-gradient(135deg,#0d1117_0%,#121823_100%)] p-7 shadow-[0_22px_70px_rgba(0,0,0,0.28)] md:p-9">
+                  <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">Event checkout</div>
+                  <h1 className="mt-4 font-display text-[clamp(3.2rem,5vw,5.4rem)] font-semibold uppercase leading-[0.92] tracking-[-0.05em] text-white">
                     {introTitle}
                   </h1>
-                  <p className="mt-5 max-w-3xl text-base leading-7 text-[#5f5549]">{introDescription}</p>
+                  <p className="mt-5 max-w-3xl text-base leading-7 text-white/66">{introDescription}</p>
 
-                  <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-[#6e6252]">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-[#eadaba] bg-[#faf4e7] px-4 py-2">
-                      <ShieldCheck className="h-4 w-4 text-[#7b6440]" />
+                  <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-white/62">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2">
+                      <ShieldCheck className="h-4 w-4 text-[#ff6a5c]" />
                       Reserva protegida e inventario sincronizado por lote
                     </div>
                     {countdown && phase !== 'form' ? (
-                      <div className="inline-flex items-center rounded-full border border-[#eadaba] bg-white px-4 py-2 text-[#6d5324]">
+                      <div className="inline-flex items-center rounded-full border border-[#ff2d2d]/24 bg-[#ff2d2d]/10 px-4 py-2 text-white">
                         Expira em {countdown}
                       </div>
                     ) : null}
@@ -423,7 +423,7 @@ export function PublicCheckoutContent({
                   <TicketSelector ticketTypes={ticketTypes} cart={cart} onAdd={onAdd} onRemove={onRemove} />
 
                   {error ? (
-                    <div className="rounded-[1.5rem] border border-[#f2c7cd] bg-[#fff4f5] px-5 py-4 text-sm text-[#a5505b]">
+                    <div className="rounded-[1.5rem] border border-[#ff2d2d]/24 bg-[#ff2d2d]/10 px-5 py-4 text-sm text-white">
                       {error}
                     </div>
                   ) : null}
@@ -432,7 +432,7 @@ export function PublicCheckoutContent({
                     <button
                       type="button"
                       onClick={() => void handleBack()}
-                      className="inline-flex items-center gap-2 rounded-full border border-[#ddd1bf] bg-white px-5 py-3 text-sm font-medium text-[#5f5549] transition-colors hover:border-[#b79e74] hover:text-[#1f1a15]"
+                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-medium text-white/76 transition-colors hover:border-[#ff2d2d]/36 hover:text-white"
                     >
                       <ArrowLeft className="h-4 w-4" />
                       Voltar para o evento
@@ -441,7 +441,7 @@ export function PublicCheckoutContent({
                       type="button"
                       onClick={handleContinueFromTickets}
                       disabled={cart.length === 0}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-6 py-3.5 text-sm font-semibold text-[#f8f3ea] transition-all duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ff4133] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Continuar para dados
                       <ArrowRight className="h-4 w-4" />
@@ -455,7 +455,7 @@ export function PublicCheckoutContent({
                   <CheckoutForm buyer={buyer} setBuyerField={setBuyerField} />
 
                   {error ? (
-                    <div className="rounded-[1.5rem] border border-[#f2c7cd] bg-[#fff4f5] px-5 py-4 text-sm text-[#a5505b]">
+                    <div className="rounded-[1.5rem] border border-[#ff2d2d]/24 bg-[#ff2d2d]/10 px-5 py-4 text-sm text-white">
                       {error}
                     </div>
                   ) : null}
@@ -464,7 +464,7 @@ export function PublicCheckoutContent({
                     <button
                       type="button"
                       onClick={() => setCurrentStep(1)}
-                      className="inline-flex items-center gap-2 rounded-full border border-[#ddd1bf] bg-white px-5 py-3 text-sm font-medium text-[#5f5549] transition-colors hover:border-[#b79e74] hover:text-[#1f1a15]"
+                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-medium text-white/76 transition-colors hover:border-[#ff2d2d]/36 hover:text-white"
                     >
                       <ArrowLeft className="h-4 w-4" />
                       Ajustar ingressos
@@ -473,7 +473,7 @@ export function PublicCheckoutContent({
                       type="button"
                       onClick={() => void handleCreateDraft()}
                       disabled={isBusy || cart.length === 0}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-6 py-3.5 text-sm font-semibold text-[#f8f3ea] transition-all duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ff4133] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {creatingDraft ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
                       Reservar pedido

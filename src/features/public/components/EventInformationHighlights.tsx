@@ -58,9 +58,9 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
       <div className="mx-auto max-w-7xl">
         <PublicReveal>
           <div className="max-w-3xl">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Event information</div>
-            <h2 className="mt-4 font-display text-[clamp(2.6rem,4vw,4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
-              Tudo o que importa, organizado com clareza e leitura imediata.
+            <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">Event information</div>
+            <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.3rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
+              Informacoes essenciais, apresentadas como parte da experiencia.
             </h2>
           </div>
         </PublicReveal>
@@ -71,17 +71,17 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
 
             return (
               <PublicReveal key={item.label} delayMs={index * 70}>
-                <div className="h-full rounded-[1.8rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,242,234,0.78))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)]">
+                <div className="h-full rounded-[1.8rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.24)]">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f5ecdd] text-[#6d5324]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ff2d2d]/12 text-[#ff6a5c]">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <div className="text-[11px] uppercase tracking-[0.26em] text-[#8e7f68]">{item.label}</div>
+                    <div className="text-[11px] uppercase tracking-[0.26em] text-white/46">{item.label}</div>
                   </div>
-                  <div className="mt-5 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-[#1f1a15]">
+                  <div className="mt-5 font-display text-[2rem] font-semibold uppercase leading-[0.94] tracking-[-0.03em] text-white">
                     {item.value}
                   </div>
-                  <p className="mt-3 text-sm leading-7 text-[#5f5549]">{item.note}</p>
+                  <p className="mt-3 text-sm leading-7 text-white/66">{item.note}</p>
                 </div>
               </PublicReveal>
             )

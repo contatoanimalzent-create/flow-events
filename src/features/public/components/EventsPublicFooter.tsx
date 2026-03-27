@@ -29,12 +29,12 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
           <div className="rounded-[2.4rem] border border-[rgba(255,255,255,0.06)] bg-[linear-gradient(135deg,rgba(17,20,26,0.96),rgba(11,14,19,0.92))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.34)] md:p-10">
             <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-end">
               <div>
-                <div className="text-[11px] uppercase tracking-[0.34em] text-[#ff6a5c]">Stay close</div>
+                <div className="text-[11px] uppercase tracking-[0.34em] text-[#ff6a5c]">Priority access</div>
                 <h3 className="mt-4 max-w-xl font-display text-[clamp(2.4rem,4vw,4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f5f7fa]">
-                  Receba as proximas experiencias antes do restante do publico.
+                  Receba novas experiencias, aberturas e acessos antes do restante do publico.
                 </h3>
                 <p className="mt-4 max-w-xl text-sm leading-7 text-[#a9b0bc] md:text-base">
-                  Convites, aberturas prioritarias e eventos em destaque enviados com o mesmo cuidado da plataforma.
+                  Uma camada editorial para quem quer descobrir experiencias com mais contexto, mais clareza e melhor timing.
                 </p>
               </div>
 
@@ -44,7 +44,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    placeholder="seu@email.com"
+                    placeholder="Seu melhor e-mail"
                     className="w-full rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-5 py-4 pr-12 text-sm text-[#f5f7fa] outline-none transition-all duration-300 placeholder:text-[#6f7785] focus:border-[#ff2d2d]/40 focus:shadow-[0_14px_28px_rgba(0,0,0,0.16)]"
                     required
                   />
@@ -54,7 +54,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                   type="submit"
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-4 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(255,45,45,0.32)]"
                 >
-                  {subscribed ? 'Inscricao confirmada' : 'Receber convites'}
+                  {subscribed ? 'Acesso confirmado' : 'Receber novidades'}
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
@@ -63,7 +63,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
 
           {categories.length > 0 ? (
             <div className="mt-10">
-              <div className="text-[11px] uppercase tracking-[0.32em] text-[#7b8390]">Explorar categorias</div>
+              <div className="text-[11px] uppercase tracking-[0.32em] text-[#7b8390]">Explore por categoria</div>
               <div className="mt-4 flex flex-wrap gap-3">
                 {categories.map((category) => (
                   <button
@@ -83,7 +83,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             <div>
               <img src="/logo.png" alt="Animalz Events" className="h-16 w-auto object-contain" />
               <p className="mt-5 max-w-sm text-sm leading-7 text-[#a9b0bc]">
-                Animalz Events conecta descoberta, compra e operacao em uma camada pensada para experiencias premium.
+                Animalz Events organiza descoberta, conversao e operacao em uma camada de experiencias com ambicao global.
               </p>
               <div className="mt-5 space-y-2 text-sm text-[#a9b0bc]">
                 <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-[#ff6a5c]" />
-                  atendimento@animalzevents.com
+                  contato@animalzevents.com
                 </div>
               </div>
             </div>
@@ -101,7 +101,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               {
                 title: 'Experiencias',
                 links: [
-                  { label: 'Eventos em destaque', href: '/events' },
+                  { label: 'Agenda completa', href: '/events' },
                   { label: 'Minha conta', href: '/me' },
                   { label: 'Sobre a plataforma', href: '/about' },
                 ],
@@ -109,9 +109,9 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               {
                 title: 'Produtores',
                 links: [
-                  { label: 'Criar evento', href: '/create-event' },
+                  { label: 'Publicar experiencia', href: '/create-event' },
                   { label: 'Monetizacao', href: '/billing' },
-                  { label: 'Growth cockpit', href: '/growth' },
+                  { label: 'Crescimento', href: '/growth' },
                 ],
               },
               {

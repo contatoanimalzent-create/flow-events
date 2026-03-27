@@ -47,7 +47,7 @@ function FilterSelect({
   return (
     <label className="block min-w-[11rem]">
       <div className={cn(
-        'mb-3 text-[11px] uppercase tracking-[0.28em]',
+        'mb-3 text-[10px] font-semibold uppercase tracking-[0.28em]',
         isDark ? 'text-white/50' : 'text-[#8e7f68]'
       )}>
         {label}
@@ -59,7 +59,7 @@ function FilterSelect({
           'w-full rounded-full px-4 py-3.5 text-sm outline-none transition-all duration-300',
           isDark
             ? 'border border-white/12 bg-white/6 text-[#f0ebe2] focus:border-white/20 focus:bg-white/10 focus:shadow-[0_12px_24px_rgba(0,0,0,0.3)]'
-            : 'border border-[#ddd1bf] bg-white/78 text-[#1f1a15] focus:border-[#b79e74] focus:bg-white focus:shadow-[0_12px_24px_rgba(48,35,18,0.08)]'
+            : 'border border-[#2a313d] bg-[#121722] text-white focus:border-[#ff2d2d]/44 focus:bg-[#151b27] focus:shadow-[0_12px_24px_rgba(0,0,0,0.28)]'
         )}
       >
         {options.map((option) => (
@@ -96,7 +96,7 @@ export function EventsFilterBar({
         'rounded-[2rem] border p-5 md:p-6',
         isDark
           ? 'border-white/10 bg-white/5 shadow-[0_18px_55px_rgba(0,0,0,0.2)]'
-          : 'border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(250,244,236,0.78))] shadow-[0_18px_55px_rgba(48,35,18,0.06)]'
+          : 'border-[#1e2430] bg-[linear-gradient(180deg,rgba(10,13,18,0.95),rgba(15,19,27,0.92))] shadow-[0_18px_55px_rgba(0,0,0,0.28)]'
       )}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
@@ -105,7 +105,7 @@ export function EventsFilterBar({
                 {resultCount} experiencias
               </div>
             ) : (
-              <PremiumBadge tone="default" className="border-[#ddd1bf] bg-white/82 text-[#5f5549]">
+              <PremiumBadge tone="default" className="border-white/10 bg-white/[0.05] text-white/76">
                 {resultCount} experiencias
               </PremiumBadge>
             )}
@@ -115,7 +115,7 @@ export function EventsFilterBar({
                   Atualizando selecao
                 </div>
               ) : (
-                <PremiumBadge tone="accent" className="border-[#e1d0ab] bg-[#f7edd1] text-[#6d5324]">
+                <PremiumBadge tone="accent" className="border-[#ff2d2d]/24 bg-[#ff2d2d]/12 text-white">
                   Atualizando selecao
                 </PremiumBadge>
               )
@@ -135,7 +135,7 @@ export function EventsFilterBar({
                 'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300',
                 isDark
                   ? 'border border-white/12 bg-white/8 text-white/70 hover:-translate-y-0.5 hover:bg-white/12 hover:text-white'
-                  : 'border border-[#ddd1bf] bg-white/72 text-[#5f5549] hover:-translate-y-0.5 hover:bg-white'
+                  : 'border border-white/10 bg-white/[0.05] text-white/70 hover:-translate-y-0.5 hover:bg-white/[0.08] hover:text-white'
               )}
             >
               <RotateCcw className="h-4 w-4" />

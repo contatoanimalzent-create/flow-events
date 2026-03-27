@@ -22,13 +22,18 @@ export function EventsScheduleList({ events, title, subtitle }: EventsScheduleLi
       <div className="mx-auto max-w-7xl">
         {title || subtitle ? (
           <PublicReveal>
-            <div className="mb-10 max-w-3xl">
-              {title ? (
-                <h2 className="font-display text-[clamp(2.4rem,4vw,3.8rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
-                  {title}
-                </h2>
-              ) : null}
-              {subtitle ? <p className="mt-4 text-base leading-8 text-[#5f5549] md:text-lg">{subtitle}</p> : null}
+            <div className="mb-10 flex flex-col gap-4 border-b border-white/8 pb-8 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-3xl">
+                {title ? (
+                  <h2 className="font-display text-[clamp(2.8rem,4vw,4.2rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
+                    {title}
+                  </h2>
+                ) : null}
+                {subtitle ? <p className="mt-4 text-base leading-8 text-white/68 md:text-lg">{subtitle}</p> : null}
+              </div>
+              <div className="text-[11px] uppercase tracking-[0.28em] text-white/42">
+                {sortedEvents.length} experiencias disponiveis
+              </div>
             </div>
           </PublicReveal>
         ) : null}

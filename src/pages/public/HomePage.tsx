@@ -147,20 +147,22 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                   <PublicReveal key={event.id} delayMs={index * 70}>
                     <a
                       href={`/e/${event.slug}`}
-                      className="group flex min-h-[13rem] flex-col justify-between rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.22)] transition-all duration-300 hover:-translate-y-1"
+                      className="group grid min-h-[15.5rem] grid-rows-[auto_1fr_auto] rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.22)] transition-all duration-300 hover:-translate-y-1"
                     >
-                      <div>
-                        <div className="text-[10px] uppercase tracking-[0.28em] text-white/46">
-                          {index === 0 ? 'Selling fast' : index === 1 ? 'Premium access' : 'New release'}
-                        </div>
-                        <div className="mt-4 font-display text-[2rem] font-semibold uppercase leading-[0.92] tracking-[-0.03em] text-white">
+                      <div className="text-[10px] uppercase tracking-[0.28em] text-white/46">
+                        {index === 0 ? 'Selling fast' : index === 1 ? 'Premium access' : 'New release'}
+                      </div>
+
+                      <div className="flex min-h-0 flex-col justify-start pt-4">
+                        <div className="min-h-[4.25rem] font-display text-[2rem] font-semibold uppercase leading-[0.92] tracking-[-0.03em] text-white">
                           {event.name}
                         </div>
-                        <p className="mt-3 text-sm leading-7 text-white/62">
+                        <p className="mt-3 min-h-[4.5rem] text-sm leading-7 text-white/62">
                           {[event.venue_name, event.city].filter(Boolean).join(' / ')}
                         </p>
                       </div>
-                      <div className="mt-6 text-sm font-semibold uppercase tracking-[0.12em] text-[#ff6a5c]">
+
+                      <div className="mt-6 self-end text-sm font-semibold uppercase tracking-[0.12em] text-[#ff6a5c]">
                         Ver detalhes
                       </div>
                     </a>

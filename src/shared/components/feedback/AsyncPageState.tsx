@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { AlertTriangle, Inbox, Loader2 } from 'lucide-react'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/components/ui/FoundationPrimitives'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 
 interface AsyncPageStateProps {
   title: string
@@ -10,10 +11,18 @@ interface AsyncPageStateProps {
 }
 
 export function PageLoadingState({
-  title = 'Loading',
-  description = 'We are organizing the data for you. One moment, please.',
+  title,
+  description,
 }: Partial<AsyncPageStateProps>) {
-  return <LoadingState title={title} description={description} icon={<Loader2 className="h-8 w-8 animate-spin" />} />
+  const { t } = useAppLocale()
+
+  return (
+    <LoadingState
+      title={title ?? t('Loading', 'Carregando')}
+      description={description ?? t('We are organizing the data for you. One moment, please.', 'Estamos organizando os dados para voce. Um momento, por favor.')}
+      icon={<Loader2 className="h-8 w-8 animate-spin" />}
+    />
+  )
 }
 
 export function PageErrorState({ title, description, action, icon }: AsyncPageStateProps) {

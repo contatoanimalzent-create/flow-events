@@ -1,7 +1,6 @@
 import { Suspense, lazy } from 'react'
 import type { PublicRoute } from './public-routes'
 import { AuthLoadingGate, useAuthStore } from '@/features/auth'
-import { PublicLocaleProvider } from '@/features/public/lib/public-locale'
 import { LoadingState } from '@/shared/components'
 
 const AboutPage = lazy(() => import('@/pages/public/AboutPage').then((m) => ({ default: m.AboutPage })))
@@ -30,34 +29,32 @@ export function PublicRouteView({ route, onLogin, onBackToHome }: PublicRouteVie
   const user = useAuthStore((state) => state.user)
 
   return (
-    <PublicLocaleProvider>
-      <Suspense fallback={<PublicFallback />}>
-        {typeof route === 'object' && route.type === 'event' ? (
-          <EventPage slug={route.slug} />
-        ) : route === 'terms' ? (
-          <TermsPage />
-        ) : route === 'privacy' ? (
-          <PrivacyPage />
-        ) : route === 'contact' ? (
-          <ContactPage onLogin={onLogin} />
-        ) : route === 'about' ? (
-          <AboutPage onLogin={onLogin} />
-        ) : route === 'create-event' ? (
-          <CreateEventPage onLogin={onLogin} />
-        ) : route === 'capital-strike' ? (
-          <CapitalStrikeLanding />
-        ) : route === 'account' ? (
-          <AuthLoadingGate>
-            {user ? <AccountPage /> : <LoginPage onBack={onBackToHome} />}
-          </AuthLoadingGate>
-        ) : route === 'events' ? (
-          <EventsCatalogPage onLogin={onLogin} />
-        ) : route === 'login' ? (
-          <LoginPage onBack={onBackToHome} />
-        ) : (
-          <HomePage onLogin={onLogin} />
-        )}
-      </Suspense>
-    </PublicLocaleProvider>
+    <Suspense fallback={<PublicFallback />}>
+      {typeof route === 'object' && route.type === 'event' ? (
+        <EventPage slug={route.slug} />
+      ) : route === 'terms' ? (
+        <TermsPage />
+      ) : route === 'privacy' ? (
+        <PrivacyPage />
+      ) : route === 'contact' ? (
+        <ContactPage onLogin={onLogin} />
+      ) : route === 'about' ? (
+        <AboutPage onLogin={onLogin} />
+      ) : route === 'create-event' ? (
+        <CreateEventPage onLogin={onLogin} />
+      ) : route === 'capital-strike' ? (
+        <CapitalStrikeLanding />
+      ) : route === 'account' ? (
+        <AuthLoadingGate>
+          {user ? <AccountPage /> : <LoginPage onBack={onBackToHome} />}
+        </AuthLoadingGate>
+      ) : route === 'events' ? (
+        <EventsCatalogPage onLogin={onLogin} />
+      ) : route === 'login' ? (
+        <LoginPage onBack={onBackToHome} />
+      ) : (
+        <HomePage onLogin={onLogin} />
+      )}
+    </Suspense>
   )
 }

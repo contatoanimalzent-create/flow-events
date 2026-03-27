@@ -1,32 +1,35 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Bell, LogOut, Menu, Search, X } from 'lucide-react'
+import { Bell, Globe, LogOut, Menu, Search, X } from 'lucide-react'
 import type { NavSection } from '@/app/layout'
 import { AuditFeedPanel } from '@/features/audit'
 import { useAccessControl } from '@/features/access-control'
 import { NotificationsPanel, useNotificationsCenter } from '@/features/notifications'
 import { useAuthStore } from '@/lib/store/auth'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 import { logError } from '@/shared/lib'
 
-const sectionTitles: Record<NavSection, string> = {
-  dashboard: 'Dashboard',
-  events: 'Events',
-  tickets: 'Tickets & Releases',
-  sales: 'Sales',
-  crm: 'CRM & Customers',
-  checkin: 'Operational Check-in',
-  staff: 'Staff & Crew',
-  suppliers: 'Suppliers',
-  products: 'Products & POS',
-  inventory: 'Inventory & Stock',
-  intelligence: 'Intelligence',
-  communication: 'Communications',
-  financial: 'Financial',
-  billing: 'Billing & Monetization',
-  growth: 'Growth Services',
-  help: 'Help & Training',
-  settings: 'Settings',
+function getSectionTitles(isPortuguese: boolean): Record<NavSection, string> {
+  return {
+    dashboard: 'Dashboard',
+    events: isPortuguese ? 'Eventos' : 'Events',
+    tickets: isPortuguese ? 'Ingressos e lotes' : 'Tickets & releases',
+    sales: isPortuguese ? 'Vendas' : 'Sales',
+    crm: isPortuguese ? 'CRM e clientes' : 'CRM & customers',
+    checkin: isPortuguese ? 'Check-in operacional' : 'Operational check-in',
+    staff: isPortuguese ? 'Equipe e operacao' : 'Staff & crew',
+    suppliers: isPortuguese ? 'Fornecedores' : 'Suppliers',
+    products: isPortuguese ? 'Produtos e PDV' : 'Products & POS',
+    inventory: isPortuguese ? 'Estoque e inventario' : 'Inventory & stock',
+    intelligence: isPortuguese ? 'Inteligencia' : 'Intelligence',
+    communication: isPortuguese ? 'Comunicacao' : 'Communications',
+    financial: isPortuguese ? 'Financeiro' : 'Financial',
+    billing: isPortuguese ? 'Billing e monetizacao' : 'Billing & monetization',
+    growth: isPortuguese ? 'Crescimento' : 'Growth services',
+    help: isPortuguese ? 'Ajuda e treinamento' : 'Help & training',
+    settings: isPortuguese ? 'Configuracoes' : 'Settings',
+  }
 }
 
 interface TopbarProps {
@@ -38,10 +41,12 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
   const { signOut } = useAuthStore()
   const access = useAccessControl()
   const notifications = useNotificationsCenter()
+  const { locale, setLocale, isPortuguese, t } = useAppLocale()
   const [showSearch, setShowSearch] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [panelTab, setPanelTab] = useState<'notifications' | 'activity'>('notifications')
   const [searchQuery, setSearchQuery] = useState('')
+  const sectionTitles = getSectionTitles(isPortuguese)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -88,10 +93,19 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
           className="hidden items-center gap-2 rounded-full border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-4 py-2 text-sm text-[#7b8390] transition-all hover:border-[#ff2d2d]/30 hover:text-[#f5f7fa] md:flex"
         >
           <Search className="h-4 w-4" />
-          <span>Search...</span>
+          <span>{t('Search...', 'Buscar...')}</span>
           <span className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-2 py-0.5 text-[11px]">
             Ctrl K
           </span>
+        </button>
+
+        <button
+          onClick={() => setLocale(locale === 'en-US' ? 'pt-BR' : 'en-US')}
+          className="inline-flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[#7b8390] transition-all hover:border-[#ff2d2d]/30 hover:text-[#f5f7fa]"
+          title={t('Switch language', 'Trocar idioma')}
+        >
+          <Globe className="h-4 w-4" />
+          {locale === 'en-US' ? 'EN' : 'PT'}
         </button>
 
         <button
@@ -107,7 +121,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
         <button
           onClick={signOut}
           className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2.5 text-[#7b8390] transition-all hover:border-[#ff453a]/25 hover:text-[#ff453a]"
-          title="Sign out"
+          title={t('Sign out', 'Sair')}
         >
           <LogOut className="h-5 w-5" />
         </button>
@@ -124,7 +138,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
                 onChange={(event) => setSearchQuery(event.target.value)}
                 onKeyDown={(event) => { if (event.key === 'Enter') handleSearch() }}
                 type="text"
-                placeholder="Search events, tickets, customers..."
+                placeholder={t('Search events, tickets, customers...', 'Busque eventos, ingressos, clientes...')}
                 className="flex-1 bg-transparent text-[#f5f7fa] outline-none placeholder:text-[#596271]"
               />
               <button
@@ -135,7 +149,9 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
               </button>
             </div>
             <div className="p-5 text-center text-sm text-[#7b8390]">
-              {searchQuery ? 'Search captured for future integration.' : 'Type to search'}
+              {searchQuery
+                ? t('Search captured for future integration.', 'Busca registrada para integracao futura.')
+                : t('Type to search', 'Digite para buscar')}
             </div>
           </div>
         </div>
@@ -147,7 +163,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
             <div>
               <div className="text-[10px] uppercase tracking-[0.3em] text-[#ff6a5c]">{access.role}</div>
               <h3 className="mt-1 font-display text-2xl font-semibold leading-none tracking-[-0.03em] text-[#f5f7fa]">
-                Internal center
+                {t('Internal center', 'Centro interno')}
               </h3>
             </div>
             <button
@@ -166,7 +182,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
                   : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]'
               }`}
             >
-              Notifications
+              {t('Notifications', 'Notificacoes')}
             </button>
             <button
               onClick={() => setPanelTab('activity')}
@@ -176,7 +192,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
                   : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]'
               }`}
             >
-              Activity
+              {t('Activity', 'Atividade')}
             </button>
           </div>
           <div className="max-h-[28rem] overflow-y-auto p-4">

@@ -23,6 +23,7 @@ import { useAccessControl } from '@/features/access-control'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store/auth'
 import { getInitials } from '@/lib/utils'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 
 interface SidebarProps {
   activeSection: NavSection
@@ -42,59 +43,63 @@ interface NavGroup {
   items: NavItem[]
 }
 
-const navGroups: NavGroup[] = [
-  {
-    label: 'Overview',
-    items: [
-      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { id: 'events', label: 'Events', icon: CalendarDays },
-    ],
-  },
-  {
-    label: 'Sales & Ticketing',
-    items: [
-      { id: 'tickets', label: 'Tickets', icon: Ticket },
-      { id: 'sales', label: 'Sales', icon: TrendingUp },
-      { id: 'crm', label: 'CRM', icon: Users },
-    ],
-  },
-  {
-    label: 'Operations',
-    items: [
-      { id: 'checkin', label: 'Check-in', icon: ScanLine },
-      { id: 'staff', label: 'Staff', icon: Users },
-      { id: 'suppliers', label: 'Suppliers', icon: Truck },
-    ],
-  },
-  {
-    label: 'Commerce & Inventory',
-    items: [
-      { id: 'products', label: 'Products & POS', icon: ShoppingBag },
-      { id: 'inventory', label: 'Inventory', icon: Package },
-    ],
-  },
-  {
-    label: 'Growth',
-    items: [
-      { id: 'intelligence', label: 'Intelligence', icon: BrainCircuit },
-      { id: 'communication', label: 'Communications', icon: MessageSquare },
-      { id: 'financial', label: 'Financial', icon: DollarSign },
-      { id: 'billing', label: 'Billing', icon: WalletCards },
-      { id: 'growth', label: 'Growth AI', icon: Zap },
-    ],
-  },
-  {
-    label: 'System',
-    items: [
-      { id: 'settings', label: 'Settings', icon: Settings },
-      { id: 'help', label: 'Help', icon: HelpCircle },
-    ],
-  },
-]
+function createNavGroups(isPortuguese: boolean): NavGroup[] {
+  return [
+    {
+      label: isPortuguese ? 'Visao geral' : 'Overview',
+      items: [
+        { id: 'dashboard', label: isPortuguese ? 'Dashboard' : 'Dashboard', icon: LayoutDashboard },
+        { id: 'events', label: isPortuguese ? 'Eventos' : 'Events', icon: CalendarDays },
+      ],
+    },
+    {
+      label: isPortuguese ? 'Vendas e ingressos' : 'Sales & ticketing',
+      items: [
+        { id: 'tickets', label: isPortuguese ? 'Ingressos' : 'Tickets', icon: Ticket },
+        { id: 'sales', label: isPortuguese ? 'Vendas' : 'Sales', icon: TrendingUp },
+        { id: 'crm', label: isPortuguese ? 'CRM' : 'CRM', icon: Users },
+      ],
+    },
+    {
+      label: isPortuguese ? 'Operacao' : 'Operations',
+      items: [
+        { id: 'checkin', label: isPortuguese ? 'Check-in' : 'Check-in', icon: ScanLine },
+        { id: 'staff', label: isPortuguese ? 'Equipe' : 'Staff', icon: Users },
+        { id: 'suppliers', label: isPortuguese ? 'Fornecedores' : 'Suppliers', icon: Truck },
+      ],
+    },
+    {
+      label: isPortuguese ? 'Comercio e estoque' : 'Commerce & inventory',
+      items: [
+        { id: 'products', label: isPortuguese ? 'Produtos e PDV' : 'Products & POS', icon: ShoppingBag },
+        { id: 'inventory', label: isPortuguese ? 'Estoque' : 'Inventory', icon: Package },
+      ],
+    },
+    {
+      label: isPortuguese ? 'Crescimento' : 'Growth',
+      items: [
+        { id: 'intelligence', label: isPortuguese ? 'Inteligencia' : 'Intelligence', icon: BrainCircuit },
+        { id: 'communication', label: isPortuguese ? 'Comunicacao' : 'Communications', icon: MessageSquare },
+        { id: 'financial', label: isPortuguese ? 'Financeiro' : 'Financial', icon: DollarSign },
+        { id: 'billing', label: isPortuguese ? 'Billing' : 'Billing', icon: WalletCards },
+        { id: 'growth', label: isPortuguese ? 'Growth AI' : 'Growth AI', icon: Zap },
+      ],
+    },
+    {
+      label: isPortuguese ? 'Sistema' : 'System',
+      items: [
+        { id: 'settings', label: isPortuguese ? 'Configuracoes' : 'Settings', icon: Settings },
+        { id: 'help', label: isPortuguese ? 'Ajuda' : 'Help', icon: HelpCircle },
+      ],
+    },
+  ]
+}
 
 export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: SidebarProps) {
   const { profile, organization } = useAuthStore()
   const access = useAccessControl()
+  const { isPortuguese } = useAppLocale()
+  const navGroups = createNavGroups(isPortuguese)
   const visibleGroups = navGroups
     .map((group) => ({
       ...group,
@@ -126,7 +131,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
               style={{ filter: 'drop-shadow(0 0 12px rgba(255,45,45,0.22))' }}
             />
             <div className="truncate text-[10px] uppercase tracking-[0.26em] text-[#6f7785]">
-              {organization?.name ?? 'Platform'}
+              {organization?.name ?? (isPortuguese ? 'Plataforma' : 'Platform')}
             </div>
           </div>
         ) : (

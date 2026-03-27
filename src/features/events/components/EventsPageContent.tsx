@@ -7,10 +7,12 @@ import { EventFormModal } from '@/features/events/modals'
 import { EVENT_STATUS_CONFIG } from '@/features/events/types'
 import type { EventRow } from '@/features/events/types'
 import { ActionConfirmationDialog, PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 import { cn, formatDate } from '@/shared/lib'
 import { EventCard } from './EventCard'
 
 export function EventsPageContent() {
+  const { t } = useAppLocale()
   const organization = useAuthStore((state) => state.organization)
   const access = useAccessControl()
   const canManageEvents = access.can('events', 'manage')
@@ -45,16 +47,16 @@ export function EventsPageContent() {
         <div>
           <div className="admin-eyebrow">Portfolio & agenda</div>
           <h1 className="admin-title">
-            Eventos<span className="admin-title-accent">.</span>
+            {t('Events', 'Eventos')}<span className="admin-title-accent">.</span>
           </h1>
           <p className="admin-subtitle">
-            {events.length} evento{events.length !== 1 ? 's' : ''} cadastrado{events.length !== 1 ? 's' : ''}
+            {events.length} {t(events.length !== 1 ? 'events registered' : 'event registered', events.length !== 1 ? 'eventos cadastrados' : 'evento cadastrado')}
           </p>
         </div>
         {canManageEvents ? (
           <button onClick={openCreateForm} className="btn-primary flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            Novo evento
+            {t('New event', 'Novo evento')}
           </button>
         ) : null}
       </div>
@@ -73,7 +75,7 @@ export function EventsPageContent() {
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
           <input
             className="input h-9 pl-9 text-sm"
-            placeholder="Buscar evento..."
+            placeholder={t('Search event...', 'Buscar evento...')}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
@@ -91,7 +93,7 @@ export function EventsPageContent() {
                   : 'border border-transparent text-text-muted hover:border-bg-border hover:bg-bg-surface hover:text-text-primary',
               )}
             >
-              {status === 'all' ? 'Todos' : EVENT_STATUS_CONFIG[status].label}
+              {status === 'all' ? t('All', 'Todos') : EVENT_STATUS_CONFIG[status].label}
             </button>
           ))}
         </div>
@@ -108,24 +110,24 @@ export function EventsPageContent() {
                 view === mode ? 'bg-brand-acid/15 text-brand-acid' : 'text-text-muted hover:text-text-primary',
               )}
             >
-              {mode === 'grid' ? 'Grid' : 'Lista'}
+              {mode === 'grid' ? t('Grid', 'Grid') : t('List', 'Lista')}
             </button>
           ))}
         </div>
       </div>
 
       {loading && (
-        <PageLoadingState title="Carregando eventos" description="Buscando o portfolio e os indicadores da organizacao." />
+        <PageLoadingState title={t('Loading events', 'Carregando eventos')} description={t('Fetching the portfolio and organization indicators.', 'Buscando o portfolio e os indicadores da organizacao.')} />
       )}
 
       {!loading && error && (
         <PageErrorState
-          title="ERRO AO CARREGAR EVENTOS"
+          title={t('Unable to load events', 'Erro ao carregar eventos')}
           description={error}
           icon={<CalendarDays className="mb-3 h-10 w-10 text-status-error" />}
           action={
             <button onClick={() => void refreshEvents()} className="btn-primary">
-              Tentar novamente
+              {t('Try again', 'Tentar novamente')}
             </button>
           }
         />
@@ -133,13 +135,13 @@ export function EventsPageContent() {
 
       {!loading && !error && filteredEvents.length === 0 && (
         <PageEmptyState
-          title={search || filter !== 'all' ? 'NENHUM RESULTADO' : 'NENHUM EVENTO'}
-          description={search || filter !== 'all' ? 'Tente outros filtros.' : 'Crie seu primeiro evento para comecar.'}
+          title={search || filter !== 'all' ? t('No results', 'Nenhum resultado') : t('No events', 'Nenhum evento')}
+          description={search || filter !== 'all' ? t('Try different filters.', 'Tente outros filtros.') : t('Create your first event to get started.', 'Crie seu primeiro evento para comecar.')}
           icon={<CalendarDays className="mb-3 h-10 w-10 text-text-muted" />}
           action={
             !search && filter === 'all' && canManageEvents ? (
               <button onClick={openCreateForm} className="btn-primary">
-                + Criar evento
+                + {t('Create event', 'Criar evento')}
               </button>
             ) : undefined
           }
@@ -181,7 +183,7 @@ export function EventsPageContent() {
           <table className="w-full">
             <thead className="border-b border-bg-border">
               <tr>
-                {['Evento', 'Status', 'Data', 'Local', 'Ocupa\u00e7\u00e3o', 'A\u00e7\u00f5es'].map((header) => (
+                {[t('Event', 'Evento'), t('Status', 'Status'), t('Date', 'Data'), t('Venue', 'Local'), t('Occupancy', 'Ocupacao'), t('Actions', 'Acoes')].map((header) => (
                   <th key={header} className="table-header">
                     {header}
                   </th>
@@ -262,10 +264,10 @@ export function EventsPageContent() {
 
       <ActionConfirmationDialog
         open={Boolean(pendingDeleteEvent)}
-        title="Remover evento"
-        description={pendingDeleteEvent ? `O evento "${pendingDeleteEvent.name}" sera removido do portfolio administrativo.` : undefined}
-        impact="A exclusao remove a configuracao principal do evento e pode afetar operacao, vendas futuras e historico associado no backoffice."
-        confirmLabel="Excluir evento"
+        title={t('Remove event', 'Remover evento')}
+        description={pendingDeleteEvent ? t(`The event "${pendingDeleteEvent.name}" will be removed from the admin portfolio.`, `O evento "${pendingDeleteEvent.name}" sera removido do portfolio administrativo.`) : undefined}
+        impact={t('This removal takes the event out of the administrative portfolio and can affect operations, future sales and historical visibility in the back office.', 'A exclusao remove a configuracao principal do evento e pode afetar operacao, vendas futuras e historico associado no backoffice.')}
+        confirmLabel={t('Delete event', 'Excluir evento')}
         confirming={false}
         onCancel={() => setPendingDeleteEvent(null)}
         onConfirm={async () => {

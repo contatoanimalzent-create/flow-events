@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Eye, EyeOff, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/lib/store/auth'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 
 export function LoginPage({ onBack }: { onBack?: () => void }) {
   const { signIn } = useAuthStore()
+  const { t } = useAppLocale()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [show, setShow] = useState(false)
@@ -15,7 +17,9 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
     setError('')
     setLoading(true)
     const result = await signIn(email, password)
-    if (result.error) setError('Incorrect email or password. Please try again.')
+    if (result.error) {
+      setError(t('Incorrect email or password. Please try again.', 'Email ou senha incorretos. Tente novamente.'))
+    }
     setLoading(false)
   }
 
@@ -33,7 +37,7 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
               onClick={onBack}
               className="mb-10 flex items-center gap-2 text-xs font-mono tracking-wider text-text-muted transition-colors hover:text-brand-acid"
             >
-              <ArrowLeft className="h-3.5 w-3.5" /> BACK
+              <ArrowLeft className="h-3.5 w-3.5" /> {t('BACK', 'VOLTAR')}
             </button>
           ) : null}
 
@@ -47,27 +51,28 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
           </div>
 
           <h1 className="mb-1 font-display text-4xl leading-none tracking-wide text-text-primary">
-            WELCOME
+            {t('WELCOME', 'BEM-VINDO')}
             <br />
-            BACK<span className="text-brand-acid">.</span>
+            {t('BACK', 'DE VOLTA')}
+            <span className="text-brand-acid">.</span>
           </h1>
-          <p className="mt-2 mb-10 text-sm text-text-muted">Sign in to continue</p>
+          <p className="mb-10 mt-2 text-sm text-text-muted">{t('Sign in to continue', 'Entre para continuar')}</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="input-label">Email</label>
+              <label className="input-label">{t('Email', 'Email')}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input"
-                placeholder="you@email.com"
+                placeholder={t('you@email.com', 'voce@email.com')}
                 required
                 autoFocus
               />
             </div>
             <div>
-              <label className="input-label">Password</label>
+              <label className="input-label">{t('Password', 'Senha')}</label>
               <div className="relative">
                 <input
                   type={show ? 'text' : 'password'}
@@ -94,19 +99,26 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
             ) : null}
 
             <button type="submit" disabled={loading} className="btn-primary mt-2 flex h-11 w-full items-center justify-center gap-2">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><span>Sign in</span><ArrowRight className="h-4 w-4" /></>}
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <span>{t('Sign in', 'Entrar')}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </button>
           </form>
 
           <p className="mt-8 text-center text-xs text-text-muted">
-            Trouble accessing your account?{' '}
-            <button className="text-brand-acid hover:underline">Contact support</button>
+            {t('Trouble accessing your account?', 'Problemas para acessar sua conta?')}{' '}
+            <button className="text-brand-acid hover:underline">{t('Contact support', 'Falar com suporte')}</button>
           </p>
         </div>
       </div>
 
       <div className="relative hidden flex-1 flex-col items-center justify-center overflow-hidden border-l border-bg-border bg-bg-secondary p-16 lg:flex">
-        <div className="pointer-events-none absolute top-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-brand-acid/6 blur-3xl animate-orb-float" />
+        <div className="pointer-events-none absolute left-1/2 top-1/4 h-96 w-96 -translate-x-1/2 rounded-full bg-brand-acid/6 blur-3xl animate-orb-float" />
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{ backgroundImage: 'linear-gradient(#d4ff00 1px, transparent 1px), linear-gradient(90deg, #d4ff00 1px, transparent 1px)', backgroundSize: '48px 48px' }}
@@ -114,21 +126,29 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
 
         <div className="relative z-10 max-w-md text-center">
           <div className="mb-6 font-display text-6xl leading-none text-text-primary xl:text-7xl">
-            CREATE,
+            {t('CREATE,', 'CRIAR,')}
             <br />
-            SELL,
+            {t('SELL,', 'VENDER,')}
             <br />
-            <span className="text-brand-acid">OPERATE</span>
+            <span className="text-brand-acid">{t('OPERATE', 'OPERAR')}</span>
             <br />
-            AND SCALE
+            {t('AND SCALE', 'E ESCALAR')}
             <br />
-            EVENTS<span className="text-brand-acid">.</span>
+            {t('EVENTS', 'EVENTOS')}
+            <span className="text-brand-acid">.</span>
           </div>
           <p className="mx-auto max-w-xs text-sm leading-relaxed text-text-muted">
-            The complete operating platform for event producers who want to grow with clarity, intelligence and control.
+            {t(
+              'The complete operating platform for event producers who want to grow with clarity, intelligence and control.',
+              'A plataforma operacional completa para produtores que querem crescer com clareza, inteligencia e controle.',
+            )}
           </p>
           <div className="mt-10 grid grid-cols-3 gap-3">
-            {[{ v: '500+', l: 'Events' }, { v: '2M+', l: 'Tickets' }, { v: '99.9%', l: 'Uptime' }].map((s) => (
+            {[
+              { v: '500+', l: t('Events', 'Eventos') },
+              { v: '2M+', l: t('Tickets', 'Ingressos') },
+              { v: '99.9%', l: 'Uptime' },
+            ].map((s) => (
               <div key={s.l} className="rounded-sm border border-bg-border bg-bg-card p-4">
                 <div className="font-display text-2xl leading-none text-brand-acid">{s.v}</div>
                 <div className="mt-1 font-mono text-[11px] tracking-wider text-text-muted">{s.l}</div>

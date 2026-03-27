@@ -12,6 +12,7 @@ import {
 import { useFinancialDashboard, useFinancialMutations } from '@/features/financial/hooks'
 import { ClosureReviewModal, CostEntryModal, ForecastModal, PayoutModal } from '@/features/financial/modals'
 import { ActionConfirmationDialog, PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 import { cn, formatCurrency } from '@/shared/lib'
 import { FinancialClosuresTable } from './FinancialClosuresTable'
 import { FinancialEventsTable } from './FinancialEventsTable'
@@ -22,6 +23,7 @@ import { FinancialPayoutsTable } from './FinancialPayoutsTable'
 import { FinancialReconciliationTable } from './FinancialReconciliationTable'
 
 export function FinancialPageContent() {
+  const { t } = useAppLocale()
   const organization = useAuthStore((state) => state.organization)
   const access = useAccessControl()
   const canManageFinancial = access.can('financial', 'manage')
@@ -94,16 +96,16 @@ export function FinancialPageContent() {
         <div>
           <div className="admin-eyebrow">Finance governance</div>
           <h1 className="admin-title">
-            Financeiro<span className="admin-title-accent">.</span>
+            {t('Financial', 'Financeiro')}<span className="admin-title-accent">.</span>
           </h1>
-          <p className="admin-subtitle">Receita, repasse, forecast e fechamento por evento.</p>
+          <p className="admin-subtitle">{t('Revenue, payouts, forecasting and closure by event.', 'Receita, repasse, forecast e fechamento por evento.')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
-            <RefreshCw className="h-3.5 w-3.5" /> Atualizar
+            <RefreshCw className="h-3.5 w-3.5" /> {t('Refresh', 'Atualizar')}
           </button>
           <button className="btn-secondary flex items-center gap-2 text-xs">
-            <Download className="h-3.5 w-3.5" /> Exportar visao executiva
+            <Download className="h-3.5 w-3.5" /> {t('Export executive view', 'Exportar visao executiva')}
           </button>
           {dashboard.tab === 'costs' && canManageFinancial ? (
             <button
@@ -113,22 +115,22 @@ export function FinancialPageContent() {
               }}
               className="btn-primary flex items-center gap-2"
             >
-              <Plus className="h-4 w-4" /> Novo lancamento
+              <Plus className="h-4 w-4" /> {t('New entry', 'Novo lancamento')}
             </button>
           ) : null}
           {dashboard.tab === 'forecast' && canManageFinancial ? (
             <button onClick={() => openForecastModal()} className="btn-primary flex items-center gap-2">
-              <Plus className="h-4 w-4" /> Atualizar forecast
+              <Plus className="h-4 w-4" /> {t('Update forecast', 'Atualizar forecast')}
             </button>
           ) : null}
           {dashboard.tab === 'payouts' && canManageFinancial ? (
             <button onClick={() => openPayoutModal()} className="btn-primary flex items-center gap-2">
-              <Plus className="h-4 w-4" /> Revisar repasse
+              <Plus className="h-4 w-4" /> {t('Review payout', 'Revisar repasse')}
             </button>
           ) : null}
           {dashboard.tab === 'closure' && canManageFinancial ? (
             <button onClick={() => openClosureModal()} className="btn-primary flex items-center gap-2">
-              <Plus className="h-4 w-4" /> Fechar evento
+              <Plus className="h-4 w-4" /> {t('Close event', 'Fechar evento')}
             </button>
           ) : null}
         </div>
@@ -136,13 +138,13 @@ export function FinancialPageContent() {
 
       <div className="surface-panel reveal flex items-center gap-1 p-2">
         {([
-          { key: 'overview', label: 'Visao geral' },
+          { key: 'overview', label: t('Overview', 'Visao geral') },
           { key: 'forecast', label: 'Forecast' },
-          { key: 'payouts', label: 'Repasses' },
-          { key: 'closure', label: 'Fechamento' },
-          { key: 'dre', label: 'DRE por evento' },
-          { key: 'reconciliation', label: 'Conciliacao' },
-          { key: 'costs', label: 'Lancamentos' },
+          { key: 'payouts', label: t('Payouts', 'Repasses') },
+          { key: 'closure', label: t('Closure', 'Fechamento') },
+          { key: 'dre', label: t('P&L by event', 'DRE por evento') },
+          { key: 'reconciliation', label: t('Reconciliation', 'Conciliacao') },
+          { key: 'costs', label: t('Entries', 'Lancamentos') },
         ] as const).map((tab) => (
           <button
             key={tab.key}
@@ -158,11 +160,11 @@ export function FinancialPageContent() {
       </div>
 
       {dashboard.loading ? (
-        <PageLoadingState title="Carregando financeiro" description="Atualizando previsoes, conciliacao e fechamento por evento." />
+        <PageLoadingState title={t('Loading financials', 'Carregando financeiro')} description={t('Updating forecasts, reconciliation and closure by event.', 'Atualizando previsoes, conciliacao e fechamento por evento.')} />
       ) : dashboard.error ? (
-        <PageErrorState title="ERRO AO CARREGAR FINANCEIRO" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
+        <PageErrorState title={t('Unable to load financials', 'Erro ao carregar financeiro')} description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : !dashboard.overview ? (
-        <PageEmptyState title="NENHUM DADO FINANCEIRO" description="Ainda nao ha dados suficientes para consolidar a visao executiva." icon={<Wallet className="mb-3 h-10 w-10 text-text-muted" />} />
+        <PageEmptyState title={t('No financial data', 'Nenhum dado financeiro')} description={t('There is not enough data yet to consolidate the executive view.', 'Ainda nao ha dados suficientes para consolidar a visao executiva.')} icon={<Wallet className="mb-3 h-10 w-10 text-text-muted" />} />
       ) : (
         <>
           {(dashboard.tab === 'overview' || dashboard.tab === 'dre') && <FinancialExecutiveCards overview={dashboard.overview} />}

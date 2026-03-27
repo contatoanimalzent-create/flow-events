@@ -2,6 +2,7 @@ import { Suspense, lazy, useState } from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
 import { AdminShell, LoadingState } from '@/shared/components'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 import { MotionPage } from '@/shared/motion'
 import { useUIStore } from '@/shared/store'
 import { defaultNavSection, type NavSection } from './navigation'
@@ -24,7 +25,15 @@ const HelpPage = lazy(() => import('@/pages/HelpPage').then((module) => ({ defau
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((module) => ({ default: module.SettingsPage })))
 
 function PageFallback() {
-  return <LoadingState title="Preparando experiencia" description="Estamos montando esta area com a nova fundacao visual." className="mx-6 my-8" />
+  const { t } = useAppLocale()
+
+  return (
+    <LoadingState
+      title={t('Preparing the experience', 'Preparando a experiencia')}
+      description={t('We are assembling this area with the new visual foundation.', 'Estamos montando esta area com a nova fundacao visual.')}
+      className="mx-6 my-8"
+    />
+  )
 }
 
 function renderSection(activeSection: NavSection) {

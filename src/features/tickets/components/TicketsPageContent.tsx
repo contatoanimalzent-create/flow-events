@@ -6,10 +6,12 @@ import { useTicketActions, useTicketsList } from '@/features/tickets/hooks'
 import { TicketBatchModal, TicketTypeModal } from '@/features/tickets/modals'
 import type { TicketBatch, TicketTypeWithBatches } from '@/features/tickets/types'
 import { ActionConfirmationDialog, PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 import { cn } from '@/shared/lib'
 import { TicketTypeCard } from './TicketTypeCard'
 
 export function TicketsPageContent() {
+  const { t } = useAppLocale()
   const organization = useAuthStore((state) => state.organization)
   const access = useAccessControl()
   const canManageTickets = access.can('tickets', 'manage')
@@ -51,20 +53,20 @@ export function TicketsPageContent() {
         <div>
           <div className="admin-eyebrow">Inventory architecture</div>
           <h1 className="admin-title">
-            Ingressos<span className="admin-title-accent">.</span>
+            {t('Tickets', 'Ingressos')}<span className="admin-title-accent">.</span>
           </h1>
-          <p className="admin-subtitle">Tipos de ingresso e lotes de venda.</p>
+          <p className="admin-subtitle">{t('Ticket types and sales releases.', 'Tipos de ingresso e lotes de venda.')}</p>
         </div>
         {canManageTickets ? (
           <button onClick={openCreateTypeModal} disabled={!selectedEventId} className="btn-primary flex items-center gap-2">
-            <Plus className="h-4 w-4" /> Novo tipo
+            <Plus className="h-4 w-4" /> {t('New type', 'Novo tipo')}
           </button>
         ) : null}
       </div>
 
       {events.length > 1 && (
         <div className="admin-filterbar">
-          <span className="text-xs font-mono text-text-muted">EVENTO:</span>
+          <span className="text-xs font-mono text-text-muted">{t('EVENT', 'EVENTO')}:</span>
           <div className="flex flex-wrap items-center gap-2">
             {events.map((event) => (
               <button
@@ -108,35 +110,35 @@ export function TicketsPageContent() {
       )}
 
       {loading && (
-        <PageLoadingState title="Carregando ingressos" description="Montando tipos e lotes do evento selecionado." />
+        <PageLoadingState title={t('Loading tickets', 'Carregando ingressos')} description={t('Building ticket types and releases for the selected event.', 'Montando tipos e lotes do evento selecionado.')} />
       )}
 
       {!loading && error && (
         <PageErrorState
-          title="ERRO AO CARREGAR INGRESSOS"
+          title={t('Unable to load tickets', 'Erro ao carregar ingressos')}
           description={error}
           icon={<Ticket className="mb-3 h-10 w-10 text-status-error" />}
           action={
             <button onClick={() => void refreshTickets()} className="btn-primary">
-              Tentar novamente
+              {t('Try again', 'Tentar novamente')}
             </button>
           }
         />
       )}
 
       {!loading && !error && events.length === 0 && (
-        <PageEmptyState title="NENHUM EVENTO" description="Crie um evento primeiro para adicionar ingressos." icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />} />
+        <PageEmptyState title={t('No events', 'Nenhum evento')} description={t('Create an event first to add tickets.', 'Crie um evento primeiro para adicionar ingressos.')} icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />} />
       )}
 
       {!loading && !error && events.length > 0 && allTicketTypes.length === 0 && (
         <PageEmptyState
-          title="NENHUM TIPO DE INGRESSO"
-          description="Adicione tipos de ingresso para comecar a vender."
+          title={t('No ticket types', 'Nenhum tipo de ingresso')}
+          description={t('Add ticket types to start selling.', 'Adicione tipos de ingresso para comecar a vender.')}
           icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />}
           action={
             canManageTickets ? (
             <button onClick={openCreateTypeModal} className="btn-primary">
-              + Novo tipo de ingresso
+              + {t('New ticket type', 'Novo tipo de ingresso')}
             </button>
             ) : undefined
           }
@@ -188,10 +190,10 @@ export function TicketsPageContent() {
 
       <ActionConfirmationDialog
         open={Boolean(pendingDeleteTicket)}
-        title="Remover tipo de ingresso"
-        description={pendingDeleteTicket ? `O tipo "${pendingDeleteTicket.name}" e todos os lotes vinculados serao removidos.` : undefined}
-        impact="A exclusao afeta a arquitetura comercial desse ingresso e remove sua configuracao do catalogo administrativo."
-        confirmLabel="Excluir tipo e lotes"
+        title={t('Remove ticket type', 'Remover tipo de ingresso')}
+        description={pendingDeleteTicket ? t(`The type "${pendingDeleteTicket.name}" and all linked releases will be removed.`, `O tipo "${pendingDeleteTicket.name}" e todos os lotes vinculados serao removidos.`) : undefined}
+        impact={t('This deletion changes the commercial structure of the ticket and removes its setup from the administrative catalog.', 'A exclusao afeta a arquitetura comercial desse ingresso e remove sua configuracao do catalogo administrativo.')}
+        confirmLabel={t('Delete type and releases', 'Excluir tipo e lotes')}
         onCancel={() => setPendingDeleteTicket(null)}
         onConfirm={async () => {
           if (!pendingDeleteTicket) {
@@ -205,10 +207,10 @@ export function TicketsPageContent() {
 
       <ActionConfirmationDialog
         open={Boolean(pendingDeleteBatch)}
-        title="Remover lote"
-        description={pendingDeleteBatch ? `O lote "${pendingDeleteBatch.name}" sera retirado da estrutura de vendas.` : undefined}
-        impact="Use esta acao apenas quando o lote nao deve mais existir no planejamento comercial do ingresso."
-        confirmLabel="Excluir lote"
+        title={t('Remove release', 'Remover lote')}
+        description={pendingDeleteBatch ? t(`The release "${pendingDeleteBatch.name}" will be removed from the sales structure.`, `O lote "${pendingDeleteBatch.name}" sera retirado da estrutura de vendas.`) : undefined}
+        impact={t('Use this action only when the release should no longer exist in the commercial planning of the ticket.', 'Use esta acao apenas quando o lote nao deve mais existir no planejamento comercial do ingresso.')}
+        confirmLabel={t('Delete release', 'Excluir lote')}
         onCancel={() => setPendingDeleteBatch(null)}
         onConfirm={async () => {
           if (!pendingDeleteBatch) {

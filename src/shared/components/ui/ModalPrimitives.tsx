@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { X } from 'lucide-react'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 import { cn } from '@/shared/lib'
 
 interface ModalShellProps {
@@ -255,27 +256,29 @@ export function ActionConfirmationDialog({
   description,
   impact,
   confirmLabel,
-  cancelLabel = 'Voltar',
+  cancelLabel,
   confirming = false,
   onConfirm,
   onCancel,
 }: ActionConfirmationDialogProps) {
+  const { t } = useAppLocale()
+
   if (!open) {
     return null
   }
 
   return (
     <ModalShell size="md" className="z-[130]">
-      <ModalHeader eyebrow="Confirmacao" title={title} subtitle={description} onClose={onCancel} />
+      <ModalHeader eyebrow={t('Confirmation', 'Confirmacao')} title={title} subtitle={description} onClose={onCancel} />
       <ModalBody>
-        <ConfirmActionBox tone={tone} title="Impacto desta acao" description={impact} />
+        <ConfirmActionBox tone={tone} title={t('Impact of this action', 'Impacto desta acao')} description={impact} />
       </ModalBody>
       <ModalFooter>
         <button onClick={onCancel} className="btn-secondary text-sm">
-          {cancelLabel}
+          {cancelLabel ?? t('Back', 'Voltar')}
         </button>
         <button onClick={() => void onConfirm()} className={tone === 'danger' ? 'btn-danger text-sm' : 'btn-primary text-sm'} disabled={confirming}>
-          {confirming ? 'Processando...' : confirmLabel}
+          {confirming ? t('Processing...', 'Processando...') : confirmLabel}
         </button>
       </ModalFooter>
     </ModalShell>

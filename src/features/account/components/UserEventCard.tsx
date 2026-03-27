@@ -1,6 +1,7 @@
 import { CalendarDays, MapPin, Ticket } from 'lucide-react'
 import type { AccountEventRecord } from '@/features/account/types'
 import { PremiumBadge, PublicReveal } from '@/features/public'
+import { formatLocaleDate, useAppLocale } from '@/shared/i18n/app-locale'
 
 interface UserEventCardProps {
   event: AccountEventRecord
@@ -8,19 +9,21 @@ interface UserEventCardProps {
   onSelect: (eventId: string) => void
 }
 
-function getEventStatusLabel(event: AccountEventRecord) {
+function getEventStatusLabel(event: AccountEventRecord, isPortuguese: boolean) {
   if (event.timeframe === 'past' && event.usedTicketCount > 0) {
-    return 'Vivido'
+    return isPortuguese ? 'Vivido' : 'Experienced'
   }
 
   if (event.timeframe === 'past') {
-    return 'Encerrado'
+    return isPortuguese ? 'Encerrado' : 'Closed'
   }
 
-  return 'Proximo acesso'
+  return isPortuguese ? 'Proximo acesso' : 'Next access'
 }
 
 export function UserEventCard({ event, active = false, onSelect }: UserEventCardProps) {
+  const { locale, isPortuguese, t } = useAppLocale()
+
   return (
     <PublicReveal>
       <button
@@ -42,32 +45,26 @@ export function UserEventCard({ event, active = false, onSelect }: UserEventCard
         <div className="relative z-10 flex h-full flex-col justify-between p-5 text-white md:p-6">
           <div className="flex flex-wrap gap-2">
             <PremiumBadge tone="default" className="border-white/20 bg-white/12 text-white">
-              {getEventStatusLabel(event)}
+              {getEventStatusLabel(event, isPortuguese)}
             </PremiumBadge>
             <PremiumBadge tone="default" className="border-white/16 bg-black/15 text-white/78">
-              {event.category || 'Experiencia'}
+              {event.category || t('Experience', 'Experiencia')}
             </PremiumBadge>
           </div>
 
           <div>
             <div className="text-[11px] uppercase tracking-[0.28em] text-white/62">
-              {new Date(event.startsAt).toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              })}
+              {formatLocaleDate(event.startsAt, locale, { day: '2-digit', month: 'long', year: 'numeric' })}
             </div>
             <div className="mt-3 font-display text-[2.2rem] font-semibold leading-[0.92] tracking-[-0.04em] text-white">
               {event.name}
             </div>
-            {event.subtitle ? (
-              <p className="mt-3 max-w-sm text-sm leading-7 text-white/74">{event.subtitle}</p>
-            ) : null}
+            {event.subtitle ? <p className="mt-3 max-w-sm text-sm leading-7 text-white/74">{event.subtitle}</p> : null}
 
             <div className="mt-5 grid gap-2 text-sm text-white/72">
               <div className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-white/58" />
-                <span>{new Date(event.startsAt).toLocaleString('pt-BR')}</span>
+                <span>{new Date(event.startsAt).toLocaleString(locale)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-white/58" />
@@ -78,9 +75,9 @@ export function UserEventCard({ event, active = false, onSelect }: UserEventCard
             <div className="mt-6 flex items-center justify-between border-t border-white/12 pt-5">
               <div className="flex items-center gap-2 text-sm text-white/82">
                 <Ticket className="h-4 w-4 text-white/64" />
-                {event.ticketsCount} ingresso{event.ticketsCount > 1 ? 's' : ''}
+                {event.ticketsCount} {t(event.ticketsCount > 1 ? 'tickets' : 'ticket', event.ticketsCount > 1 ? 'ingressos' : 'ingresso')}
               </div>
-              <span className="text-sm font-medium text-white/78">Abrir acesso</span>
+              <span className="text-sm font-medium text-white/78">{t('Open access', 'Abrir acesso')}</span>
             </div>
           </div>
         </div>

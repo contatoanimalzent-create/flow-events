@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { AuthProvider } from '@/features/auth'
+import { AppLocaleProvider } from '@/shared/i18n/app-locale'
 import { QueryProvider } from './QueryProvider'
 
 interface AppProvidersProps {
@@ -9,7 +10,9 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryProvider>
-      <AuthProvider>{children}</AuthProvider>
+      <AppLocaleProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </AppLocaleProvider>
     </QueryProvider>
   )
 }

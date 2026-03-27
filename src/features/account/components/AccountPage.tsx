@@ -4,6 +4,7 @@ import { useAuthStore } from '@/features/auth'
 import { PublicLayout } from '@/features/public'
 import { useAccountOverview } from '@/features/account/hooks'
 import { EmptyState, ErrorState, LoadingState, PageHeader } from '@/shared/components'
+import { useAppLocale } from '@/shared/i18n/app-locale'
 import { UserEventDetail } from './UserEventDetail'
 import { UserEventsSection } from './UserEventsSection'
 import { UserHeader } from './UserHeader'
@@ -12,6 +13,7 @@ export function AccountPage() {
   const signOut = useAuthStore((state) => state.signOut)
   const overviewQuery = useAccountOverview()
   const overview = overviewQuery.data
+  const { t } = useAppLocale()
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
 
   const allEvents = useMemo(
@@ -25,9 +27,7 @@ export function AccountPage() {
       return
     }
 
-    setSelectedEventId((current) =>
-      current && allEvents.some((event) => event.id === current) ? current : allEvents[0].id,
-    )
+    setSelectedEventId((current) => (current && allEvents.some((event) => event.id === current) ? current : allEvents[0].id))
   }, [allEvents])
 
   const selectedEvent = allEvents.find((event) => event.id === selectedEventId) ?? allEvents[0] ?? null
@@ -37,26 +37,38 @@ export function AccountPage() {
       <div className="px-5 py-8 md:px-10 lg:px-16 lg:py-10">
         <div className="mx-auto max-w-7xl space-y-8">
           <PageHeader
-            eyebrow="Account"
-            title="Seus eventos, seus tickets, seu acesso."
-            description="Uma area autenticada pensada para o pos-compra: simples para abrir, clara para usar e pronta para acompanhar voce ate a entrada."
+            eyebrow={t('Account', 'Conta')}
+            title={t('Your events, your tickets, your access.', 'Seus eventos, seus ingressos, seu acesso.')}
+            description={t(
+              'An authenticated area built for post-purchase: simple to open, clear to use and ready to carry you all the way to entry.',
+              'Uma area autenticada pensada para o pos-compra: simples para abrir, clara para usar e pronta para acompanhar voce ate a entrada.',
+            )}
           />
 
           {overviewQuery.isPending ? (
             <LoadingState
-              title="Carregando sua conta"
-              description="Estamos reunindo seus eventos comprados, tickets digitais e historico recente."
+              title={t('Loading your account', 'Carregando sua conta')}
+              description={t(
+                'We are gathering your purchased events, digital tickets and recent history.',
+                'Estamos reunindo seus eventos comprados, ingressos digitais e historico recente.',
+              )}
               className="min-h-[20rem]"
             />
           ) : overviewQuery.isError ? (
             <ErrorState
-              title="Nao foi possivel abrir sua conta agora"
-              description="Tente novamente em instantes. Seus ingressos continuam seguros na plataforma."
+              title={t('Unable to open your account right now', 'Nao foi possivel abrir sua conta agora')}
+              description={t(
+                'Try again in a moment. Your tickets remain safe inside the platform.',
+                'Tente novamente em instantes. Seus ingressos continuam seguros na plataforma.',
+              )}
             />
           ) : !overview ? (
             <EmptyState
-              title="Sua conta ainda nao tem acessos carregados"
-              description="Assim que um pedido confirmado estiver associado ao seu e-mail, ele aparece aqui automaticamente."
+              title={t('Your account does not have any access loaded yet', 'Sua conta ainda nao tem acessos carregados')}
+              description={t(
+                'As soon as a confirmed order is linked to your email, it appears here automatically.',
+                'Assim que um pedido confirmado estiver associado ao seu email, ele aparece aqui automaticamente.',
+              )}
             />
           ) : (
             <>
@@ -64,15 +76,18 @@ export function AccountPage() {
 
               {overview.stats.totalEvents === 0 ? (
                 <EmptyState
-                  title="Nenhum evento associado ao seu perfil"
-                  description="Quando voce concluir uma compra ou inscricao, seus tickets e instrucoes passam a aparecer aqui."
+                  title={t('No events linked to your profile', 'Nenhum evento associado ao seu perfil')}
+                  description={t(
+                    'Once you complete a purchase or registration, your tickets and instructions will appear here.',
+                    'Quando voce concluir uma compra ou inscricao, seus ingressos e instrucoes passam a aparecer aqui.',
+                  )}
                   action={
                     <a
                       href="/events"
                       className="inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-5 py-3 text-sm font-medium text-[#f8f3ea]"
                     >
                       <Ticket className="h-4 w-4" />
-                      Explorar eventos
+                      {t('Explore events', 'Explorar eventos')}
                     </a>
                   }
                 />
@@ -80,23 +95,35 @@ export function AccountPage() {
                 <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_28rem]">
                   <div className="space-y-8">
                     <UserEventsSection
-                      title="Proximos eventos"
-                      description="Acessos ativos e experiencias que ja fazem parte da sua agenda."
+                      title={t('Upcoming events', 'Proximos eventos')}
+                      description={t(
+                        'Active access and experiences already on your agenda.',
+                        'Acessos ativos e experiencias que ja fazem parte da sua agenda.',
+                      )}
                       events={overview.upcomingEvents}
                       activeEventId={selectedEventId}
                       onSelect={setSelectedEventId}
-                      emptyTitle="Nenhum evento futuro no momento"
-                      emptyDescription="Quando uma nova experiencia estiver confirmada, ela aparece aqui com acesso rapido ao ticket."
+                      emptyTitle={t('No upcoming events right now', 'Nenhum evento futuro no momento')}
+                      emptyDescription={t(
+                        'When a new experience is confirmed, it will appear here with quick ticket access.',
+                        'Quando uma nova experiencia estiver confirmada, ela aparece aqui com acesso rapido ao ticket.',
+                      )}
                     />
 
                     <UserEventsSection
-                      title="Eventos passados"
-                      description="Historico recente para voce reencontrar tickets usados e experiencias anteriores."
+                      title={t('Past events', 'Eventos passados')}
+                      description={t(
+                        'Recent history so you can revisit used tickets and previous experiences.',
+                        'Historico recente para voce reencontrar ingressos usados e experiencias anteriores.',
+                      )}
                       events={overview.pastEvents}
                       activeEventId={selectedEventId}
                       onSelect={setSelectedEventId}
-                      emptyTitle="Seu historico ainda esta vazio"
-                      emptyDescription="Depois do primeiro evento, este espaco vira sua memoria de experiencias ja vividas."
+                      emptyTitle={t('Your history is still empty', 'Seu historico ainda esta vazio')}
+                      emptyDescription={t(
+                        'After your first event, this space becomes your memory of experiences already lived.',
+                        'Depois do primeiro evento, este espaco vira sua memoria de experiencias ja vividas.',
+                      )}
                     />
                   </div>
 

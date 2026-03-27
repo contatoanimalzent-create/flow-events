@@ -26,13 +26,14 @@ export function PublicLayout({
   return (
     <div className={cn('min-h-screen bg-bg-primary text-text-primary luxury-canvas', className)}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-[-8rem] top-[-10rem] h-[26rem] w-[26rem] rounded-full bg-[#f0dfbf]/35 blur-3xl" />
-        <div className="absolute bottom-[-12rem] right-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[#ead8c6]/40 blur-3xl" />
+        <div className="absolute left-[-8rem] top-[-10rem] h-[26rem] w-[26rem] rounded-full bg-[#ff2d2d]/22 blur-3xl" />
+        <div className="absolute bottom-[-12rem] right-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[#445066]/18 blur-3xl" />
         <div
-          className="absolute inset-0 opacity-50"
+          className="absolute inset-0 opacity-60"
           style={{
-            backgroundImage: 'linear-gradient(rgba(120,104,78,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(120,104,78,0.06) 1px, transparent 1px)',
-            backgroundSize: '64px 64px',
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px), repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0 2px, transparent 2px 16px)',
+            backgroundSize: '72px 72px, 72px 72px, auto',
             maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.4), transparent 85%)',
           }}
         />

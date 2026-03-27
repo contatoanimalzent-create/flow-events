@@ -19,9 +19,9 @@ export const typographyScale = {
     display: '-0.04em',
   },
   fontFamily: {
-    display: "'Cormorant Garamond', serif",
-    body: "'DM Sans', system-ui, sans-serif",
-    mono: "'DM Mono', monospace",
+    display: "'Barlow Condensed', sans-serif",
+    body: "'Manrope', system-ui, sans-serif",
+    mono: "'IBM Plex Mono', monospace",
   },
 } as const
 

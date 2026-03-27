@@ -5,8 +5,8 @@ export const surfaceSystem = {
     accent: 'glass-accent',
   },
   border: {
-    subtle: 'rgba(193, 178, 154, 0.42)',
-    strong: 'rgba(138, 115, 82, 0.22)',
+    subtle: 'rgba(255, 255, 255, 0.05)',
+    strong: 'rgba(255, 45, 45, 0.18)',
   },
   material: {
     admin: 'luxury-paper',

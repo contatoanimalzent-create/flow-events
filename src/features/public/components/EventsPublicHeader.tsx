@@ -57,11 +57,14 @@ export function EventsPublicHeader({
     >
       <div className="border-b border-white/6 bg-[linear-gradient(90deg,rgba(255,45,45,0.15),rgba(255,45,45,0.03),transparent)]">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-2 text-[11px] uppercase tracking-[0.28em] text-white/58 md:px-10 lg:px-16">
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2 leading-none">
             <span className="h-2 w-2 rounded-full bg-[#ff2d2d]" />
-            Premium access, hospitality e experiences em curadoria
+            <span className="truncate">Premium access, hospitality e experiences em curadoria</span>
           </div>
-          <a href="/help" className="hidden items-center gap-2 text-white/58 transition-colors hover:text-white md:inline-flex">
+          <a
+            href="/help"
+            className="hidden shrink-0 items-center gap-2 rounded-full border border-white/8 bg-white/[0.04] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/76 transition-all duration-300 hover:border-[#ff2d2d]/30 hover:bg-white/[0.08] hover:text-white md:inline-flex"
+          >
             <Headphones className="h-3.5 w-3.5" />
             Concierge e suporte
           </a>
@@ -75,10 +78,12 @@ export function EventsPublicHeader({
         )}
       >
         <a href="/" className="flex items-center gap-3 no-underline">
-          <img src="/logo.png" alt="Animalz Events" className="h-10 w-auto object-contain" />
-          <div className="hidden md:block">
-            <div className="text-[10px] uppercase tracking-[0.34em] text-[#ff6a5c]">Animalz Events</div>
-            <div className="mt-1 font-display text-[1.2rem] uppercase tracking-[0.12em] text-[#f5f7fa]">Experiences</div>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/95 p-2 shadow-[0_10px_24px_rgba(0,0,0,0.18)]">
+            <img src="/logo.png" alt="Animalz Events" className="h-full w-full object-contain" />
+          </div>
+          <div className="hidden min-w-0 self-center md:flex md:flex-col md:justify-center">
+            <div className="text-[10px] uppercase tracking-[0.34em] leading-none text-[#ff6a5c]">Animalz Events</div>
+            <div className="mt-1.5 font-display text-[1.24rem] uppercase tracking-[0.12em] leading-none text-[#f5f7fa]">Experiences</div>
           </div>
         </a>
 

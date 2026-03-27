@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Copy, Instagram, Link2, Loader2, MessageCircle, Send } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { growthService } from '@/features/growth/services/growth.service'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 
 interface ShareButtonsProps {
   organizationId: string
@@ -23,6 +24,7 @@ export function ShareButtons({
   className,
 }: ShareButtonsProps) {
   const user = useAuthStore((state) => state.user)
+  const { isPortuguese } = usePublicLocale()
   const [isGenerating, setIsGenerating] = useState(false)
   const [copiedState, setCopiedState] = useState<'idle' | 'copied'>('idle')
 
@@ -61,7 +63,7 @@ export function ShareButtons({
 
   async function openShare(channel: 'whatsapp' | 'telegram' | 'instagram') {
     const shareUrl = await resolveShareUrl()
-    const shareText = `${eventName}${description ? ` — ${description}` : ''}`
+    const shareText = `${eventName}${description ? ` - ${description}` : ''}`
 
     if (channel === 'instagram') {
       await navigator.clipboard.writeText(shareUrl)
@@ -98,8 +100,20 @@ export function ShareButtons({
         Telegram
       </button>
       <button type="button" onClick={() => void copyLink()} className={buttonClassName}>
-        {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : copiedState === 'copied' ? <Copy className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
-        {copiedState === 'copied' ? 'Link copiado' : 'Copiar link'}
+        {isGenerating ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : copiedState === 'copied' ? (
+          <Copy className="h-4 w-4" />
+        ) : (
+          <Link2 className="h-4 w-4" />
+        )}
+        {copiedState === 'copied'
+          ? isPortuguese
+            ? 'Link copiado'
+            : 'Link copied'
+          : isPortuguese
+            ? 'Copiar link'
+            : 'Copy link'}
       </button>
     </div>
   )

@@ -1,6 +1,7 @@
 import type { PublicEventSummary } from '@/features/public/types/public.types'
 import { EventScheduleCard } from './EventScheduleCard'
 import { PublicReveal } from './PublicReveal'
+import { usePublicLocale } from '../lib/public-locale'
 
 interface EventsScheduleListProps {
   events: PublicEventSummary[]
@@ -9,6 +10,7 @@ interface EventsScheduleListProps {
 }
 
 export function EventsScheduleList({ events, title, subtitle }: EventsScheduleListProps) {
+  const { isPortuguese } = usePublicLocale()
   if (events.length === 0) {
     return null
   }
@@ -32,7 +34,7 @@ export function EventsScheduleList({ events, title, subtitle }: EventsScheduleLi
                 {subtitle ? <p className="mt-4 text-base leading-8 text-white/68 md:text-lg">{subtitle}</p> : null}
               </div>
               <div className="text-[11px] uppercase tracking-[0.28em] text-white/42">
-                {sortedEvents.length} experiencias disponiveis
+                {sortedEvents.length} {isPortuguese ? 'experiencias disponiveis' : 'experiences available'}
               </div>
             </div>
           </PublicReveal>

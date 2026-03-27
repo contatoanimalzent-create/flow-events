@@ -2,7 +2,7 @@ import { ArrowRight, CalendarDays, MapPin, Sparkles, Users } from 'lucide-react'
 import type { EventMediaPresentation } from '@/features/event-media/types'
 import { EventHeroMedia } from '@/features/event-media'
 import type { PublicEventRecord } from '@/features/public/types/public.types'
-import { formatCurrency } from '@/shared/lib'
+import { formatPublicCurrency, formatPublicDate, formatPublicNumber, usePublicLocale } from '../lib/public-locale'
 import { PremiumBadge } from './PremiumBadge'
 import { PublicReveal } from './PublicReveal'
 
@@ -29,6 +29,7 @@ export function EventCinematicHero({
   isFreeMode,
   minPrice,
 }: EventCinematicHeroProps) {
+  const { locale, isPortuguese } = usePublicLocale()
   const occupancy = event.total_capacity > 0 ? Math.round((event.sold_tickets / event.total_capacity) * 100) : 0
 
   return (
@@ -47,25 +48,31 @@ export function EventCinematicHero({
 
           <div className="relative z-10 flex min-h-[calc(100svh-7.25rem)] flex-col justify-between p-7 text-white md:p-10 lg:p-14">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <PublicReveal className="flex flex-wrap gap-3">
-                <PremiumBadge tone="default" className="border-white/16 bg-white/10 text-white">
-                  {event.category || 'Evento'}
-                </PremiumBadge>
-                <PremiumBadge tone="default" className="border-white/16 bg-black/12 text-white/84">
-                  {getStatusLabel(event.status)}
-                </PremiumBadge>
-              </PublicReveal>
+                <PublicReveal className="flex flex-wrap gap-3">
+                  <PremiumBadge tone="default" className="border-white/16 bg-white/10 text-white">
+                    {event.category || (isPortuguese ? 'Evento' : 'Event')}
+                  </PremiumBadge>
+                  <PremiumBadge tone="default" className="border-white/16 bg-black/12 text-white/84">
+                    {event.status === 'ongoing' ? (isPortuguese ? 'Ao vivo' : 'Live') : event.status === 'published' ? (isPortuguese ? 'Proxima janela' : 'Next release') : (isPortuguese ? 'Experiencia' : 'Experience')}
+                  </PremiumBadge>
+                </PublicReveal>
             </div>
 
             <div className="grid gap-10 xl:grid-cols-[minmax(0,1.08fr)_23rem] xl:items-end">
               <div className="max-w-4xl">
                 <PublicReveal>
-                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/54">Featured experience</div>
+                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/54">
+                    {isPortuguese ? 'Experiencia em destaque' : 'Featured experience'}
+                  </div>
                   <h1 className="mt-5 max-w-5xl font-display text-[clamp(4rem,9vw,8.4rem)] font-semibold uppercase leading-[0.83] tracking-[-0.04em] text-white">
                     {event.name}
                   </h1>
                   <p className="mt-6 max-w-2xl text-base leading-8 text-white/80 md:text-lg">
-                    {event.subtitle || event.short_description || 'Garanta seu acesso em uma jornada de compra desenhada para grandes experiencias.'}
+                    {event.subtitle ||
+                      event.short_description ||
+                      (isPortuguese
+                        ? 'Garanta seu acesso em uma jornada de compra desenhada para grandes experiencias.'
+                        : 'Secure your access through a purchase journey designed for premium live experiences.')}
                   </p>
                 </PublicReveal>
 
@@ -74,24 +81,30 @@ export function EventCinematicHero({
                     href="#tickets"
                     className="inline-flex items-center gap-3 rounded-full bg-[#ff2d2d] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-500 hover:-translate-y-1 hover:bg-[#ff4133] hover:shadow-[0_20px_44px_rgba(255,45,45,0.24)]"
                   >
-                    {isFreeMode ? 'Garantir inscricao' : 'Comprar ingressos'}
+                    {isFreeMode ? (isPortuguese ? 'Garantir inscricao' : 'Reserve registration') : (isPortuguese ? 'Comprar ingressos' : 'Buy tickets')}
                     <ArrowRight className="h-4 w-4" />
                   </a>
                   <div className="text-sm text-white/78">
-                    {isFreeMode || minPrice === 0 ? 'Inscricao gratuita' : `a partir de ${formatCurrency(minPrice)}`}
+                    {isFreeMode || minPrice === 0
+                      ? isPortuguese ? 'Inscricao gratuita' : 'Free registration'
+                      : isPortuguese
+                        ? `a partir de ${formatPublicCurrency(minPrice, locale)}`
+                        : `from ${formatPublicCurrency(minPrice, locale)}`}
                   </div>
                 </PublicReveal>
               </div>
 
               <PublicReveal delayMs={180}>
                 <div className="rounded-[2rem] border border-white/12 bg-black/28 p-5 backdrop-blur-md">
-                  <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Event highlights</div>
+                  <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">
+                    {isPortuguese ? 'Destaques do evento' : 'Event highlights'}
+                  </div>
                   <div className="mt-4 grid gap-4">
                     {[
                       {
                         icon: CalendarDays,
-                        label: 'Data',
-                        value: new Date(event.starts_at).toLocaleDateString('pt-BR', {
+                        label: isPortuguese ? 'Data' : 'Date',
+                        value: formatPublicDate(event.starts_at, locale, {
                           day: '2-digit',
                           month: 'long',
                           year: 'numeric',
@@ -99,18 +112,20 @@ export function EventCinematicHero({
                       },
                       {
                         icon: MapPin,
-                        label: 'Local',
+                        label: isPortuguese ? 'Local' : 'Location',
                         value: [event.venue_name, event.venue_address?.city].filter(Boolean).join(' / '),
                       },
                       {
                         icon: Users,
-                        label: 'Demanda',
-                        value: `${occupancy}% da capacidade ocupada`,
+                        label: isPortuguese ? 'Demanda' : 'Demand',
+                        value: isPortuguese ? `${occupancy}% da capacidade ocupada` : `${occupancy}% of capacity committed`,
                       },
                       {
                         icon: Sparkles,
-                        label: 'Acesso',
-                        value: isFreeMode ? 'Inscricao gratuita com QR code' : `${event.sold_tickets.toLocaleString('pt-BR')} ingressos vendidos`,
+                        label: isPortuguese ? 'Acesso' : 'Access',
+                        value: isFreeMode
+                          ? isPortuguese ? 'Inscricao gratuita com QR code' : 'Free registration with QR code'
+                          : `${formatPublicNumber(event.sold_tickets, locale)} ${isPortuguese ? 'ingressos vendidos' : 'tickets sold'}`,
                       },
                     ].map((item) => {
                       const Icon = item.icon

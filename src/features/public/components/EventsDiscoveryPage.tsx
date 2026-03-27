@@ -9,9 +9,11 @@ import {
   PublicReveal,
   RelatedExperiencesGrid,
 } from '@/features/public'
+import { usePublicLocale } from '../lib/public-locale'
 import { usePublicEvents } from '../hooks/usePublicEvents'
 
 export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
+  const { isPortuguese } = usePublicLocale()
   const [search, setSearch] = useState('')
   const [city, setCity] = useState('all')
   const [dateRange, setDateRange] = useState('all')
@@ -95,10 +97,12 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
               <div className="max-w-4xl">
                 <div className="text-[11px] uppercase tracking-[0.34em] text-white/48">Experiences calendar</div>
                 <h1 className="mt-5 font-display text-[clamp(3.6rem,8vw,6.8rem)] font-semibold uppercase leading-[0.84] tracking-[-0.04em] text-white">
-                  Agenda premium de experiencias.
+                  {isPortuguese ? 'Agenda premium de experiencias.' : 'Premium experiences calendar.'}
                 </h1>
                 <p className="mt-5 max-w-2xl text-base leading-8 text-white/68 md:text-lg">
-                  Descubra eventos por cidade, periodo e categoria em uma camada mais direta, mais comercial e muito menos parecida com um marketplace generico.
+                  {isPortuguese
+                    ? 'Descubra eventos por cidade, periodo e categoria em uma camada mais direta, mais comercial e muito menos parecida com um marketplace generico.'
+                    : 'Discover events by city, date range and category through a more direct, more commercial layer that feels far less like a generic marketplace.'}
                 </p>
                 {categories.length > 0 ? (
                   <div className="mt-7 flex flex-wrap gap-3">
@@ -118,9 +122,9 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
 
               <div className="grid gap-4">
                 {[
-                  { label: 'Eventos visiveis', value: `${filteredEvents.length || events.length}` },
-                  { label: 'Cidades ativas', value: `${cityCount}` },
-                  { label: 'Categorias', value: `${categories.length}` },
+                  { label: isPortuguese ? 'Eventos visiveis' : 'Visible events', value: `${filteredEvents.length || events.length}` },
+                  { label: isPortuguese ? 'Cidades ativas' : 'Active cities', value: `${cityCount}` },
+                  { label: isPortuguese ? 'Categorias' : 'Categories', value: `${categories.length}` },
                 ].map((item) => (
                   <div key={item.label} className="rounded-[1.7rem] border border-white/10 bg-black/24 p-5">
                     <div className="text-[10px] uppercase tracking-[0.28em] text-white/42">{item.label}</div>
@@ -158,8 +162,8 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-24 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <LoadingState
-              title="Carregando experiencias"
-              description="Buscando os eventos disponiveis agora."
+              title={isPortuguese ? 'Carregando experiencias' : 'Loading experiences'}
+              description={isPortuguese ? 'Buscando os eventos disponiveis agora.' : 'Loading currently available events.'}
               className="min-h-[18rem]"
             />
           </div>
@@ -168,8 +172,8 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-24 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <EmptyState
-              title="Nenhum evento encontrado"
-              description="Ajuste cidade, data ou categoria para abrir uma nova selecao de experiencias."
+              title={isPortuguese ? 'Nenhuma experiencia encontrada' : 'No experiences found'}
+              description={isPortuguese ? 'Ajuste cidade, data ou categoria para abrir uma nova selecao de experiencias.' : 'Adjust city, date or category to open a new selection of experiences.'}
               className="min-h-[20rem]"
             />
           </div>
@@ -180,11 +184,18 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
 
           <EventsScheduleList
             events={scheduleEvents}
-            title="Upcoming schedule"
-            subtitle="Uma listagem comercial e muito mais facil de percorrer para comparar datas, venues, demanda e acessos disponiveis."
+            title={isPortuguese ? 'Agenda de proximas experiencias' : 'Upcoming schedule'}
+            subtitle={
+              isPortuguese
+                ? 'Uma listagem comercial e muito mais facil de percorrer para comparar datas, venues, demanda e acessos disponiveis.'
+                : 'A commercial list that is much easier to scan for dates, venues, demand and available access.'
+            }
           />
 
-          <RelatedExperiencesGrid events={relatedEvents.length > 0 ? relatedEvents : filteredEvents.slice(0, 4)} title="Explore related experiences" />
+          <RelatedExperiencesGrid
+            events={relatedEvents.length > 0 ? relatedEvents : filteredEvents.slice(0, 4)}
+            title={isPortuguese ? 'Explore experiencias relacionadas' : 'Explore related experiences'}
+          />
           <ExploreMoreSection currentEventId={featuredEvent?.id ?? ''} events={filteredEvents} />
         </>
       )}

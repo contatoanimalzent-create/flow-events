@@ -16,6 +16,7 @@ import {
   usePublicEvent,
   usePublicEvents,
 } from '@/features/public'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 import { formatCurrency, useSeoMeta } from '@/shared/lib'
 
 interface CartItem {
@@ -60,20 +61,24 @@ function LoadingState() {
   )
 }
 
-function NotFoundState() {
+function NotFoundState({ isPortuguese }: { isPortuguese: boolean }) {
   return (
     <PublicLayout showFooter={false}>
       <div className="flex min-h-[70svh] items-center justify-center px-5 text-center md:px-10 lg:px-16">
         <div className="rounded-[2.2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] px-10 py-12 shadow-[0_18px_55px_rgba(0,0,0,0.24)]">
-          <div className="font-display text-[3.4rem] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white">Evento nao encontrado</div>
+          <div className="font-display text-[3.4rem] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white">
+            {isPortuguese ? 'Evento nao encontrado' : 'Experience not found'}
+          </div>
           <p className="mt-4 text-sm leading-7 text-white/66">
-            O link pode ter expirado ou a experiencia nao esta mais publica.
+            {isPortuguese
+              ? 'O link pode ter expirado ou a experiencia nao esta mais publica.'
+              : 'This link may have expired or the experience is no longer public.'}
           </p>
           <a
             href="/events"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-5 py-3 text-sm font-medium uppercase tracking-[0.12em] text-white"
           >
-            Voltar para experiencias
+            {isPortuguese ? 'Voltar para experiencias' : 'Back to experiences'}
             <ArrowRight className="h-4 w-4" />
           </a>
         </div>
@@ -83,6 +88,7 @@ function NotFoundState() {
 }
 
 export function EventPage({ slug }: { slug: string }) {
+  const { isPortuguese } = usePublicLocale()
   const publicEventQuery = usePublicEvent(slug)
   const publicEventsQuery = usePublicEvents()
   const detail = publicEventQuery.data
@@ -190,11 +196,13 @@ export function EventPage({ slug }: { slug: string }) {
   }, [mediaPresentation])
 
   useSeoMeta({
-    title: event ? `${event.name} | Animalz Events` : 'Experiencia | Animalz Events',
+    title: event ? `${event.name} | Animalz Events` : isPortuguese ? 'Experiencia | Animalz Events' : 'Experience | Animalz Events',
     description:
       event?.short_description ||
       event?.full_description ||
-      'Experiencias premium com narrativa forte, agenda clara e checkout refinado.',
+      (isPortuguese
+        ? 'Experiencias premium com narrativa forte, agenda clara e checkout refinado.'
+        : 'Premium experiences with stronger storytelling, a clearer schedule and a refined checkout.'),
     image:
       mediaPresentation?.heroAsset?.thumbnail_url ||
       mediaPresentation?.heroAsset?.secure_url ||
@@ -209,7 +217,7 @@ export function EventPage({ slug }: { slug: string }) {
   }
 
   if (!event || !mediaPresentation) {
-    return <NotFoundState />
+    return <NotFoundState isPortuguese={isPortuguese} />
   }
 
   if (step === 'checkout') {
@@ -261,20 +269,27 @@ export function EventPage({ slug }: { slug: string }) {
   const relatedEvents = (publicEventsQuery.data ?? []).filter((item) => item.id !== event.id)
   const storySections = [
     {
-      eyebrow: 'The experience',
-      title: 'Uma pagina de evento pensada para vender atmosfera antes de vender acesso.',
+      eyebrow: isPortuguese ? 'A experiencia' : 'The experience',
+      title: isPortuguese
+        ? 'Uma pagina de evento pensada para vender atmosfera antes de vender acesso.'
+        : 'An event page built to sell atmosphere before it sells access.',
       description:
         event.full_description ||
-        `${event.name} combina narrativa visual, descoberta premium e uma camada de compra pronta para converter sem perder clareza.`,
+        (isPortuguese
+          ? `${event.name} combina narrativa visual, descoberta premium e uma camada de compra pronta para converter sem perder clareza.`
+          : `${event.name} combines visual storytelling, premium discovery and a purchase flow designed to convert without losing clarity.`),
       asset: storyAssets[0] ?? mediaPresentation.coverAsset,
       reverse: false,
     },
     {
-      eyebrow: 'The venue and journey',
-      title: 'Venue, chegada e beneficios apresentados como parte da experiencia comercial.',
+      eyebrow: isPortuguese ? 'Venue e jornada' : 'The venue and journey',
+      title: isPortuguese
+        ? 'Venue, chegada e beneficios apresentados como parte da experiencia comercial.'
+        : 'Venue, arrival and benefits presented as part of the commercial experience.',
       description:
-        `${event.venue_name || 'O venue'} entra como parte da promessa da pagina: local, horario, capacidade e regras aparecem com leitura rapida, sem cara de ficha tecnica.` +
-        ` O resultado e uma landing mais proxima de um mini-site de evento do que de uma pagina utilitaria.`,
+        (isPortuguese
+          ? `${event.venue_name || 'O venue'} entra como parte da promessa da pagina: local, horario, capacidade e regras aparecem com leitura rapida, sem cara de ficha tecnica. O resultado e uma landing mais proxima de um mini-site de evento do que de uma pagina utilitaria.`
+          : `${event.venue_name || 'The venue'} becomes part of the promise of the page: location, timing, capacity and rules are presented with quick readability instead of a technical sheet. The result feels closer to an event mini-site than a utility page.`),
       asset: storyAssets[1] ?? mediaPresentation.galleryImages[0] ?? mediaPresentation.coverAsset,
       reverse: true,
     },
@@ -302,7 +317,7 @@ export function EventPage({ slug }: { slug: string }) {
               className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-4 py-2.5 text-sm font-medium uppercase tracking-[0.12em] text-white"
             >
               <Ticket className="h-4 w-4" />
-              {cartQty} selecionado{cartQty > 1 ? 's' : ''}
+              {cartQty} {isPortuguese ? `selecionado${cartQty > 1 ? 's' : ''}` : `selected${cartQty > 1 ? '' : ''}`}
             </button>
           ) : null}
         </div>
@@ -329,9 +344,13 @@ export function EventPage({ slug }: { slug: string }) {
       <div className="px-5 pt-6 md:px-10 lg:px-16">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.24)]">
           <div className="max-w-2xl">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">Share and plan</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">
+              {isPortuguese ? 'Compartilhe e planeje' : 'Share and plan'}
+            </div>
             <p className="mt-3 text-sm leading-7 text-white/66">
-              Compartilhe o link do evento, convide seu grupo e avance para a compra quando estiver pronto.
+              {isPortuguese
+                ? 'Compartilhe o link do evento, convide seu grupo e avance para a compra quando estiver pronto.'
+                : 'Share the event link, invite your group and move to purchase when you are ready.'}
             </p>
           </div>
           <ShareButtons
@@ -366,12 +385,22 @@ export function EventPage({ slug }: { slug: string }) {
                     <p className="mt-5 text-base leading-8 text-white/66">{section.description}</p>
 
                     <div className="mt-6 grid gap-3 md:grid-cols-2">
-                      {[
-                        { icon: MapPin, label: 'Venue', value: event.venue_name || 'Venue em curadoria' },
+                        {[
+                        {
+                          icon: MapPin,
+                          label: 'Venue',
+                          value: event.venue_name || (isPortuguese ? 'Venue em curadoria' : 'Curated venue'),
+                        },
                         {
                           icon: ShieldCheck,
-                          label: 'Acesso',
-                          value: isFreeMode ? 'Inscricao digital' : 'Ingresso digital e check-in via QR',
+                          label: isPortuguese ? 'Acesso' : 'Access',
+                          value: isFreeMode
+                            ? isPortuguese
+                              ? 'Inscricao digital'
+                              : 'Digital registration'
+                            : isPortuguese
+                              ? 'Ingresso digital e check-in via QR'
+                              : 'Digital ticket with QR check-in',
                         },
                       ].map((item) => {
                         const Icon = item.icon
@@ -418,16 +447,30 @@ export function EventPage({ slug }: { slug: string }) {
             <div className="rounded-[2.5rem] border border-white/8 bg-[linear-gradient(135deg,#0d1117_0%,#121823_100%)] px-8 py-10 shadow-[0_22px_70px_rgba(0,0,0,0.26)] md:px-10 md:py-12">
               <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                 <div className="max-w-3xl">
-                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/48">Final call</div>
+                  <div className="text-[11px] uppercase tracking-[0.34em] text-white/48">
+                    {isPortuguese ? 'Chamada final' : 'Final call'}
+                  </div>
                   <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.2rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
-                    {isFreeMode ? 'Confirme sua inscricao enquanto o acesso ainda esta aberto.' : 'Garanta seu lugar antes que os lotes avancem.'}
+                    {isFreeMode
+                      ? isPortuguese
+                        ? 'Confirme sua inscricao enquanto o acesso ainda esta aberto.'
+                        : 'Confirm your registration while access is still open.'
+                      : isPortuguese
+                        ? 'Garanta seu lugar antes que os lotes avancem.'
+                        : 'Secure your place before the next release moves forward.'}
                   </h2>
                   <p className="mt-4 text-base leading-8 text-white/66 md:text-lg">
                     {isFreeMode
-                      ? 'A confirmacao acontece em poucos passos e o QR code chega assim que a inscricao for concluida.'
+                      ? isPortuguese
+                        ? 'A confirmacao acontece em poucos passos e o QR code chega assim que a inscricao for concluida.'
+                        : 'Confirmation happens in just a few steps, and the QR code arrives as soon as registration is complete.'
                       : minPrice > 0
-                        ? `Os acessos comecam em ${formatCurrency(minPrice)} e o checkout segue a mesma base operacional do restante da plataforma.`
-                        : 'O checkout foi refinado para manter clareza, velocidade e confianca na ultima etapa da compra.'}
+                        ? isPortuguese
+                          ? `Os acessos comecam em ${formatCurrency(minPrice)} e o checkout segue a mesma base operacional do restante da plataforma.`
+                          : `Access starts at ${formatCurrency(minPrice)} and checkout runs on the same trusted operational foundation as the rest of the platform.`
+                        : isPortuguese
+                          ? 'O checkout foi refinado para manter clareza, velocidade e confianca na ultima etapa da compra.'
+                          : 'Checkout has been refined to keep the final stage of purchase clear, fast and trustworthy.'}
                   </p>
                 </div>
                 <button
@@ -442,7 +485,7 @@ export function EventPage({ slug }: { slug: string }) {
                   }}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white"
                 >
-                  {cartQty > 0 ? 'Ir para checkout' : 'Selecionar ingressos'}
+                  {cartQty > 0 ? (isPortuguese ? 'Ir para checkout' : 'Go to checkout') : isPortuguese ? 'Selecionar ingressos' : 'Select tickets'}
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -451,7 +494,10 @@ export function EventPage({ slug }: { slug: string }) {
         </div>
       </section>
 
-      <RelatedExperiencesGrid events={relatedEvents.slice(0, 4)} title="Continue explorando" />
+      <RelatedExperiencesGrid
+        events={relatedEvents.slice(0, 4)}
+        title={isPortuguese ? 'Continue explorando' : 'Keep exploring'}
+      />
       <ExploreMoreSection currentEventId={event.id} events={publicEventsQuery.data ?? []} />
     </PublicLayout>
   )

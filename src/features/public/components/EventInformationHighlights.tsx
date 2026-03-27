@@ -1,6 +1,7 @@
 import { CalendarDays, Clock3, MapPin, ShieldCheck, Sparkles, Users } from 'lucide-react'
 import type { PublicEventRecord } from '@/features/public/types/public.types'
 import { PublicReveal } from './PublicReveal'
+import { formatPublicDate, formatPublicNumber, formatPublicTime, usePublicLocale } from '../lib/public-locale'
 
 interface EventInformationHighlightsProps {
   event: PublicEventRecord
@@ -8,48 +9,51 @@ interface EventInformationHighlightsProps {
 }
 
 export function EventInformationHighlights({ event, isFreeMode }: EventInformationHighlightsProps) {
+  const { locale, isPortuguese } = usePublicLocale()
   const highlights = [
     {
       icon: CalendarDays,
-      label: 'Data',
-      value: new Date(event.starts_at).toLocaleDateString('pt-BR', {
+      label: isPortuguese ? 'Data' : 'Date',
+      value: formatPublicDate(event.starts_at, locale, {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
       }),
-      note: 'Agenda principal da experiencia',
+      note: isPortuguese ? 'Agenda principal da experiencia' : 'Primary date for the experience',
     },
     {
       icon: Clock3,
-      label: 'Horario',
+      label: isPortuguese ? 'Horario' : 'Time',
       value: event.doors_open_at
-        ? `Portoes as ${new Date(event.doors_open_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
-        : new Date(event.starts_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-      note: 'Chegada recomendada com antecedencia',
+        ? isPortuguese
+          ? `Portoes as ${formatPublicTime(event.doors_open_at, locale)}`
+          : `Doors at ${formatPublicTime(event.doors_open_at, locale)}`
+        : formatPublicTime(event.starts_at, locale),
+      note: isPortuguese ? 'Chegada recomendada com antecedencia' : 'Early arrival is recommended',
     },
     {
       icon: MapPin,
-      label: 'Local',
+      label: isPortuguese ? 'Local' : 'Location',
       value: [event.venue_name, event.venue_address?.city, event.venue_address?.state].filter(Boolean).join(' / '),
-      note: 'Venue preparado para a operacao do evento',
+      note: isPortuguese ? 'Venue preparado para a operacao do evento' : 'Venue prepared for live event operations',
     },
     {
       icon: Users,
-      label: 'Capacidade',
-      value: `${event.total_capacity.toLocaleString('pt-BR')} pessoas`,
-      note: `${event.sold_tickets.toLocaleString('pt-BR')} acessos ja vendidos`,
+      label: isPortuguese ? 'Capacidade' : 'Capacity',
+      value: `${formatPublicNumber(event.total_capacity, locale)} ${isPortuguese ? 'pessoas' : 'people'}`,
+      note: `${formatPublicNumber(event.sold_tickets, locale)} ${isPortuguese ? 'acessos ja vendidos' : 'accesses already sold'}`,
     },
     {
       icon: Sparkles,
-      label: 'Categoria',
-      value: event.category || 'Experiencia premium',
-      note: event.age_rating ? `Classificacao ${event.age_rating}` : 'Curadoria de atmosfera premium',
+      label: isPortuguese ? 'Categoria' : 'Category',
+      value: event.category || (isPortuguese ? 'Experiencia premium' : 'Premium experience'),
+      note: event.age_rating ? (isPortuguese ? `Classificacao ${event.age_rating}` : `Age rating ${event.age_rating}`) : (isPortuguese ? 'Curadoria de atmosfera premium' : 'Curated premium atmosphere'),
     },
     {
       icon: ShieldCheck,
-      label: 'Acesso',
-      value: isFreeMode ? 'Inscricao com QR code digital' : 'Ingresso digital com validacao antifraude',
-      note: 'Compra, emissao e check-in ligados ao mesmo produto',
+      label: isPortuguese ? 'Acesso' : 'Access',
+      value: isFreeMode ? (isPortuguese ? 'Inscricao com QR code digital' : 'Registration with digital QR code') : (isPortuguese ? 'Ingresso digital com validacao antifraude' : 'Digital ticket with anti-fraud validation'),
+      note: isPortuguese ? 'Compra, emissao e check-in ligados ao mesmo produto' : 'Purchase, issuance and check-in connected to the same product',
     },
   ]
 
@@ -58,9 +62,13 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
       <div className="mx-auto max-w-7xl">
         <PublicReveal>
           <div className="max-w-3xl">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">Event information</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">
+              {isPortuguese ? 'Informacoes do evento' : 'Event information'}
+            </div>
             <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.3rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
-              Informacoes essenciais, apresentadas como parte da experiencia.
+              {isPortuguese
+                ? 'Informacoes essenciais, apresentadas como parte da experiencia.'
+                : 'Essential information, presented as part of the experience.'}
             </h2>
           </div>
         </PublicReveal>

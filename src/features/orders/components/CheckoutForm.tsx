@@ -1,48 +1,77 @@
 import { PublicReveal } from '@/features/public/components/PublicReveal'
 import type { CheckoutBuyerForm } from '@/features/orders/types'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 
 interface CheckoutFormProps {
   buyer: CheckoutBuyerForm
   setBuyerField: <TKey extends keyof CheckoutBuyerForm>(field: TKey, value: CheckoutBuyerForm[TKey]) => void
 }
 
-const FIELDS: Array<{
-  key: keyof CheckoutBuyerForm
-  label: string
-  type: string
-  placeholder: string
-  helper?: string
-}> = [
-  { key: 'name', label: 'Nome completo *', type: 'text', placeholder: 'Seu nome como deseja receber a confirmacao' },
-  { key: 'email', label: 'E-mail *', type: 'email', placeholder: 'seu@email.com', helper: 'Enviaremos confirmacao e ticket digital para este endereco.' },
-  { key: 'phone', label: 'WhatsApp', type: 'tel', placeholder: '(00) 00000-0000', helper: 'Usado apenas para atualizacoes relevantes da compra.' },
-  { key: 'cpf', label: 'Documento', type: 'text', placeholder: 'CPF ou documento exigido pelo evento', helper: 'Preencha se a experiencia exigir identificacao nominal.' },
-]
-
 export function CheckoutForm({ buyer, setBuyerField }: CheckoutFormProps) {
+  const { isPortuguese } = usePublicLocale()
+  const fields = [
+    {
+      key: 'name',
+      label: isPortuguese ? 'Nome completo *' : 'Full name *',
+      type: 'text',
+      placeholder: isPortuguese ? 'Seu nome como deseja receber a confirmacao' : 'Your name as it should appear on the confirmation',
+    },
+    {
+      key: 'email',
+      label: 'E-mail *',
+      type: 'email',
+      placeholder: isPortuguese ? 'seu@email.com' : 'you@email.com',
+      helper: isPortuguese ? 'Enviaremos confirmacao e ticket digital para este endereco.' : 'We will send confirmation and digital ticket details to this address.',
+    },
+    {
+      key: 'phone',
+      label: isPortuguese ? 'WhatsApp' : 'Phone',
+      type: 'tel',
+      placeholder: isPortuguese ? '(00) 00000-0000' : '+1 (000) 000-0000',
+      helper: isPortuguese ? 'Usado apenas para atualizacoes relevantes da compra.' : 'Used only for relevant purchase updates.',
+    },
+    {
+      key: 'cpf',
+      label: isPortuguese ? 'Documento' : 'Document',
+      type: 'text',
+      placeholder: isPortuguese ? 'CPF ou documento exigido pelo evento' : 'ID or document required by the event',
+      helper: isPortuguese ? 'Preencha se a experiencia exigir identificacao nominal.' : 'Fill this in if the experience requires named identification.',
+    },
+  ] as Array<{
+    key: keyof CheckoutBuyerForm
+    label: string
+    type: string
+    placeholder: string
+    helper?: string
+  }>
+
   return (
     <PublicReveal>
-      <div className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(248,242,234,0.8))] p-6 shadow-[0_18px_55px_rgba(48,35,18,0.06)] md:p-7">
-        <div className="text-[11px] uppercase tracking-[0.3em] text-[#8e7f68]">Buyer details</div>
-        <div className="mt-4 font-display text-[2.4rem] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
-          Quem recebe esta experiencia?
+      <div className="rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.24)] md:p-7">
+        <div className="text-[11px] uppercase tracking-[0.3em] text-white/46">
+          {isPortuguese ? 'Dados do comprador' : 'Buyer details'}
         </div>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-[#5f5549]">
-          Um formulario curto, claro e sem friccao. Apenas o necessario para reservar, pagar e emitir os ingressos com seguranca.
+        <div className="mt-4 font-display text-[2.4rem] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
+          {isPortuguese ? 'Quem recebe esta experiencia?' : 'Who receives this experience?'}
+        </div>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-white/66">
+          {isPortuguese
+            ? 'Um formulario curto, claro e sem friccao. Apenas o necessario para reservar, pagar e emitir os ingressos com seguranca.'
+            : 'A short, clear and low-friction form. Only what is needed to reserve, pay and issue tickets with confidence.'}
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {FIELDS.map((field) => (
+          {fields.map((field) => (
             <div key={field.key} className={field.key === 'email' ? 'md:col-span-2' : ''}>
-              <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-[#8e7f68]">{field.label}</label>
+              <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-white/46">{field.label}</label>
               <input
                 type={field.type}
                 placeholder={field.placeholder}
                 value={buyer[field.key]}
                 onChange={(event) => setBuyerField(field.key, event.target.value)}
-                className="w-full rounded-[1.3rem] border border-[#ddd1bf] bg-white px-4 py-3.5 text-sm text-[#1f1a15] outline-none transition-all duration-300 placeholder:text-[#a2927e] focus:border-[#b79e74] focus:shadow-[0_12px_24px_rgba(48,35,18,0.08)]"
+                className="w-full rounded-[1.3rem] border border-white/10 bg-white/[0.05] px-4 py-3.5 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/28 focus:border-[#ff2d2d]/34 focus:bg-white/[0.08] focus:shadow-[0_12px_24px_rgba(0,0,0,0.2)]"
               />
-              {field.helper ? <div className="mt-2 text-xs leading-6 text-[#8e7f68]">{field.helper}</div> : null}
+              {field.helper ? <div className="mt-2 text-xs leading-6 text-white/46">{field.helper}</div> : null}
             </div>
           ))}
         </div>

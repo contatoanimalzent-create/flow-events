@@ -1,22 +1,24 @@
 import { Check } from 'lucide-react'
 import { cn } from '@/shared/lib'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 
 interface CheckoutStepperProps {
   currentStep: 1 | 2 | 3 | 4
 }
 
-const STEPS = [
-  { key: 1, label: 'Selecao', description: 'Ingressos' },
-  { key: 2, label: 'Comprador', description: 'Dados essenciais' },
-  { key: 3, label: 'Pagamento', description: 'Reserva e conclusao' },
-  { key: 4, label: 'Confirmacao', description: 'Acesso emitido' },
-] as const
-
 export function CheckoutStepper({ currentStep }: CheckoutStepperProps) {
+  const { isPortuguese } = usePublicLocale()
+  const steps = [
+    { key: 1, label: isPortuguese ? 'Selecao' : 'Selection', description: isPortuguese ? 'Ingressos' : 'Tickets' },
+    { key: 2, label: isPortuguese ? 'Comprador' : 'Buyer', description: isPortuguese ? 'Dados essenciais' : 'Essential details' },
+    { key: 3, label: isPortuguese ? 'Pagamento' : 'Payment', description: isPortuguese ? 'Reserva e conclusao' : 'Reservation and completion' },
+    { key: 4, label: isPortuguese ? 'Confirmacao' : 'Confirmation', description: isPortuguese ? 'Acesso emitido' : 'Access issued' },
+  ] as const
+
   return (
     <div className="rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-5 shadow-[0_18px_55px_rgba(0,0,0,0.24)]">
       <div className="grid gap-4 md:grid-cols-4">
-        {STEPS.map((step) => {
+        {steps.map((step) => {
           const isActive = currentStep === step.key
           const isComplete = currentStep > step.key
 

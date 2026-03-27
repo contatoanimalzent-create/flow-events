@@ -1,7 +1,7 @@
 import { ArrowRight, CalendarDays, MapPin, Users } from 'lucide-react'
 import { getEventAssetUrl } from '@/features/event-media'
 import type { PublicEventSummary } from '@/features/public/types/public.types'
-import { formatCurrency } from '@/shared/lib'
+import { formatPublicCurrency, formatPublicDate, formatPublicNumber, usePublicLocale } from '../lib/public-locale'
 import { PublicReveal } from './PublicReveal'
 
 interface FeaturedEventBannerProps {
@@ -10,9 +10,16 @@ interface FeaturedEventBannerProps {
 }
 
 export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBannerProps) {
+  const { locale, isPortuguese } = usePublicLocale()
   const coverImage = getEventAssetUrl(event.mediaPresentation?.coverAsset) || event.cover_url
   const priceLabel =
-    event.minPrice === null ? 'Sob consulta' : event.minPrice === 0 ? 'Acesso gratuito' : `a partir de ${formatCurrency(event.minPrice)}`
+    event.minPrice === null
+      ? isPortuguese ? 'Sob consulta' : 'On request'
+      : event.minPrice === 0
+        ? isPortuguese ? 'Acesso gratuito' : 'Free access'
+        : isPortuguese
+          ? `a partir de ${formatPublicCurrency(event.minPrice, locale)}`
+          : `from ${formatPublicCurrency(event.minPrice, locale)}`
 
   return (
     <section className="px-5 py-8 md:px-10 lg:px-16 lg:py-10">
@@ -44,7 +51,7 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                 {showLabel ? (
                   <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/66">
                     <span className="h-2 w-2 rounded-full bg-[#ff2d2d]" />
-                    Featured access
+                    {isPortuguese ? 'Acesso em destaque' : 'Featured access'}
                   </span>
                 ) : null}
 
@@ -53,15 +60,17 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                 </h2>
 
                 <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 md:text-lg">
-                  {event.subtitle || event.short_description || 'Uma experiencia pensada para transformar compra em expectativa e presenca em memoria.'}
+                  {event.subtitle || event.short_description || (isPortuguese
+                    ? 'Uma experiencia pensada para transformar compra em expectativa e presenca em memoria.'
+                    : 'An experience designed to turn purchase into anticipation and attendance into memory.')}
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
                   {[
                     {
                       icon: CalendarDays,
-                      label: 'Data',
-                      value: new Date(event.starts_at).toLocaleDateString('pt-BR', {
+                      label: isPortuguese ? 'Date' : 'Date',
+                      value: formatPublicDate(event.starts_at, locale, {
                         day: '2-digit',
                         month: 'long',
                         year: 'numeric',
@@ -69,13 +78,13 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                     },
                     {
                       icon: MapPin,
-                      label: 'Local',
+                      label: isPortuguese ? 'Local' : 'Location',
                       value: [event.venue_name, event.city].filter(Boolean).join(' / '),
                     },
                     {
                       icon: Users,
-                      label: 'Procura',
-                      value: `${event.sold_tickets.toLocaleString('pt-BR')} acessos vendidos`,
+                      label: isPortuguese ? 'Demanda' : 'Demand',
+                      value: `${formatPublicNumber(event.sold_tickets, locale)} ${isPortuguese ? 'acessos vendidos' : 'accesses sold'}`,
                     },
                   ].map((item) => {
                     const Icon = item.icon
@@ -99,7 +108,7 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                     href={`/e/${event.slug}`}
                     className="inline-flex items-center gap-3 rounded-full bg-[#ff2d2d] px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-500 hover:-translate-y-1 hover:bg-[#ff4133]"
                   >
-                    Ver experiencia
+                    {isPortuguese ? 'Ver experiencia' : 'View experience'}
                     <ArrowRight className="h-4 w-4" />
                   </a>
                   <div className="text-sm text-white/70">{priceLabel}</div>
@@ -108,9 +117,9 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
 
               <div className="grid gap-4 self-end">
                 {[
-                  { label: 'Status', value: event.status === 'ongoing' ? 'Ao vivo' : 'Proxima janela' },
-                  { label: 'Categoria', value: event.category || 'Experiencia premium' },
-                  { label: 'Compra', value: 'Fluxo protegido e direto' },
+                  { label: isPortuguese ? 'Status' : 'Status', value: event.status === 'ongoing' ? (isPortuguese ? 'Ao vivo' : 'Live') : isPortuguese ? 'Proxima janela' : 'Next release' },
+                  { label: isPortuguese ? 'Categoria' : 'Category', value: event.category || (isPortuguese ? 'Experiencia premium' : 'Premium experience') },
+                  { label: isPortuguese ? 'Compra' : 'Purchase', value: isPortuguese ? 'Fluxo protegido e direto' : 'Protected and direct flow' },
                 ].map((item) => (
                   <div key={item.label} className="rounded-[1.6rem] border border-white/10 bg-black/24 p-5 backdrop-blur-sm">
                     <div className="text-[10px] uppercase tracking-[0.28em] text-white/42">{item.label}</div>

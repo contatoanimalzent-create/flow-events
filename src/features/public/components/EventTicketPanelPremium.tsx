@@ -1,8 +1,8 @@
 import { ChevronRight, Minus, Plus, Sparkles, Ticket } from 'lucide-react'
 import type { PublicTicketType } from '@/features/public/types/public.types'
-import { formatCurrency } from '@/shared/lib'
 import { PremiumBadge } from './PremiumBadge'
 import { PublicReveal } from './PublicReveal'
+import { formatPublicCurrency, formatPublicNumber, usePublicLocale } from '../lib/public-locale'
 
 interface CartItem {
   ticketTypeId: string
@@ -15,15 +15,16 @@ interface CartItem {
 }
 
 export function TicketAvailabilityBadge({ available }: { available: number }) {
+  const { isPortuguese } = usePublicLocale()
   if (available <= 0) {
-    return <PremiumBadge tone="accent" className="border-[#ff2d2d]/28 bg-[#ff2d2d]/12 text-white">Esgotado</PremiumBadge>
+    return <PremiumBadge tone="accent" className="border-[#ff2d2d]/28 bg-[#ff2d2d]/12 text-white">{isPortuguese ? 'Esgotado' : 'Sold out'}</PremiumBadge>
   }
 
   if (available <= 20) {
-    return <PremiumBadge tone="accent">Ultimas vagas</PremiumBadge>
+    return <PremiumBadge tone="accent">{isPortuguese ? 'Ultimas vagas' : 'Final availability'}</PremiumBadge>
   }
 
-  return <PremiumBadge tone="success">Disponivel</PremiumBadge>
+  return <PremiumBadge tone="success">{isPortuguese ? 'Disponivel' : 'Available'}</PremiumBadge>
 }
 
 export function TicketOptionCard({
@@ -39,6 +40,7 @@ export function TicketOptionCard({
   onAdd: () => void
   onRemove: () => void
 }) {
+  const { locale, isPortuguese } = usePublicLocale()
   const available = Math.max(batch.quantity - batch.sold_count - batch.reserved_count, 0)
   const maxPerOrder = batch.max_per_order ?? ticketType.max_per_order ?? available
   const isDisabled = available === 0 || selectedQuantity >= maxPerOrder
@@ -55,7 +57,10 @@ export function TicketOptionCard({
             {batch.name}
           </div>
           <p className="mt-3 max-w-xl text-sm leading-7 text-white/66">
-            {ticketType.description || 'Acesso pensado para uma experiencia bem resolvida, com disponibilidade e operacao refletidas em tempo real.'}
+            {ticketType.description ||
+              (isPortuguese
+                ? 'Acesso pensado para uma experiencia bem resolvida, com disponibilidade e operacao refletidas em tempo real.'
+                : 'Access designed for a premium experience, with live availability and operations reflected in real time.')}
           </p>
         </div>
 
@@ -76,10 +81,10 @@ export function TicketOptionCard({
         <div>
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/44">Valor</div>
           <div className="mt-2 font-display text-[2.6rem] font-semibold leading-none tracking-[-0.04em] text-white">
-            {batch.price === 0 ? 'Gratuito' : formatCurrency(batch.price)}
+            {batch.price === 0 ? (isPortuguese ? 'Gratuito' : 'Free') : formatPublicCurrency(batch.price, locale)}
           </div>
           <div className="mt-2 text-xs text-white/52">
-            {available.toLocaleString('pt-BR')} disponiveis / max {maxPerOrder} por pedido
+            {formatPublicNumber(available, locale)} {isPortuguese ? 'disponiveis' : 'available'} / {isPortuguese ? 'max' : 'max'} {maxPerOrder} {isPortuguese ? 'por pedido' : 'per order'}
           </div>
         </div>
 
@@ -120,21 +125,28 @@ export function StickyPurchaseCTA({
   isFreeMode: boolean
   onCheckout: () => void
 }) {
+  const { locale, isPortuguese } = usePublicLocale()
   return (
     <div className="fixed inset-x-4 bottom-4 z-40 md:hidden">
       <div className="flex items-center justify-between gap-4 rounded-full border border-white/10 bg-[rgba(8,11,16,0.96)] px-5 py-3 text-white shadow-[0_24px_70px_rgba(0,0,0,0.34)]">
         <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/54">
-            {cartQty > 0 ? `${cartQty} selecionado${cartQty > 1 ? 's' : ''}` : 'Acesso'}
+            {cartQty > 0
+              ? isPortuguese
+                ? `${cartQty} selecionado${cartQty > 1 ? 's' : ''}`
+                : `${cartQty} selected`
+              : isPortuguese
+                ? 'Acesso'
+                : 'Access'}
           </div>
           <div className="mt-1 truncate text-sm font-medium text-white">
             {cartQty > 0
               ? cartTotal === 0
-                ? 'Gratuito'
-                : formatCurrency(cartTotal)
+                ? isPortuguese ? 'Gratuito' : 'Free'
+                : formatPublicCurrency(cartTotal, locale)
               : isFreeMode || minPrice === 0
-                ? 'Inscricao gratuita'
-                : `a partir de ${formatCurrency(minPrice)}`}
+                ? isPortuguese ? 'Inscricao gratuita' : 'Free registration'
+                : isPortuguese ? `a partir de ${formatPublicCurrency(minPrice, locale)}` : `from ${formatPublicCurrency(minPrice, locale)}`}
           </div>
         </div>
 
@@ -150,7 +162,7 @@ export function StickyPurchaseCTA({
           }}
           className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-white"
         >
-          {cartQty > 0 ? 'Checkout' : 'Ver ingressos'}
+          {cartQty > 0 ? 'Checkout' : isPortuguese ? 'Ver ingressos' : 'View tickets'}
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
@@ -177,17 +189,24 @@ export function EventTicketPanelPremium({
   onRemove: (batchId: string) => void
   onCheckout: () => void
 }) {
+  const { locale, isPortuguese } = usePublicLocale()
   return (
     <section id="tickets" className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
       <div className="mx-auto max-w-7xl">
         <PublicReveal>
           <div className="max-w-3xl">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">Premium access</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">
+              {isPortuguese ? 'Acesso premium' : 'Premium access'}
+            </div>
             <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.3rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
-              Escolha seu acesso em um painel comercial, nao em uma tabela fria.
+              {isPortuguese
+                ? 'Escolha seu acesso em um painel comercial, nao em uma tabela fria.'
+                : 'Choose your access in a commercial panel, not in a cold table.'}
             </h2>
             <p className="mt-4 text-base leading-8 text-white/68 md:text-lg">
-              Cada opcao abaixo reflete disponibilidade, regras e inventario reais. A apresentacao ficou premium; a operacao continua precisa.
+              {isPortuguese
+                ? 'Cada opcao abaixo reflete disponibilidade, regras e inventario reais. A apresentacao ficou premium; a operacao continua precisa.'
+                : 'Each option below reflects real availability, rules and inventory. The presentation is premium; the operation remains precise.'}
             </p>
           </div>
         </PublicReveal>
@@ -232,17 +251,29 @@ export function EventTicketPanelPremium({
                     <Ticket className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="text-[11px] uppercase tracking-[0.28em] text-white/46">Seu pedido</div>
+                    <div className="text-[11px] uppercase tracking-[0.28em] text-white/46">
+                      {isPortuguese ? 'Seu pedido' : 'Your order'}
+                    </div>
                     <div className="mt-2 font-display text-[2.2rem] font-semibold uppercase leading-[0.92] tracking-[-0.03em] text-white">
-                      {cartQty > 0 ? `${cartQty} selecionado${cartQty > 1 ? 's' : ''}` : 'Escolha seu acesso'}
+                      {cartQty > 0
+                        ? isPortuguese
+                          ? `${cartQty} selecionado${cartQty > 1 ? 's' : ''}`
+                          : `${cartQty} selected`
+                        : isPortuguese
+                          ? 'Escolha seu acesso'
+                          : 'Choose your access'}
                     </div>
                   </div>
                 </div>
 
                 <p className="mt-5 text-sm leading-7 text-white/66">
                   {cartQty > 0
-                    ? 'Revise a selecao e siga para o checkout. A reserva de inventario acontece no passo seguinte.'
-                    : 'Adicione uma ou mais opcoes ao carrinho para liberar o checkout e reservar o inventario no momento certo.'}
+                    ? isPortuguese
+                      ? 'Revise a selecao e siga para o checkout. A reserva de inventario acontece no passo seguinte.'
+                      : 'Review your selection and continue to checkout. Inventory reservation happens in the next step.'
+                    : isPortuguese
+                      ? 'Adicione uma ou mais opcoes ao carrinho para liberar o checkout e reservar o inventario no momento certo.'
+                      : 'Add one or more options to unlock checkout and reserve inventory at the right moment.'}
                 </p>
 
                 <div className="mt-6 space-y-3">
@@ -257,7 +288,7 @@ export function EventTicketPanelPremium({
                           <div className="text-right">
                             <div className="text-sm font-medium text-white">{item.qty}x</div>
                             <div className="mt-1 text-xs text-white/50">
-                              {item.price === 0 ? 'Gratuito' : formatCurrency(item.price * item.qty)}
+                              {item.price === 0 ? (isPortuguese ? 'Gratuito' : 'Free') : formatPublicCurrency(item.price * item.qty, locale)}
                             </div>
                           </div>
                         </div>
@@ -265,7 +296,7 @@ export function EventTicketPanelPremium({
                     ))
                   ) : (
                     <div className="rounded-[1.5rem] border border-dashed border-white/10 bg-white/[0.04] p-5 text-sm leading-7 text-white/62">
-                      Nenhuma opcao selecionada ainda.
+                      {isPortuguese ? 'Nenhuma opcao selecionada ainda.' : 'No option selected yet.'}
                     </div>
                   )}
                 </div>
@@ -273,12 +304,12 @@ export function EventTicketPanelPremium({
                 <div className="mt-6 rounded-[1.7rem] border border-white/8 bg-black/18 p-5">
                   <div className="flex items-center justify-between text-sm text-white/54">
                     <span>Subtotal</span>
-                    <span>{cartTotal === 0 ? 'Gratuito' : formatCurrency(cartTotal)}</span>
+                    <span>{cartTotal === 0 ? (isPortuguese ? 'Gratuito' : 'Free') : formatPublicCurrency(cartTotal, locale)}</span>
                   </div>
                   <div className="mt-4 flex items-center justify-between border-t border-white/8 pt-4">
-                    <span className="text-sm font-medium text-white">Total da selecao</span>
+                    <span className="text-sm font-medium text-white">{isPortuguese ? 'Total da selecao' : 'Selection total'}</span>
                     <span className="font-display text-[2.5rem] font-semibold leading-none tracking-[-0.04em] text-white">
-                      {cartTotal === 0 ? 'Gratuito' : formatCurrency(cartTotal)}
+                      {cartTotal === 0 ? (isPortuguese ? 'Gratuito' : 'Free') : formatPublicCurrency(cartTotal, locale)}
                     </span>
                   </div>
                 </div>
@@ -289,15 +320,17 @@ export function EventTicketPanelPremium({
                   disabled={cartQty === 0}
                   className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#ff2d2d] px-5 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ff4133] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Ir para o checkout
+                  {isPortuguese ? 'Ir para o checkout' : 'Go to checkout'}
                   <ChevronRight className="h-4 w-4" />
                 </button>
 
                 <div className="mt-6 space-y-3 text-sm leading-7 text-white/66">
                   {[
-                    'Reserva temporaria de inventario no checkout',
-                    'Pagamento protegido e emissao automatica do ticket digital',
-                    isFreeMode ? 'Inscricao validada por QR code' : 'Entrada sustentada por QR code antifraude',
+                    isPortuguese ? 'Reserva temporaria de inventario no checkout' : 'Temporary inventory reservation in checkout',
+                    isPortuguese ? 'Pagamento protegido e emissao automatica do ticket digital' : 'Protected payment and automatic digital ticket issuance',
+                    isFreeMode
+                      ? isPortuguese ? 'Inscricao validada por QR code' : 'Registration validated by QR code'
+                      : isPortuguese ? 'Entrada sustentada por QR code antifraude' : 'Entry supported by anti-fraud QR code',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-3">
                       <Sparkles className="mt-1 h-4 w-4 text-[#ff6a5c]" />

@@ -10,9 +10,11 @@ import {
   RelatedExperiencesGrid,
   usePublicEvents,
 } from '@/features/public'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 import { useSeoMeta } from '@/shared/lib'
 
 export function HomePage({ onLogin }: { onLogin: () => void }) {
+  const { isPortuguese } = usePublicLocale()
   const publicEventsQuery = usePublicEvents()
   const events = publicEventsQuery.data ?? []
 
@@ -50,8 +52,10 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
     null
 
   useSeoMeta({
-    title: 'Animalz Events | Premium experiences platform',
-    description: 'Descubra experiencias, compre com confianca e navegue por uma agenda premium de eventos ao vivo.',
+    title: isPortuguese ? 'Animalz Events | Plataforma premium de experiencias' : 'Animalz Events | Premium experiences platform',
+    description: isPortuguese
+      ? 'Descubra experiencias, compre com confianca e navegue por uma agenda premium de eventos ao vivo.'
+      : 'Discover experiences, purchase with confidence and navigate a premium calendar of live events.',
     image: seoImage,
     url: typeof window !== 'undefined' ? window.location.href : '/',
   })
@@ -62,8 +66,12 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-20 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <LoadingState
-              title="Carregando experiencias"
-              description="Buscando os proximos eventos da plataforma."
+              title={isPortuguese ? 'Carregando experiencias' : 'Loading experiences'}
+              description={
+                isPortuguese
+                  ? 'Buscando os proximos eventos da plataforma.'
+                  : 'Loading the next experiences available on the platform.'
+              }
               className="min-h-[18rem]"
             />
           </div>
@@ -91,10 +99,14 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                             Animalz Experiences
                           </div>
                           <h1 className="mt-6 max-w-4xl font-display text-[clamp(4.2rem,9vw,8rem)] font-semibold uppercase leading-[0.82] tracking-[-0.04em] text-white">
-                            Descubra a proxima experiencia antes do restante do publico.
+                            {isPortuguese
+                              ? 'Descubra a proxima experiencia antes do restante do publico.'
+                              : 'Discover the next experience before the wider public.'}
                           </h1>
                           <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 md:text-lg">
-                            Agenda premium, destaque comercial forte e compra clara desde a primeira dobra.
+                            {isPortuguese
+                              ? 'Agenda premium, destaque comercial forte e compra clara desde a primeira dobra.'
+                              : 'A premium calendar with stronger commercial focus and a clearer path to purchase from the first fold.'}
                           </p>
                         </div>
 
@@ -103,23 +115,23 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                             href={`/e/${heroEvent.slug}`}
                             className="inline-flex items-center rounded-full bg-[#ff2d2d] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white"
                           >
-                            Ver evento principal
+                            {isPortuguese ? 'Ver evento principal' : 'View featured event'}
                           </a>
                           <a
                             href="/events"
                             className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.05] px-6 py-3.5 text-sm font-medium uppercase tracking-[0.12em] text-white"
                           >
-                            Explorar agenda
+                            {isPortuguese ? 'Explorar agenda' : 'Explore calendar'}
                           </a>
                         </div>
                       </div>
 
                       <div className="grid gap-4 self-end">
                         {[
-                          { label: 'Evento em destaque', value: heroEvent.name },
-                          { label: 'Cidades ativas', value: `${cityCount} cidades` },
-                          { label: 'Experiencias publicas', value: `${events.length} eventos` },
-                          { label: 'Categorias', value: `${categories.length} curadorias` },
+                          { label: isPortuguese ? 'Evento em destaque' : 'Featured event', value: heroEvent.name },
+                          { label: isPortuguese ? 'Cidades ativas' : 'Active cities', value: `${cityCount} ${isPortuguese ? 'cidades' : 'cities'}` },
+                          { label: isPortuguese ? 'Experiencias publicas' : 'Public experiences', value: `${events.length} ${isPortuguese ? 'eventos' : 'events'}` },
+                          { label: isPortuguese ? 'Categorias' : 'Categories', value: `${categories.length} ${isPortuguese ? 'curadorias' : 'curations'}` },
                         ].map((item) => (
                           <div key={item.label} className="rounded-[1.7rem] border border-white/10 bg-black/28 p-5 backdrop-blur-sm">
                             <div className="text-[10px] uppercase tracking-[0.28em] text-white/42">{item.label}</div>
@@ -149,9 +161,13 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                       href={`/e/${event.slug}`}
                       className="group grid min-h-[15.5rem] grid-rows-[auto_1fr_auto] rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.22)] transition-all duration-300 hover:-translate-y-1"
                     >
-                      <div className="text-[10px] uppercase tracking-[0.28em] text-white/46">
-                        {index === 0 ? 'Selling fast' : index === 1 ? 'Premium access' : 'New release'}
-                      </div>
+                        <div className="text-[10px] uppercase tracking-[0.28em] text-white/46">
+                          {index === 0
+                            ? isPortuguese ? 'Venda acelerada' : 'Selling fast'
+                            : index === 1
+                              ? isPortuguese ? 'Acesso premium' : 'Premium access'
+                              : isPortuguese ? 'Nova abertura' : 'New release'}
+                        </div>
 
                       <div className="flex min-h-0 flex-col justify-start pt-4">
                         <div className="min-h-[4.25rem] font-display text-[2rem] font-semibold uppercase leading-[0.92] tracking-[-0.03em] text-white">
@@ -163,7 +179,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                       </div>
 
                       <div className="mt-6 self-end text-sm font-semibold uppercase tracking-[0.12em] text-[#ff6a5c]">
-                        Ver detalhes
+                        {isPortuguese ? 'Ver detalhes' : 'View details'}
                       </div>
                     </a>
                   </PublicReveal>
@@ -174,11 +190,15 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
 
           <EventsScheduleList
             events={upcomingEvents}
-            title="Upcoming schedule"
-            subtitle="Uma agenda vertical, clara e forte para percorrer proximas datas, comparar venues e abrir cada experiencia com contexto comercial."
+            title={isPortuguese ? 'Agenda de proximas experiencias' : 'Upcoming schedule'}
+            subtitle={
+              isPortuguese
+                ? 'Uma agenda vertical, clara e forte para percorrer proximas datas, comparar venues e abrir cada experiencia com contexto comercial.'
+                : 'A stronger vertical calendar to scan upcoming dates, compare venues and open each experience with clearer commercial context.'
+            }
           />
 
-          <RelatedExperiencesGrid events={featuredCollection} title="Explore featured access" />
+          <RelatedExperiencesGrid events={featuredCollection} title={isPortuguese ? 'Explore acessos em destaque' : 'Explore featured access'} />
           <ExploreMoreSection currentEventId={heroEvent?.id ?? ''} events={events} />
         </>
       )}

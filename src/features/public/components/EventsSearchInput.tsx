@@ -1,5 +1,6 @@
 import { Loader2, Search } from 'lucide-react'
 import { cn } from '@/shared/lib'
+import { usePublicLocale } from '../lib/public-locale'
 
 interface EventsSearchInputProps {
   value: string
@@ -9,6 +10,7 @@ interface EventsSearchInputProps {
 }
 
 export function EventsSearchInput({ value, onChange, isPending = false, tone = 'light' }: EventsSearchInputProps) {
+  const { isPortuguese } = usePublicLocale()
   const isDark = tone === 'dark'
 
   return (
@@ -17,7 +19,7 @@ export function EventsSearchInput({ value, onChange, isPending = false, tone = '
         'mb-3 text-[11px] uppercase tracking-[0.28em]',
         isDark ? 'text-white/50' : 'text-[#8e7f68]'
       )}>
-        Buscar experiencias
+        {isPortuguese ? 'Buscar experiencias' : 'Search experiences'}
       </div>
       <div className="relative">
         <Search className={cn(
@@ -27,7 +29,13 @@ export function EventsSearchInput({ value, onChange, isPending = false, tone = '
         <input
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder={isDark ? 'Buscar eventos...' : 'Nome, cidade, venue ou atmosfera'}
+          placeholder={
+            isDark
+              ? isPortuguese ? 'Buscar eventos...' : 'Search events...'
+              : isPortuguese
+                ? 'Nome, cidade, venue ou atmosfera'
+                : 'Name, city, venue or atmosphere'
+          }
           className={cn(
             'w-full rounded-full px-12 py-3.5 text-sm outline-none transition-all duration-300',
             isDark

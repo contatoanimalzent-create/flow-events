@@ -3,6 +3,7 @@ import { cn } from '@/shared/lib'
 import { PremiumBadge } from './PremiumBadge'
 import { EventsSearchInput } from './EventsSearchInput'
 import { PublicReveal } from './PublicReveal'
+import { usePublicLocale } from '../lib/public-locale'
 
 interface EventsFilterBarProps {
   search: string
@@ -87,6 +88,7 @@ export function EventsFilterBar({
   isPending = false,
   tone = 'light',
 }: EventsFilterBarProps) {
+  const { isPortuguese } = usePublicLocale()
   const isDark = tone === 'dark'
   const hasActiveFilters = Boolean(search) || city !== 'all' || dateRange !== 'all' || category !== 'all'
 
@@ -102,21 +104,21 @@ export function EventsFilterBar({
           <div className="flex flex-wrap items-center gap-3">
             {isDark ? (
               <div className="inline-flex rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-medium text-white/70">
-                {resultCount} experiencias
+                {resultCount} {isPortuguese ? 'experiencias' : 'experiences'}
               </div>
             ) : (
               <PremiumBadge tone="default" className="border-white/10 bg-white/[0.05] text-white/76">
-                {resultCount} experiencias
+                {resultCount} {isPortuguese ? 'experiencias' : 'experiences'}
               </PremiumBadge>
             )}
             {isPending ? (
               isDark ? (
                 <div className="inline-flex rounded-full border border-white/12 bg-[#c49a50]/20 px-4 py-2 text-sm font-medium text-[#c49a50]">
-                  Atualizando selecao
+                  {isPortuguese ? 'Atualizando selecao' : 'Updating selection'}
                 </div>
               ) : (
                 <PremiumBadge tone="accent" className="border-[#ff2d2d]/24 bg-[#ff2d2d]/12 text-white">
-                  Atualizando selecao
+                  {isPortuguese ? 'Atualizando selecao' : 'Updating selection'}
                 </PremiumBadge>
               )
             ) : null}
@@ -139,7 +141,7 @@ export function EventsFilterBar({
               )}
             >
               <RotateCcw className="h-4 w-4" />
-              Limpar filtros
+              {isPortuguese ? 'Limpar filtros' : 'Clear filters'}
             </button>
           ) : null}
         </div>
@@ -147,24 +149,33 @@ export function EventsFilterBar({
         <div className="mt-5 flex flex-wrap gap-4">
           <EventsSearchInput value={search} onChange={onSearchChange} isPending={isPending} tone={tone} />
           <FilterSelect
-            label="Cidade"
+            label={isPortuguese ? 'Cidade' : 'City'}
             value={city}
             onChange={onCityChange}
-            options={[{ label: 'Todas as cidades', value: 'all' }, ...cityOptions.map((item) => ({ label: item, value: item }))]}
+            options={[{ label: isPortuguese ? 'Todas as cidades' : 'All cities', value: 'all' }, ...cityOptions.map((item) => ({ label: item, value: item }))]}
             tone={tone}
           />
           <FilterSelect
-            label="Data"
+            label={isPortuguese ? 'Data' : 'Date'}
             value={dateRange}
             onChange={onDateRangeChange}
-            options={[...DATE_OPTIONS]}
+            options={
+              isPortuguese
+                ? [...DATE_OPTIONS]
+                : [
+                    { label: 'Any date', value: 'all' },
+                    { label: 'Next 30 days', value: '30d' },
+                    { label: 'Next 90 days', value: '90d' },
+                    { label: 'Later on', value: 'later' },
+                  ]
+            }
             tone={tone}
           />
           <FilterSelect
-            label="Categoria"
+            label={isPortuguese ? 'Categoria' : 'Category'}
             value={category}
             onChange={onCategoryChange}
-            options={[{ label: 'Todas as categorias', value: 'all' }, ...categoryOptions.map((item) => ({ label: item, value: item }))]}
+            options={[{ label: isPortuguese ? 'Todas as categorias' : 'All categories', value: 'all' }, ...categoryOptions.map((item) => ({ label: item, value: item }))]}
             tone={tone}
           />
         </div>

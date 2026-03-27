@@ -1,7 +1,7 @@
 import { ArrowRight, CalendarDays, MapPin, Ticket } from 'lucide-react'
 import { getEventAssetUrl } from '@/features/event-media'
 import type { PublicEventSummary } from '@/features/public/types/public.types'
-import { formatCurrency } from '@/shared/lib'
+import { usePublicLocale, formatPublicCurrency, formatPublicDate, formatPublicNumber } from '../lib/public-locale'
 
 interface EventScheduleCardProps {
   event: PublicEventSummary
@@ -9,13 +9,19 @@ interface EventScheduleCardProps {
 }
 
 export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) {
-  const eventDate = new Date(event.starts_at)
-  const day = eventDate.toLocaleDateString('pt-BR', { day: '2-digit' })
-  const month = eventDate.toLocaleDateString('pt-BR', { month: 'short' })
-  const year = eventDate.toLocaleDateString('pt-BR', { year: 'numeric' })
+  const { locale, isPortuguese } = usePublicLocale()
+  const day = formatPublicDate(event.starts_at, locale, { day: '2-digit' })
+  const month = formatPublicDate(event.starts_at, locale, { month: 'short' })
+  const year = formatPublicDate(event.starts_at, locale, { year: 'numeric' })
 
   const priceLabel =
-    event.minPrice === null ? 'Sob consulta' : event.minPrice === 0 ? 'Acesso gratuito' : `a partir de ${formatCurrency(event.minPrice)}`
+    event.minPrice === null
+      ? isPortuguese ? 'Sob consulta' : 'On request'
+      : event.minPrice === 0
+        ? isPortuguese ? 'Acesso gratuito' : 'Free access'
+        : isPortuguese
+          ? `a partir de ${formatPublicCurrency(event.minPrice, locale)}`
+          : `from ${formatPublicCurrency(event.minPrice, locale)}`
   const coverImage =
     getEventAssetUrl(event.mediaPresentation.coverAsset) ||
     event.cover_url ||
@@ -43,7 +49,7 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
         <div className="flex min-w-0 flex-col justify-between p-6 md:p-7">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-[#ff2d2d]/24 bg-[#ff2d2d]/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white">
-              {index < 3 ? 'High demand' : 'Now selling'}
+              {index < 3 ? (isPortuguese ? 'Alta demanda' : 'High demand') : isPortuguese ? 'Venda aberta' : 'Now selling'}
             </span>
             {event.category ? (
               <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/58">
@@ -56,14 +62,16 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
             {event.name}
           </h3>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68 md:text-base">
-            {event.subtitle || event.short_description || 'Uma experiencia pensada para transformar data, venue e narrativa em desejo imediato.'}
+            {event.subtitle || event.short_description || (isPortuguese
+              ? 'Uma experiencia pensada para transformar data, venue e narrativa em desejo imediato.'
+              : 'An experience designed to turn date, venue and story into immediate desire.')}
           </p>
 
           <div className="mt-6 grid gap-3 text-sm text-white/68 md:grid-cols-2">
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-[#ff6a5c]" />
               <span>
-                {eventDate.toLocaleDateString('pt-BR', {
+                {formatPublicDate(event.starts_at, locale, {
                   day: '2-digit',
                   month: 'long',
                   year: 'numeric',
@@ -85,12 +93,12 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
             </div>
             <div className="mt-3 flex items-center gap-2 text-sm text-white/62">
               <Ticket className="h-4 w-4 text-[#ff6a5c]" />
-              {event.sold_tickets.toLocaleString('pt-BR')} acessos vendidos
+              {formatPublicNumber(event.sold_tickets, locale)} {isPortuguese ? 'acessos vendidos' : 'accesses sold'}
             </div>
           </div>
 
           <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em] text-white">
-            Ver detalhes
+            {isPortuguese ? 'Ver detalhes' : 'View details'}
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] transition-transform duration-300 group-hover:translate-x-1">
               <ArrowRight className="h-4 w-4" />
             </span>

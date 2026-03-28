@@ -230,10 +230,8 @@ export async function createOrderDraftWithReservations(input: CreateOrderDraftIn
     })
 
     if (!rpcResult.error) {
-      const orderId = String(rpcResult.data)
-      const orderResult = await supabase.from('orders').select('*').eq('id', orderId).single()
-      assertOrdersResult(orderResult)
-      return toOrderRow(orderResult.data as Record<string, unknown> | null, 'Nao foi possivel carregar o pedido criado')
+      // RPC now returns full order as JSONB (avoids anon RLS block on orders SELECT)
+      return toOrderRow(rpcResult.data as Record<string, unknown> | null, 'Nao foi possivel carregar o pedido criado')
     }
 
     if (!isMissingRpc(rpcResult.error)) {

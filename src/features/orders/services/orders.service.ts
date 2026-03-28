@@ -140,25 +140,26 @@ export const ordersService = {
 
   async issueDigitalTicketsForOrder(orderId: string): Promise<DigitalTicketRow[]> {
     return ordersApi.mutation('issue_digital_tickets_for_order', async () => {
-      const existingTickets = await this.listDigitalTicketsByOrder(orderId)
+      // Use the SECURITY DEFINER RPC so anon users (public checkout) can issue tickets
+      const rpcResult = await supabase.rpc('issue_digital_tickets_for_order', { p_order_id: orderId })
 
-      if (existingTickets.length > 0) {
-        return existingTickets
+      if (!rpcResult.error) {
+        return this.listDigitalTicketsByOrder(orderId)
       }
+
+      // Fallback for authenticated org members (direct insert)
+      if (rpcResult.error.code !== 'PGRST202' && !rpcResult.error.message?.toLowerCase().includes('could not find')) {
+        throw new OrdersServiceError(rpcResult.error.message, 'order_ticket_issuance_failed')
+      }
+
+      const existingTickets = await this.listDigitalTicketsByOrder(orderId)
+      if (existingTickets.length > 0) return existingTickets
 
       const [order, orderItems] = await Promise.all([this.getOrderById(orderId), this.listOrderItemsByOrder(orderId)])
 
-      if (!order) {
-        throw new OrdersServiceError('Pedido nao encontrado para emissao', 'order_not_found')
-      }
-
-      if (order.status !== 'paid') {
-        throw new OrdersServiceError('Somente pedidos pagos podem emitir ingressos digitais', 'order_not_paid')
-      }
-
-      if (orderItems.length === 0) {
-        throw new OrdersServiceError('Pedido sem itens nao pode emitir ingressos', 'order_has_no_items')
-      }
+      if (!order) throw new OrdersServiceError('Pedido nao encontrado para emissao', 'order_not_found')
+      if (order.status !== 'paid') throw new OrdersServiceError('Somente pedidos pagos podem emitir ingressos digitais', 'order_not_paid')
+      if (orderItems.length === 0) throw new OrdersServiceError('Pedido sem itens nao pode emitir ingressos', 'order_has_no_items')
 
       const insertResult = await supabase.from('digital_tickets').insert(buildDigitalTicketInsertPayload(order, orderItems))
       assertOrdersResult(insertResult)

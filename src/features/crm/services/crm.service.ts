@@ -25,6 +25,11 @@ function isTableMissingError(message?: string) {
   return normalizedMessage.includes('does not exist') || normalizedMessage.includes('could not find the table')
 }
 
+function isPermissionError(message?: string) {
+  const normalizedMessage = String(message ?? '').toLowerCase()
+  return normalizedMessage.includes('permission denied') || normalizedMessage.includes('insufficient privilege')
+}
+
 async function listStoredCustomers(organizationId: string) {
   return crmApi.query('list_stored_customers', async () => {
     const result = await supabase.from('customers').select('*').eq('organization_id', organizationId)
@@ -105,9 +110,13 @@ async function buildSnapshot(organizationId: string) {
 
     assertCrmResult(ordersResult)
     assertCrmResult(paymentsResult)
-    assertCrmResult(digitalTicketsResult)
+    if (digitalTicketsResult.error && !isTableMissingError(digitalTicketsResult.error.message) && !isPermissionError(digitalTicketsResult.error.message)) {
+      throw new CrmServiceError(digitalTicketsResult.error.message)
+    }
     assertCrmResult(checkinsResult)
     assertCrmResult(eventsResult)
+
+    const resolvedDigitalTickets = digitalTicketsResult.error ? [] : ((digitalTicketsResult.data as Record<string, unknown>[] | null) ?? [])
 
     const orderIds = new Set((((ordersResult.data as Record<string, unknown>[] | null) ?? [])).map((row) => String(row.id)))
 
@@ -130,7 +139,7 @@ async function buildSnapshot(organizationId: string) {
         status: String(row.status ?? 'pending'),
         amount: Number(row.amount ?? 0),
       })),
-      digitalTickets: (((digitalTicketsResult.data as Record<string, unknown>[] | null) ?? []))
+      digitalTickets: resolvedDigitalTickets
         .filter((row) => orderIds.has(String(row.order_id)))
         .map((row) => ({
           id: String(row.id),

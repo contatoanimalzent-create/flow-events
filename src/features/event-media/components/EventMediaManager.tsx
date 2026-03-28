@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Film, ImagePlus, Library, Loader2 } from 'lucide-react'
 import { ActionConfirmationDialog, FeedbackBanner, PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
 import { useEventAssetActions, useEventAssetUpload, useEventAssets } from '@/features/event-media/hooks'
-import { getEventMediaProviderStatus } from '@/features/event-media/services'
 import type { EventMediaAsset } from '@/features/event-media/types'
 import { EventAssetEditModal, EventAssetUploadModal } from '@/features/event-media/modals'
 import { EventAssetGrid } from './EventAssetGrid'
@@ -32,7 +31,6 @@ function reorderAssetIds(assets: EventMediaAsset[], currentId: string, direction
 }
 
 export function EventMediaManager({ eventId, organizationId }: EventMediaManagerProps) {
-  const providerStatus = getEventMediaProviderStatus()
   const { assets, loading, error, refetch } = useEventAssets(eventId)
   const { uploadAsset, uploading } = useEventAssetUpload({ eventId, organizationId })
   const { updateAsset, deleteAsset, reorderAssets, setCoverAsset, setHeroAsset, saving } = useEventAssetActions({
@@ -145,7 +143,7 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
             ATIVOS VISUAIS DO EVENTO<span className="text-brand-acid">.</span>
           </h3>
           <p className="mt-1 text-xs text-text-muted">
-            Cloudinary pronto para uso. Provider atual: {providerStatus.primaryProvider}. Bucket fallback: {providerStatus.bucketName}.
+            Envie seus arquivos ou use a Biblioteca de Midia para adicionar imagens e videos ao evento.
           </p>
         </div>
 

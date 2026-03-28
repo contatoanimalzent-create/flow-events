@@ -10,14 +10,16 @@ export function useAuthBootstrap() {
     let active = true
 
     async function initializeSession() {
-      const { data } = await authService.getSession()
+      try {
+        const { data } = await authService.getSession()
 
-      if (!active) return
+        if (!active) return
 
-      await bootstrapSession(data.session?.user ?? null)
-
-      if (active) {
-        setInitialized(true)
+        await bootstrapSession(data.session?.user ?? null)
+      } catch {
+        if (active) clearSession()
+      } finally {
+        if (active) setInitialized(true)
       }
     }
 

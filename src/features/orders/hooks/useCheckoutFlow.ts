@@ -199,7 +199,7 @@ export function useCheckoutFlow({
       buyer: {
         name: buyer.name,
         email: buyer.email,
-        cpf: buyer.cpf || undefined,
+        cpf: buyer.cpf ? buyer.cpf.replace(/\D/g, '') || undefined : undefined,
         phone: buyer.phone || undefined,
       },
       items: cartSummary.items,

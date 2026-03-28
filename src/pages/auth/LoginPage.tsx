@@ -11,6 +11,7 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
   const [show, setShow] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [rememberMe, setRememberMe] = useState(true)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,6 +20,10 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
     const result = await signIn(email, password)
     if (result.error) {
       setError(t('Incorrect email or password. Please try again.', 'Email ou senha incorretos. Tente novamente.'))
+    } else if (!rememberMe) {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith('sb-') && k.endsWith('-auth-token'))
+        .forEach((k) => localStorage.removeItem(k))
     }
     setLoading(false)
   }
@@ -91,6 +96,25 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
                 </button>
               </div>
             </div>
+
+            <label className="flex cursor-pointer items-center gap-2.5">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="sr-only"
+                />
+                <div className={`h-4 w-4 rounded-sm border transition-colors ${rememberMe ? 'border-brand-acid bg-brand-acid' : 'border-bg-border bg-bg-surface'}`}>
+                  {rememberMe && (
+                    <svg className="h-4 w-4 text-bg-primary" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <span className="text-xs text-text-muted">{t('Keep me signed in', 'Continuar conectado')}</span>
+            </label>
 
             {error ? (
               <div className="rounded-sm border border-status-error/20 bg-status-error/8 px-4 py-3 text-xs text-status-error">

@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { PageShell } from '@/shared/components'
 import { MotionPage } from '@/shared/motion'
 import { cn } from '@/shared/lib'
-import { ExitLeadCaptureDialog } from '@/features/growth/components/ExitLeadCaptureDialog'
 import { PublicFooter } from './PublicFooter'
 import { PublicHeader } from './PublicHeader'
 
@@ -50,7 +49,6 @@ export function PublicLayout({
         </MotionPage>
         {showFooter ? <PublicFooter /> : null}
       </div>
-      <ExitLeadCaptureDialog source="public_exit" />
     </div>
   )
 }

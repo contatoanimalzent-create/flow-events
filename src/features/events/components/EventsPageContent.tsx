@@ -53,20 +53,37 @@ export function EventsPageContent() {
             {events.length} {t(events.length !== 1 ? 'events registered' : 'event registered', events.length !== 1 ? 'eventos cadastrados' : 'evento cadastrado')}
           </p>
         </div>
-        {canManageEvents ? (
-          <button onClick={openCreateForm} className="btn-primary flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            {t('New event', 'Novo evento')}
-          </button>
-        ) : null}
+        <div className="novare-stage-panel-dark">
+          <div className="novare-stage-label">{t('Live catalog', 'Catalogo ao vivo')}</div>
+          <div className="novare-stage-title">
+            {t('The event portfolio now behaves like an editorial operating layer.', 'O portfolio de eventos agora se comporta como uma camada editorial de operacao.')}
+          </div>
+          <div className="novare-stage-copy">
+            {t(
+              'Every launch, draft and published event stays inside the same visual system used by the public layer and the back office.',
+              'Cada lancamento, rascunho e evento publicado permanece dentro do mesmo sistema visual usado na camada publica e no backoffice.',
+            )}
+          </div>
+          {canManageEvents ? (
+            <div className="mt-6">
+              <button onClick={openCreateForm} className="btn-primary flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                {t('New event', 'Novo evento')}
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
 
-      <div className="reveal grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" style={{ animationDelay: '40ms' }}>
+      <div className="novare-stage-stack">
         {statsBar.map((stat, index) => (
-          <div key={index} className="card p-4">
-            <div className="text-[10px] uppercase tracking-widest text-text-muted">{stat.label}</div>
-            <div className="mt-1 text-2xl font-semibold text-text-primary">{stat.value}</div>
-          </div>
+          <article key={index} className="novare-stage-metric">
+            <div className="novare-stage-label">{stat.label}</div>
+            <div className="novare-stage-metric-value">{stat.value}</div>
+            <div className="novare-stage-metric-copy">
+              {t('Signal extracted from the current event catalog.', 'Sinal extraido do catalogo atual de eventos.')}
+            </div>
+          </article>
         ))}
       </div>
 

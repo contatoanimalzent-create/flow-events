@@ -107,16 +107,16 @@ export function GrowthPage() {
         }
       />
 
-      <section className="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[2.4rem] border border-[#e4d7c6] bg-white/92 p-8 shadow-[0_20px_60px_rgba(68,49,24,0.06)]">
-          <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">{t('Growth architecture', 'Arquitetura de crescimento')}</div>
-          <div className="mt-4 font-display text-[clamp(2.5rem,3.5vw,4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
+      <section className="novare-stage">
+        <div className="novare-stage-panel">
+          <div className="novare-stage-label">{t('Growth architecture', 'Arquitetura de crescimento')}</div>
+          <div className="novare-stage-title">
             {t(
               'Viral loops that begin in media, pass through checkout and return to CRM and campaigns.',
               'Ciclos virais que comecam na midia, passam pela compra e retornam para relacionamento e campanhas.',
             )}
           </div>
-          <p className="mt-5 max-w-2xl text-sm leading-7 text-[#665948]">
+          <p className="novare-stage-copy">
             {t(
               'Every share can become an attributed link, every exit can capture a lead, and every conversion can feed internal notifications and future automations.',
               'Cada compartilhamento pode virar um link atribuido, cada saida pode capturar um contato e cada conversao pode alimentar notificacoes internas e automacoes futuras.',
@@ -124,23 +124,33 @@ export function GrowthPage() {
           </p>
         </div>
 
-        <div className="rounded-[2.4rem] border border-[#e4d7c6] bg-[#1f1a15] p-8 text-white shadow-[0_20px_60px_rgba(68,49,24,0.12)]">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-3 py-2 text-[11px] uppercase tracking-[0.26em] text-white/64">
+        <div className="novare-stage-panel-dark">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[11px] uppercase tracking-[0.3em] text-[#ae936f]">
             <Sparkles className="h-4 w-4" />
             {t('Live status', 'Status ao vivo')}
           </div>
-          <div className="mt-5 font-display text-[2.4rem] font-semibold leading-[0.94] tracking-[-0.04em] text-white">
+          <div className="novare-stage-title">
             {t(
               'Sharing, referrals and remarketing now appear as product features, not as a parallel layer.',
               'Compartilhamento, indicacoes e reativacao agora aparecem como recursos de produto, nao como camada paralela.',
             )}
           </div>
-          <div className="mt-6 space-y-3 text-sm leading-7 text-white/72">
+          <div className="novare-stage-copy">
             <p>{t('Shareable links carry referral attribution when an authenticated user generates an invite.', 'Links compartilhaveis levam atribuicao de indicacao quando um usuario autenticado gera um convite.')}</p>
-            <p>{t('Leads captured by the public layer feed this cockpit and can trigger existing notifications and campaigns.', 'Contatos capturados pela camada publica alimentam este painel e podem disparar notificacoes e campanhas existentes.')}</p>
-            <p>{t('Checkout conversions return to operations as attributable proof of growth.', 'Conversoes da compra retornam para a operacao como prova atribuivel de crescimento.')}</p>
+            <p className="mt-3">{t('Leads captured by the public layer feed this cockpit and can trigger existing notifications and campaigns.', 'Contatos capturados pela camada publica alimentam este painel e podem disparar notificacoes e campanhas existentes.')}</p>
+            <p className="mt-3">{t('Checkout conversions return to operations as attributable proof of growth.', 'Conversoes da compra retornam para a operacao como prova atribuivel de crescimento.')}</p>
           </div>
         </div>
+      </section>
+
+      <section className="novare-stage-stack">
+        {growthOverviewQuery.data.metrics.slice(0, 3).map((metric) => (
+          <article key={metric.label} className="novare-stage-metric">
+            <div className="novare-stage-label">{metric.label}</div>
+            <div className="novare-stage-metric-value">{metric.value}</div>
+            <div className="novare-stage-metric-copy">{metric.note}</div>
+          </article>
+        ))}
       </section>
 
       <div className="mt-8">

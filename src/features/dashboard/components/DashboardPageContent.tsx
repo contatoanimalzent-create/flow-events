@@ -2,7 +2,7 @@ import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useDashboardOverview } from '@/features/dashboard/hooks'
 import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
-import { cn } from '@/shared/lib'
+import { cn, formatCurrency, formatNumber } from '@/shared/lib'
 import { DashboardConversionChart } from './DashboardConversionChart'
 import { DashboardCustomerRankingTable } from './DashboardCustomerRankingTable'
 import { DashboardEventRankingTable } from './DashboardEventRankingTable'
@@ -28,9 +28,21 @@ export function DashboardPageContent() {
           </h1>
           <p className="admin-subtitle">Visao executiva de receita, operacao, clientes e campanhas.</p>
         </div>
-        <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
-          <RefreshCw className="h-3.5 w-3.5" /> Atualizar
-        </button>
+        <div className="novare-stage-panel-dark">
+          <div className="novare-stage-label">Operations command</div>
+          <div className="novare-stage-title">Receita, ocupacao e saude operacional em uma unica leitura.</div>
+          <div className="novare-stage-copy">
+            Painel executivo para produtores que precisam enxergar caixa, conversao, check-in e risco sem alternar entre modulos.
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button onClick={() => void dashboard.refresh()} className="btn-primary flex items-center gap-2 text-xs">
+              <RefreshCw className="h-3.5 w-3.5" /> Atualizar
+            </button>
+            <div className="rounded-full border border-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-[#8e847d]">
+              Org {organization.name}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="admin-filterbar">
@@ -87,6 +99,42 @@ export function DashboardPageContent() {
         <PageEmptyState title="NENHUM EVENTO DISPONIVEL" description="Crie ou publique eventos para liberar a visao executiva consolidada." />
       ) : (
         <>
+          <section className="novare-stage">
+            <div className="novare-stage-panel">
+              <div className="novare-stage-label">Executive snapshot</div>
+              <div className="novare-stage-title">Cada evento publicado retorna para este cockpit como prova real de margem, tracao e capacidade.</div>
+              <div className="novare-stage-copy">
+                A camada principal concentra vendas, sinal comercial, clientes ativos e volume operacional com a mesma linguagem visual do restante do produto.
+              </div>
+            </div>
+
+            <div className="novare-stage-stack">
+              {[
+                {
+                  label: 'Receita bruta',
+                  value: formatCurrency(dashboard.overview.summary.grossRevenue),
+                  note: 'Volume consolidado entrando na operacao.',
+                },
+                {
+                  label: 'Eventos ativos',
+                  value: formatNumber(dashboard.overview.summary.activeEvents),
+                  note: 'Portfolio hoje em circulacao e venda.',
+                },
+                {
+                  label: 'Clientes ativos',
+                  value: formatNumber(dashboard.overview.summary.totalCustomers),
+                  note: 'Base que segue respondendo ao produto.',
+                },
+              ].map((item) => (
+                <article key={item.label} className="novare-stage-metric">
+                  <div className="novare-stage-label">{item.label}</div>
+                  <div className="novare-stage-metric-value">{item.value}</div>
+                  <div className="novare-stage-metric-copy">{item.note}</div>
+                </article>
+              ))}
+            </div>
+          </section>
+
           <DashboardExecutiveCards summary={dashboard.overview.summary} />
 
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.5fr_1fr]">

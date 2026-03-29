@@ -398,16 +398,16 @@ export function AdminShell({ className, children, ...props }: HTMLAttributes<HTM
     <div className={cn('admin-shell-foundation', className)} {...props}>
       <div className="pointer-events-none absolute inset-0">
         <div
-          className="absolute inset-0 opacity-[0.55]"
+          className="absolute inset-0 opacity-[0.3]"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
-            backgroundSize: '72px 72px',
+              'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
           }}
         />
-        <div className="absolute left-[-12rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-[#d62a0b]/[0.08] blur-[150px]" />
-        <div className="absolute right-[-10rem] top-[10rem] h-[30rem] w-[30rem] rounded-full bg-[#ae936f]/[0.09] blur-[160px]" />
-        <div className="absolute bottom-[-12rem] left-[24%] h-[28rem] w-[28rem] rounded-full bg-[#9ba1a6]/[0.10] blur-[170px]" />
+        <div className="absolute left-[-10rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[#d62a0b]/[0.09] blur-[150px]" />
+        <div className="absolute right-[-8rem] top-[18%] h-[24rem] w-[24rem] rounded-full bg-[#ae936f]/[0.08] blur-[150px]" />
+        <div className="absolute bottom-[-10rem] left-[34%] h-[24rem] w-[24rem] rounded-full bg-[#9ba1a6]/[0.06] blur-[170px]" />
       </div>
       <div className="relative z-10 flex min-h-screen w-full">
         {children}

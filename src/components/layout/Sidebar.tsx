@@ -1,12 +1,9 @@
 import {
   BrainCircuit,
   CalendarDays,
-  ChevronLeft,
-  ChevronRight,
   DollarSign,
   HelpCircle,
   LayoutDashboard,
-  WalletCards,
   MessageSquare,
   Package,
   ScanLine,
@@ -16,13 +13,15 @@ import {
   TrendingUp,
   Truck,
   Users,
+  WalletCards,
+  X,
   Zap,
 } from 'lucide-react'
 import type { NavSection } from '@/app/layout'
 import { useAccessControl } from '@/features/access-control'
-import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store/auth'
 import { getInitials } from '@/lib/utils'
+import { cn } from '@/shared/lib'
 import { useAppLocale } from '@/shared/i18n/app-locale'
 
 interface SidebarProps {
@@ -35,6 +34,7 @@ interface SidebarProps {
 interface NavItem {
   id: NavSection
   label: string
+  blurb: string
   icon: React.ElementType
 }
 
@@ -46,50 +46,125 @@ interface NavGroup {
 function createNavGroups(isPortuguese: boolean): NavGroup[] {
   return [
     {
-      label: isPortuguese ? 'Visao geral' : 'Overview',
+      label: isPortuguese ? 'Operacao central' : 'Core operation',
       items: [
-        { id: 'dashboard', label: isPortuguese ? 'Painel' : 'Dashboard', icon: LayoutDashboard },
-        { id: 'events', label: isPortuguese ? 'Eventos' : 'Events', icon: CalendarDays },
+        {
+          id: 'dashboard',
+          label: isPortuguese ? 'Painel' : 'Dashboard',
+          blurb: isPortuguese ? 'Visao executiva da operacao inteira.' : 'Executive read of the whole operation.',
+          icon: LayoutDashboard,
+        },
+        {
+          id: 'events',
+          label: isPortuguese ? 'Eventos' : 'Events',
+          blurb: isPortuguese ? 'Portfolio, agenda e publicacao.' : 'Portfolio, schedule and publishing.',
+          icon: CalendarDays,
+        },
+        {
+          id: 'tickets',
+          label: isPortuguese ? 'Ingressos' : 'Tickets',
+          blurb: isPortuguese ? 'Lotes, precos e ocupacao.' : 'Releases, pricing and occupancy.',
+          icon: Ticket,
+        },
+        {
+          id: 'sales',
+          label: isPortuguese ? 'Vendas' : 'Sales',
+          blurb: isPortuguese ? 'Pedidos, pagamentos e emissao.' : 'Orders, payments and issuance.',
+          icon: TrendingUp,
+        },
       ],
     },
     {
-      label: isPortuguese ? 'Vendas e ingressos' : 'Sales & ticketing',
+      label: isPortuguese ? 'Campo e relacionamento' : 'Field and relationship',
       items: [
-        { id: 'tickets', label: isPortuguese ? 'Ingressos' : 'Tickets', icon: Ticket },
-        { id: 'sales', label: isPortuguese ? 'Vendas' : 'Sales', icon: TrendingUp },
-        { id: 'crm', label: isPortuguese ? 'Relacionamento' : 'CRM', icon: Users },
+        {
+          id: 'crm',
+          label: isPortuguese ? 'Relacionamento' : 'CRM',
+          blurb: isPortuguese ? 'Publico, recorrencia e audiencia.' : 'Audience, retention and recurrence.',
+          icon: Users,
+        },
+        {
+          id: 'checkin',
+          label: isPortuguese ? 'Credenciamento' : 'Check-in',
+          blurb: isPortuguese ? 'Fluxo de acesso e validacao.' : 'Access flow and validation.',
+          icon: ScanLine,
+        },
+        {
+          id: 'staff',
+          label: isPortuguese ? 'Equipe' : 'Staff',
+          blurb: isPortuguese ? 'Escala e execucao de time.' : 'Roster and field execution.',
+          icon: Users,
+        },
+        {
+          id: 'suppliers',
+          label: isPortuguese ? 'Fornecedores' : 'Suppliers',
+          blurb: isPortuguese ? 'Parceiros e execucao terceirizada.' : 'Partners and outsourced execution.',
+          icon: Truck,
+        },
       ],
     },
     {
-      label: isPortuguese ? 'Operacao' : 'Operations',
+      label: isPortuguese ? 'Receita e crescimento' : 'Revenue and growth',
       items: [
-        { id: 'checkin', label: isPortuguese ? 'Credenciamento' : 'Check-in', icon: ScanLine },
-        { id: 'staff', label: isPortuguese ? 'Equipe' : 'Staff', icon: Users },
-        { id: 'suppliers', label: isPortuguese ? 'Fornecedores' : 'Suppliers', icon: Truck },
-      ],
-    },
-    {
-      label: isPortuguese ? 'Comercio e estoque' : 'Commerce & inventory',
-      items: [
-        { id: 'products', label: isPortuguese ? 'Produtos e PDV' : 'Products & POS', icon: ShoppingBag },
-        { id: 'inventory', label: isPortuguese ? 'Estoque' : 'Inventory', icon: Package },
-      ],
-    },
-    {
-      label: isPortuguese ? 'Crescimento' : 'Growth',
-      items: [
-        { id: 'intelligence', label: isPortuguese ? 'Inteligencia' : 'Intelligence', icon: BrainCircuit },
-        { id: 'communication', label: isPortuguese ? 'Comunicacao' : 'Communications', icon: MessageSquare },
-        { id: 'financial', label: isPortuguese ? 'Financeiro' : 'Financial', icon: DollarSign },
-        { id: 'billing', label: isPortuguese ? 'Cobranca' : 'Billing', icon: WalletCards },
-        { id: 'growth', label: isPortuguese ? 'Crescimento com IA' : 'Growth AI', icon: Zap },
+        {
+          id: 'products',
+          label: isPortuguese ? 'Produtos' : 'Products',
+          blurb: isPortuguese ? 'PDV, itens e consumo.' : 'POS, items and consumption.',
+          icon: ShoppingBag,
+        },
+        {
+          id: 'inventory',
+          label: isPortuguese ? 'Estoque' : 'Inventory',
+          blurb: isPortuguese ? 'Giro, ruptura e controle.' : 'Turns, stockouts and control.',
+          icon: Package,
+        },
+        {
+          id: 'communication',
+          label: isPortuguese ? 'Comunicacao' : 'Communication',
+          blurb: isPortuguese ? 'Campanhas e jornadas.' : 'Campaigns and journeys.',
+          icon: MessageSquare,
+        },
+        {
+          id: 'intelligence',
+          label: isPortuguese ? 'Inteligencia' : 'Intelligence',
+          blurb: isPortuguese ? 'Alertas e leitura executiva.' : 'Alerts and executive intelligence.',
+          icon: BrainCircuit,
+        },
+        {
+          id: 'financial',
+          label: isPortuguese ? 'Financeiro' : 'Financial',
+          blurb: isPortuguese ? 'Margem, repasse e fechamento.' : 'Margin, payouts and closeout.',
+          icon: DollarSign,
+        },
+        {
+          id: 'billing',
+          label: isPortuguese ? 'Cobranca' : 'Billing',
+          blurb: isPortuguese ? 'Planos e monetizacao.' : 'Plans and monetization.',
+          icon: WalletCards,
+        },
+        {
+          id: 'growth',
+          label: isPortuguese ? 'Crescimento' : 'Growth',
+          blurb: isPortuguese ? 'Aquisicao, indicacao e retorno.' : 'Acquisition, referral and return.',
+          icon: Zap,
+        },
       ],
     },
     {
       label: isPortuguese ? 'Sistema' : 'System',
       items: [
-        { id: 'settings', label: isPortuguese ? 'Configuracoes' : 'Settings', icon: Settings },
-        { id: 'help', label: isPortuguese ? 'Ajuda' : 'Help', icon: HelpCircle },
+        {
+          id: 'settings',
+          label: isPortuguese ? 'Configuracoes' : 'Settings',
+          blurb: isPortuguese ? 'Marca, dominio e permissoes.' : 'Brand, domain and permissions.',
+          icon: Settings,
+        },
+        {
+          id: 'help',
+          label: isPortuguese ? 'Ajuda' : 'Help',
+          blurb: isPortuguese ? 'Treinamento e base operacional.' : 'Training and operational base.',
+          icon: HelpCircle,
+        },
       ],
     },
   ]
@@ -100,153 +175,132 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
   const access = useAccessControl()
   const { isPortuguese } = useAppLocale()
   const navGroups = createNavGroups(isPortuguese)
-  const visibleGroups = navGroups
     .map((group) => ({
       ...group,
       items: group.items.filter((item) => access.canAccessSection(item.id)),
     }))
     .filter((group) => group.items.length > 0)
 
+  if (!isOpen) {
+    return null
+  }
+
   return (
-    <aside
-      className={cn(
-        'relative z-20 flex shrink-0 flex-col border-r transition-all duration-300',
-        'bg-[linear-gradient(180deg,rgba(14,12,11,0.96)_0%,rgba(7,6,7,0.98)_100%)] border-[rgba(255,255,255,0.05)]',
-        isOpen ? 'w-72' : 'w-20',
-      )}
-    >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 top-0 h-48 w-full bg-[radial-gradient(circle_at_top,rgba(214,42,11,0.07),transparent_62%)]" />
-        <div className="absolute bottom-0 left-0 h-56 w-full bg-[radial-gradient(circle_at_bottom,rgba(174,147,111,0.08),transparent_68%)]" />
-      </div>
+    <div className="fixed inset-0 z-40">
+      <button
+        type="button"
+        aria-label={isPortuguese ? 'Fechar navegacao' : 'Close navigation'}
+        className="absolute inset-0 bg-[rgba(7,6,7,0.76)] backdrop-blur-sm"
+        onClick={onToggle}
+      />
 
-      {/* Logo */}
-      <div
-        className={cn(
-          'relative z-10 flex shrink-0 items-center border-b border-[rgba(255,255,255,0.06)]',
-          isOpen ? 'gap-4 px-6 py-5' : 'justify-center px-4 py-5',
-        )}
-      >
-        {isOpen ? (
-          <div className="flex flex-col gap-2 animate-fade-in min-w-0 w-full">
-            <img
-              src="/logo.png"
-              alt="Animalz Events"
-              className="h-16 w-auto object-contain"
-              style={{ filter: 'drop-shadow(0 0 12px rgba(174,147,111,0.22))' }}
-            />
-            <div className="truncate text-[10px] uppercase tracking-[0.26em] text-[#6f6660]">
-              {organization?.name ?? (isPortuguese ? 'Plataforma' : 'Platform')}
-            </div>
-          </div>
-        ) : (
-          <img
-            src="/logo.png"
-            alt="A"
-            className="w-12 h-auto object-contain"
-            style={{ filter: 'drop-shadow(0 0 8px rgba(174,147,111,0.22))' }}
+      <aside className="absolute right-0 top-0 h-full w-full max-w-[560px] overflow-y-auto border-l border-white/8 bg-[#0d0b0a] shadow-[0_30px_120px_rgba(0,0,0,0.68)]">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-[-8rem] top-[-8rem] h-[20rem] w-[20rem] rounded-full bg-[#d62a0b]/[0.14] blur-[120px]" />
+          <div className="absolute right-[-6rem] top-[20%] h-[18rem] w-[18rem] rounded-full bg-[#ae936f]/[0.12] blur-[120px]" />
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
+              backgroundSize: '56px 56px',
+            }}
           />
-        )}
-      </div>
+        </div>
 
-      {/* Nav */}
-      <nav className="relative z-10 flex-1 overflow-y-auto px-3 py-5">
-        {isOpen
-          ? visibleGroups.map((group) => (
-              <div key={group.label} className="mb-6">
-                <div className="mb-2 px-3 text-[10px] uppercase tracking-[0.32em] text-[#8e847d]">
-                  {group.label}
-                </div>
-                {group.items.map((item) => {
-                  const Icon = item.icon
-                  const isActive = activeSection === item.id
+        <div className="relative z-10 flex min-h-full flex-col px-6 py-6 md:px-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.42em] text-[#ae936f]">
+                {isPortuguese ? 'Mapa do produto' : 'Product map'}
+              </div>
+              <div className="mt-3 font-display text-[clamp(2.8rem,5vw,4.2rem)] leading-[0.9] tracking-[-0.05em] text-[#ebe7e0]">
+                {isPortuguese ? 'Navegacao operacional.' : 'Operational navigation.'}
+              </div>
+            </div>
 
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => onNavigate(item.id)}
-                      className={cn(
-                        'mb-1 flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left transition-all duration-200',
-                        isActive
-                          ? 'border border-[#d62a0b]/22 bg-[linear-gradient(135deg,rgba(214,42,11,0.18),rgba(174,147,111,0.06))] text-[#ebe7e0] shadow-[0_12px_24px_rgba(214,42,11,0.08)]'
-                          : 'text-[#8e847d] hover:bg-[rgba(255,255,255,0.04)] hover:text-[#ebe7e0]',
-                      )}
-                    >
-                      <div
+            <button
+              type="button"
+              onClick={onToggle}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-[#8e847d] transition-all hover:border-[#ae936f]/30 hover:text-[#ebe7e0]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="mt-5 max-w-md text-sm leading-7 text-[#b8b0a8]/74">
+            {isPortuguese
+              ? 'Cada modulo foi reorganizado para seguir a mesma linguagem visual do produto inteiro, sem a estrutura anterior.'
+              : 'Every module has been reorganized to follow the same visual language across the entire product.'}
+          </div>
+
+          <div className="mt-10 space-y-10">
+            {navGroups.map((group) => (
+              <section key={group.label}>
+                <div className="text-[10px] uppercase tracking-[0.34em] text-[#ae936f]/85">{group.label}</div>
+                <div className="mt-4 grid gap-3">
+                  {group.items.map((item, index) => {
+                    const Icon = item.icon
+                    const isActive = item.id === activeSection
+
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          onNavigate(item.id)
+                          onToggle()
+                        }}
                         className={cn(
-                          'flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-colors duration-200',
-                          isActive ? 'bg-[#d62a0b]/16 text-[#d62a0b]' : 'bg-transparent text-[#8e847d]',
+                          'group flex items-start gap-4 rounded-[2rem] border px-5 py-5 text-left transition-all duration-300',
+                          isActive
+                            ? 'border-[#ae936f]/28 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] shadow-[0_20px_60px_rgba(0,0,0,0.24)]'
+                            : 'border-white/8 bg-white/[0.03] hover:border-[#ae936f]/20 hover:bg-white/[0.05]',
                         )}
                       >
-                        <Icon className="h-4 w-4 shrink-0" />
-                      </div>
-                      <span className="flex-1 truncate text-sm font-medium">{item.label}</span>
-                      {isActive ? (
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#d62a0b]" />
-                      ) : null}
-                    </button>
-                  )
-                })}
-              </div>
-            ))
-          : visibleGroups.flatMap((group) => group.items).map((item) => {
-              const Icon = item.icon
-              const isActive = activeSection === item.id
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/8 bg-white/[0.04] text-[#ae936f]">
+                          <Icon className="h-5 w-5" />
+                        </div>
 
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onNavigate(item.id)}
-                  title={item.label}
-                  className={cn(
-                    'mb-1 flex w-full justify-center rounded-xl p-3 transition-all duration-200',
-                    isActive
-                      ? 'border border-[#d62a0b]/22 bg-[#d62a0b]/12 text-[#d62a0b]'
-                      : 'text-[#8e847d] hover:bg-[rgba(255,255,255,0.04)] hover:text-[#ebe7e0]',
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
-                </button>
-              )
-            })}
-      </nav>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-baseline gap-3">
+                            <span className="text-[11px] font-mono uppercase tracking-[0.32em] text-[#ae936f]/55">
+                              {String(index + 1).padStart(2, '0')}
+                            </span>
+                            <span className="font-display text-[2rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">
+                              {item.label}
+                            </span>
+                          </div>
+                          <div className="mt-2 max-w-md text-sm leading-6 text-[#b8b0a8]/70">{item.blurb}</div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </section>
+            ))}
+          </div>
 
-      {/* User profile */}
-      <div className={cn('relative z-10 shrink-0 border-t border-[rgba(255,255,255,0.06)]', isOpen ? 'p-4' : 'p-3')}>
-        {isOpen ? (
-          <div
-            className="flex items-center gap-3 rounded-[24px] border border-[rgba(255,255,255,0.06)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.02)_100%)] p-3.5 animate-fade-in shadow-[0_18px_44px_rgba(0,0,0,0.26)]"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d62a0b]/12 shrink-0">
-              <span className="text-xs font-semibold text-[#d62a0b]">
-                {getInitials(`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`)}
-              </span>
+          <div className="mt-10 rounded-[2rem] border border-white/8 bg-white/[0.03] p-5">
+            <div className="text-[10px] uppercase tracking-[0.34em] text-[#ae936f]">
+              {isPortuguese ? 'Sessao ativa' : 'Live profile'}
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium text-[#ebe7e0]">
-                {profile?.first_name} {profile?.last_name}
+            <div className="mt-4 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#d62a0b]/12 text-sm font-semibold text-[#d62a0b]">
+                {getInitials(`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`)}
               </div>
-              <div className="truncate text-[11px] capitalize text-[#8e847d]">{access.role}</div>
+              <div className="min-w-0">
+                <div className="truncate text-base font-medium text-[#ebe7e0]">
+                  {profile?.first_name} {profile?.last_name}
+                </div>
+                <div className="truncate text-sm text-[#8e847d]">
+                  {organization?.name ?? (isPortuguese ? 'Operacao principal' : 'Primary operation')}
+                </div>
+              </div>
             </div>
           </div>
-        ) : (
-          <div className="flex justify-center">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d62a0b]/12">
-              <span className="text-xs font-semibold text-[#d62a0b]">
-                {getInitials(`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`)}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Toggle button */}
-      <button
-        onClick={onToggle}
-        className="absolute -right-3 top-8 flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(255,255,255,0.08)] bg-[#12100f] text-[#8e847d] shadow-card transition-all hover:border-[#d62a0b]/35 hover:text-[#d62a0b]"
-      >
-        {isOpen ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-      </button>
-    </aside>
+        </div>
+      </aside>
+    </div>
   )
 }

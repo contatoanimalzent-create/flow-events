@@ -258,30 +258,31 @@
   .display-title { @apply font-display text-text-primary leading-none; }
 
   .admin-page {
-    @apply mx-auto max-w-[1560px] space-y-10 px-6 py-8 lg:px-10 lg:py-10;
+    @apply mx-auto max-w-[1720px] space-y-12 px-5 py-10 md:px-8 lg:px-10 lg:py-12;
   }
   .admin-header {
-    @apply reveal flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between;
+    @apply reveal grid gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start;
+    border-color: rgba(255,255,255,0.06);
   }
   .admin-title {
-    @apply font-display text-[3rem] font-semibold tracking-[-0.05em] text-[#ebe7e0] lg:text-[4rem] leading-[0.9];
+    @apply font-display text-[clamp(4rem,7vw,6.8rem)] font-semibold tracking-[-0.06em] text-[#ebe7e0] leading-[0.86];
   }
   .admin-title-accent {
     @apply text-brand-acid;
   }
   .admin-subtitle {
-    @apply mt-3 max-w-3xl text-sm leading-7;
-    color: rgba(184,176,168,0.72);
+    @apply mt-5 max-w-2xl text-base leading-8;
+    color: rgba(184,176,168,0.76);
   }
   .admin-eyebrow {
-    @apply text-[11px] uppercase tracking-[0.34em] text-[#ae936f];
+    @apply text-[11px] uppercase tracking-[0.46em] text-[#ae936f];
   }
   .admin-filterbar {
-    @apply reveal flex flex-wrap items-center gap-3 rounded-[26px] p-3.5;
+    @apply reveal flex flex-wrap items-center gap-3 rounded-[2rem] px-4 py-4;
     border: 1px solid rgba(255,255,255,0.08);
-    background: linear-gradient(180deg, rgba(20,17,16,0.82) 0%, rgba(13,11,10,0.76) 100%);
-    box-shadow: 0 22px 56px rgba(0,0,0,0.28);
-    backdrop-filter: blur(18px);
+    background: linear-gradient(180deg, rgba(18,16,15,0.92) 0%, rgba(12,11,10,0.88) 100%);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.28);
+    backdrop-filter: blur(24px);
   }
   .admin-filter-chip {
     @apply rounded-full border border-transparent px-3.5 py-2 text-xs font-medium text-text-secondary transition-all hover:border-bg-border hover:bg-bg-elevated hover:text-text-primary;
@@ -296,23 +297,23 @@
     @apply bg-bg-elevated text-text-primary border border-bg-border;
   }
   .metric-card {
-    @apply card p-5;
+    @apply card p-6;
   }
   .metric-label {
-    @apply text-[10px] uppercase tracking-[0.32em];
-    color: rgba(255,255,255,0.4);
+    @apply text-[10px] uppercase tracking-[0.34em];
+    color: rgba(184,176,168,0.56);
   }
   .metric-value {
-    @apply mt-5 font-display text-[2.35rem] font-semibold leading-none tracking-[-0.05em] text-[#ebe7e0];
+    @apply mt-6 font-display text-[2.8rem] font-semibold leading-none tracking-[-0.06em] text-[#ebe7e0];
   }
   .surface-panel {
-    @apply rounded-[30px];
+    @apply rounded-[2rem];
     border: 1px solid rgba(255,255,255,0.08);
     background:
-      radial-gradient(circle at top right, rgba(214,42,11,0.05), transparent 24%),
-      linear-gradient(180deg, rgba(20,17,16,0.88) 0%, rgba(12,11,10,0.84) 100%);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-    backdrop-filter: blur(18px);
+      radial-gradient(circle at top right, rgba(214,42,11,0.06), transparent 22%),
+      linear-gradient(180deg, rgba(18,16,15,0.92) 0%, rgba(12,11,10,0.9) 100%);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.05);
+    backdrop-filter: blur(24px);
   }
   .surface-panel-muted {
     background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.02) 100%);
@@ -334,7 +335,7 @@
   .section-shell-spacious { @apply space-y-8; }
 
   .premium-card {
-    @apply rounded-[30px] p-6;
+    @apply rounded-[2rem] p-6;
   }
   .metric-icon {
     @apply flex h-11 w-11 items-center justify-center rounded-full bg-brand-acid/10 text-brand-acid;
@@ -344,16 +345,16 @@
   .metric-trend  { @apply text-brand-acid; }
 
   .premium-table-shell {
-    @apply overflow-hidden rounded-[28px] border border-bg-border shadow-card;
-    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.03) 100%);
+    @apply overflow-hidden rounded-[2rem] border border-bg-border shadow-card;
+    background: linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.025) 100%);
   }
   .premium-table { @apply w-full border-collapse; }
   .premium-filterbar {
-    @apply flex flex-wrap items-center gap-3 rounded-[26px] p-3.5;
+    @apply flex flex-wrap items-center gap-3 rounded-[2rem] px-4 py-4;
     border: 1px solid rgba(255,255,255,0.08);
-    background: linear-gradient(180deg, rgba(17,20,26,0.82) 0%, rgba(12,15,20,0.76) 100%);
-    box-shadow: 0 22px 56px rgba(0,0,0,0.28);
-    backdrop-filter: blur(18px);
+    background: linear-gradient(180deg, rgba(18,16,15,0.92) 0%, rgba(12,11,10,0.88) 100%);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.28);
+    backdrop-filter: blur(24px);
   }
   .premium-tabs {
     @apply inline-flex flex-wrap items-center gap-2 rounded-full p-1.5;
@@ -427,13 +428,13 @@
   }
   .page-header { @apply flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between; }
   .page-eyebrow,
-  .section-eyebrow { @apply text-[11px] uppercase tracking-[0.3em] text-brand-acid; }
+  .section-eyebrow { @apply text-[11px] uppercase tracking-[0.42em] text-[#ae936f]; }
   .page-title-luxury {
-    @apply mt-2 font-display text-[clamp(3rem,5vw,5.2rem)] leading-[0.9] tracking-[-0.05em] text-[#ebe7e0];
+    @apply mt-3 font-display text-[clamp(4rem,7vw,6.5rem)] leading-[0.86] tracking-[-0.06em] text-[#ebe7e0];
   }
   .page-description {
-    @apply mt-4 max-w-3xl text-sm leading-7;
-    color: rgba(184,176,168,0.72);
+    @apply mt-5 max-w-2xl text-base leading-8;
+    color: rgba(184,176,168,0.76);
   }
   .section-header { @apply flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between; }
   .section-title-luxury {
@@ -444,6 +445,46 @@
   }
   .page-header-actions,
   .section-header-actions { @apply flex flex-wrap items-center gap-2; }
+  .novare-stage {
+    @apply grid gap-6 lg:grid-cols-[1.12fr_0.88fr] lg:items-stretch;
+  }
+  .novare-stage-stack {
+    @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-3;
+  }
+  .novare-stage-panel {
+    @apply rounded-[2rem] border p-6;
+    border-color: rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, rgba(18,16,15,0.92) 0%, rgba(12,11,10,0.88) 100%);
+    box-shadow: 0 28px 80px rgba(0,0,0,0.28);
+  }
+  .novare-stage-panel-dark {
+    @apply rounded-[2rem] border p-6;
+    border-color: rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, rgba(10,9,9,0.96) 0%, rgba(7,6,7,0.94) 100%);
+    box-shadow: 0 28px 80px rgba(0,0,0,0.38);
+  }
+  .novare-stage-label {
+    @apply text-[10px] uppercase tracking-[0.42em] text-[#ae936f];
+  }
+  .novare-stage-title {
+    @apply mt-4 font-display text-[clamp(2rem,3.2vw,3.2rem)] leading-[0.92] tracking-[-0.05em] text-[#ebe7e0];
+  }
+  .novare-stage-copy {
+    @apply mt-4 text-sm leading-7;
+    color: rgba(184,176,168,0.74);
+  }
+  .novare-stage-metric {
+    @apply rounded-[1.6rem] border p-5;
+    border-color: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+  }
+  .novare-stage-metric-value {
+    @apply mt-4 font-display text-[2.3rem] leading-none tracking-[-0.05em] text-[#ebe7e0];
+  }
+  .novare-stage-metric-copy {
+    @apply mt-3 text-sm leading-7;
+    color: rgba(184,176,168,0.68);
+  }
 
   .motion-page { animation: revealUp 0.52s var(--ds-ease-productive) both; }
   .motion-reveal {
@@ -460,17 +501,17 @@
   .motion-stagger > *:nth-child(4) { animation-delay: calc(var(--stagger-step, 110ms) * 3); }
   .motion-stagger > *:nth-child(5) { animation-delay: calc(var(--stagger-step, 110ms) * 4); }
 
-  .admin-shell-foundation { @apply relative flex h-screen overflow-hidden bg-[#070607]; }
-  .admin-page-layout { @apply mx-auto max-w-[1560px] space-y-8 px-6 py-6 lg:px-10 lg:py-8; }
+  .admin-shell-foundation { @apply relative flex min-h-screen overflow-hidden bg-[#070607]; }
+  .admin-page-layout { @apply mx-auto max-w-[1720px] space-y-10 px-5 py-8 md:px-8 lg:px-10 lg:py-10; }
   .admin-metric-section,
   .admin-table-section,
   .admin-form-section { @apply space-y-4; }
   .admin-action-bar {
-    @apply flex flex-wrap items-center justify-between gap-3 rounded-[26px] p-3.5;
+    @apply flex flex-wrap items-center justify-between gap-3 rounded-[2rem] px-4 py-4;
     border: 1px solid rgba(255,255,255,0.08);
-    background: linear-gradient(180deg, rgba(20,17,16,0.82) 0%, rgba(13,11,10,0.76) 100%);
-    box-shadow: 0 22px 56px rgba(0,0,0,0.28);
-    backdrop-filter: blur(18px);
+    background: linear-gradient(180deg, rgba(18,16,15,0.92) 0%, rgba(12,11,10,0.88) 100%);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.28);
+    backdrop-filter: blur(24px);
   }
   .luxury-modal-shell {
     @apply rounded-[30px];

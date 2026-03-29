@@ -128,7 +128,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
               src="/logo.png"
               alt="Animalz Events"
               className="h-16 w-auto object-contain"
-              style={{ filter: 'drop-shadow(0 0 12px rgba(255,45,45,0.22))' }}
+              style={{ filter: 'drop-shadow(0 0 12px rgba(196,154,80,0.22))' }}
             />
             <div className="truncate text-[10px] uppercase tracking-[0.26em] text-[#6f7785]">
               {organization?.name ?? (isPortuguese ? 'Plataforma' : 'Platform')}
@@ -139,7 +139,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
             src="/logo.png"
             alt="A"
             className="w-12 h-auto object-contain"
-            style={{ filter: 'drop-shadow(0 0 8px rgba(255,45,45,0.22))' }}
+            style={{ filter: 'drop-shadow(0 0 8px rgba(196,154,80,0.22))' }}
           />
         )}
       </div>
@@ -163,21 +163,21 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
                       className={cn(
                         'mb-1 flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left transition-all duration-200',
                         isActive
-                          ? 'bg-[linear-gradient(135deg,rgba(255,45,45,0.18),rgba(255,45,45,0.08))] text-[#f5f7fa] border border-[#ff2d2d]/30 shadow-[0_12px_24px_rgba(255,45,45,0.12)]'
+                          ? 'border border-[#d4ff00]/22 bg-[linear-gradient(135deg,rgba(212,255,0,0.16),rgba(212,255,0,0.05))] text-[#f5f7fa] shadow-[0_12px_24px_rgba(212,255,0,0.08)]'
                           : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.04)] hover:text-[#f5f7fa]',
                       )}
                     >
                       <div
                         className={cn(
                           'flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-colors duration-200',
-                          isActive ? 'bg-[#ff2d2d]/18 text-[#ff6a5c]' : 'bg-transparent text-[#7b8390]',
+                          isActive ? 'bg-[#d4ff00]/16 text-[#d4ff00]' : 'bg-transparent text-[#7b8390]',
                         )}
                       >
                         <Icon className="h-4 w-4 shrink-0" />
                       </div>
                       <span className="flex-1 truncate text-sm font-medium">{item.label}</span>
                       {isActive ? (
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ff2d2d]" />
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#d4ff00]" />
                       ) : null}
                     </button>
                   )
@@ -196,7 +196,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
                   className={cn(
                     'mb-1 flex w-full justify-center rounded-xl p-3 transition-all duration-200',
                     isActive
-                      ? 'bg-[#ff2d2d]/14 text-[#ff6a5c] border border-[#ff2d2d]/24'
+                      ? 'border border-[#d4ff00]/22 bg-[#d4ff00]/12 text-[#d4ff00]'
                       : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.04)] hover:text-[#f5f7fa]',
                   )}
                 >
@@ -212,8 +212,8 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
           <div
             className="flex items-center gap-3 rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.03)] p-3 animate-fade-in"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff2d2d]/12 shrink-0">
-              <span className="text-xs font-semibold text-[#ff6a5c]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d4ff00]/12 shrink-0">
+              <span className="text-xs font-semibold text-[#d4ff00]">
                 {getInitials(`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`)}
               </span>
             </div>
@@ -226,8 +226,8 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff2d2d]/12">
-              <span className="text-xs font-semibold text-[#ff6a5c]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d4ff00]/12">
+              <span className="text-xs font-semibold text-[#d4ff00]">
                 {getInitials(`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`)}
               </span>
             </div>
@@ -238,7 +238,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
       {/* Toggle button */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-8 flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(255,255,255,0.08)] bg-[#11141a] text-[#7b8390] shadow-card transition-all hover:border-[#ff2d2d]/40 hover:text-[#ff6a5c]"
+        className="absolute -right-3 top-8 flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(255,255,255,0.08)] bg-[#11141a] text-[#7b8390] shadow-card transition-all hover:border-[#d4ff00]/35 hover:text-[#d4ff00]"
       >
         {isOpen ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
       </button>

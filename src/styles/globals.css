@@ -15,7 +15,7 @@
     --ds-text-muted: 111 119 133;
     --ds-border-subtle: 34 40 52;
     --ds-border-strong: 58 69 88;
-    --ds-accent-primary: 255 45 45;
+    --ds-accent-primary: 212 255 0;
     --ds-accent-secondary: 143 153 168;
     --ds-accent-tertiary: 91 111 140;
     --ds-accent-plum: 115 124 144;
@@ -25,7 +25,7 @@
     --ds-status-info: 76 132 255;
     --ds-shadow-soft: 0 18px 42px rgba(0, 0, 0, 0.34);
     --ds-shadow-float: 0 36px 90px rgba(0, 0, 0, 0.58);
-    --ds-shadow-glow: 0 16px 50px rgba(255, 45, 45, 0.28);
+    --ds-shadow-glow: 0 16px 50px rgba(212, 255, 0, 0.24);
     --ds-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
     --ds-ease-productive: cubic-bezier(0.16, 1, 0.3, 1);
     --ds-duration-fast: 180ms;
@@ -47,7 +47,7 @@
     margin: 0;
     padding: 0;
     background-image:
-      radial-gradient(circle at top left, rgba(255,45,45,0.12), transparent 24%),
+      radial-gradient(circle at top left, rgba(212,255,0,0.10), transparent 24%),
       radial-gradient(circle at bottom right, rgba(96,110,131,0.1), transparent 28%),
       linear-gradient(135deg, rgba(255,255,255,0.015) 0%, rgba(255,255,255,0) 60%);
   }
@@ -63,7 +63,7 @@
 @layer components {
   .luxury-canvas {
     background:
-      radial-gradient(circle at top, rgba(255,45,45,0.12), transparent 30%),
+      radial-gradient(circle at top, rgba(212,255,0,0.10), transparent 30%),
       linear-gradient(180deg, rgba(19,24,32,0.82) 0%, rgba(5,7,10,0) 100%),
       repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 14px);
   }
@@ -86,9 +86,9 @@
   }
   .glass-accent {
     background:
-      radial-gradient(circle at top right, rgba(255,45,45,0.14), transparent 36%),
+      radial-gradient(circle at top right, rgba(212,255,0,0.10), transparent 36%),
       linear-gradient(180deg, rgba(22,27,36,0.96) 0%, rgba(15,19,26,0.92) 100%);
-    box-shadow: var(--ds-shadow-soft), inset 0 1px 0 rgba(255,45,45,0.1);
+    box-shadow: var(--ds-shadow-soft), inset 0 1px 0 rgba(212,255,0,0.08);
   }
 
   .cursor-dot {
@@ -96,7 +96,7 @@
     top: 0; left: 0;
     z-index: 9999;
     width: 8px; height: 8px;
-    background: #ff2d2d;
+    background: #d4ff00;
     border-radius: 50%;
     pointer-events: none;
     box-shadow: 0 0 10px rgba(196,154,80,0.8), 0 0 20px rgba(196,154,80,0.3);
@@ -149,8 +149,8 @@
   }
   .card-hover:hover {
     transform: translateY(-4px);
-    border-color: rgba(255,45,45,0.32);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 1px rgba(255,45,45,0.12);
+    border-color: rgba(212,255,0,0.22);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 1px rgba(212,255,0,0.10);
   }
 
   /* Dark section utilities — keep for public pages */
@@ -185,7 +185,7 @@
   /* Mesh/grid background for admin content */
   .main-grid-bg {
     background-image:
-      radial-gradient(ellipse at top left, rgba(255,45,45,0.1), transparent 32%),
+      radial-gradient(ellipse at top left, rgba(212,255,0,0.08), transparent 32%),
       radial-gradient(ellipse at bottom right, rgba(84,97,118,0.08), transparent 36%),
       linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);

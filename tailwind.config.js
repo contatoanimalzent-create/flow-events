@@ -18,7 +18,7 @@ export default {
           muted:     '#6f7785',
         },
         brand: {
-          acid:   '#ff2d2d',
+          acid:   '#d4ff00',
           blue:   '#4f6784',
           purple: '#7e8798',
           teal:   '#8f99a8',
@@ -55,7 +55,7 @@ export default {
         'card-deep':      '0 28px 72px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05)',
         'card-dark':      '0 24px 58px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.04)',
         'card-dark-deep': '0 36px 92px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
-        'glow-acid':      '0 12px 40px rgba(255,45,45,0.32)',
+        'glow-acid':      '0 12px 40px rgba(212,255,0,0.24)',
         'glow-teal':      '0 10px 34px rgba(143,153,168,0.14)',
         'glow-blue':      '0 10px 34px rgba(76,132,255,0.16)',
         'glow-error':     '0 10px 34px rgba(255,69,58,0.22)',
@@ -73,7 +73,7 @@ export default {
         marquee: { to: { transform: 'translateX(-50%)' } },
       },
       backgroundImage: {
-        'gradient-acid': 'linear-gradient(135deg, #ff2d2d 0%, #ff5a36 100%)',
+        'gradient-acid': 'linear-gradient(135deg, #d4ff00 0%, #c49a50 100%)',
         'gradient-ink':  'linear-gradient(160deg, #141922 0%, #0d1117 60%, #10141b 100%)',
         'gradient-noir': 'linear-gradient(160deg, #05070a 0%, #0a0d12 60%, #06080b 100%)',
       },

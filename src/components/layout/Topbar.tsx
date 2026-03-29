@@ -80,7 +80,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
         </button>
 
         <div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-[#ff6a5c]">{access.role}</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-[#d4ff00]/80">{access.role}</div>
           <h1 className="mt-0.5 font-display text-[1.9rem] font-semibold leading-none tracking-[-0.03em] text-[#f5f7fa]">
             {sectionTitles[activeSection]}
           </h1>
@@ -90,7 +90,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
         <button
           onClick={() => setShowSearch(true)}
-          className="hidden items-center gap-2 rounded-full border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-4 py-2 text-sm text-[#7b8390] transition-all hover:border-[#ff2d2d]/30 hover:text-[#f5f7fa] md:flex"
+          className="hidden items-center gap-2 rounded-full border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-4 py-2 text-sm text-[#7b8390] transition-all hover:border-[#d4ff00]/30 hover:text-[#f5f7fa] md:flex"
         >
           <Search className="h-4 w-4" />
           <span>{t('Search...', 'Buscar...')}</span>
@@ -101,7 +101,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
         <button
           onClick={() => setLocale(locale === 'en-US' ? 'pt-BR' : 'en-US')}
-          className="inline-flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[#7b8390] transition-all hover:border-[#ff2d2d]/30 hover:text-[#f5f7fa]"
+          className="inline-flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[#7b8390] transition-all hover:border-[#d4ff00]/30 hover:text-[#f5f7fa]"
           title={t('Switch language', 'Trocar idioma')}
         >
           <Globe className="h-4 w-4" />
@@ -114,13 +114,13 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
         >
           <Bell className="h-5 w-5" />
           {notifications.unreadCount > 0 ? (
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 animate-pulse rounded-full bg-[#ff2d2d]" />
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 animate-pulse rounded-full bg-[#d4ff00]" />
           ) : null}
         </button>
 
         <button
           onClick={signOut}
-          className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2.5 text-[#7b8390] transition-all hover:border-[#ff453a]/25 hover:text-[#ff453a]"
+          className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2.5 text-[#7b8390] transition-all hover:border-[#d4ff00]/25 hover:text-[#d4ff00]"
           title={t('Sign out', 'Sair')}
         >
           <LogOut className="h-5 w-5" />
@@ -161,7 +161,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
         <div className="absolute right-6 top-[80px] z-40 w-[420px] overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#11141a] shadow-[0_24px_80px_rgba(0,0,0,0.7)]">
           <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.06)] p-5">
             <div>
-              <div className="text-[10px] uppercase tracking-[0.3em] text-[#ff6a5c]">{access.role}</div>
+              <div className="text-[10px] uppercase tracking-[0.3em] text-[#d4ff00]/80">{access.role}</div>
               <h3 className="mt-1 font-display text-2xl font-semibold leading-none tracking-[-0.03em] text-[#f5f7fa]">
                 {t('Internal center', 'Centro interno')}
               </h3>
@@ -178,7 +178,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
               onClick={() => setPanelTab('notifications')}
               className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${
                 panelTab === 'notifications'
-                  ? 'bg-[#ff2d2d] text-[#f5f7fa] shadow-[0_6px_18px_rgba(255,45,45,0.28)]'
+                  ? 'bg-[#d4ff00] text-[#0a0908] shadow-[0_6px_18px_rgba(212,255,0,0.22)]'
                   : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]'
               }`}
             >

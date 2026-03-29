@@ -54,10 +54,10 @@
 
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: rgba(20, 24, 31, 0.8); }
-  ::-webkit-scrollbar-thumb { background: rgba(255, 45, 45, 0.42); border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 45, 45, 0.78); }
+  ::-webkit-scrollbar-thumb { background: rgba(212, 255, 0, 0.34); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(212, 255, 0, 0.58); }
 
-  ::selection { background: rgba(255, 45, 45, 0.26); color: #f5f7fa; }
+  ::selection { background: rgba(212, 255, 0, 0.22); color: #05070a; }
 }
 
 @layer components {

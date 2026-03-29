@@ -17,6 +17,7 @@ import {
   X,
   Zap,
 } from 'lucide-react'
+import { useEffect } from 'react'
 import type { NavSection } from '@/app/layout'
 import { useAccessControl } from '@/features/access-control'
 import { useAuthStore } from '@/lib/store/auth'
@@ -174,6 +175,24 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
   const { profile, organization } = useAuthStore()
   const access = useAccessControl()
   const { isPortuguese } = useAppLocale()
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    const previousOverflow = document.body.style.overflow
+    const previousOverscroll = document.body.style.overscrollBehavior
+
+    document.body.style.overflow = 'hidden'
+    document.body.style.overscrollBehavior = 'none'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.body.style.overscrollBehavior = previousOverscroll
+    }
+  }, [isOpen])
+
   const navGroups = createNavGroups(isPortuguese)
     .map((group) => ({
       ...group,
@@ -194,7 +213,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
         onClick={onToggle}
       />
 
-      <aside className="absolute right-0 top-0 h-full w-full max-w-[560px] overflow-y-auto border-l border-white/8 bg-[#0d0b0a] shadow-[0_30px_120px_rgba(0,0,0,0.68)]">
+      <aside className="absolute right-0 top-0 h-screen w-full max-w-[560px] overflow-y-auto overscroll-contain border-l border-white/8 bg-[#0d0b0a] shadow-[0_30px_120px_rgba(0,0,0,0.68)]">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-[-8rem] top-[-8rem] h-[20rem] w-[20rem] rounded-full bg-[#d62a0b]/[0.14] blur-[120px]" />
           <div className="absolute right-[-6rem] top-[20%] h-[18rem] w-[18rem] rounded-full bg-[#ae936f]/[0.12] blur-[120px]" />

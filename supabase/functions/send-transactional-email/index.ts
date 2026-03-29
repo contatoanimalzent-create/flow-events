@@ -2,11 +2,15 @@ import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 import {
   buildOrderConfirmationEmail,
+  buildOrderConfirmationWithQREmail,
   buildTicketsEmail,
   sendResendEmail,
 } from '../_shared/transactional-email.ts'
 
-type TransactionalTemplateKey = 'order-confirmation' | 'tickets-issued'
+type TransactionalTemplateKey =
+  | 'order-confirmation'
+  | 'order-confirmation-with-qr'
+  | 'tickets-issued'
 
 function buildTemplatePayload(
   templateKey: TransactionalTemplateKey,
@@ -16,6 +20,10 @@ function buildTemplatePayload(
     buyerName: string
     buyerEmail: string
     totalAmount: number
+    recipientName?: string
+    eventDate?: string
+    eventLocation?: string
+    exerciseType?: string
     tickets: Array<{
       ticketNumber: string
       holderName: string | null
@@ -26,6 +34,19 @@ function buildTemplatePayload(
   },
 ) {
   switch (templateKey) {
+    case 'order-confirmation-with-qr':
+      return buildOrderConfirmationWithQREmail({
+        orderId: data.orderId,
+        eventName: data.eventName,
+        buyerName: data.buyerName,
+        buyerEmail: data.buyerEmail,
+        totalAmount: data.totalAmount,
+        recipientName: data.recipientName,
+        eventDate: data.eventDate,
+        eventLocation: data.eventLocation,
+        exerciseType: data.exerciseType,
+        tickets: data.tickets,
+      })
     case 'tickets-issued':
       return buildTicketsEmail(data)
     case 'order-confirmation':
@@ -41,7 +62,7 @@ Deno.serve(async (req) => {
 
   try {
     const supabase = createSupabaseAdminClient()
-    const { orderId, templateKey = 'tickets-issued', recipientEmail } = await req.json()
+    const { orderId, templateKey = 'order-confirmation-with-qr', recipientEmail } = await req.json()
 
     if (!orderId) {
       return Response.json({ error: 'orderId is required' }, { status: 400, headers: corsHeaders })
@@ -57,8 +78,13 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Pedido nao encontrado' }, { status: 404, headers: corsHeaders })
     }
 
+    // Fetch event details including date and location
     const [{ data: event }, { data: digitalTickets }] = await Promise.all([
-      supabase.from('events').select('name').eq('id', order.event_id).single(),
+      supabase
+        .from('events')
+        .select('id,name,starts_at,venue_address,venue_name,settings')
+        .eq('id', order.event_id)
+        .single(),
       supabase
         .from('digital_tickets')
         .select('ticket_number,holder_name,holder_email,qr_token,status')
@@ -72,12 +98,38 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Pedido sem e-mail de destino' }, { status: 422, headers: corsHeaders })
     }
 
+    // Format event date if available
+    const eventDate = event?.starts_at
+      ? new Date(event.starts_at).toLocaleDateString('pt-BR', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : undefined
+
+    // Extract location from venue info
+    const eventLocation = event?.venue_name
+      ? `${event.venue_name}${event.venue_address ? ' - ' + event.venue_address : ''}`
+      : undefined
+
+    // Extract exercise type from settings if available
+    const exerciseType = event?.settings
+      ? ((event.settings as Record<string, unknown>)?.exercise_type as string | undefined)
+      : undefined
+
     const content = buildTemplatePayload(templateKey, {
       orderId: order.id,
       eventName: event?.name ?? 'Animalz Event',
       buyerName: order.buyer_name ?? '',
       buyerEmail: order.buyer_email ?? '',
       totalAmount: Number(order.total_amount ?? 0),
+      recipientName: order.buyer_name ?? undefined,
+      eventDate,
+      eventLocation,
+      exerciseType,
       tickets: ((digitalTickets as Array<Record<string, unknown>> | null) ?? []).map((ticket) => ({
         ticketNumber: String(ticket.ticket_number ?? ''),
         holderName: (ticket.holder_name as string | null | undefined) ?? null,

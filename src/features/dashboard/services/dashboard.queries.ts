@@ -13,5 +13,14 @@ export const dashboardQueries = {
     queryOptions({
       queryKey: dashboardKeys.overview(organizationId, period, eventId),
       queryFn: () => dashboardService.getOverview(organizationId, period, eventId),
+      // Cache: mantém dados por 5 min antes de refetch automático
+      staleTime: 5 * 60 * 1000,
+      // Tenta refetch a cada 10 min em background
+      refetchInterval: 10 * 60 * 1000,
+      // Não refetch quando tab fica inativa
+      refetchOnWindowFocus: false,
+      // Se houver erro, retenta em 30s
+      retry: 1,
+      retryDelay: 30_000,
     }),
 }

@@ -13,6 +13,16 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true,
   },
+  global: {
+    // Timeout de 10s para todas as requisições (vs 30s padrão)
+    headers: {
+      'X-Request-Timeout': '10',
+    },
+  },
+  db: {
+    // Pool de conexão mais agressivo
+    schema: 'public',
+  },
 })
 
 export type Database = {

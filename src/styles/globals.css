@@ -310,7 +310,7 @@
   .page-shell {
     @apply mx-auto w-full px-5 py-8 md:px-10 lg:px-16 lg:py-10;
   }
-  .page-shell-public { @apply luxury-canvas; }
+  .page-shell-public { background: transparent; }
   .page-shell-admin  { @apply main-grid-bg; }
   .section-shell         { @apply space-y-5; }
   .section-shell-tight   { @apply space-y-3; }

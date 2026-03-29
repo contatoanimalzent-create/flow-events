@@ -1,4 +1,5 @@
 import { mutationOptions, queryOptions } from '@tanstack/react-query'
+import type { AppLocale } from '@/shared/i18n/app-locale'
 import { billingService } from './billing.service'
 
 interface UpdateOrganizationPlanVariables {
@@ -8,17 +9,18 @@ interface UpdateOrganizationPlanVariables {
 
 export const billingKeys = {
   all: ['billing'] as const,
-  overview: (organizationId: string) => [...billingKeys.all, 'overview', organizationId] as const,
+  overview: (organizationId: string, locale: AppLocale) => [...billingKeys.all, 'overview', organizationId, locale] as const,
+  overviewScope: (organizationId: string) => [...billingKeys.all, 'overview', organizationId] as const,
   plans: () => [...billingKeys.all, 'plans'] as const,
   gate: (organizationId: string, eventId = 'all') => [...billingKeys.all, 'gate', organizationId, eventId] as const,
   actions: () => [...billingKeys.all, 'actions'] as const,
 }
 
 export const billingQueries = {
-  overview: (organizationId: string) =>
+  overview: (organizationId: string, locale: AppLocale) =>
     queryOptions({
-      queryKey: billingKeys.overview(organizationId),
-      queryFn: () => billingService.getOverview(organizationId),
+      queryKey: billingKeys.overview(organizationId, locale),
+      queryFn: () => billingService.getOverview(organizationId, locale),
     }),
   plans: () =>
     queryOptions({

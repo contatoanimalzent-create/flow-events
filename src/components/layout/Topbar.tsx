@@ -12,12 +12,12 @@ import { logError } from '@/shared/lib'
 
 function getSectionTitles(isPortuguese: boolean): Record<NavSection, string> {
   return {
-    dashboard: 'Dashboard',
+    dashboard: isPortuguese ? 'Painel' : 'Dashboard',
     events: isPortuguese ? 'Eventos' : 'Events',
     tickets: isPortuguese ? 'Ingressos e lotes' : 'Tickets & releases',
     sales: isPortuguese ? 'Vendas' : 'Sales',
-    crm: isPortuguese ? 'CRM e clientes' : 'CRM & customers',
-    checkin: isPortuguese ? 'Check-in operacional' : 'Operational check-in',
+    crm: isPortuguese ? 'Relacionamento e clientes' : 'CRM & customers',
+    checkin: isPortuguese ? 'Credenciamento operacional' : 'Operational check-in',
     staff: isPortuguese ? 'Equipe e operacao' : 'Staff & crew',
     suppliers: isPortuguese ? 'Fornecedores' : 'Suppliers',
     products: isPortuguese ? 'Produtos e PDV' : 'Products & POS',
@@ -25,8 +25,8 @@ function getSectionTitles(isPortuguese: boolean): Record<NavSection, string> {
     intelligence: isPortuguese ? 'Inteligencia' : 'Intelligence',
     communication: isPortuguese ? 'Comunicacao' : 'Communications',
     financial: isPortuguese ? 'Financeiro' : 'Financial',
-    billing: isPortuguese ? 'Billing e monetizacao' : 'Billing & monetization',
-    growth: isPortuguese ? 'Crescimento' : 'Growth services',
+    billing: isPortuguese ? 'Cobranca e monetizacao' : 'Billing & monetization',
+    growth: isPortuguese ? 'Operacoes de crescimento' : 'Growth services',
     help: isPortuguese ? 'Ajuda e treinamento' : 'Help & training',
     settings: isPortuguese ? 'Configuracoes' : 'Settings',
   }

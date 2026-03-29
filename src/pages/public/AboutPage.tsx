@@ -1,9 +1,11 @@
 import { ArrowRight, Globe, Layers3, Sparkles } from 'lucide-react'
 import { BrandSection, PublicLayout, PublicReveal, SocialProofSection, usePublicEvents } from '@/features/public'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 import { useSeoMeta } from '@/shared/lib'
 import { LoadingState } from '@/shared/components'
 
 export function AboutPage({ onLogin }: { onLogin: () => void }) {
+  const { isPortuguese, locale } = usePublicLocale()
   const publicEventsQuery = usePublicEvents()
   const events = publicEventsQuery.data ?? []
   const participants = events.reduce((sum, event) => sum + event.sold_tickets, 0)
@@ -11,8 +13,10 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
   const cities = new Set(events.map((event) => event.city).filter(Boolean)).size
 
   useSeoMeta({
-    title: 'Sobre | Animalz Events',
-    description: 'Animalz Events conecta compradores a eventos de cultura, gastronomia, musica e lifestyle, com compra simples e acesso garantido.',
+    title: isPortuguese ? 'Sobre | Animalz Events' : 'About | Animalz Events',
+    description: isPortuguese
+      ? 'Animalz Events conecta compradores a eventos de cultura, gastronomia, musica e lifestyle, com compra simples e acesso garantido.'
+      : 'Animalz Events connects buyers to culture, food, music and lifestyle events with simple purchase and guaranteed access.',
     image: events[0]?.mediaPresentation.coverAsset?.secure_url ?? events[0]?.cover_url ?? null,
     url: typeof window !== 'undefined' ? window.location.href : '/about',
   })
@@ -25,13 +29,17 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.06)] px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-[#6a6058]">
                 <Sparkles className="h-4 w-4" />
-                About Animalz Events
+                {isPortuguese ? 'Sobre a Animalz Events' : 'About Animalz Events'}
               </div>
               <h1 className="mt-6 font-display text-[clamp(4rem,7vw,7.2rem)] font-semibold leading-[0.86] tracking-[-0.05em] text-[#f0ebe2]">
-                Eventos que valem a experiencia. Acesso simples e garantido.
+                {isPortuguese
+                  ? 'Eventos que valem a experiencia. Acesso simples e garantido.'
+                  : 'Events worth the experience. Simple and guaranteed access.'}
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#9a9088] md:text-lg">
-                Animalz Events conecta compradores aos melhores eventos de cultura, gastronomia, musica e lifestyle. Compre ingressos com facilidade, receba seu QR code e aproveite cada momento.
+                {isPortuguese
+                  ? 'Animalz Events conecta compradores aos melhores eventos de cultura, gastronomia, musica e lifestyle. Compre ingressos com facilidade, receba seu QR code e aproveite cada momento.'
+                  : 'Animalz Events connects buyers to the best culture, food, music and lifestyle events. Buy tickets easily, receive your QR code and enjoy every moment.'}
               </p>
             </div>
           </PublicReveal>
@@ -42,13 +50,17 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                 {[
                   {
                     icon: Layers3,
-                    label: 'Para compradores',
-                    text: 'Descubra eventos com criterio, compre ingressos em segundos e garanta seu lugar com QR code.',
+                    label: isPortuguese ? 'Para compradores' : 'For buyers',
+                    text: isPortuguese
+                      ? 'Descubra eventos com criterio, compre ingressos em segundos e garanta seu lugar com QR code.'
+                      : 'Discover events with curation, buy tickets in seconds and secure your place with a QR code.',
                   },
                   {
                     icon: Globe,
-                    label: 'Para produtores',
-                    text: 'Publique seu evento, venda ingressos, gerencie check-in e acompanhe resultados em um unico lugar.',
+                    label: isPortuguese ? 'Para produtores' : 'For creators',
+                    text: isPortuguese
+                      ? 'Publique seu evento, venda ingressos, gerencie credenciamento e acompanhe resultados em um unico lugar.'
+                      : 'Publish your event, sell tickets, manage check-in and track results in one place.',
                   },
                 ].map((item) => {
                   const Icon = item.icon
@@ -76,31 +88,33 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-16 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <LoadingState
-              title="Carregando informacoes"
-              description="Buscando os dados mais recentes da plataforma."
+              title={isPortuguese ? 'Carregando informacoes' : 'Loading information'}
+              description={isPortuguese ? 'Buscando os dados mais recentes da plataforma.' : 'Loading the latest platform data.'}
               className="min-h-[18rem]"
             />
           </div>
         </div>
       ) : (
         <SocialProofSection
-          title="Numeros reais de quem ja escolheu a plataforma."
-          description="Eventos publicados, ingressos vendidos e cidades alcancadas. Cada numero representa uma experiencia real vivida por pessoas reais."
+          title={isPortuguese ? 'Numeros reais de quem ja escolheu a plataforma.' : 'Real numbers from people already using the platform.'}
+          description={isPortuguese ? 'Eventos publicados, ingressos vendidos e cidades alcancadas. Cada numero representa uma experiencia real vivida por pessoas reais.' : 'Published events, sold tickets and reached cities. Each number represents a real experience lived by real people.'}
           metrics={[
             {
-              label: 'Eventos publicados',
-              value: events.length.toLocaleString('pt-BR'),
-              note: 'Eventos, festivais e experiencias disponiveis para compra na plataforma.',
+              label: isPortuguese ? 'Eventos publicados' : 'Published events',
+              value: events.length.toLocaleString(locale),
+              note: isPortuguese ? 'Eventos, festivais e experiencias disponiveis para compra na plataforma.' : 'Events, festivals and experiences available for purchase on the platform.',
             },
             {
-              label: 'Ingressos vendidos',
-              value: participants.toLocaleString('pt-BR'),
-              note: 'Compradores que garantiram seu lugar e viveram suas experiencias.',
+              label: isPortuguese ? 'Ingressos vendidos' : 'Tickets sold',
+              value: participants.toLocaleString(locale),
+              note: isPortuguese ? 'Compradores que garantiram seu lugar e viveram suas experiencias.' : 'Buyers who secured their place and lived their experiences.',
             },
             {
-              label: 'Vagas disponiveis',
-              value: capacity.toLocaleString('pt-BR'),
-              note: `${cities.toLocaleString('pt-BR')} cidades com eventos ativos na plataforma.`,
+              label: isPortuguese ? 'Vagas disponiveis' : 'Available spots',
+              value: capacity.toLocaleString(locale),
+              note: isPortuguese
+                ? `${cities.toLocaleString(locale)} cidades com eventos ativos na plataforma.`
+                : `${cities.toLocaleString(locale)} cities with active events on the platform.`,
             },
           ]}
         />
@@ -111,12 +125,14 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
           <PublicReveal>
             <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
               <div>
-                <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">Comece agora</div>
+                <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">{isPortuguese ? 'Comece agora' : 'Start now'}</div>
                 <div className="mt-4 font-display text-[clamp(2.8rem,4.5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-white">
-                  Encontre seu proximo evento ou publique o seu.
+                  {isPortuguese ? 'Encontre seu proximo evento ou publique o seu.' : 'Find your next event or publish your own.'}
                 </div>
                 <p className="mt-5 max-w-2xl text-base leading-8 text-white/72">
-                  Compre ingressos com facilidade, garanta seu acesso com QR code, ou crie e gerencie seu proprio evento na plataforma.
+                  {isPortuguese
+                    ? 'Compre ingressos com facilidade, garanta seu acesso com QR code, ou crie e gerencie seu proprio evento na plataforma.'
+                    : 'Buy tickets easily, secure your access with a QR code, or create and manage your own event on the platform.'}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-4">
@@ -124,14 +140,14 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                   href="/events"
                   className="inline-flex items-center gap-2 rounded-full bg-[#f2e6d6] px-6 py-3 text-sm font-medium text-[#1f1a15] transition-all hover:-translate-y-0.5"
                 >
-                  Ver todos os eventos
+                  {isPortuguese ? 'Ver todos os eventos' : 'View all events'}
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
                   href="/create-event"
                   className="inline-flex items-center gap-2 rounded-full border border-white/18 px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/8"
                 >
-                  Sou produtor
+                  {isPortuguese ? 'Sou produtor' : 'I am a creator'}
                 </a>
               </div>
             </div>

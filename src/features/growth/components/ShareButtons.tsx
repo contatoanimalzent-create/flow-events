@@ -24,7 +24,7 @@ export function ShareButtons({
   className,
 }: ShareButtonsProps) {
   const user = useAuthStore((state) => state.user)
-  const { isPortuguese } = usePublicLocale()
+  const { isPortuguese, locale } = usePublicLocale()
   const [isGenerating, setIsGenerating] = useState(false)
   const [copiedState, setCopiedState] = useState<'idle' | 'copied'>('idle')
 
@@ -43,6 +43,7 @@ export function ShareButtons({
           eventName,
           eventSlug,
           referrerId: user.id,
+          locale,
         })
 
         return link.shareUrl

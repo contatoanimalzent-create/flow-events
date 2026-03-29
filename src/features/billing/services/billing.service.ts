@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
 import { filterExampleEvents } from '@/shared/lib/example-events'
+import type { AppLocale } from '@/shared/i18n/app-locale'
 import {
   calculateFeeBreakdown,
   getRemainingLimit,
@@ -104,8 +105,16 @@ function buildFallbackPlan(slug = 'starter'): BillingSubscriptionPlan {
   return fallbackPlans[slug] ?? fallbackPlans.starter
 }
 
-function buildRevenueSeries(orders: Array<Record<string, unknown>>, monthlySubscriptionRevenue: number): BillingRevenuePoint[] {
-  const formatter = new Intl.DateTimeFormat('pt-BR', { month: 'short' })
+function normalizeLocale(locale?: AppLocale): AppLocale {
+  return locale === 'pt-BR' ? 'pt-BR' : 'en-US'
+}
+
+function buildRevenueSeries(
+  orders: Array<Record<string, unknown>>,
+  monthlySubscriptionRevenue: number,
+  locale?: AppLocale,
+): BillingRevenuePoint[] {
+  const formatter = new Intl.DateTimeFormat(normalizeLocale(locale), { month: 'short' })
   const grouped = new Map<string, BillingRevenuePoint>()
 
   for (const order of orders) {
@@ -196,7 +205,7 @@ export const billingService = {
     })
   },
 
-  async getOverview(organizationId: string): Promise<BillingOverview> {
+  async getOverview(organizationId: string, locale?: AppLocale): Promise<BillingOverview> {
     return billingApi.query('get_overview', async () => {
       const organization = await getOrganizationPlanRecord(organizationId)
       const joinedPlan = Array.isArray(organization.subscription_plan) ? organization.subscription_plan[0] : organization.subscription_plan
@@ -280,7 +289,7 @@ export const billingService = {
           averageTakeRate: totalSold > 0 ? Number(((generatedFees / totalSold) * 100).toFixed(1)) : 0,
         },
         usage,
-        revenueSeries: buildRevenueSeries(revenueOrders, monthlySubscriptionRevenue),
+        revenueSeries: buildRevenueSeries(revenueOrders, monthlySubscriptionRevenue, locale),
         eventFeeConfigurations: events.map((event): BillingEventFeeConfigSummary => ({
           eventId: String(event.id),
           eventName: String(event.name ?? ''),

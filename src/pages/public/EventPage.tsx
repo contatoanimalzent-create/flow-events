@@ -201,7 +201,7 @@ export function EventPage({ slug }: { slug: string }) {
       event?.short_description ||
       event?.full_description ||
       (isPortuguese
-        ? 'Experiencias premium com narrativa forte, agenda clara e checkout refinado.'
+        ? 'Experiencias premium com narrativa forte, agenda clara e compra refinada.'
         : 'Premium experiences with stronger storytelling, a clearer schedule and a refined checkout.'),
     image:
       mediaPresentation?.heroAsset?.thumbnail_url ||
@@ -282,13 +282,13 @@ export function EventPage({ slug }: { slug: string }) {
       reverse: false,
     },
     {
-      eyebrow: isPortuguese ? 'Venue e jornada' : 'The venue and journey',
+      eyebrow: isPortuguese ? 'Local e jornada' : 'The venue and journey',
       title: isPortuguese
-        ? 'Venue, chegada e beneficios apresentados como parte da experiencia comercial.'
+        ? 'Local, chegada e beneficios apresentados como parte da experiencia comercial.'
         : 'Venue, arrival and benefits presented as part of the commercial experience.',
       description:
         (isPortuguese
-          ? `${event.venue_name || 'O venue'} entra como parte da promessa da pagina: local, horario, capacidade e regras aparecem com leitura rapida, sem cara de ficha tecnica. O resultado e uma landing mais proxima de um mini-site de evento do que de uma pagina utilitaria.`
+          ? `${event.venue_name || 'O local'} entra como parte da promessa da pagina: localizacao, horario, capacidade e regras aparecem com leitura rapida, sem cara de ficha tecnica. O resultado fica mais proximo de um mini-site de evento do que de uma pagina utilitaria.`
           : `${event.venue_name || 'The venue'} becomes part of the promise of the page: location, timing, capacity and rules are presented with quick readability instead of a technical sheet. The result feels closer to an event mini-site than a utility page.`),
       asset: storyAssets[1] ?? mediaPresentation.galleryImages[0] ?? mediaPresentation.coverAsset,
       reverse: true,
@@ -389,7 +389,7 @@ export function EventPage({ slug }: { slug: string }) {
                         {
                           icon: MapPin,
                           label: isPortuguese ? 'Local' : 'Venue',
-                          value: event.venue_name || (isPortuguese ? 'Venue em curadoria' : 'Curated venue'),
+                          value: event.venue_name || (isPortuguese ? 'Local em curadoria' : 'Curated venue'),
                         },
                         {
                           icon: ShieldCheck,
@@ -466,10 +466,10 @@ export function EventPage({ slug }: { slug: string }) {
                         : 'Confirmation happens in just a few steps, and the QR code arrives as soon as registration is complete.'
                       : minPrice > 0
                         ? isPortuguese
-                          ? `Os acessos comecam em ${formatCurrency(minPrice)} e o checkout segue a mesma base operacional do restante da plataforma.`
+                          ? `Os acessos comecam em ${formatCurrency(minPrice)} e a compra segue a mesma base operacional do restante da plataforma.`
                           : `Access starts at ${formatCurrency(minPrice)} and checkout runs on the same trusted operational foundation as the rest of the platform.`
                         : isPortuguese
-                          ? 'O checkout foi refinado para manter clareza, velocidade e confianca na ultima etapa da compra.'
+                          ? 'A etapa de compra foi refinada para manter clareza, velocidade e confianca no fechamento do pedido.'
                           : 'Checkout has been refined to keep the final stage of purchase clear, fast and trustworthy.'}
                   </p>
                 </div>
@@ -485,7 +485,7 @@ export function EventPage({ slug }: { slug: string }) {
                   }}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white"
                 >
-                  {cartQty > 0 ? (isPortuguese ? 'Ir para checkout' : 'Go to checkout') : isPortuguese ? 'Selecionar ingressos' : 'Select tickets'}
+                  {cartQty > 0 ? (isPortuguese ? 'Ir para a compra' : 'Go to checkout') : isPortuguese ? 'Selecionar ingressos' : 'Select tickets'}
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>

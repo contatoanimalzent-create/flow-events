@@ -61,7 +61,7 @@ export function PublicCheckoutContent({
   onRemove,
   onInventoryChanged,
 }: PublicCheckoutContentProps) {
-  const { isPortuguese } = usePublicLocale()
+  const { isPortuguese, locale } = usePublicLocale()
   const { buyer, setBuyerField, resetCheckout } = useCheckoutStore()
   const [phase, setPhase] = useState<'form' | 'review' | 'payment' | 'processing'>('form')
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
@@ -171,6 +171,7 @@ export function PublicCheckoutContent({
           grossAmount: cartSummary.total_amount,
           referralCode,
           source: 'public_checkout',
+          locale,
         })
       }
 
@@ -267,6 +268,7 @@ export function PublicCheckoutContent({
             grossAmount: cartSummary.total_amount,
             referralCode,
             source: 'free_checkout',
+            locale,
           })
         }
 
@@ -357,11 +359,11 @@ export function PublicCheckoutContent({
           : 'We kept only the essential fields to reserve, pay and issue tickets with confidence.'
       : phase === 'processing'
           ? isPortuguese
-            ? 'O gateway esta processando a transacao. Assim que a confirmacao chegar, os ingressos digitais serao emitidos automaticamente.'
+            ? 'O processador esta tratando a transacao. Assim que a confirmacao chegar, os ingressos digitais serao emitidos automaticamente.'
             : 'The gateway is processing the transaction. As soon as confirmation arrives, digital tickets will be issued automatically.'
       : event.absorb_fee
             ? isPortuguese
-              ? 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional, com fee absorvida pelo produtor para manter o total limpo ao comprador.'
+              ? 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional, com taxa absorvida pelo produtor para manter o total limpo ao comprador.'
               : 'Reservation, payment and issuance happen on the same operational foundation, with fees absorbed by the producer to keep the buyer total clean.'
             : isPortuguese
               ? 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional do produto, agora com apresentacao mais clara e comercial.'
@@ -411,7 +413,7 @@ export function PublicCheckoutContent({
               <PublicReveal>
                 <div className="rounded-[2.2rem] border border-white/8 bg-[linear-gradient(135deg,#0d1117_0%,#121823_100%)] p-7 shadow-[0_22px_70px_rgba(0,0,0,0.28)] md:p-9">
                   <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">
-                    {isPortuguese ? 'Checkout do evento' : 'Event checkout'}
+                    {isPortuguese ? 'Compra do evento' : 'Event checkout'}
                   </div>
                   <h1 className="mt-4 font-display text-[clamp(3.2rem,5vw,5.4rem)] font-semibold uppercase leading-[0.92] tracking-[-0.05em] text-white">
                     {introTitle}

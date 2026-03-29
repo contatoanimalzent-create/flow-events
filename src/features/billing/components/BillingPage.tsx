@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { CalendarDays, Lock, Sparkles, Ticket } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useBillingActions, useBillingOverview, useSubscriptionPlans } from '@/features/billing/hooks'
-import { formatCurrency, formatDate } from '@/shared/lib'
+import { formatLocaleCurrency, formatLocaleDate, formatLocaleNumber, useAppLocale } from '@/shared/i18n/app-locale'
 import {
   AdminActionBar,
   AdminPageLayout,
@@ -19,8 +19,10 @@ import {
 import { FeeConfigurationPanel } from './FeeConfigurationPanel'
 import { RevenueDashboard } from './RevenueDashboard'
 import { SubscriptionCard } from './SubscriptionCard'
+import { translateBillingEventStatus, translateBillingFeature, translateBillingPlanName } from '../lib/billing-localization'
 
 export function BillingPage() {
+  const { locale, t } = useAppLocale()
   const organization = useAuthStore((state) => state.organization)
   const overviewQuery = useBillingOverview(organization?.id)
   const plansQuery = useSubscriptionPlans()
@@ -38,8 +40,11 @@ export function BillingPage() {
     return (
       <AdminPageLayout>
         <EmptyState
-          title="Monetizacao indisponivel"
-          description="Conecte um perfil com organizacao vinculada para visualizar planos, fees e receita da plataforma."
+          title={t('Monetization unavailable', 'Monetizacao indisponivel')}
+          description={t(
+            'Connect a profile linked to an organization to view plans, fees and platform revenue.',
+            'Conecte um perfil com organizacao vinculada para visualizar planos, taxas e receita da plataforma.',
+          )}
         />
       </AdminPageLayout>
     )
@@ -48,7 +53,13 @@ export function BillingPage() {
   if (overviewQuery.isPending || plansQuery.isPending) {
     return (
       <AdminPageLayout>
-        <LoadingState title="Carregando monetizacao" description="Estamos consolidando plano, uso e receita para esta organizacao." />
+        <LoadingState
+          title={t('Loading monetization', 'Carregando monetizacao')}
+          description={t(
+            'We are consolidating plan, usage and revenue for this organization.',
+            'Estamos consolidando plano, uso e receita para esta organizacao.',
+          )}
+        />
       </AdminPageLayout>
     )
   }
@@ -57,8 +68,11 @@ export function BillingPage() {
     return (
       <AdminPageLayout>
         <EmptyState
-          title="Nao foi possivel montar a camada de billing"
-          description="A organizacao ainda nao retornou um overview valido de monetizacao."
+          title={t('Unable to assemble the billing layer', 'Nao foi possivel montar a camada de faturamento')}
+          description={t(
+            'The organization did not return a valid monetization overview yet.',
+            'A organizacao ainda nao retornou uma visao geral valida de monetizacao.',
+          )}
         />
       </AdminPageLayout>
     )
@@ -67,13 +81,32 @@ export function BillingPage() {
   return (
     <AdminPageLayout>
       <PageHeader
-        eyebrow="Billing"
-        title={<>Monetizacao da plataforma<span className="admin-title-accent">.</span></>}
-        description="Planos, limites, fee por evento e receita da plataforma agora vivem em uma camada unica, pronta para escalar como SaaS."
+        eyebrow={t('Billing', 'Faturamento')}
+        title={
+          <>
+            {t('Platform monetization', 'Monetizacao da plataforma')}
+            <span className="admin-title-accent">.</span>
+          </>
+        }
+        description={t(
+          'Plans, limits, event fees and platform revenue now live in a single layer ready to scale as software.',
+          'Planos, limites, taxas por evento e receita da plataforma agora vivem em uma camada unica, pronta para escalar como software.',
+        )}
         actions={
           <AdminActionBar>
-            <PremiumBadge tone="accent">{overview.organization.currentPlan.name}</PremiumBadge>
-            <PremiumBadge tone="info">{overview.organization.activeFeatures.length} features ativas</PremiumBadge>
+            <PremiumBadge tone="accent">
+              {translateBillingPlanName(
+                overview.organization.currentPlan.slug,
+                overview.organization.currentPlan.name,
+                locale,
+              )}
+            </PremiumBadge>
+            <PremiumBadge tone="info">
+              {t(
+                `${overview.organization.activeFeatures.length} active features`,
+                `${overview.organization.activeFeatures.length} recursos ativos`,
+              )}
+            </PremiumBadge>
           </AdminActionBar>
         }
       />
@@ -83,56 +116,83 @@ export function BillingPage() {
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)]">
         <PremiumCard className="p-6">
           <SectionHeader
-            eyebrow="Usage"
-            title="Limites e operacao do plano"
-            description="Os bloqueios agora seguem a estrutura do plano e deixam claro quanto ainda cabe de operacao antes de um upgrade."
+            eyebrow={t('Usage', 'Uso')}
+            title={t('Plan limits and operations', 'Limites e operacao do plano')}
+            description={t(
+              'The guardrails now follow the plan structure and make clear how much room is left before an upgrade.',
+              'Os limites agora seguem a estrutura do plano e deixam claro quanto ainda cabe de operacao antes de um upgrade.',
+            )}
           />
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             <SurfacePanel className="p-5">
               <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-text-muted">
                 <CalendarDays className="h-3.5 w-3.5" />
-                Eventos
+                {t('Events', 'Eventos')}
               </div>
-              <div className="mt-3 font-display text-[2.5rem] leading-none tracking-[-0.05em] text-text-primary">{overview.usage.eventCount}</div>
+              <div className="mt-3 font-display text-[2.5rem] leading-none tracking-[-0.05em] text-text-primary">
+                {formatLocaleNumber(overview.usage.eventCount, locale)}
+              </div>
               <div className="mt-2 text-sm text-text-muted">
-                {overview.usage.eventLimit == null ? 'Plano sem limite pratico de eventos.' : `${overview.usage.remainingEvents} restantes antes do limite.`}
+                {overview.usage.eventLimit == null
+                  ? t('This plan has no practical event limit.', 'Este plano nao tem limite pratico de eventos.')
+                  : t(
+                      `${overview.usage.remainingEvents} remaining before the limit.`,
+                      `${overview.usage.remainingEvents} restantes antes do limite.`,
+                    )}
               </div>
             </SurfacePanel>
 
             <SurfacePanel className="p-5">
               <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-text-muted">
                 <Ticket className="h-3.5 w-3.5" />
-                Tipos de ingresso
+                {t('Ticket types', 'Tipos de ingresso')}
               </div>
-              <div className="mt-3 font-display text-[2.5rem] leading-none tracking-[-0.05em] text-text-primary">{overview.usage.ticketTypeCount}</div>
+              <div className="mt-3 font-display text-[2.5rem] leading-none tracking-[-0.05em] text-text-primary">
+                {formatLocaleNumber(overview.usage.ticketTypeCount, locale)}
+              </div>
               <div className="mt-2 text-sm text-text-muted">
-                Pico atual de {overview.usage.maxTicketTypesPerEvent} tipos no mesmo evento.
+                {t(
+                  `Current peak of ${overview.usage.maxTicketTypesPerEvent} types in the same event.`,
+                  `Pico atual de ${overview.usage.maxTicketTypesPerEvent} tipos no mesmo evento.`,
+                )}
               </div>
             </SurfacePanel>
 
             <SurfacePanel className="p-5">
               <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-text-muted">
                 <Sparkles className="h-3.5 w-3.5" />
-                Feature access
+                {t('Feature access', 'Acesso a recursos')}
               </div>
-              <div className="mt-3 font-display text-[2.5rem] leading-none tracking-[-0.05em] text-text-primary">{overview.organization.activeFeatures.length}</div>
-              <div className="mt-2 text-sm text-text-muted">Capacidades premium em operacao para checkout, analytics e automacao.</div>
+              <div className="mt-3 font-display text-[2.5rem] leading-none tracking-[-0.05em] text-text-primary">
+                {formatLocaleNumber(overview.organization.activeFeatures.length, locale)}
+              </div>
+              <div className="mt-2 text-sm text-text-muted">
+                {t(
+                  'Premium capabilities enabled for purchase flow, analytics and automation.',
+                  'Capacidades premium em operacao para compra, analises e automacao.',
+                )}
+              </div>
             </SurfacePanel>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
             {overview.organization.activeFeatures.map((feature) => (
-              <PremiumBadge key={feature} tone="default">{feature.replace(/_/g, ' ')}</PremiumBadge>
+              <PremiumBadge key={feature} tone="default">
+                {translateBillingFeature(feature, locale)}
+              </PremiumBadge>
             ))}
           </div>
         </PremiumCard>
 
         <PremiumCard className="p-6">
           <SectionHeader
-            eyebrow="Fee Strategy"
-            title="Modelo de fee por evento"
-            description="Cada evento pode cobrar taxa fixa ou percentual e decidir se o comprador ve essa taxa ou se a organizacao a absorve."
+            eyebrow={t('Fee strategy', 'Estrategia de taxas')}
+            title={t('Event fee model', 'Modelo de taxa por evento')}
+            description={t(
+              'Each event can charge a fixed or percentage fee and decide whether the buyer sees it or the organization absorbs it.',
+              'Cada evento pode cobrar taxa fixa ou percentual e decidir se o comprador ve essa taxa ou se a organizacao a absorve.',
+            )}
           />
 
           {selectedEventConfig ? (
@@ -163,7 +223,10 @@ export function BillingPage() {
             </>
           ) : (
             <div className="mt-6 rounded-[1.5rem] border border-dashed border-bg-border px-5 py-8 text-sm text-text-muted">
-              Assim que os eventos forem configurados, esta area passa a mostrar a estrategia de taxa usada em cada experiencia.
+              {t(
+                'As soon as events are configured, this area will show the fee strategy used in each experience.',
+                'Assim que os eventos forem configurados, esta area passa a mostrar a estrategia de taxa usada em cada experiencia.',
+              )}
             </div>
           )}
         </PremiumCard>
@@ -171,9 +234,12 @@ export function BillingPage() {
 
       <section className="space-y-6">
         <SectionHeader
-          eyebrow="Plans"
-          title="Planos de produtor"
-          description="A base de assinatura agora esta estruturada em tabela propria, com limites e features que ja alimentam o produto."
+          eyebrow={t('Plans', 'Planos')}
+          title={t('Producer plans', 'Planos de produtor')}
+          description={t(
+            'The subscription base is now structured in its own table, with limits and features already feeding the product.',
+            'A base de assinatura agora esta estruturada em tabela propria, com limites e recursos que ja alimentam o produto.',
+          )}
         />
 
         <div className="grid gap-4 xl:grid-cols-4">
@@ -191,42 +257,51 @@ export function BillingPage() {
 
       <section className="space-y-6">
         <SectionHeader
-          eyebrow="Events"
-          title="Configuracao de fees por evento"
-          description="Um painel unico para ver rapidamente quem esta repassando taxa ao comprador e quem absorve a fee dentro do repasse."
+          eyebrow={t('Events', 'Eventos')}
+          title={t('Fee configuration by event', 'Configuracao de taxas por evento')}
+          description={t(
+            'A single panel to quickly see who is passing the fee to the buyer and who is absorbing it in the payout.',
+            'Um painel unico para ver rapidamente quem esta repassando taxa ao comprador e quem a absorve dentro do repasse.',
+          )}
         />
 
         <PremiumCard className="p-3">
           <PremiumTable>
             <thead>
               <tr>
-                <th>Evento</th>
-                <th>Inicio</th>
-                <th>Status</th>
-                <th>Modelo</th>
-                <th>Fee</th>
-                <th>Repasse</th>
-                <th>Vendidos</th>
+                <th>{t('Event', 'Evento')}</th>
+                <th>{t('Start', 'Inicio')}</th>
+                <th>{t('Status', 'Status')}</th>
+                <th>{t('Model', 'Modelo')}</th>
+                <th>{t('Fee', 'Taxa')}</th>
+                <th>{t('Payout', 'Repasse')}</th>
+                <th>{t('Sold', 'Vendidos')}</th>
               </tr>
             </thead>
             <tbody>
               {overview.eventFeeConfigurations.map((eventConfig) => (
                 <tr key={eventConfig.eventId}>
                   <td className="font-medium text-text-primary">{eventConfig.eventName}</td>
-                  <td>{formatDate(eventConfig.startsAt, 'dd/MM/yyyy')}</td>
+                  <td>
+                    {formatLocaleDate(eventConfig.startsAt, locale, {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    })}
+                  </td>
                   <td>
                     <PremiumBadge tone={eventConfig.status === 'published' || eventConfig.status === 'ongoing' ? 'success' : 'default'}>
-                      {eventConfig.status}
+                      {translateBillingEventStatus(eventConfig.status, locale)}
                     </PremiumBadge>
                   </td>
-                  <td>{eventConfig.feeType === 'fixed' ? 'Fixa por ingresso' : 'Percentual'}</td>
-                  <td>{eventConfig.feeType === 'fixed' ? formatCurrency(eventConfig.feeValue) : `${eventConfig.feeValue.toFixed(1)}%`}</td>
+                  <td>{eventConfig.feeType === 'fixed' ? t('Fixed per ticket', 'Fixa por ingresso') : t('Percentage', 'Percentual')}</td>
+                  <td>{eventConfig.feeType === 'fixed' ? formatLocaleCurrency(eventConfig.feeValue, locale) : `${eventConfig.feeValue.toFixed(1)}%`}</td>
                   <td>
                     <PremiumBadge tone={eventConfig.absorbFee ? 'warning' : 'info'}>
-                      {eventConfig.absorbFee ? 'Absorvida' : 'Repassada'}
+                      {eventConfig.absorbFee ? t('Absorbed', 'Absorvida') : t('Passed on', 'Repassada')}
                     </PremiumBadge>
                   </td>
-                  <td>{eventConfig.soldTickets.toLocaleString('pt-BR')}</td>
+                  <td>{formatLocaleNumber(eventConfig.soldTickets, locale)}</td>
                 </tr>
               ))}
             </tbody>
@@ -237,21 +312,24 @@ export function BillingPage() {
       <section className="grid gap-6 xl:grid-cols-2">
         <PremiumCard className="p-6">
           <SectionHeader
-            eyebrow="Feature Flags"
-            title="Features premium ja controladas por plano"
-            description="A fundacao de flags ja permite ativar ou bloquear capacidades premium sem alterar os contratos atuais do app."
+            eyebrow={t('Feature flags', 'Controle de recursos')}
+            title={t('Premium capabilities already controlled by plan', 'Recursos premium ja controlados por plano')}
+            description={t(
+              'The feature-flag foundation already allows premium capabilities to be enabled or blocked without changing the current app contracts.',
+              'A fundacao de controle ja permite ativar ou bloquear recursos premium sem alterar os contratos atuais do app.',
+            )}
           />
           <div className="mt-5 grid gap-3">
             {[
-              { label: 'Premium checkout', enabled: overview.organization.activeFeatures.includes('premium_checkout') },
-              { label: 'Advanced analytics', enabled: overview.organization.activeFeatures.includes('advanced_analytics') },
-              { label: 'White-label', enabled: overview.organization.activeFeatures.includes('white_label') },
-              { label: 'API access', enabled: overview.organization.activeFeatures.includes('api_access') },
+              { label: translateBillingFeature('premium_checkout', locale), enabled: overview.organization.activeFeatures.includes('premium_checkout') },
+              { label: translateBillingFeature('advanced_analytics', locale), enabled: overview.organization.activeFeatures.includes('advanced_analytics') },
+              { label: translateBillingFeature('white_label', locale), enabled: overview.organization.activeFeatures.includes('white_label') },
+              { label: translateBillingFeature('api_access', locale), enabled: overview.organization.activeFeatures.includes('api_access') },
             ].map((feature) => (
               <SurfacePanel key={feature.label} className="flex items-center justify-between p-4">
                 <div className="text-sm font-medium text-text-primary">{feature.label}</div>
                 <PremiumBadge tone={feature.enabled ? 'success' : 'warning'}>
-                  {feature.enabled ? 'Liberado' : 'Premium'}
+                  {feature.enabled ? t('Enabled', 'Liberado') : t('Premium', 'Premium')}
                 </PremiumBadge>
               </SurfacePanel>
             ))}
@@ -260,19 +338,37 @@ export function BillingPage() {
 
         <PremiumCard className="p-6">
           <SectionHeader
-            eyebrow="Notes"
-            title="Como essa camada monetiza o produto"
-            description="A fundacao foi desenhada para cobrar fee por evento, gerar receita recorrente por plano e refletir isso direto no checkout e no financeiro."
+            eyebrow={t('Notes', 'Notas')}
+            title={t('How this layer monetizes the product', 'Como essa camada monetiza o produto')}
+            description={t(
+              'This foundation was designed to charge per-event fees, generate recurring plan revenue and reflect that directly in the purchase flow and finance.',
+              'Esta fundacao foi desenhada para cobrar taxa por evento, gerar receita recorrente por plano e refletir isso direto na compra e no financeiro.',
+            )}
           />
           <div className="mt-5 space-y-4 text-sm leading-7 text-text-muted">
-            <p>Pedidos agora diferenciam fee gerada para a plataforma, fee cobrada do comprador e fee absorvida pelo organizador, sem alterar o contrato legado de `fee_amount`.</p>
-            <p>Os formularios de evento passam a decidir se a taxa e percentual ou fixa por ingresso, e o checkout reflete imediatamente esse comportamento no total exibido.</p>
-            <p>Os hooks de criacao tambem consultam os limites do plano antes de abrir ainda mais a operacao, reduzindo sobreuso silencioso e preparando upgrades reais.</p>
+            <p>
+              {t(
+                'Orders now differentiate platform fee, buyer fee and producer-absorbed fee without changing the legacy `fee_amount` contract.',
+                'Os pedidos agora diferenciam taxa da plataforma, taxa cobrada do comprador e taxa absorvida pelo organizador, sem alterar o contrato legado de `fee_amount`.',
+              )}
+            </p>
+            <p>
+              {t(
+                'Event forms now decide whether the fee is percentage-based or fixed per ticket, and the purchase flow immediately reflects that behavior in the displayed total.',
+                'Os formularios de evento agora decidem se a taxa e percentual ou fixa por ingresso, e a compra reflete imediatamente esse comportamento no total exibido.',
+              )}
+            </p>
+            <p>
+              {t(
+                'Creation flows also consult plan limits before expanding the operation further, reducing silent overuse and preparing real upgrades.',
+                'Os fluxos de criacao tambem consultam os limites do plano antes de abrir ainda mais a operacao, reduzindo sobreuso silencioso e preparando upgrades reais.',
+              )}
+            </p>
           </div>
           <div className="mt-6">
             <PremiumButton variant="secondary" className="gap-2" disabled>
               <Lock className="h-4 w-4" />
-              Upgrade automation em proxima etapa
+              {t('Upgrade automation in the next step', 'Automacao de upgrade na proxima etapa')}
             </PremiumButton>
           </div>
         </PremiumCard>

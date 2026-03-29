@@ -36,10 +36,10 @@ export function EventsPublicHeader({
 
   const navLinks = useMemo(
     () => [
-      { label: 'Home', href: '/' },
+      { label: isPortuguese ? 'Inicio' : 'Home', href: '/' },
       { label: isPortuguese ? 'Eventos' : 'Events', href: '/events' },
       { label: isPortuguese ? 'Sobre' : 'About', href: '/about' },
-      { label: isPortuguese ? 'Criar Evento' : 'Create Event', href: '/create-event' },
+      { label: isPortuguese ? 'Criar evento' : 'Create event', href: '/create-event' },
     ],
     [isPortuguese],
   )

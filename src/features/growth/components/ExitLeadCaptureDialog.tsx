@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, Loader2, Mail, X } from 'lucide-react'
 import { useLeadCapture } from '@/features/growth/hooks/useGrowthOverview'
 import { dismissLeadCapture, wasLeadCaptureDismissed } from '@/features/growth/services/growth.storage'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 
 interface ExitLeadCaptureDialogProps {
   source: string
@@ -15,9 +16,10 @@ export function ExitLeadCaptureDialog({
   source,
   organizationId,
   eventId,
-  title = 'Receba a proxima janela antes do resto do mercado.',
-  description = 'Salvamos seu acesso a futuras experiencias, viradas de lote e convites premium sem poluir sua caixa.',
+  title,
+  description,
 }: ExitLeadCaptureDialogProps) {
+  const { isPortuguese, locale } = usePublicLocale()
   const captureLead = useLeadCapture()
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState('')
@@ -60,10 +62,26 @@ export function ExitLeadCaptureDialog({
   const footerCopy = useMemo(
     () =>
       status === 'success'
-        ? 'Seu e-mail entrou na esteira de acesso prioritario.'
-        : 'Nada de spam. So convites, viradas e beneficios relevantes.',
-    [status],
+        ? isPortuguese
+          ? 'Seu e-mail entrou na fila de acesso prioritario.'
+          : 'Your email is now in the priority access flow.'
+        : isPortuguese
+          ? 'Nada de spam. So convites, viradas e beneficios relevantes.'
+          : 'No spam. Only relevant invitations, release updates and benefits.',
+    [isPortuguese, status],
   )
+
+  const resolvedTitle =
+    title ||
+    (isPortuguese
+      ? 'Receba a proxima abertura antes do restante do mercado.'
+      : 'Receive the next release before the rest of the market.')
+
+  const resolvedDescription =
+    description ||
+    (isPortuguese
+      ? 'Salvamos seu acesso a futuras experiencias, viradas de lote e convites premium sem poluir sua caixa.'
+      : 'We save your access to future experiences, tier changes and premium invitations without flooding your inbox.')
 
   async function handleSubmit() {
     if (!email.trim()) {
@@ -77,6 +95,7 @@ export function ExitLeadCaptureDialog({
         eventId,
         source,
         metadata: { page: typeof window !== 'undefined' ? window.location.pathname : '' },
+        locale,
       })
       setStatus('success')
       dismissLeadCapture()
@@ -115,7 +134,7 @@ export function ExitLeadCaptureDialog({
         <button
           onClick={handleClose}
           className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] text-[#6a6058] transition-all hover:border-[rgba(255,255,255,0.2)] hover:text-[#f0ebe2]"
-          aria-label="Fechar"
+          aria-label={isPortuguese ? 'Fechar' : 'Close'}
         >
           <X className="h-4 w-4" />
         </button>
@@ -135,15 +154,15 @@ export function ExitLeadCaptureDialog({
             <div className="relative">
               <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-[#c49a50]">
                 <Mail className="h-3.5 w-3.5" />
-                Acesso antecipado
+                {isPortuguese ? 'Acesso antecipado' : 'Early access'}
               </div>
               <h2
                 className="mt-5 font-display leading-[0.9] tracking-[-0.04em] text-[#f0ebe2]"
                 style={{ fontSize: 'clamp(2.2rem,3.5vw,3.4rem)', fontWeight: 600 }}
               >
-                {title}
+                {resolvedTitle}
               </h2>
-              <p className="mt-5 text-sm leading-7 text-[#6a6058]">{description}</p>
+              <p className="mt-5 text-sm leading-7 text-[#6a6058]">{resolvedDescription}</p>
             </div>
           </div>
 
@@ -153,18 +172,18 @@ export function ExitLeadCaptureDialog({
             <div className="mb-4 flex items-center gap-2 md:hidden">
               <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-[10px] uppercase tracking-[0.3em] text-[#c49a50]">
                 <Mail className="h-3 w-3" />
-                Acesso antecipado
+                {isPortuguese ? 'Acesso antecipado' : 'Early access'}
               </div>
             </div>
 
-            <div className="text-[10px] uppercase tracking-[0.3em] text-[#c49a50]">Acesso gratuito</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-[#c49a50]">{isPortuguese ? 'Acesso gratuito' : 'Free access'}</div>
             <div className="mt-2 font-display text-[1.6rem] font-semibold leading-[0.94] tracking-[-0.04em] text-[#f0ebe2] sm:text-[1.9rem]">
-              Entre uma vez e mantenha a relacao viva.
+              {isPortuguese ? 'Entre uma vez e mantenha a relacao viva.' : 'Sign up once and keep the relationship alive.'}
             </div>
 
             <div className="mt-5 sm:mt-7">
               <label className="block text-[10px] uppercase tracking-[0.26em] text-[#6a6058]">
-                Seu melhor e-mail
+                {isPortuguese ? 'Seu melhor e-mail' : 'Your best email'}
               </label>
               <input
                 type="email"
@@ -176,7 +195,7 @@ export function ExitLeadCaptureDialog({
                   if (status !== 'idle') setStatus('idle')
                 }}
                 onKeyDown={(e) => { if (e.key === 'Enter') void handleSubmit() }}
-                placeholder="voce@exemplo.com"
+                placeholder={isPortuguese ? 'voce@exemplo.com' : 'you@example.com'}
                 className="mt-3 h-12 w-full rounded-[1rem] px-4 py-3 text-sm text-[#f0ebe2] outline-none transition-all placeholder:text-[#4a4540]"
                 style={{
                   background: 'rgba(255,255,255,0.05)',
@@ -193,7 +212,9 @@ export function ExitLeadCaptureDialog({
                 }}
               />
               {status === 'error' ? (
-                <p className="mt-2 text-xs text-[#c45c6a]">Revise o e-mail e tente novamente.</p>
+                <p className="mt-2 text-xs text-[#c45c6a]">
+                  {isPortuguese ? 'Revise o e-mail e tente novamente.' : 'Review the email and try again.'}
+                </p>
               ) : null}
               {status === 'success' ? (
                 <p className="mt-2 text-xs text-[#4a9b7f]">{footerCopy}</p>
@@ -214,7 +235,9 @@ export function ExitLeadCaptureDialog({
                 {captureLead.isPending
                   ? <Loader2 className="h-4 w-4 animate-spin" />
                   : <ArrowRight className="h-4 w-4" />}
-                {status === 'success' ? 'Acesso garantido!' : 'Garantir acesso'}
+                {status === 'success'
+                  ? isPortuguese ? 'Acesso garantido!' : 'Access secured!'
+                  : isPortuguese ? 'Garantir acesso' : 'Secure access'}
               </button>
 
               <button
@@ -222,7 +245,7 @@ export function ExitLeadCaptureDialog({
                 onClick={handleClose}
                 className="w-full rounded-full border border-[rgba(255,255,255,0.08)] py-3 text-sm font-medium text-[#6a6058] transition-all hover:border-[rgba(255,255,255,0.16)] hover:text-[#f0ebe2] active:scale-95"
               >
-                Agora nao
+                {isPortuguese ? 'Agora nao' : 'Not now'}
               </button>
             </div>
 

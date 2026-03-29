@@ -29,7 +29,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
                 <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#d4ff00]/60">
-                  {isPortuguese ? 'Newsletter' : 'Newsletter'}
+                  {isPortuguese ? 'Novidades' : 'Newsletter'}
                 </div>
                 <h3 className="mt-4 font-display text-[clamp(1.8rem,3vw,2.6rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
                   {isPortuguese
@@ -108,11 +108,11 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               </div>
             </div>
 
-            {[
+            {[ 
               {
                 title: isPortuguese ? 'Plataforma' : 'Platform',
                 links: [
-                  { label: 'Home', href: '/' },
+                  { label: isPortuguese ? 'Inicio' : 'Home', href: '/' },
                   { label: isPortuguese ? 'Eventos' : 'Events', href: '/events' },
                   { label: isPortuguese ? 'Minha conta' : 'My account', href: '/me' },
                 ],
@@ -125,7 +125,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                 ],
               },
               {
-                title: isPortuguese ? 'Legal' : 'Legal',
+                title: isPortuguese ? 'Juridico' : 'Legal',
                 links: [
                   { label: isPortuguese ? 'Privacidade' : 'Privacy', href: '/privacy' },
                   { label: isPortuguese ? 'Termos' : 'Terms', href: '/terms' },

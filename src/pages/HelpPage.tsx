@@ -14,7 +14,7 @@ const topics = [
     title: { en: 'Creating events', pt: 'Criando eventos' },
     description: {
       en: 'Learn how to create, configure and manage your events, from free registrations to premium VIP experiences.',
-      pt: 'Aprenda a criar, configurar e operar seus eventos, de inscricoes gratuitas a experiencias VIP premium.',
+      pt: 'Aprenda a criar, configurar e operar seus eventos, de inscricoes gratuitas a experiencias VIP de alto valor.',
     },
   },
   {
@@ -27,10 +27,10 @@ const topics = [
   },
   {
     icon: '✅',
-    title: { en: 'Check-in and operations', pt: 'Check-in e operacao' },
+    title: { en: 'Check-in and operations', pt: 'Credenciamento e operacao' },
     description: {
       en: 'Run event-day check-in, staff control, ticket validation and operational integrations with confidence.',
-      pt: 'Conduza check-in, equipe, validacao de tickets e integracoes operacionais com seguranca.',
+      pt: 'Conduza credenciamento, equipe, validacao de ingressos e integracoes operacionais com seguranca.',
     },
   },
   {
@@ -38,7 +38,7 @@ const topics = [
     title: { en: 'Reports and data', pt: 'Relatorios e dados' },
     description: {
       en: 'Understand your numbers with analytics, sales reporting, attendance data and audience insights.',
-      pt: 'Entenda seus numeros com analytics, vendas, presenca e inteligencia de publico.',
+      pt: 'Entenda seus numeros com analises, vendas, presenca e inteligencia de publico.',
     },
   },
   {
@@ -97,7 +97,7 @@ export function HelpPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-full border border-bg-border px-6 py-3 text-sm font-medium text-text-primary transition-all hover:bg-bg-border"
           >
-            {t('Full documentation →', 'Documentacao completa →')}
+            {t('Full documentation ->', 'Documentacao completa ->')}
           </a>
         </div>
       </div>

@@ -84,7 +84,7 @@ export function TicketOptionCard({
             {batch.price === 0 ? (isPortuguese ? 'Gratuito' : 'Free') : formatPublicCurrency(batch.price, locale)}
           </div>
           <div className="mt-2 text-xs text-white/52">
-            {formatPublicNumber(available, locale)} {isPortuguese ? 'disponiveis' : 'available'} / {isPortuguese ? 'max' : 'max'} {maxPerOrder} {isPortuguese ? 'por pedido' : 'per order'}
+            {formatPublicNumber(available, locale)} {isPortuguese ? 'disponiveis' : 'available'} / {isPortuguese ? 'limite' : 'max'} {maxPerOrder} {isPortuguese ? 'por pedido' : 'per order'}
           </div>
         </div>
 
@@ -162,7 +162,7 @@ export function StickyPurchaseCTA({
           }}
           className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-white"
         >
-          {cartQty > 0 ? 'Checkout' : isPortuguese ? 'Ver ingressos' : 'View tickets'}
+          {cartQty > 0 ? (isPortuguese ? 'Finalizar compra' : 'Checkout') : isPortuguese ? 'Ver ingressos' : 'View tickets'}
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
@@ -269,10 +269,10 @@ export function EventTicketPanelPremium({
                 <p className="mt-5 text-sm leading-7 text-white/66">
                   {cartQty > 0
                     ? isPortuguese
-                      ? 'Revise a selecao e siga para o checkout. A reserva de inventario acontece no passo seguinte.'
+                      ? 'Revise a selecao e siga para a compra. A reserva de inventario acontece no passo seguinte.'
                       : 'Review your selection and continue to checkout. Inventory reservation happens in the next step.'
                     : isPortuguese
-                      ? 'Adicione uma ou mais opcoes ao carrinho para liberar o checkout e reservar o inventario no momento certo.'
+                      ? 'Adicione uma ou mais opcoes ao carrinho para liberar a compra e reservar o inventario no momento certo.'
                       : 'Add one or more options to unlock checkout and reserve inventory at the right moment.'}
                 </p>
 
@@ -320,13 +320,13 @@ export function EventTicketPanelPremium({
                   disabled={cartQty === 0}
                   className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#ff2d2d] px-5 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ff4133] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  {isPortuguese ? 'Ir para o checkout' : 'Go to checkout'}
+                  {isPortuguese ? 'Ir para a compra' : 'Go to checkout'}
                   <ChevronRight className="h-4 w-4" />
                 </button>
 
                 <div className="mt-6 space-y-3 text-sm leading-7 text-white/66">
                   {[
-                    isPortuguese ? 'Reserva temporaria de inventario no checkout' : 'Temporary inventory reservation in checkout',
+                    isPortuguese ? 'Reserva temporaria de inventario durante a compra' : 'Temporary inventory reservation in checkout',
                     isPortuguese ? 'Pagamento protegido e emissao automatica do ticket digital' : 'Protected payment and automatic digital ticket issuance',
                     isFreeMode
                       ? isPortuguese ? 'Inscricao validada por QR code' : 'Registration validated by QR code'

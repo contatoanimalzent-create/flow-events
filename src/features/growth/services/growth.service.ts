@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
-import { formatCurrency, formatNumber, slugify } from '@/shared/lib'
+import type { AppLocale } from '@/shared/i18n/app-locale'
+import { slugify } from '@/shared/lib'
 import { filterExampleEvents } from '@/shared/lib/example-events'
 import type {
   CaptureLeadInput,
@@ -12,6 +13,40 @@ import type {
 } from '@/features/growth/types/growth.types'
 
 const growthApi = createApiClient('growth')
+
+function normalizeLocale(locale?: AppLocale): AppLocale {
+  return locale === 'pt-BR' ? 'pt-BR' : 'en-US'
+}
+
+function translate(locale: AppLocale | undefined, english: string, portuguese: string) {
+  return normalizeLocale(locale) === 'pt-BR' ? portuguese : english
+}
+
+function formatCurrency(value: number, locale?: AppLocale) {
+  return new Intl.NumberFormat(normalizeLocale(locale), {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value)
+}
+
+function formatNumber(value: number, locale?: AppLocale) {
+  return new Intl.NumberFormat(normalizeLocale(locale)).format(value)
+}
+
+function formatSourceLabel(source: string | null | undefined, locale?: AppLocale) {
+  switch (source) {
+    case 'public_referral':
+      return translate(locale, 'shared referral link', 'link compartilhado de indicacao')
+    case 'public_checkout':
+      return translate(locale, 'public checkout', 'compra publica')
+    case 'free_checkout':
+      return translate(locale, 'free checkout', 'compra gratuita')
+    case 'public_event_page':
+      return translate(locale, 'public event page', 'pagina publica do evento')
+    default:
+      return source ?? translate(locale, 'product flow', 'fluxo do produto')
+  }
+}
 
 function getOrigin() {
   if (typeof window !== 'undefined') {
@@ -134,20 +169,20 @@ function mapReferralConversion(row: Record<string, unknown>): ReferralConversion
   }
 }
 
-function formatBenefitLabel(link: ReferralLinkRecord) {
+function formatBenefitLabel(link: ReferralLinkRecord, locale?: AppLocale) {
   if (link.benefit_type === 'discount') {
-    return `${formatCurrency(link.benefit_value)} de desconto`
+    return translate(locale, `${formatCurrency(link.benefit_value, locale)} discount`, `${formatCurrency(link.benefit_value, locale)} de desconto`)
   }
 
   if (link.benefit_type === 'cashback') {
-    return `${formatCurrency(link.benefit_value)} de cashback`
+    return translate(locale, `${formatCurrency(link.benefit_value, locale)} cashback`, `${formatCurrency(link.benefit_value, locale)} de cashback`)
   }
 
   if (link.benefit_type === 'future_credit') {
-    return `${formatCurrency(link.benefit_value)} em credito futuro`
+    return translate(locale, `${formatCurrency(link.benefit_value, locale)} in future credit`, `${formatCurrency(link.benefit_value, locale)} em credito futuro`)
   }
 
-  return 'Beneficio VIP futuro'
+  return translate(locale, 'Future VIP benefit', 'Beneficio VIP futuro')
 }
 
 export const growthService = {
@@ -161,6 +196,7 @@ export const growthService = {
     referrerId: string
     benefitType?: ReferralBenefitType
     benefitValue?: number
+    locale?: AppLocale
   }) {
     return growthApi.request('get_or_create_referral_link', async () => {
       const existingResult = await supabase
@@ -190,7 +226,11 @@ export const growthService = {
             code: buildReferralCode(params.eventName),
             benefit_type: params.benefitType ?? 'discount',
             benefit_value: params.benefitValue ?? 20,
-            benefit_description: 'Beneficio automatico para o proximo ciclo de compra.',
+            benefit_description: translate(
+              params.locale,
+              'Automatic benefit for the next purchase cycle.',
+              'Beneficio automatico para o proximo ciclo de compra.',
+            ),
             metadata: {
               event_slug: params.eventSlug,
               channel: 'public_share',
@@ -238,8 +278,12 @@ export const growthService = {
         await createInternalRemarketingSignal({
           organizationId: input.organizationId,
           eventId: input.eventId ?? '',
-          title: 'Novo lead capturado na camada publica',
-          body: `${input.email.trim().toLowerCase()} entrou na esteira organica via ${input.source}.`,
+          title: translate(input.locale, 'New lead captured in the public layer', 'Novo contato capturado na camada publica'),
+          body: translate(
+            input.locale,
+            `${input.email.trim().toLowerCase()} entered the organic flow through ${formatSourceLabel(input.source, input.locale)}.`,
+            `${input.email.trim().toLowerCase()} entrou na esteira organica por ${formatSourceLabel(input.source, input.locale)}.`,
+          ),
           referenceType: 'growth_lead',
           referenceId: String(result.data.id),
           payload: {
@@ -318,8 +362,12 @@ export const growthService = {
       await createInternalRemarketingSignal({
         organizationId: input.organizationId,
         eventId: input.eventId,
-        title: 'Nova conversao via referral',
-        body: `${input.buyerEmail ?? 'Um comprador'} converteu por um link compartilhavel do evento.`,
+        title: translate(input.locale, 'New conversion via referral', 'Nova conversao por indicacao'),
+        body: translate(
+          input.locale,
+          `${input.buyerEmail ?? 'A buyer'} converted through a shareable event link.`,
+          `${input.buyerEmail ?? 'Um comprador'} converteu por um link compartilhavel do evento.`,
+        ),
         referenceType: 'referral_conversion',
         referenceId: String(conversionResult.data.id),
         payload: {
@@ -334,7 +382,7 @@ export const growthService = {
     }, { organizationId: input.organizationId, eventId: input.eventId, orderId: input.orderId })
   },
 
-  async getGrowthOverview(organizationId: string): Promise<GrowthOverview> {
+  async getGrowthOverview(organizationId: string, locale?: AppLocale): Promise<GrowthOverview> {
     return growthApi.query('get_growth_overview', async () => {
       const [eventsResult, ordersResult, linksResult, conversionsResult, leadsResult] = await Promise.all([
         supabase.from('events').select('id,name,slug,starts_at,status,sold_tickets').eq('organization_id', organizationId).order('starts_at', { ascending: false }),
@@ -361,7 +409,7 @@ export const growthService = {
       const links = ((linksResult.data ?? []) as Array<Record<string, unknown>>).map(mapReferralLink)
       const conversions = ((conversionsResult.data ?? []) as Array<Record<string, unknown>>).map(mapReferralConversion)
       const leads = (leadsResult.data ?? []) as Array<Record<string, unknown>>
-      const eventNameById = new Map(events.map((event) => [String(event.id), String(event.name ?? 'Evento')]))
+      const eventNameById = new Map(events.map((event) => [String(event.id), String(event.name ?? translate(locale, 'Event', 'Evento'))]))
       const eventSlugById = new Map(events.map((event) => [String(event.id), String(event.slug ?? '')]))
       const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total_amount ?? 0), 0)
       const referralRevenue = conversions.reduce((sum, conversion) => sum + conversion.gross_amount, 0)
@@ -370,32 +418,32 @@ export const growthService = {
 
       const metrics = [
         {
-          label: 'Receita capturada',
-          value: formatCurrency(totalRevenue),
-          note: 'Pedidos pagos que sustentam a camada organica e o ciclo de recompra.',
+          label: translate(locale, 'Captured revenue', 'Receita capturada'),
+          value: formatCurrency(totalRevenue, locale),
+          note: translate(locale, 'Paid orders sustaining the organic layer and repurchase cycle.', 'Pedidos pagos que sustentam a camada organica e o ciclo de recompra.'),
         },
         {
-          label: 'Receita via referral',
-          value: formatCurrency(referralRevenue),
-          note: 'Conversoes atribuidas a links compartilhaveis e loops virais ativos.',
+          label: translate(locale, 'Referral revenue', 'Receita por indicacao'),
+          value: formatCurrency(referralRevenue, locale),
+          note: translate(locale, 'Conversions attributed to shareable links and active viral loops.', 'Conversoes atribuidas a links compartilhaveis e ciclos virais ativos.'),
         },
         {
-          label: 'Leads capturados',
-          value: formatNumber(leads.length),
-          note: 'Demandas salvas pela captura de saida e convites da camada publica.',
+          label: translate(locale, 'Captured leads', 'Contatos capturados'),
+          value: formatNumber(leads.length, locale),
+          note: translate(locale, 'Demand preserved through exit capture and invitations from the public layer.', 'Demandas salvas pela captura de saida e convites da camada publica.'),
         },
         {
-          label: 'Experiencias em movimento',
-          value: formatNumber(activeEvents),
-          note: `${formatNumber(soldTickets)} participantes ja passaram por eventos desta operacao.`,
+          label: translate(locale, 'Live experiences', 'Experiencias em movimento'),
+          value: formatNumber(activeEvents, locale),
+          note: translate(locale, `${formatNumber(soldTickets, locale)} attendees have already gone through events in this operation.`, `${formatNumber(soldTickets, locale)} participantes ja passaram por eventos desta operacao.`),
         },
       ]
 
       const referralLinks = links.map((link) => ({
         id: link.id,
         code: link.code,
-        eventName: eventNameById.get(link.event_id) ?? 'Evento',
-        benefitLabel: formatBenefitLabel(link),
+        eventName: eventNameById.get(link.event_id) ?? translate(locale, 'Event', 'Evento'),
+        benefitLabel: formatBenefitLabel(link, locale),
         conversions: link.conversion_count,
         revenue: link.revenue_generated,
         shareUrl: buildEventShareUrl(eventSlugById.get(link.event_id) ?? '', link.code),
@@ -404,22 +452,34 @@ export const growthService = {
       const recentSignals = [
         ...conversions.map((conversion) => ({
           id: `conversion-${conversion.id}`,
-          title: 'Conversao por indicacao',
-          description: `${conversion.buyer_email ?? 'Novo comprador'} converteu ${formatCurrency(conversion.gross_amount)} no evento ${eventNameById.get(conversion.event_id) ?? 'principal'}.`,
+          title: translate(locale, 'Referral conversion', 'Conversao por indicacao'),
+          description: translate(
+            locale,
+            `${conversion.buyer_email ?? 'New buyer'} converted ${formatCurrency(conversion.gross_amount, locale)} in ${eventNameById.get(conversion.event_id) ?? 'the main event'}.`,
+            `${conversion.buyer_email ?? 'Novo comprador'} converteu ${formatCurrency(conversion.gross_amount, locale)} no evento ${eventNameById.get(conversion.event_id) ?? 'principal'}.`,
+          ),
           timestamp: conversion.created_at,
           tone: 'success' as const,
         })),
         ...leads.map((lead) => ({
           id: `lead-${String(lead.id)}`,
-          title: 'Lead pronto para nurturance',
-          description: `${String(lead.email ?? 'Lead')} entrou via ${String(lead.source ?? 'captura publica')} e ja pode seguir para campaigns.`,
+          title: translate(locale, 'Lead ready for follow-up', 'Contato pronto para acompanhamento'),
+          description: translate(
+            locale,
+            `${String(lead.email ?? 'Lead')} came in through ${formatSourceLabel(String(lead.source ?? 'public_capture'), locale)} and can already move into campaigns.`,
+            `${String(lead.email ?? 'Contato')} entrou por ${formatSourceLabel(String(lead.source ?? 'captura_publica'), locale)} e ja pode seguir para campanhas.`,
+          ),
           timestamp: String(lead.created_at ?? new Date().toISOString()),
           tone: 'neutral' as const,
         })),
         ...orders.slice(0, 5).map((order) => ({
           id: `order-${String(order.id)}`,
-          title: 'Venda recente registrada',
-          description: `${String(order.buyer_name ?? 'Comprador')} entrou por ${String(order.source_channel ?? 'public_event_page')} com ${formatCurrency(Number(order.total_amount ?? 0))}.`,
+          title: translate(locale, 'Recent sale recorded', 'Venda recente registrada'),
+          description: translate(
+            locale,
+            `${String(order.buyer_name ?? 'Buyer')} came through ${formatSourceLabel(String(order.source_channel ?? 'public_event_page'), locale)} with ${formatCurrency(Number(order.total_amount ?? 0), locale)}.`,
+            `${String(order.buyer_name ?? 'Comprador')} entrou por ${formatSourceLabel(String(order.source_channel ?? 'public_event_page'), locale)} com ${formatCurrency(Number(order.total_amount ?? 0), locale)}.`,
+          ),
           timestamp: String(order.created_at ?? new Date().toISOString()),
           tone: String(order.source_channel ?? '').includes('referral') ? 'success' as const : 'warning' as const,
         })),

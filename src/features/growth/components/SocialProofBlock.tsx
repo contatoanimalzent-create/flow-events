@@ -1,4 +1,5 @@
 import { PublicReveal } from '@/features/public'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 
 interface SocialProofItem {
   label: string
@@ -13,7 +14,10 @@ interface SocialProofBlockProps {
   items: SocialProofItem[]
 }
 
-export function SocialProofBlock({ eyebrow = 'Numeros reais', title, description, items }: SocialProofBlockProps) {
+export function SocialProofBlock({ eyebrow, title, description, items }: SocialProofBlockProps) {
+  const { isPortuguese } = usePublicLocale()
+  const resolvedEyebrow = eyebrow || (isPortuguese ? 'Numeros reais' : 'Real numbers')
+
   return (
     <PublicReveal className="px-5 py-10 md:px-10 lg:px-16">
       <section className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] border border-[rgba(255,255,255,0.08)] bg-[#0e0c0a] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.58)] md:p-12">
@@ -21,7 +25,7 @@ export function SocialProofBlock({ eyebrow = 'Numeros reais', title, description
         <div className="pointer-events-none absolute bottom-[-4rem] left-[-3rem] h-48 w-48 rounded-full bg-[#6a86ad]/04 blur-3xl" />
 
         <div className="relative max-w-3xl">
-          <div className="text-[11px] uppercase tracking-[0.32em] text-[#c49a50]">{eyebrow}</div>
+          <div className="text-[11px] uppercase tracking-[0.32em] text-[#c49a50]">{resolvedEyebrow}</div>
           <h2 className="mt-4 font-display text-[clamp(2.6rem,4vw,4.4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f0ebe2]">
             {title}
           </h2>

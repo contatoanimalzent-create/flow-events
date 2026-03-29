@@ -18,8 +18,8 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
       : event.minPrice === 0
         ? isPortuguese ? 'Acesso gratuito' : 'Free access'
         : isPortuguese
-          ? `a partir de ${formatPublicCurrency(event.minPrice, locale)}`
-          : `from ${formatPublicCurrency(event.minPrice, locale)}`
+          ? `A partir de ${formatPublicCurrency(event.minPrice, locale)}`
+          : `From ${formatPublicCurrency(event.minPrice, locale)}`
 
   return (
     <section className="px-5 py-8 md:px-10 lg:px-16 lg:py-10">
@@ -69,7 +69,7 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                   {[
                     {
                       icon: CalendarDays,
-                      label: isPortuguese ? 'Date' : 'Date',
+                      label: isPortuguese ? 'Data' : 'Date',
                       value: formatPublicDate(event.starts_at, locale, {
                         day: '2-digit',
                         month: 'long',
@@ -117,7 +117,7 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
 
               <div className="grid gap-4 self-end">
                 {[
-                  { label: isPortuguese ? 'Status' : 'Status', value: event.status === 'ongoing' ? (isPortuguese ? 'Ao vivo' : 'Live') : isPortuguese ? 'Proxima janela' : 'Next release' },
+                  { label: isPortuguese ? 'Status' : 'Status', value: event.status === 'ongoing' ? (isPortuguese ? 'Ao vivo' : 'Live') : isPortuguese ? 'Proxima abertura' : 'Next release' },
                   { label: isPortuguese ? 'Categoria' : 'Category', value: event.category || (isPortuguese ? 'Experiencia premium' : 'Premium experience') },
                   { label: isPortuguese ? 'Compra' : 'Purchase', value: isPortuguese ? 'Fluxo protegido e direto' : 'Protected and direct flow' },
                 ].map((item) => (

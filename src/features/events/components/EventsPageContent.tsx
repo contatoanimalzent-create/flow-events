@@ -45,7 +45,7 @@ export function EventsPageContent() {
     <div className="admin-page" onClick={closeMenu}>
       <div className="admin-header">
         <div>
-          <div className="admin-eyebrow">Portfolio & agenda</div>
+          <div className="admin-eyebrow">{t('Portfolio & schedule', 'Portfolio e agenda')}</div>
           <h1 className="admin-title">
             {t('Events', 'Eventos')}<span className="admin-title-accent">.</span>
           </h1>
@@ -110,7 +110,7 @@ export function EventsPageContent() {
                 view === mode ? 'bg-brand-acid/15 text-brand-acid' : 'text-text-muted hover:text-text-primary',
               )}
             >
-              {mode === 'grid' ? t('Grid', 'Grid') : t('List', 'Lista')}
+              {mode === 'grid' ? t('Grid', 'Grade') : t('List', 'Lista')}
             </button>
           ))}
         </div>
@@ -266,7 +266,7 @@ export function EventsPageContent() {
         open={Boolean(pendingDeleteEvent)}
         title={t('Remove event', 'Remover evento')}
         description={pendingDeleteEvent ? t(`The event "${pendingDeleteEvent.name}" will be removed from the admin portfolio.`, `O evento "${pendingDeleteEvent.name}" sera removido do portfolio administrativo.`) : undefined}
-        impact={t('This removal takes the event out of the administrative portfolio and can affect operations, future sales and historical visibility in the back office.', 'A exclusao remove a configuracao principal do evento e pode afetar operacao, vendas futuras e historico associado no backoffice.')}
+        impact={t('This removal takes the event out of the administrative portfolio and can affect operations, future sales and historical visibility in the back office.', 'A exclusao remove a configuracao principal do evento e pode afetar operacao, vendas futuras e historico associado no painel administrativo.')}
         confirmLabel={t('Delete event', 'Excluir evento')}
         confirming={false}
         onCancel={() => setPendingDeleteEvent(null)}

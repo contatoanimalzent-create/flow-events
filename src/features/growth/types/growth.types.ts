@@ -1,3 +1,5 @@
+import type { AppLocale } from '@/shared/i18n/app-locale'
+
 export type ReferralBenefitType = 'discount' | 'cashback' | 'future_credit' | 'vip_upgrade'
 
 export interface CaptureLeadInput {
@@ -7,6 +9,7 @@ export interface CaptureLeadInput {
   eventId?: string | null
   source: string
   metadata?: Record<string, unknown>
+  locale?: AppLocale
 }
 
 export interface ReferralLinkRecord {
@@ -49,6 +52,7 @@ export interface RegisterReferralConversionInput {
   grossAmount: number
   referralCode?: string | null
   source?: string
+  locale?: AppLocale
 }
 
 export interface GrowthOverviewMetric {

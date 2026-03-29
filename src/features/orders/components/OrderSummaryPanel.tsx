@@ -98,7 +98,7 @@ export function OrderSummaryPanel({
                   ? isPortuguese ? 'Sem absorcao' : 'No absorption'
                   : formatPublicCurrency(summary.absorbed_fee_amount, locale)
                 : summary.customer_fee_amount === 0
-                  ? isPortuguese ? 'No fee at this stage' : 'No fee at this stage'
+                  ? isPortuguese ? 'Sem taxa nesta etapa' : 'No fee at this stage'
                   : formatPublicCurrency(summary.customer_fee_amount, locale)}
             </span>
           </div>

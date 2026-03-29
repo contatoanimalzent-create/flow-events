@@ -24,7 +24,7 @@ export function useBillingActions() {
       }
 
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: billingKeys.overview(organizationId) }),
+        queryClient.invalidateQueries({ queryKey: billingKeys.overviewScope(organizationId) }),
         queryClient.invalidateQueries({ queryKey: billingKeys.gate(organizationId, 'all') }),
         queryClient.invalidateQueries({ queryKey: billingKeys.plans() }),
       ])

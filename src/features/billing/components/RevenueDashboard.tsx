@@ -1,7 +1,7 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Banknote, Crown, Percent, Wallet } from 'lucide-react'
 import { MetricCard, PremiumCard, SectionHeader } from '@/shared/components'
-import { formatCurrency } from '@/shared/lib'
+import { formatLocaleCurrency, useAppLocale } from '@/shared/i18n/app-locale'
 import type { BillingRevenuePoint, BillingRevenueSummary } from '@/features/billing/types'
 
 interface RevenueDashboardProps {
@@ -10,26 +10,60 @@ interface RevenueDashboardProps {
 }
 
 export function RevenueDashboard({ summary, series }: RevenueDashboardProps) {
+  const { locale, t } = useAppLocale()
+
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Revenue"
-        title="Receita da plataforma"
-        description="A monetizacao agora combina fee operacional, recorrencia do plano e visibilidade imediata da take rate."
+        eyebrow={t('Revenue', 'Receita')}
+        title={t('Platform revenue', 'Receita da plataforma')}
+        description={t(
+          'The monetization layer now combines operating fees, recurring plans and immediate take-rate visibility.',
+          'A camada de monetizacao agora combina taxa operacional, recorrencia do plano e visibilidade imediata da taxa media.',
+        )}
       />
 
       <div className="grid gap-4 xl:grid-cols-4">
-        <MetricCard label="Total vendido" value={formatCurrency(summary.totalSold)} helper="Pedidos com impacto real em receita" icon={<Wallet className="h-5 w-5" />} />
-        <MetricCard label="Taxas geradas" value={formatCurrency(summary.generatedFees)} helper="Fee transacional da plataforma" icon={<Percent className="h-5 w-5" />} />
-        <MetricCard label="Receita da plataforma" value={formatCurrency(summary.platformRevenue)} helper="Fee + plano recorrente" icon={<Banknote className="h-5 w-5" />} />
-        <MetricCard label="Plano recorrente" value={summary.monthlySubscriptionRevenue > 0 ? formatCurrency(summary.monthlySubscriptionRevenue) : 'Sob consulta'} helper={`${summary.activeEvents} eventos ativos · ${summary.absorbedEvents} com taxa absorvida`} icon={<Crown className="h-5 w-5" />} trend={`${summary.averageTakeRate.toFixed(1)}% take rate`} />
+        <MetricCard
+          label={t('Total sold', 'Total vendido')}
+          value={formatLocaleCurrency(summary.totalSold, locale)}
+          helper={t('Orders with real revenue impact', 'Pedidos com impacto real em receita')}
+          icon={<Wallet className="h-5 w-5" />}
+        />
+        <MetricCard
+          label={t('Generated fees', 'Taxas geradas')}
+          value={formatLocaleCurrency(summary.generatedFees, locale)}
+          helper={t('Platform transaction fee', 'Taxa transacional da plataforma')}
+          icon={<Percent className="h-5 w-5" />}
+        />
+        <MetricCard
+          label={t('Platform revenue', 'Receita da plataforma')}
+          value={formatLocaleCurrency(summary.platformRevenue, locale)}
+          helper={t('Fee plus recurring plan revenue', 'Taxa mais receita recorrente do plano')}
+          icon={<Banknote className="h-5 w-5" />}
+        />
+        <MetricCard
+          label={t('Recurring plan', 'Plano recorrente')}
+          value={summary.monthlySubscriptionRevenue > 0 ? formatLocaleCurrency(summary.monthlySubscriptionRevenue, locale) : t('Custom quote', 'Sob consulta')}
+          helper={t(
+            `${summary.activeEvents} active events | ${summary.absorbedEvents} with absorbed fee`,
+            `${summary.activeEvents} eventos ativos | ${summary.absorbedEvents} com taxa absorvida`,
+          )}
+          icon={<Crown className="h-5 w-5" />}
+          trend={t(
+            `${summary.averageTakeRate.toFixed(1)}% take rate`,
+            `${summary.averageTakeRate.toFixed(1)}% de taxa media`,
+          )}
+        />
       </div>
 
       <PremiumCard className="p-6">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.28em] text-text-muted">Ultimos ciclos</div>
-            <h3 className="mt-2 font-display text-4xl leading-none tracking-[-0.05em] text-text-primary">Fee e receita em movimento.</h3>
+            <div className="text-[11px] uppercase tracking-[0.28em] text-text-muted">{t('Recent cycles', 'Ciclos recentes')}</div>
+            <h3 className="mt-2 font-display text-4xl leading-none tracking-[-0.05em] text-text-primary">
+              {t('Fees and revenue in motion.', 'Taxas e receita em movimento.')}
+            </h3>
           </div>
         </div>
 
@@ -50,7 +84,7 @@ export function RevenueDashboard({ summary, series }: RevenueDashboardProps) {
               <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: '#7d6a55', fontSize: 12 }} />
               <YAxis tickLine={false} axisLine={false} tick={{ fill: '#7d6a55', fontSize: 12 }} />
               <Tooltip
-                formatter={(value: number) => formatCurrency(Number(value))}
+                formatter={(value: number) => formatLocaleCurrency(Number(value), locale)}
                 contentStyle={{
                   borderRadius: '20px',
                   border: '1px solid rgba(212, 196, 173, 0.6)',

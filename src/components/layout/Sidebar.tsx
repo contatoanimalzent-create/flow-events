@@ -48,7 +48,7 @@ function createNavGroups(isPortuguese: boolean): NavGroup[] {
     {
       label: isPortuguese ? 'Visao geral' : 'Overview',
       items: [
-        { id: 'dashboard', label: isPortuguese ? 'Dashboard' : 'Dashboard', icon: LayoutDashboard },
+        { id: 'dashboard', label: isPortuguese ? 'Painel' : 'Dashboard', icon: LayoutDashboard },
         { id: 'events', label: isPortuguese ? 'Eventos' : 'Events', icon: CalendarDays },
       ],
     },
@@ -57,13 +57,13 @@ function createNavGroups(isPortuguese: boolean): NavGroup[] {
       items: [
         { id: 'tickets', label: isPortuguese ? 'Ingressos' : 'Tickets', icon: Ticket },
         { id: 'sales', label: isPortuguese ? 'Vendas' : 'Sales', icon: TrendingUp },
-        { id: 'crm', label: isPortuguese ? 'CRM' : 'CRM', icon: Users },
+        { id: 'crm', label: isPortuguese ? 'Relacionamento' : 'CRM', icon: Users },
       ],
     },
     {
       label: isPortuguese ? 'Operacao' : 'Operations',
       items: [
-        { id: 'checkin', label: isPortuguese ? 'Check-in' : 'Check-in', icon: ScanLine },
+        { id: 'checkin', label: isPortuguese ? 'Credenciamento' : 'Check-in', icon: ScanLine },
         { id: 'staff', label: isPortuguese ? 'Equipe' : 'Staff', icon: Users },
         { id: 'suppliers', label: isPortuguese ? 'Fornecedores' : 'Suppliers', icon: Truck },
       ],
@@ -81,8 +81,8 @@ function createNavGroups(isPortuguese: boolean): NavGroup[] {
         { id: 'intelligence', label: isPortuguese ? 'Inteligencia' : 'Intelligence', icon: BrainCircuit },
         { id: 'communication', label: isPortuguese ? 'Comunicacao' : 'Communications', icon: MessageSquare },
         { id: 'financial', label: isPortuguese ? 'Financeiro' : 'Financial', icon: DollarSign },
-        { id: 'billing', label: isPortuguese ? 'Billing' : 'Billing', icon: WalletCards },
-        { id: 'growth', label: isPortuguese ? 'Growth AI' : 'Growth AI', icon: Zap },
+        { id: 'billing', label: isPortuguese ? 'Cobranca' : 'Billing', icon: WalletCards },
+        { id: 'growth', label: isPortuguese ? 'Crescimento com IA' : 'Growth AI', icon: Zap },
       ],
     },
     {

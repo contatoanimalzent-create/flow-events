@@ -2,15 +2,19 @@ import { useState } from 'react'
 import { ArrowLeft, Mail, Phone, Send } from 'lucide-react'
 import { PublicLayout } from '@/features/public'
 import { PublicReveal } from '@/features/public/components/PublicReveal'
+import { usePublicLocale } from '@/features/public/lib/public-locale'
 import { useSeoMeta } from '@/shared/lib'
 
 export function ContactPage({ onLogin }: { onLogin?: () => void }) {
+  const { isPortuguese } = usePublicLocale()
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
 
   useSeoMeta({
-    title: 'Contato | Animalz Events',
-    description: 'Entre em contato com a equipe Animalz Events. Tire duvidas, fale sobre parcerias ou solicite suporte.',
+    title: isPortuguese ? 'Contato | Animalz Events' : 'Contact | Animalz Events',
+    description: isPortuguese
+      ? 'Entre em contato com a equipe Animalz Events. Tire duvidas, fale sobre parcerias ou solicite suporte.'
+      : 'Contact the Animalz Events team. Ask questions, discuss partnerships or request support.',
     url: typeof window !== 'undefined' ? window.location.href : '/contact',
   })
 
@@ -36,30 +40,32 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
                   className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-[#8b7c69] transition-colors hover:text-[#1f1a15]"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  Voltar
+                  {isPortuguese ? 'Voltar' : 'Back'}
                 </a>
                 <h1 className="mt-8 font-display text-[clamp(3.2rem,6vw,5.8rem)] font-semibold leading-[0.88] tracking-[-0.05em] text-[#1f1a15]">
-                  Fale com a gente.
+                  {isPortuguese ? 'Fale com a gente.' : 'Talk to us.'}
                 </h1>
                 <p className="mt-6 max-w-lg text-base leading-8 text-[#5f5549] md:text-lg">
-                  Tem duvidas, quer saber mais sobre a plataforma ou precisa de ajuda? Envie uma mensagem e responderemos em breve.
+                  {isPortuguese
+                    ? 'Tem duvidas, quer saber mais sobre a plataforma ou precisa de ajuda? Envie uma mensagem e responderemos em breve.'
+                    : 'Do you have questions, want to know more about the platform or need help? Send a message and we will reply soon.'}
                 </p>
 
                 <div className="mt-10 grid gap-4">
                   {[
                     {
                       icon: Mail,
-                      label: 'Suporte',
+                      label: isPortuguese ? 'Suporte' : 'Support',
                       value: 'support@animalz.events',
                     },
                     {
                       icon: Mail,
-                      label: 'Parcerias',
+                      label: isPortuguese ? 'Parcerias' : 'Partnerships',
                       value: 'business@animalz.events',
                     },
                     {
                       icon: Phone,
-                      label: 'Telefone',
+                      label: isPortuguese ? 'Telefone' : 'Phone',
                       value: '+55 (11) 9999-9999',
                     },
                   ].map((item) => {
@@ -91,24 +97,24 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
                       <Send className="h-6 w-6" />
                     </div>
                     <h3 className="font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-[#1f1a15]">
-                      Mensagem enviada!
+                      {isPortuguese ? 'Mensagem enviada!' : 'Message sent!'}
                     </h3>
                     <p className="max-w-sm text-sm leading-7 text-[#5f5549]">
-                      Recebemos sua mensagem e entraremos em contato em breve.
+                      {isPortuguese ? 'Recebemos sua mensagem e entraremos em contato em breve.' : 'We received your message and will get back to you soon.'}
                     </p>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="grid gap-5">
-                    <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">Enviar mensagem</div>
+                    <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">{isPortuguese ? 'Enviar mensagem' : 'Send message'}</div>
 
                     <div>
-                      <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">Nome</label>
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">{isPortuguese ? 'Nome' : 'Name'}</label>
                       <input
                         type="text"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
-                        placeholder="Seu nome"
+                        placeholder={isPortuguese ? 'Seu nome' : 'Your name'}
                         className="w-full rounded-[1.2rem] border border-[#e5d8c7] bg-[#fbf7f1] px-4 py-3 text-sm text-[#1f1a15] outline-none placeholder:text-[#b0a090] focus:border-[#c9b08a] focus:ring-0"
                       />
                     </div>
@@ -120,19 +126,19 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         required
-                        placeholder="seu@email.com"
+                        placeholder={isPortuguese ? 'seu@email.com' : 'you@email.com'}
                         className="w-full rounded-[1.2rem] border border-[#e5d8c7] bg-[#fbf7f1] px-4 py-3 text-sm text-[#1f1a15] outline-none placeholder:text-[#b0a090] focus:border-[#c9b08a] focus:ring-0"
                       />
                     </div>
 
                     <div>
-                      <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">Mensagem</label>
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.24em] text-[#8b7c69]">{isPortuguese ? 'Mensagem' : 'Message'}</label>
                       <textarea
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         required
                         rows={5}
-                        placeholder="Como podemos ajudar?"
+                        placeholder={isPortuguese ? 'Como podemos ajudar?' : 'How can we help?'}
                         className="w-full resize-none rounded-[1.2rem] border border-[#e5d8c7] bg-[#fbf7f1] px-4 py-3 text-sm text-[#1f1a15] outline-none placeholder:text-[#b0a090] focus:border-[#c9b08a] focus:ring-0"
                       />
                     </div>
@@ -141,7 +147,7 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
                       type="submit"
                       className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f1a15] px-6 py-3 text-sm font-medium text-[#f8f3ea] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(31,26,21,0.22)]"
                     >
-                      Enviar mensagem
+                      {isPortuguese ? 'Enviar mensagem' : 'Send message'}
                       <Send className="h-4 w-4" />
                     </button>
                   </form>

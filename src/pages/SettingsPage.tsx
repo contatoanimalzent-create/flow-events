@@ -38,7 +38,7 @@ const PLANS = {
     features: [
       'Eventos ilimitados',
       'Ingressos ilimitados',
-      'Check-in por QR Code',
+      'Credenciamento por QR Code',
       'PDV básico integrado',
       'Gestão de Staff',
       'Vendas públicas (/e/slug)',
@@ -57,7 +57,7 @@ const PLANS = {
       'Taxa de serviço reduzida',
       'WhatsApp automático',
       'Campanhas de e-mail',
-      'Growth AI insights',
+      'Insights de crescimento',
       'Relatórios avançados',
       'Suporte prioritário (chat)',
     ],
@@ -71,12 +71,12 @@ const PLANS = {
     processingFee: '1% do produtor',
     features: [
       'Tudo do Pro',
-      'White-label completo',
+      'Marca branca completa',
       'Domínio personalizado',
       'Gestão de tráfego pago',
-      'Analytics white-label',
+      'Analises com marca branca',
       'Ticket Social (Stories)',
-      'API access completo',
+      'Acesso completo a API',
     ],
   },
   enterprise: {
@@ -90,7 +90,7 @@ const PLANS = {
       'Tudo do Business',
       'Taxa negociada por volume',
       'Totem facial (hardware)',
-      'Offline sync',
+      'Sincronizacao offline',
       'Reconhecimento facial',
       'SLA dedicado 24/7',
       'Onboarding personalizado',
@@ -231,7 +231,7 @@ export function SettingsPage() {
 
   const roleLabels: Record<string, string> = {
     org_admin: 'Administrador', org_manager: 'Gerente',
-    checkin_operator: 'Check-in', pdv_operator: 'PDV',
+    checkin_operator: 'Credenciamento', pdv_operator: 'PDV',
     staff_member: 'Staff', supplier: 'Fornecedor',
   }
 
@@ -244,7 +244,7 @@ export function SettingsPage() {
           CONFIGURAÇÕES<span className="text-brand-acid">.</span>
         </h1>
         <p className="text-text-muted text-xs mt-1 font-mono tracking-wider">
-          Organização, white-label, planos e equipe
+          Organizacao, marca branca, planos e equipe
         </p>
       </div>
 
@@ -252,7 +252,7 @@ export function SettingsPage() {
       <div className="flex items-center gap-1 border-b border-bg-border reveal" style={{ animationDelay: '20ms' }}>
         {([
           { key: 'org', label: 'Organização', icon: Building2 },
-          { key: 'whitelabel', label: 'White-label', icon: Palette },
+          { key: 'whitelabel', label: 'Marca branca', icon: Palette },
           { key: 'integrations', label: 'Integrações', icon: Link2 },
           { key: 'billing', label: 'Plano & Comissões', icon: Percent },
           { key: 'team', label: 'Equipe', icon: Users },
@@ -390,7 +390,7 @@ export function SettingsPage() {
                 <div className="flex items-start gap-3">
                   <Palette className="w-5 h-5 text-brand-acid shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="text-sm font-semibold text-text-primary">White-label completo</h3>
+                    <h3 className="text-sm font-semibold text-text-primary">Marca branca completa</h3>
                     <p className="text-xs text-text-secondary mt-1">
                       Com o plano Business ou Enterprise, seu comprador nunca vê a marca Animalz Events — vê apenas a sua.
                       Domínio próprio, e-mail próprio, cores e logo personalizados.
@@ -568,7 +568,7 @@ export function SettingsPage() {
                         <div className="text-[10px] font-mono tracking-widest text-brand-acid uppercase mb-1">Taxa de Serviço</div>
                         <div className="text-xs text-text-secondary">
                           Cobrada do <strong className="text-text-primary">comprador</strong> do ingresso.
-                          Aparece no checkout. O produtor não paga e não absorve.
+                          Aparece na compra. O produtor não paga e não absorve.
                         </div>
                       </div>
                       <div className="bg-bg-card rounded-sm p-3 border border-bg-border">
@@ -783,7 +783,7 @@ export function SettingsPage() {
                   {[
                     { role: 'Administrador', desc: 'Acesso total — todas as funcionalidades' },
                     { role: 'Gerente', desc: 'Acesso a eventos, vendas, staff e relatórios' },
-                    { role: 'Check-in', desc: 'Apenas operação de portarias e QR Code' },
+                    { role: 'Credenciamento', desc: 'Apenas operação de portarias e QR Code' },
                     { role: 'PDV', desc: 'Apenas ponto de venda e caixa' },
                     { role: 'Financeiro', desc: 'Apenas módulo financeiro e relatórios' },
                     { role: 'Visualização', desc: 'Somente leitura — sem edições' },
@@ -837,7 +837,7 @@ export function SettingsPage() {
                   <select className="input" value={inviteRole} onChange={e => setInviteRole(e.target.value)}>
                     <option value="org_admin">Administrador</option>
                     <option value="org_manager">Gerente</option>
-                    <option value="checkin_operator">Check-in</option>
+                    <option value="checkin_operator">Credenciamento</option>
                     <option value="pdv_operator">PDV</option>
                     <option value="staff_member">Staff</option>
                   </select>

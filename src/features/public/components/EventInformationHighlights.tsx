@@ -35,7 +35,7 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
       icon: MapPin,
       label: isPortuguese ? 'Local' : 'Location',
       value: [event.venue_name, event.venue_address?.city, event.venue_address?.state].filter(Boolean).join(' / '),
-      note: isPortuguese ? 'Venue preparado para a operacao do evento' : 'Venue prepared for live event operations',
+      note: isPortuguese ? 'Local preparado para a operacao do evento' : 'Venue prepared for live event operations',
     },
     {
       icon: Users,
@@ -53,7 +53,7 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
       icon: ShieldCheck,
       label: isPortuguese ? 'Acesso' : 'Access',
       value: isFreeMode ? (isPortuguese ? 'Inscricao com QR code digital' : 'Registration with digital QR code') : (isPortuguese ? 'Ingresso digital com validacao antifraude' : 'Digital ticket with anti-fraud validation'),
-      note: isPortuguese ? 'Compra, emissao e check-in ligados ao mesmo produto' : 'Purchase, issuance and check-in connected to the same product',
+      note: isPortuguese ? 'Compra, emissao e credenciamento ligados ao mesmo produto' : 'Purchase, issuance and check-in connected to the same product',
     },
   ]
 

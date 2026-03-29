@@ -8,7 +8,7 @@ import {
   PremiumSelect,
   SurfacePanel,
 } from '@/shared/components'
-import { formatCurrency } from '@/shared/lib'
+import { formatLocaleCurrency, useAppLocale } from '@/shared/i18n/app-locale'
 import { calculateFeeBreakdown } from '@/features/billing/services/billing.calculations'
 import type { BillingFeeType } from '@/features/billing/types'
 
@@ -35,6 +35,7 @@ export function FeeConfigurationPanel({
   sampleSubtotal = 840,
   sampleQuantity = 2,
 }: FeeConfigurationPanelProps) {
+  const { locale, t } = useAppLocale()
   const preview = calculateFeeBreakdown({
     subtotal: sampleSubtotal,
     quantity: sampleQuantity,
@@ -46,21 +47,34 @@ export function FeeConfigurationPanel({
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
-        <PremiumBadge tone="accent">{feeType === 'fixed' ? 'Taxa fixa por ingresso' : 'Taxa percentual sobre subtotal'}</PremiumBadge>
-        <PremiumBadge tone={absorbFee ? 'warning' : 'info'}>{absorbFee ? 'Absorvida pelo produtor' : 'Repassada ao comprador'}</PremiumBadge>
+        <PremiumBadge tone="accent">
+          {feeType === 'fixed'
+            ? t('Fixed fee per ticket', 'Taxa fixa por ingresso')
+            : t('Percentage fee on subtotal', 'Taxa percentual sobre subtotal')}
+        </PremiumBadge>
+        <PremiumBadge tone={absorbFee ? 'warning' : 'info'}>
+          {absorbFee
+            ? t('Absorbed by the producer', 'Absorvida pelo produtor')
+            : t('Passed to the buyer', 'Repassada ao comprador')}
+        </PremiumBadge>
       </div>
 
       {editable ? (
         <FormGrid>
-          <FormField label="Modelo de taxa">
+          <FormField label={t('Fee model', 'Modelo de taxa')}>
             <PremiumSelect value={feeType} onChange={(event) => onFeeTypeChange?.(event.target.value as BillingFeeType)}>
-              <option value="percentage">Percentual</option>
-              <option value="fixed">Fixa por ingresso</option>
+              <option value="percentage">{t('Percentage', 'Percentual')}</option>
+              <option value="fixed">{t('Fixed per ticket', 'Fixa por ingresso')}</option>
             </PremiumSelect>
-            <FormHint>Use percentual para mixes de preco variados ou fixa quando quiser linearidade por acesso.</FormHint>
+            <FormHint>
+              {t(
+                'Use percentage for varied prices or a fixed fee when you want linear pricing per access.',
+                'Use percentual para precos variados ou taxa fixa quando quiser linearidade por acesso.',
+              )}
+            </FormHint>
           </FormField>
 
-          <FormField label={feeType === 'fixed' ? 'Valor por ingresso' : 'Percentual da taxa'}>
+          <FormField label={feeType === 'fixed' ? t('Amount per ticket', 'Valor por ingresso') : t('Fee percentage', 'Percentual da taxa')}>
             <PremiumInput
               type="number"
               min={0}
@@ -69,7 +83,11 @@ export function FeeConfigurationPanel({
               onChange={(event) => onFeeValueChange?.(event.target.value)}
               placeholder={feeType === 'fixed' ? '8.00' : '10'}
             />
-            <FormHint>{feeType === 'fixed' ? 'Valor em reais por ingresso vendido.' : 'Percentual aplicado sobre o subtotal do pedido.'}</FormHint>
+            <FormHint>
+              {feeType === 'fixed'
+                ? t('Amount in reais for each ticket sold.', 'Valor em reais por ingresso vendido.')
+                : t('Percentage applied on the order subtotal.', 'Percentual aplicado sobre o subtotal do pedido.')}
+            </FormHint>
           </FormField>
         </FormGrid>
       ) : null}
@@ -77,9 +95,12 @@ export function FeeConfigurationPanel({
       {editable ? (
         <SurfacePanel tone="muted" className="flex flex-wrap items-center justify-between gap-4 p-4">
           <div>
-            <div className="text-sm font-medium text-text-primary">Absorver taxa</div>
+            <div className="text-sm font-medium text-text-primary">{t('Absorb fee', 'Absorver taxa')}</div>
             <p className="mt-1 text-sm leading-6 text-text-muted">
-              Quando ativado, o comprador ve o total limpo e a organizacao absorve a taxa no repasse, sem perder a receita gerada para a plataforma.
+              {t(
+                'When enabled, the buyer sees a clean total and the organization absorbs the fee in the payout without losing platform revenue.',
+                'Quando ativado, o comprador ve o total limpo e a organizacao absorve a taxa no repasse, sem perder a receita gerada para a plataforma.',
+              )}
             </p>
           </div>
           <button
@@ -96,30 +117,45 @@ export function FeeConfigurationPanel({
         <div>
           <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-text-muted">
             <Ticket className="h-3.5 w-3.5" />
-            Simulacao
+            {t('Simulation', 'Simulacao')}
           </div>
           <div className="mt-3 text-sm leading-6 text-text-muted">
-            Preview para {sampleQuantity} ingressos com subtotal de {formatCurrency(sampleSubtotal)}.
+            {t(
+              `Preview for ${sampleQuantity} tickets with subtotal of ${formatLocaleCurrency(sampleSubtotal, locale)}.`,
+              `Simulacao para ${sampleQuantity} ingressos com subtotal de ${formatLocaleCurrency(sampleSubtotal, locale)}.`,
+            )}
           </div>
         </div>
         <div>
           <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-text-muted">
             <Percent className="h-3.5 w-3.5" />
-            Fee da plataforma
+            {t('Platform fee', 'Taxa da plataforma')}
           </div>
-          <div className="mt-3 font-display text-3xl leading-none tracking-[-0.04em] text-text-primary">{formatCurrency(preview.platformFeeAmount)}</div>
-          <div className="mt-2 text-sm text-text-muted">Valor gerado para Animalz por esse pedido.</div>
+          <div className="mt-3 font-display text-3xl leading-none tracking-[-0.04em] text-text-primary">
+            {formatLocaleCurrency(preview.platformFeeAmount, locale)}
+          </div>
+          <div className="mt-2 text-sm text-text-muted">
+            {t('Revenue generated for Animalz on this order.', 'Valor gerado para a Animalz neste pedido.')}
+          </div>
         </div>
         <div>
           <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.24em] text-text-muted">
             <Receipt className="h-3.5 w-3.5" />
-            Total ao comprador
+            {t('Buyer total', 'Total do comprador')}
           </div>
-          <div className="mt-3 font-display text-3xl leading-none tracking-[-0.04em] text-text-primary">{formatCurrency(preview.totalAmount)}</div>
+          <div className="mt-3 font-display text-3xl leading-none tracking-[-0.04em] text-text-primary">
+            {formatLocaleCurrency(preview.totalAmount, locale)}
+          </div>
           <div className="mt-2 text-sm text-text-muted">
             {preview.customerFeeAmount > 0
-              ? `${formatCurrency(preview.customerFeeAmount)} aparece no checkout.`
-              : `${formatCurrency(preview.absorbedFeeAmount)} fica absorvido no repasse.`}
+              ? t(
+                  `${formatLocaleCurrency(preview.customerFeeAmount, locale)} appears in the purchase flow.`,
+                  `${formatLocaleCurrency(preview.customerFeeAmount, locale)} aparece na compra.`,
+                )
+              : t(
+                  `${formatLocaleCurrency(preview.absorbedFeeAmount, locale)} stays absorbed in the payout.`,
+                  `${formatLocaleCurrency(preview.absorbedFeeAmount, locale)} fica absorvido no repasse.`,
+                )}
           </div>
         </div>
       </SurfacePanel>

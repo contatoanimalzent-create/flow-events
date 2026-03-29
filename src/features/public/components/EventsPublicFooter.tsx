@@ -1,26 +1,11 @@
 import { ArrowRight, Globe, Headphones, Mail, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { usePublicLocale } from '../lib/public-locale'
+import { AnimalzBrandMark } from './AnimalzBrandMark'
 
 interface EventsPublicFooterProps {
   categories?: string[]
   onCategoryClick?: (category: string) => void
-}
-
-function FooterMark() {
-  return (
-    <div className="inline-flex items-start gap-3 text-white">
-      <div className="relative flex flex-col leading-none">
-        <span className="font-display text-[2.5rem] font-semibold uppercase tracking-[-0.08em]">A</span>
-        <span className="-mt-2.5 ml-6 font-display text-[3rem] font-semibold uppercase tracking-[-0.1em]">E</span>
-        <span className="absolute bottom-[0.6rem] left-0 h-[2px] w-[4.6rem] bg-white/90" />
-      </div>
-      <div className="pt-1">
-        <div className="text-[10px] uppercase tracking-[0.42em] text-white/38">Animalz</div>
-        <div className="mt-1 text-[12px] font-medium uppercase tracking-[0.28em] text-white/78">Experiences</div>
-      </div>
-    </div>
-  )
 }
 
 export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsPublicFooterProps) {
@@ -124,7 +109,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
 
           <div className="mt-12 grid gap-10 border-t border-white/10 pt-8 lg:grid-cols-[0.95fr_0.7fr_0.7fr_0.7fr]">
             <div>
-              <FooterMark />
+              <AnimalzBrandMark inverse />
               <p className="mt-5 max-w-sm text-sm leading-7 text-white/58">
                 {isPortuguese
                   ? 'Animalz Experiences organiza descoberta, compra e operacao em uma linguagem premium inspirada por cultura, velocidade e presenca de marca.'

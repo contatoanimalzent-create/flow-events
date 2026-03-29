@@ -41,7 +41,7 @@ export function PremiumEventCard({
       <a
         href={`/e/${event.slug}`}
         aria-label={event.name}
-        className="group relative block h-full min-h-[31rem] overflow-hidden rounded-[2rem] border border-white/10 bg-[#05080d] shadow-[0_26px_82px_rgba(0,0,0,0.34)] transition-all duration-500 hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_34px_100px_rgba(0,0,0,0.46)]"
+        className="group relative block h-full min-h-[31rem] overflow-hidden rounded-[2rem] border border-[#0b1016]/10 bg-[#05080d] shadow-[0_22px_70px_rgba(11,16,22,0.14)] transition-all duration-500 hover:-translate-y-1.5 hover:border-[#0b1016]/18 hover:shadow-[0_34px_100px_rgba(11,16,22,0.2)]"
       >
         <div
           aria-hidden="true"
@@ -70,7 +70,7 @@ export function PremiumEventCard({
               year: 'numeric',
             })}
           </div>
-          <div className="mt-3 font-display text-[2.4rem] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
+          <div className="mt-3 max-w-[11ch] font-display text-[2.4rem] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
             {event.name}
           </div>
           {event.subtitle ? (

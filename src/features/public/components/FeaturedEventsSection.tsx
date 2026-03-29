@@ -50,7 +50,7 @@ function EventMetaLine({
       <div className="flex items-center gap-2">
         <Users className="h-4 w-4 text-white/68" />
         <span>
-          {formatPublicNumber(event.sold_tickets, locale)} {isPortuguese ? 'vendidos' : 'sold'}
+          {formatPublicNumber(event.sold_tickets, locale)} {isPortuguese ? 'sold' : 'sold'}
         </span>
       </div>
     </div>
@@ -74,7 +74,7 @@ function FeaturedEventTile({
     <PublicReveal delayMs={index * 90}>
       <a
         href={`/e/${event.slug}`}
-        className="group relative block h-full overflow-hidden rounded-[2.25rem] border border-white/10 bg-[#05080d] shadow-[0_24px_90px_rgba(0,0,0,0.3)]"
+        className="group relative block h-full overflow-hidden rounded-[2.25rem] border border-[#0b1016]/10 bg-[#05080d] shadow-[0_24px_90px_rgba(11,16,22,0.18)]"
       >
         <div className={large ? 'min-h-[35rem] md:min-h-[42rem]' : 'min-h-[22rem] md:min-h-[20rem]'}>
           <img
@@ -88,7 +88,7 @@ function FeaturedEventTile({
 
           <div className="relative z-10 flex h-full flex-col justify-end p-6 text-white md:p-8">
             <div className="inline-flex w-fit rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-white/80 backdrop-blur-md">
-              {event.category || (isPortuguese ? 'Experiencia' : 'Experience')}
+              {event.category || (isPortuguese ? 'Experience' : 'Experience')}
             </div>
             <div
               className={
@@ -106,17 +106,13 @@ function FeaturedEventTile({
             <div className="mt-6 flex items-center justify-between gap-4 border-t border-white/12 pt-5">
               <div className="text-sm font-medium text-white/82">
                 {event.minPrice === null
-                  ? isPortuguese
-                    ? 'Sob consulta'
-                    : 'On request'
+                  ? 'On request'
                   : event.minPrice === 0
-                    ? isPortuguese
-                      ? 'Acesso gratuito'
-                      : 'Free access'
-                    : `${isPortuguese ? 'A partir de' : 'From'} ${formatPublicCurrency(event.minPrice, locale)}`}
+                    ? 'Free access'
+                    : `From ${formatPublicCurrency(event.minPrice, locale)}`}
               </div>
               <span className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.12em] text-white">
-                {isPortuguese ? 'Abrir capitulo' : 'Open chapter'}
+                Open chapter
                 <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
               </span>
             </div>
@@ -130,19 +126,15 @@ function FeaturedEventTile({
 export function FeaturedEventsSection({ events }: FeaturedEventsSectionProps) {
   const { isPortuguese, locale } = usePublicLocale()
   const primaryEvent = events[0]
-  const secondaryEvents = events.slice(1, 3)
+  const secondaryEvents = events.slice(1, 4)
 
   if (events.length === 0) {
     return (
       <section className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-[1920px]">
           <EmptyState
-            title={isPortuguese ? 'Nenhuma experiencia publicada no momento' : 'No published experiences right now'}
-            description={
-              isPortuguese
-                ? 'Assim que novas experiencias entrarem em curadoria, esta vitrine publica sera atualizada automaticamente.'
-                : 'As soon as new events enter curation, this public showcase updates automatically.'
-            }
+            title="No published experiences right now"
+            description="As soon as new events enter curation, this public showcase updates automatically."
             className="min-h-[20rem]"
           />
         </div>
@@ -154,21 +146,22 @@ export function FeaturedEventsSection({ events }: FeaturedEventsSectionProps) {
     <section className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
       <div className="mx-auto max-w-[1920px]">
         <PublicReveal>
-          <div className="mb-8 flex items-end justify-between gap-6 border-b border-white/8 pb-8">
+          <div className="mb-8 grid gap-6 rounded-[2.5rem] border border-[#0b1016]/10 bg-[#fffaf3] p-8 shadow-[0_22px_70px_rgba(11,16,22,0.08)] lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div className="max-w-3xl">
-              <div className="text-[11px] uppercase tracking-[0.36em] text-white/38">
-                {isPortuguese ? 'Selecao atual' : 'Selected now'}
+              <div className="text-[11px] uppercase tracking-[0.36em] text-[#6d727a]">
+                Selected now
               </div>
-              <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,5rem)] font-semibold uppercase leading-[0.86] tracking-[-0.05em] text-white">
-                {isPortuguese
-                  ? 'Uma curadoria pensada para o que merece atencao agora.'
-                  : 'A curated lineup for what deserves attention next.'}
+              <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,5rem)] font-semibold uppercase leading-[0.86] tracking-[-0.05em] text-[#0b1016]">
+                A sharper showcase for what deserves attention right now.
               </h2>
+            </div>
+            <div className="max-w-2xl text-base leading-8 text-[#5b6168]">
+              Instead of repeating the same module, the public layer now uses one master spotlight and a tighter sequence of supporting experiences.
             </div>
           </div>
         </PublicReveal>
 
-        <div className="grid gap-6 xl:grid-cols-[1.16fr_0.84fr]">
+        <div className="grid gap-6 xl:grid-cols-[1.18fr_0.82fr]">
           {primaryEvent ? (
             <FeaturedEventTile
               event={primaryEvent}

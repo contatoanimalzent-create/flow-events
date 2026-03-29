@@ -30,7 +30,7 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
   return (
     <a
       href={`/e/${event.slug}`}
-      className="group relative block overflow-hidden rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] shadow-[0_18px_55px_rgba(0,0,0,0.26)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(0,0,0,0.34)]"
+      className="group relative block overflow-hidden rounded-[2rem] border border-[#0b1016]/10 bg-[#fffaf3] shadow-[0_18px_55px_rgba(11,16,22,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(11,16,22,0.12)]"
     >
       <div className="grid gap-0 lg:grid-cols-[13rem_minmax(0,1fr)_12rem]">
         <div className="relative min-h-[15rem] overflow-hidden lg:min-h-full">
@@ -58,16 +58,16 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
             ) : null}
           </div>
 
-          <h3 className="mt-5 font-display text-[clamp(2.2rem,3vw,3.2rem)] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white">
-            {event.name}
-          </h3>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68 md:text-base">
+              <h3 className="mt-5 font-display text-[clamp(2.2rem,3vw,3.2rem)] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-[#0b1016]">
+                {event.name}
+              </h3>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5b6168] md:text-base">
             {event.subtitle || event.short_description || (isPortuguese
               ? 'Uma experiencia pensada para transformar data, venue e narrativa em desejo imediato.'
               : 'An experience designed to turn date, venue and story into immediate desire.')}
           </p>
 
-          <div className="mt-6 grid gap-3 text-sm text-white/68 md:grid-cols-2">
+          <div className="mt-6 grid gap-3 text-sm text-[#5b6168] md:grid-cols-2">
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-[#ff6a5c]" />
               <span>
@@ -85,7 +85,7 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
           </div>
         </div>
 
-        <div className="flex flex-col justify-between border-t border-white/8 bg-black/16 p-6 lg:border-l lg:border-t-0">
+        <div className="flex flex-col justify-between border-t border-[#0b1016]/10 bg-[#0b1016] p-6 lg:border-l lg:border-t-0">
           <div>
             <div className="text-[10px] uppercase tracking-[0.26em] text-white/44">Ticketing</div>
             <div className="mt-3 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-white">

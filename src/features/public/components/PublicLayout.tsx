@@ -23,15 +23,15 @@ export function PublicLayout({
   className,
 }: PublicLayoutProps) {
   return (
-    <div className={cn('min-h-screen bg-bg-primary text-text-primary luxury-canvas', className)}>
+    <div className={cn('min-h-screen bg-[#f5efe8] text-[#0b1016] public-editorial-shell', className)}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-[-8rem] top-[-10rem] h-[26rem] w-[26rem] rounded-full bg-[#ff2d2d]/22 blur-3xl" />
-        <div className="absolute bottom-[-12rem] right-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[#445066]/18 blur-3xl" />
+        <div className="absolute left-[-8rem] top-[-10rem] h-[26rem] w-[26rem] rounded-full bg-[#d4a36d]/16 blur-3xl" />
+        <div className="absolute bottom-[-12rem] right-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[#a92424]/10 blur-3xl" />
         <div
           className="absolute inset-0 opacity-60"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px), repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0 2px, transparent 2px 16px)',
+              'linear-gradient(rgba(11,16,22,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(11,16,22,0.04) 1px, transparent 1px), repeating-linear-gradient(135deg, rgba(11,16,22,0.02) 0 2px, transparent 2px 16px)',
             backgroundSize: '72px 72px, 72px 72px, auto',
             maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.4), transparent 85%)',
           }}

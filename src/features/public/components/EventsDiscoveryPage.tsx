@@ -91,15 +91,15 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
   return (
     <PublicLayout onLogin={onLogin}>
       <section className="px-5 pb-8 pt-8 md:px-10 lg:px-16 lg:pb-10 lg:pt-10">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-[1920px]">
           <PublicReveal>
-            <div className="grid gap-6 rounded-[2.6rem] border border-white/8 bg-[linear-gradient(135deg,#0d1117_0%,#121823_100%)] px-8 py-10 shadow-[0_24px_80px_rgba(0,0,0,0.28)] lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-end">
+            <div className="grid gap-6 rounded-[2.8rem] border border-[#0b1016]/10 bg-[#fffaf3] px-8 py-10 shadow-[0_24px_80px_rgba(11,16,22,0.08)] lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-end">
               <div className="max-w-4xl">
-                <div className="text-[11px] uppercase tracking-[0.34em] text-white/48">Experiences calendar</div>
-                <h1 className="mt-5 font-display text-[clamp(3.6rem,8vw,6.8rem)] font-semibold uppercase leading-[0.84] tracking-[-0.04em] text-white">
-                  {isPortuguese ? 'Agenda premium de experiencias.' : 'Premium experiences calendar.'}
+                <div className="text-[11px] uppercase tracking-[0.34em] text-[#6d727a]">Experiences calendar</div>
+                <h1 className="mt-5 font-display text-[clamp(3.6rem,8vw,6.8rem)] font-semibold uppercase leading-[0.84] tracking-[-0.04em] text-[#0b1016]">
+                  {isPortuguese ? 'A more elegant event calendar.' : 'A more elegant event calendar.'}
                 </h1>
-                <p className="mt-5 max-w-2xl text-base leading-8 text-white/68 md:text-lg">
+                <p className="mt-5 max-w-2xl text-base leading-8 text-[#5b6168] md:text-lg">
                   {isPortuguese
                     ? 'Descubra eventos por cidade, periodo e categoria em uma camada mais direta, mais comercial e muito menos parecida com um marketplace generico.'
                     : 'Discover events by city, date range and category through a more direct, more commercial layer that feels far less like a generic marketplace.'}
@@ -111,7 +111,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                         key={item}
                         type="button"
                         onClick={() => startTransition(() => setCategory(item))}
-                        className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-medium text-white/72 transition-all duration-300 hover:border-[#ff2d2d]/36 hover:text-white"
+                        className="rounded-full border border-[#0b1016]/10 bg-white px-4 py-2 text-sm font-medium text-[#5b6168] transition-all duration-300 hover:border-[#ff4b36]/36 hover:text-[#0b1016]"
                       >
                         {item}
                       </button>
@@ -121,12 +121,12 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
               </div>
 
               <div className="grid gap-4">
-                {[
+                {[ 
                   { label: isPortuguese ? 'Eventos visiveis' : 'Visible events', value: `${filteredEvents.length || events.length}` },
                   { label: isPortuguese ? 'Cidades ativas' : 'Active cities', value: `${cityCount}` },
                   { label: isPortuguese ? 'Categorias' : 'Categories', value: `${categories.length}` },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-[1.7rem] border border-white/10 bg-black/24 p-5">
+                  <div key={item.label} className="rounded-[1.7rem] border border-[#0b1016]/10 bg-[#0b1016] p-5">
                     <div className="text-[10px] uppercase tracking-[0.28em] text-white/42">{item.label}</div>
                     <div className="mt-3 font-display text-[2rem] font-semibold uppercase tracking-[-0.03em] text-white">
                       {item.value}

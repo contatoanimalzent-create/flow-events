@@ -405,9 +405,9 @@ export function AdminShell({ className, children, ...props }: HTMLAttributes<HTM
             backgroundSize: '72px 72px',
           }}
         />
-        <div className="absolute left-[-12rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-[#d4ff00]/[0.08] blur-[150px]" />
-        <div className="absolute right-[-10rem] top-[10rem] h-[30rem] w-[30rem] rounded-full bg-[#c49a50]/[0.09] blur-[160px]" />
-        <div className="absolute bottom-[-12rem] left-[24%] h-[28rem] w-[28rem] rounded-full bg-[#60708c]/[0.10] blur-[170px]" />
+        <div className="absolute left-[-12rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-[#d62a0b]/[0.08] blur-[150px]" />
+        <div className="absolute right-[-10rem] top-[10rem] h-[30rem] w-[30rem] rounded-full bg-[#ae936f]/[0.09] blur-[160px]" />
+        <div className="absolute bottom-[-12rem] left-[24%] h-[28rem] w-[28rem] rounded-full bg-[#9ba1a6]/[0.10] blur-[170px]" />
       </div>
       <div className="relative z-10 flex min-h-screen w-full">
         {children}

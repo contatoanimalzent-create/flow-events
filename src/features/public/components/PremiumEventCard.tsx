@@ -33,7 +33,7 @@ export function PremiumEventCard({
       <a
         href={`/e/${event.slug}`}
         aria-label={event.name}
-        className="group relative block h-full min-h-[26rem] overflow-hidden rounded-2xl border border-white/8 bg-[#0c0c10] transition-all duration-500 hover:border-[#d4ff00]/20"
+        className="group relative block h-full min-h-[26rem] overflow-hidden rounded-2xl border border-white/8 bg-[#12100f] transition-all duration-500 hover:border-[#ae936f]/20"
       >
         <img
           src={coverImage}
@@ -41,11 +41,11 @@ export function PremiumEventCard({
           loading={priority ? 'eager' : 'lazy'}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#060609] via-[#060609]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070607] via-[#070607]/40 to-transparent" />
 
         <div className="absolute left-4 top-4 z-10">
           {event.category ? (
-            <span className="inline-flex items-center rounded-full bg-[#d4ff00]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#d4ff00] backdrop-blur-sm">
+            <span className="inline-flex items-center rounded-full bg-[#ae936f]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#ae936f] backdrop-blur-sm">
               {event.category}
             </span>
           ) : null}
@@ -78,7 +78,7 @@ export function PremiumEventCard({
                   ? isPortuguese ? 'Acesso livre' : 'Free access'
                   : `${isPortuguese ? 'A partir de' : 'From'} ${formatPublicCurrency(event.minPrice, locale)}`}
             </span>
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all group-hover:border-[#d4ff00]/30 group-hover:text-[#d4ff00]">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all group-hover:border-[#ae936f]/30 group-hover:text-[#ae936f]">
               <ArrowUpRight className="h-4 w-4" />
             </span>
           </div>

@@ -30,14 +30,14 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
             fallbackImage={fallbackImage}
             scrollY={scrollY}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#060609]/95 via-[#060609]/60 to-[#060609]/80" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#060609] via-transparent to-[#060609]/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#070607]/95 via-[#070607]/60 to-[#070607]/80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#070607] via-transparent to-[#070607]/40" />
         </>
       ) : (
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[#060609]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(212,255,0,0.06),transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(212,255,0,0.03),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[#070607]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(214,42,11,0.09),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(174,147,111,0.05),transparent_50%)]" />
         </div>
       )}
 
@@ -45,7 +45,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
-          backgroundImage: 'linear-gradient(rgba(212,255,0,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(212,255,0,0.3) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(rgba(174,147,111,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(174,147,111,0.18) 1px, transparent 1px)',
           backgroundSize: '80px 80px',
         }}
       />
@@ -54,7 +54,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
       <div className="relative z-10 flex min-h-[100svh] flex-col justify-between px-5 pb-8 pt-28 md:px-8 lg:px-10">
         <div className="mx-auto w-full max-w-[1440px]">
           <PublicReveal>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#d4ff00]/20 bg-[#d4ff00]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#d4ff00]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#ae936f]/20 bg-[#ae936f]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#ae936f]">
               <Sparkles className="h-3.5 w-3.5" />
               {isPortuguese ? 'Plataforma de eventos premium' : 'Premium events platform'}
             </div>
@@ -63,8 +63,8 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
           <PublicReveal delayMs={80}>
             <h1 className="mt-8 max-w-[14ch] font-display text-[clamp(3rem,8vw,7rem)] font-bold uppercase leading-[0.88] tracking-tight text-white">
               {isPortuguese
-                ? <>Onde cada evento vira <span className="text-[#d4ff00]">experiencia.</span></>
-                : <>Where every event becomes an <span className="text-[#d4ff00]">experience.</span></>
+                ? <>Onde cada evento vira <span className="text-[#d62a0b]">experiencia.</span></>
+                : <>Where every event becomes an <span className="text-[#d62a0b]">experience.</span></>
               }
             </h1>
           </PublicReveal>
@@ -81,7 +81,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
                 href="/events"
-                className="group inline-flex items-center gap-2 rounded-full bg-[#d4ff00] px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#060609] transition-all duration-300 hover:bg-[#e5ff4d] hover:shadow-[0_0_30px_rgba(212,255,0,0.25)]"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#d62a0b] px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#ebe7e0] transition-all duration-300 hover:bg-[#e14425] hover:shadow-[0_0_30px_rgba(214,42,11,0.25)]"
               >
                 {isPortuguese ? 'Explorar eventos' : 'Explore events'}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -104,13 +104,13 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
               <PublicReveal delayMs={240}>
                 <a
                   href={`/e/${heroEvent.slug}`}
-                  className="group flex items-center gap-5 rounded-2xl border border-white/8 bg-white/[0.04] p-5 backdrop-blur-sm transition-all hover:border-[#d4ff00]/20 hover:bg-white/[0.06]"
+                  className="group flex items-center gap-5 rounded-2xl border border-white/8 bg-white/[0.04] p-5 backdrop-blur-sm transition-all hover:border-[#ae936f]/20 hover:bg-white/[0.06]"
                 >
-                  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-[#d4ff00]/10">
-                    <CalendarDays className="h-6 w-6 text-[#d4ff00]" />
+                  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-[#ae936f]/10">
+                    <CalendarDays className="h-6 w-6 text-[#ae936f]" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#d4ff00]/60">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#ae936f]/70">
                       {isPortuguese ? 'Em destaque' : 'Spotlight'}
                     </div>
                     <div className="mt-1 truncate text-lg font-bold text-white">{heroEvent.name}</div>
@@ -125,7 +125,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
                       ) : null}
                     </div>
                   </div>
-                  <ArrowRight className="ml-auto h-5 w-5 flex-shrink-0 text-white/20 transition-all group-hover:text-[#d4ff00] group-hover:translate-x-1" />
+                  <ArrowRight className="ml-auto h-5 w-5 flex-shrink-0 text-white/20 transition-all group-hover:text-[#d62a0b] group-hover:translate-x-1" />
                 </a>
               </PublicReveal>
             ) : null}
@@ -135,7 +135,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
               <div className="flex gap-3">
                 {stats.map((stat) => (
                   <div key={stat.label} className="rounded-2xl border border-white/8 bg-white/[0.03] px-5 py-4 text-center backdrop-blur-sm">
-                    <div className="font-display text-2xl font-bold text-[#d4ff00]">{stat.value}</div>
+                    <div className="font-display text-2xl font-bold text-[#ae936f]">{stat.value}</div>
                     <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/30">{stat.label}</div>
                   </div>
                 ))}

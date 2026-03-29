@@ -23,7 +23,7 @@ export function ExploreMoreSection({ currentEventId, events }: ExploreMoreSectio
         <PublicReveal>
           <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#d4ff00]/60">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#ae936f]/70">
                 {isPortuguese ? 'Continue explorando' : 'Keep exploring'}
               </div>
               <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3.2rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
@@ -32,7 +32,7 @@ export function ExploreMoreSection({ currentEventId, events }: ExploreMoreSectio
             </div>
             <a
               href="/events"
-              className="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-5 py-2.5 text-sm font-medium text-white/70 transition-all hover:bg-[#d4ff00] hover:text-[#060609]"
+              className="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-5 py-2.5 text-sm font-medium text-white/70 transition-all hover:bg-[#d62a0b] hover:text-[#ebe7e0]"
             >
               {isPortuguese ? 'Ver todos' : 'View all'}
               <ArrowRight className="h-4 w-4" />

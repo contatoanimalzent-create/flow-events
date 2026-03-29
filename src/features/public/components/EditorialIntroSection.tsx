@@ -40,7 +40,7 @@ export function EditorialIntroSection() {
         <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <PublicReveal>
             <div className="max-w-xl">
-              <div className="text-[11px] uppercase tracking-[0.34em] text-[#c49a50]">Experience platform</div>
+              <div className="text-[11px] uppercase tracking-[0.34em] text-[#ae936f]">Experience platform</div>
               <h2 className="mt-5 font-display text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
                 Discover. Purchase. Arrive.
               </h2>
@@ -60,7 +60,7 @@ export function EditorialIntroSection() {
             {principles.map((principle, index) => (
               <PublicReveal key={principle.number} delayMs={index * 90}>
                 <div className="card-dark-hover group h-full p-6">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[#c49a50]/30 bg-[#c49a50]/10 font-display text-2xl font-semibold text-[#c49a50] transition-all duration-500 group-hover:border-[#c49a50]/60 group-hover:bg-[#c49a50]/20">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[#ae936f]/30 bg-[#ae936f]/10 font-display text-2xl font-semibold text-[#ae936f] transition-all duration-500 group-hover:border-[#ae936f]/60 group-hover:bg-[#ae936f]/20">
                     {principle.number}
                   </div>
                   <div className="mt-6 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-white">

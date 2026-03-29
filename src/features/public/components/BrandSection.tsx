@@ -59,7 +59,7 @@ export function BrandSection() {
               return (
                 <PublicReveal key={pillar.title} delayMs={index * 90}>
                   <article className="h-full rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.05)] p-6 shadow-[0_18px_55px_rgba(0,0,0,0.5)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.6)]">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#c49a50]/15 text-[#c49a50]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ae936f]/15 text-[#ae936f]">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="mt-6 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-[#f0ebe2]">

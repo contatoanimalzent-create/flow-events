@@ -30,7 +30,7 @@ export function EventChaptersShowcase({ events }: EventChaptersShowcaseProps) {
         <PublicReveal>
           <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#d4ff00]/60">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#ae936f]/70">
                 {isPortuguese ? 'Proximos eventos' : 'Upcoming events'}
               </div>
               <h2 className="mt-3 max-w-2xl font-display text-[clamp(2rem,4vw,3.2rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
@@ -39,7 +39,7 @@ export function EventChaptersShowcase({ events }: EventChaptersShowcaseProps) {
                   : 'Curated events for you'}
               </h2>
             </div>
-            <a href="/events" className="inline-flex items-center gap-2 text-sm font-medium text-white/40 transition-all hover:text-[#d4ff00]">
+            <a href="/events" className="inline-flex items-center gap-2 text-sm font-medium text-white/40 transition-all hover:text-[#ae936f]">
               {isPortuguese ? 'Ver agenda completa' : 'Full calendar'}
               <ArrowRight className="h-4 w-4" />
             </a>
@@ -51,7 +51,7 @@ export function EventChaptersShowcase({ events }: EventChaptersShowcaseProps) {
             <PublicReveal key={event.id} delayMs={index * 100}>
               <a
                 href={`/e/${event.slug}`}
-                className={`group relative block overflow-hidden rounded-2xl border border-white/8 bg-[#0c0c10] transition-all duration-500 hover:border-[#d4ff00]/20 ${index === 0 ? 'lg:col-span-2 lg:row-span-2' : ''}`}
+                className={`group relative block overflow-hidden rounded-2xl border border-white/8 bg-[#12100f] transition-all duration-500 hover:border-[#ae936f]/20 ${index === 0 ? 'lg:col-span-2 lg:row-span-2' : ''}`}
               >
                 <div
                   className={index === 0 ? 'aspect-[1.6] lg:aspect-[2]' : 'aspect-[1.4]'}
@@ -62,10 +62,10 @@ export function EventChaptersShowcase({ events }: EventChaptersShowcaseProps) {
                     loading="lazy"
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#060609] via-[#060609]/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070607] via-[#070607]/30 to-transparent" />
 
                   <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-[#d4ff00]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#d4ff00] backdrop-blur-sm">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-[#ae936f]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#ae936f] backdrop-blur-sm">
                       {event.city || (isPortuguese ? 'Evento' : 'Event')}
                     </div>
                     <div

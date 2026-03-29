@@ -20,12 +20,12 @@ export function DashboardRevenueChart({ data }: DashboardRevenueChartProps) {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="grossRevenueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#d4ff00" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#d4ff00" stopOpacity={0} />
+                <stop offset="5%" stopColor="#d62a0b" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#d62a0b" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="netRevenueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#23d2ff" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#23d2ff" stopOpacity={0} />
+                <stop offset="5%" stopColor="#ae936f" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#ae936f" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#202020" />
@@ -35,8 +35,8 @@ export function DashboardRevenueChart({ data }: DashboardRevenueChartProps) {
               formatter={(value: number, name: string) => [formatCurrency(value), name === 'grossRevenue' ? 'Receita bruta' : 'Receita liquida']}
               contentStyle={{ backgroundColor: '#111111', border: '1px solid #262626', borderRadius: '8px' }}
             />
-            <Area type="monotone" dataKey="grossRevenue" stroke="#d4ff00" fill="url(#grossRevenueGradient)" strokeWidth={2} />
-            <Area type="monotone" dataKey="netRevenue" stroke="#23d2ff" fill="url(#netRevenueGradient)" strokeWidth={2} />
+            <Area type="monotone" dataKey="grossRevenue" stroke="#d62a0b" fill="url(#grossRevenueGradient)" strokeWidth={2} />
+            <Area type="monotone" dataKey="netRevenue" stroke="#ae936f" fill="url(#netRevenueGradient)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       )}

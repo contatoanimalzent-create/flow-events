@@ -22,10 +22,10 @@ const SIZE_CLASSNAME: Record<NonNullable<ModalShellProps['size']>, string> = {
 
 export function ModalShell({ children, size = 'lg', className, panelClassName }: ModalShellProps) {
   return (
-    <div className={cn('fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(3,4,6,0.82)] p-4 backdrop-blur-md', className)}>
+    <div className={cn('fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(7,6,7,0.82)] p-4 backdrop-blur-md', className)}>
       <div
         className={cn(
-          'animate-slide-up flex w-full flex-col overflow-hidden rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(13,17,22,0.98)_0%,rgba(9,12,17,0.96)_100%)] shadow-[0_36px_100px_rgba(0,0,0,0.56)]',
+          'animate-slide-up flex w-full flex-col overflow-hidden rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(18,16,15,0.98)_0%,rgba(11,10,10,0.96)_100%)] shadow-[0_36px_100px_rgba(0,0,0,0.56)]',
           SIZE_CLASSNAME[size],
           panelClassName,
         )}
@@ -48,14 +48,14 @@ export function ModalHeader({ title, subtitle, eyebrow, onClose, className }: Mo
   return (
     <div className={cn('flex items-start justify-between gap-4 border-b border-white/6 px-6 py-5', className)}>
       <div className="min-w-0">
-        {eyebrow ? <div className="text-[10px] uppercase tracking-[0.32em] text-[#c49a50]">{eyebrow}</div> : null}
-        <h2 className="mt-1 font-display text-[2rem] leading-none tracking-[-0.04em] text-[#f0ebe2]">{title}</h2>
-        {subtitle ? <p className="mt-2 max-w-2xl text-sm leading-6 text-white/52">{subtitle}</p> : null}
+        {eyebrow ? <div className="text-[10px] uppercase tracking-[0.32em] text-[#ae936f]">{eyebrow}</div> : null}
+        <h2 className="mt-1 font-display text-[2rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">{title}</h2>
+        {subtitle ? <p className="mt-2 max-w-2xl text-sm leading-6 text-[#b8b0a8]/70">{subtitle}</p> : null}
       </div>
       {onClose ? (
         <button
           onClick={onClose}
-          className="rounded-full border border-white/8 bg-white/[0.03] p-2 text-text-muted transition-all hover:border-[#d4ff00]/20 hover:bg-white/[0.06] hover:text-text-primary"
+          className="rounded-full border border-white/8 bg-white/[0.03] p-2 text-text-muted transition-all hover:border-[#d62a0b]/20 hover:bg-white/[0.06] hover:text-text-primary"
         >
           <X className="h-4 w-4" />
         </button>

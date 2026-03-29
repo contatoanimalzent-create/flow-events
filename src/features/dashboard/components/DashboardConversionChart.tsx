@@ -21,7 +21,7 @@ export function DashboardConversionChart({ data }: DashboardConversionChartProps
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#727272' }} axisLine={false} tickLine={false} interval={0} angle={-15} textAnchor="end" height={60} />
             <YAxis tick={{ fontSize: 10, fill: '#727272' }} axisLine={false} tickLine={false} />
             <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, 'Conversao']} contentStyle={{ backgroundColor: '#111111', border: '1px solid #262626', borderRadius: '8px' }} />
-            <Bar dataKey="conversionRate" fill="#d4ff00" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="conversionRate" fill="#d62a0b" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )}

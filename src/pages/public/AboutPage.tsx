@@ -67,7 +67,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                   return (
                     <div key={item.label} className="rounded-[1.6rem] border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] p-5">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#c49a50]/15 text-[#c49a50]">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#ae936f]/15 text-[#ae936f]">
                           <Icon className="h-4 w-4" />
                         </div>
                         <div className="text-[11px] uppercase tracking-[0.28em] text-[#6a6058]">{item.label}</div>

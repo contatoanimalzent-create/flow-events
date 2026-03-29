@@ -181,7 +181,7 @@ export function CheckoutModal({ eventId, eventName, ticketType, onClose }: Check
     appearance: {
       theme: 'night',
       variables: {
-        colorPrimary:          '#d4ff00',
+        colorPrimary:          '#d62a0b',
         colorBackground:       '#1a1a1a',
 
         colorText:             '#f5f5f0',
@@ -193,7 +193,7 @@ export function CheckoutModal({ eventId, eventName, ticketType, onClose }: Check
         fontSizeBase:          '14px',
         spacingUnit:           '4px',
         colorIconTab:          '#6b6b6b',
-        colorIconTabSelected:  '#d4ff00',
+        colorIconTabSelected:  '#d62a0b',
       },
       rules: {
         '.Input': {
@@ -203,8 +203,8 @@ export function CheckoutModal({ eventId, eventName, ticketType, onClose }: Check
           padding:         '10px 14px',
         },
         '.Input:focus': {
-          border:    '1px solid rgba(212,255,0,0.4)',
-          boxShadow: '0 0 0 1px rgba(212,255,0,0.15)',
+          border:    '1px solid rgba(214,42,11,0.4)',
+          boxShadow: '0 0 0 1px rgba(214,42,11,0.15)',
         },
         '.Label': {
           fontSize:      '10px',
@@ -218,10 +218,10 @@ export function CheckoutModal({ eventId, eventName, ticketType, onClose }: Check
           backgroundColor: '#141414',
         },
         '.Tab--selected': {
-          border:          '1px solid rgba(212,255,0,0.4)',
-          backgroundColor: 'rgba(212,255,0,0.05)',
+          border:          '1px solid rgba(214,42,11,0.4)',
+          backgroundColor: 'rgba(214,42,11,0.05)',
         },
-        '.Tab:hover': { border: '1px solid rgba(212,255,0,0.2)' },
+        '.Tab:hover': { border: '1px solid rgba(214,42,11,0.2)' },
       },
     },
   }

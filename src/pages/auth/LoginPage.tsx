@@ -29,7 +29,7 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#050608] flex">
+    <div className="min-h-screen bg-[#070607] flex">
       <div className="relative flex flex-1 flex-col items-center justify-center px-8 py-12">
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -44,7 +44,7 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
           {onBack ? (
             <button
               onClick={onBack}
-              className="mb-10 flex items-center gap-2 text-xs font-mono tracking-wider text-white/45 transition-colors hover:text-[#d4ff00]"
+              className="mb-10 flex items-center gap-2 text-xs font-mono tracking-wider text-white/45 transition-colors hover:text-[#ae936f]"
             >
               <ArrowLeft className="h-3.5 w-3.5" /> {t('BACK', 'VOLTAR')}
             </button>
@@ -55,15 +55,15 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
               src="/logo.png"
               alt="Animalz Events"
               className="h-24 w-auto object-contain"
-              style={{ filter: 'drop-shadow(0 0 12px rgba(196,154,80,0.25))' }}
+              style={{ filter: 'drop-shadow(0 0 12px rgba(174,147,111,0.25))' }}
             />
           </div>
 
-          <h1 className="mb-1 font-display text-4xl leading-none tracking-wide text-[#f1eadf]">
+          <h1 className="mb-1 font-display text-4xl leading-none tracking-wide text-[#ebe7e0]">
             {t('WELCOME', 'BEM-VINDO')}
             <br />
             {t('BACK', 'DE VOLTA')}
-            <span className="text-[#d4ff00]">.</span>
+            <span className="text-[#d62a0b]">.</span>
           </h1>
           <p className="mb-10 mt-2 text-sm text-white/48">{t('Sign in to continue', 'Entre para continuar')}</p>
 
@@ -74,7 +74,7 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input border-white/10 bg-white/[0.03] text-[#f1eadf] placeholder:text-white/30 focus:border-[#d4ff00]"
+                className="input border-white/10 bg-white/[0.03] text-[#ebe7e0] placeholder:text-white/30 focus:border-[#d62a0b]"
                 placeholder={t('you@email.com', 'voce@email.com')}
                 required
                 autoFocus
@@ -87,14 +87,14 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
                   type={show ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input border-white/10 bg-white/[0.03] pr-10 text-[#f1eadf] placeholder:text-white/30 focus:border-[#d4ff00]"
+                  className="input border-white/10 bg-white/[0.03] pr-10 text-[#ebe7e0] placeholder:text-white/30 focus:border-[#d62a0b]"
                   placeholder="••••••••"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShow(!show)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/35 transition-colors hover:text-[#d4ff00]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/35 transition-colors hover:text-[#ae936f]"
                 >
                   {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -109,9 +109,9 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="sr-only"
                 />
-                <div className={`h-4 w-4 rounded-sm border transition-colors ${rememberMe ? 'border-[#d4ff00] bg-[#d4ff00]' : 'border-white/14 bg-white/[0.03]'}`}>
+                <div className={`h-4 w-4 rounded-sm border transition-colors ${rememberMe ? 'border-[#d62a0b] bg-[#d62a0b]' : 'border-white/14 bg-white/[0.03]'}`}>
                   {rememberMe && (
-                    <svg className="h-4 w-4 text-[#050608]" viewBox="0 0 16 16" fill="none">
+                    <svg className="h-4 w-4 text-[#ebe7e0]" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
@@ -129,7 +129,7 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#d4ff00] text-[#050608] transition-colors hover:bg-[#e5ff5c] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#d62a0b] text-[#ebe7e0] transition-colors hover:bg-[#e14425] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -144,13 +144,13 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
 
           <p className="mt-8 text-center text-xs text-white/45">
             {t('Trouble accessing your account?', 'Problemas para acessar sua conta?')}{' '}
-            <button className="text-[#d4ff00] hover:underline">{t('Contact support', 'Falar com suporte')}</button>
+            <button className="text-[#ae936f] hover:underline">{t('Contact support', 'Falar com suporte')}</button>
           </p>
         </div>
       </div>
 
-      <div className="relative hidden flex-1 flex-col items-center justify-center overflow-hidden border-l border-white/8 bg-[#090b0e] p-16 lg:flex">
-        <div className="pointer-events-none absolute left-1/2 top-1/4 h-96 w-96 -translate-x-1/2 rounded-full bg-[#d4ff00]/[0.08] blur-3xl animate-orb-float" />
+      <div className="relative hidden flex-1 flex-col items-center justify-center overflow-hidden border-l border-white/8 bg-[#0d0b0a] p-16 lg:flex">
+        <div className="pointer-events-none absolute left-1/2 top-1/4 h-96 w-96 -translate-x-1/2 rounded-full bg-[#d62a0b]/[0.08] blur-3xl animate-orb-float" />
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -161,17 +161,17 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
         />
 
         <div className="relative z-10 max-w-md text-center">
-          <div className="mb-6 font-display text-6xl leading-none text-[#f1eadf] xl:text-7xl">
+          <div className="mb-6 font-display text-6xl leading-none text-[#ebe7e0] xl:text-7xl">
             {t('CREATE,', 'CRIAR,')}
             <br />
             {t('SELL,', 'VENDER,')}
             <br />
-            <span className="text-[#d4ff00]">{t('OPERATE', 'OPERAR')}</span>
+            <span className="text-[#d62a0b]">{t('OPERATE', 'OPERAR')}</span>
             <br />
             {t('AND SCALE', 'E ESCALAR')}
             <br />
             {t('EVENTS', 'EVENTOS')}
-            <span className="text-[#d4ff00]">.</span>
+            <span className="text-[#d62a0b]">.</span>
           </div>
           <p className="mx-auto max-w-xs text-sm leading-relaxed text-white/48">
             {t(
@@ -186,7 +186,7 @@ export function LoginPage({ onBack }: { onBack?: () => void }) {
               { v: '99.9%', l: 'Uptime' },
             ].map((s) => (
               <div key={s.l} className="rounded-sm border border-white/8 bg-white/[0.03] p-4">
-                <div className="font-display text-2xl leading-none text-[#d4ff00]">{s.v}</div>
+                <div className="font-display text-2xl leading-none text-[#ae936f]">{s.v}</div>
                 <div className="mt-1 font-mono text-[11px] tracking-wider text-white/42">{s.l}</div>
               </div>
             ))}

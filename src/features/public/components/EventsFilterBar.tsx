@@ -113,7 +113,7 @@ export function EventsFilterBar({
             )}
             {isPending ? (
               isDark ? (
-                <div className="inline-flex rounded-full border border-white/12 bg-[#c49a50]/20 px-4 py-2 text-sm font-medium text-[#c49a50]">
+                <div className="inline-flex rounded-full border border-white/12 bg-[#ae936f]/20 px-4 py-2 text-sm font-medium text-[#ae936f]">
                   {isPortuguese ? 'Atualizando selecao' : 'Updating selection'}
                 </div>
               ) : (

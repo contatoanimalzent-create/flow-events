@@ -1,7 +1,7 @@
 import type { TicketBatchFormData, TicketTypeFormData } from './tickets.types'
 
 export const TICKET_COLOR_OPTIONS = [
-  { value: '#d4ff00', label: 'Acid' },
+  { value: '#d62a0b', label: 'Brasa' },
   { value: '#5BE7C4', label: 'Teal' },
   { value: '#4BA3FF', label: 'Blue' },
   { value: '#8B7CFF', label: 'Purple' },
@@ -14,7 +14,7 @@ export const EMPTY_TICKET_TYPE_FORM: TicketTypeFormData = {
   name: '',
   description: '',
   sector: '',
-  color: '#d4ff00',
+  color: '#d62a0b',
   is_nominal: true,
   is_transferable: false,
   max_per_order: '5',

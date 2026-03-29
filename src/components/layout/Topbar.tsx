@@ -94,20 +94,20 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex min-h-[84px] shrink-0 items-center gap-4 border-b border-white/6 bg-[linear-gradient(180deg,rgba(11,14,19,0.92)_0%,rgba(9,12,17,0.86)_100%)] px-6 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 flex min-h-[84px] shrink-0 items-center gap-4 border-b border-white/6 bg-[linear-gradient(180deg,rgba(18,16,15,0.92)_0%,rgba(11,10,10,0.86)_100%)] px-6 backdrop-blur-xl">
         <button
           onClick={onMenuToggle}
-          className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2 text-[#7b8390] transition-all hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]"
+          className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2 text-[#8e847d] transition-all hover:bg-[rgba(255,255,255,0.06)] hover:text-[#ebe7e0]"
         >
           <Menu className="h-5 w-5" />
         </button>
 
         <div className="min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-[#d4ff00]/80">{access.role}</div>
-          <h1 className="mt-0.5 font-display text-[1.9rem] font-semibold leading-none tracking-[-0.03em] text-[#f5f7fa]">
+          <div className="text-[10px] uppercase tracking-[0.3em] text-[#ae936f]">{access.role}</div>
+          <h1 className="mt-0.5 font-display text-[1.9rem] font-semibold leading-none tracking-[-0.03em] text-[#ebe7e0]">
             {sectionTitles[activeSection]}
           </h1>
-          <p className="mt-1 hidden max-w-xl truncate text-xs text-white/42 xl:block">
+          <p className="mt-1 hidden max-w-xl truncate text-xs text-[#b8b0a8]/70 xl:block">
             {sectionDescriptions[activeSection]}
           </p>
         </div>
@@ -116,7 +116,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
         <button
           onClick={() => setShowSearch(true)}
-          className="hidden items-center gap-2 rounded-full border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-4 py-2 text-sm text-[#7b8390] transition-all hover:border-[#d4ff00]/30 hover:text-[#f5f7fa] md:flex"
+          className="hidden items-center gap-2 rounded-full border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-4 py-2 text-sm text-[#8e847d] transition-all hover:border-[#ae936f]/30 hover:text-[#ebe7e0] md:flex"
         >
           <Search className="h-4 w-4" />
           <span>{t('Search...', 'Buscar...')}</span>
@@ -127,7 +127,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
         <button
           onClick={() => setLocale(locale === 'en-US' ? 'pt-BR' : 'en-US')}
-          className="inline-flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[#7b8390] transition-all hover:border-[#d4ff00]/30 hover:text-[#f5f7fa]"
+          className="inline-flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] px-3 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[#8e847d] transition-all hover:border-[#ae936f]/30 hover:text-[#ebe7e0]"
           title={t('Switch language', 'Trocar idioma')}
         >
           <Globe className="h-4 w-4" />
@@ -136,17 +136,17 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
         <button
           onClick={() => setShowNotifications((current) => !current)}
-          className="relative rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2.5 text-[#7b8390] transition-all hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]"
+          className="relative rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2.5 text-[#8e847d] transition-all hover:bg-[rgba(255,255,255,0.06)] hover:text-[#ebe7e0]"
         >
           <Bell className="h-5 w-5" />
           {notifications.unreadCount > 0 ? (
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 animate-pulse rounded-full bg-[#d4ff00]" />
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 animate-pulse rounded-full bg-[#d62a0b]" />
           ) : null}
         </button>
 
         <button
           onClick={signOut}
-          className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2.5 text-[#7b8390] transition-all hover:border-[#d4ff00]/25 hover:text-[#d4ff00]"
+          className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2.5 text-[#8e847d] transition-all hover:border-[#d62a0b]/25 hover:text-[#d62a0b]"
           title={t('Sign out', 'Sair')}
         >
           <LogOut className="h-5 w-5" />
@@ -155,9 +155,9 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
       {showSearch ? (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-20 backdrop-blur-sm">
-          <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#11141a] shadow-[0_24px_80px_rgba(0,0,0,0.7)]">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#12100f] shadow-[0_24px_80px_rgba(0,0,0,0.7)]">
             <div className="flex items-center gap-3 border-b border-[rgba(255,255,255,0.06)] px-4 py-3">
-              <Search className="h-5 w-5 text-[#7b8390]" />
+              <Search className="h-5 w-5 text-[#8e847d]" />
               <input
                 autoFocus
                 value={searchQuery}
@@ -165,16 +165,16 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
                 onKeyDown={(event) => { if (event.key === 'Enter') handleSearch() }}
                 type="text"
                 placeholder={t('Search events, tickets, customers...', 'Busque eventos, ingressos, clientes...')}
-                className="flex-1 bg-transparent text-[#f5f7fa] outline-none placeholder:text-[#596271]"
+                className="flex-1 bg-transparent text-[#ebe7e0] outline-none placeholder:text-[#6f6660]"
               />
               <button
                 onClick={() => setShowSearch(false)}
-                className="rounded-full p-1.5 text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]"
+                className="rounded-full p-1.5 text-[#8e847d] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#ebe7e0]"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="p-5 text-center text-sm text-[#7b8390]">
+            <div className="p-5 text-center text-sm text-[#8e847d]">
               {searchQuery
                 ? t('Search captured for future integration.', 'Busca registrada para integracao futura.')
                 : t('Type to search', 'Digite para buscar')}
@@ -184,17 +184,17 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
       ) : null}
 
       {showNotifications ? (
-        <div className="absolute right-6 top-[80px] z-40 w-[420px] overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#11141a] shadow-[0_24px_80px_rgba(0,0,0,0.7)]">
+        <div className="absolute right-6 top-[80px] z-40 w-[420px] overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#12100f] shadow-[0_24px_80px_rgba(0,0,0,0.7)]">
           <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.06)] p-5">
             <div>
-              <div className="text-[10px] uppercase tracking-[0.3em] text-[#d4ff00]/80">{access.role}</div>
-              <h3 className="mt-1 font-display text-2xl font-semibold leading-none tracking-[-0.03em] text-[#f5f7fa]">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-[#ae936f]">{access.role}</div>
+              <h3 className="mt-1 font-display text-2xl font-semibold leading-none tracking-[-0.03em] text-[#ebe7e0]">
                 {t('Internal center', 'Centro interno')}
               </h3>
             </div>
             <button
               onClick={() => setShowNotifications(false)}
-              className="rounded-full p-1.5 text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]"
+              className="rounded-full p-1.5 text-[#8e847d] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#ebe7e0]"
             >
               <X className="h-4 w-4" />
             </button>
@@ -204,8 +204,8 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
               onClick={() => setPanelTab('notifications')}
               className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${
                 panelTab === 'notifications'
-                  ? 'bg-[#d4ff00] text-[#0a0908] shadow-[0_6px_18px_rgba(212,255,0,0.22)]'
-                  : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]'
+                  ? 'bg-[#d62a0b] text-[#ebe7e0] shadow-[0_6px_18px_rgba(214,42,11,0.22)]'
+                  : 'text-[#8e847d] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#ebe7e0]'
               }`}
             >
               {t('Notifications', 'Notificacoes')}
@@ -214,8 +214,8 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
               onClick={() => setPanelTab('activity')}
               className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${
                 panelTab === 'activity'
-                  ? 'bg-[rgba(255,255,255,0.08)] text-[#f5f7fa]'
-                  : 'text-[#7b8390] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]'
+                  ? 'bg-[rgba(255,255,255,0.08)] text-[#ebe7e0]'
+                  : 'text-[#8e847d] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#ebe7e0]'
               }`}
             >
               {t('Activity', 'Atividade')}

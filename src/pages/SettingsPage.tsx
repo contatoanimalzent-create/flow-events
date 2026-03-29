@@ -105,7 +105,7 @@ export function SettingsPage() {
   const [form, setForm] = useState<OrgForm>({
     name: '', slug: '', email: '', phone: '', website: '',
     address_city: '', address_state: '',
-    primary_color: '#d4ff00', logo_url: '', description: '',
+    primary_color: '#d62a0b', logo_url: '', description: '',
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -134,7 +134,7 @@ export function SettingsPage() {
         website: org.website ?? '',
         address_city: org.address_city ?? '',
         address_state: org.address_state ?? '',
-        primary_color: org.primary_color ?? '#d4ff00',
+        primary_color: org.primary_color ?? '#d62a0b',
         logo_url: organization.logo_url ?? '',
         description: org.description ?? '',
       })

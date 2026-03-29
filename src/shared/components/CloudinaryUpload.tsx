@@ -59,7 +59,7 @@ export function CloudinaryUpload({ onUpload, label = 'Upload Image', className =
         type="button"
         onClick={() => fileInputRef.current?.click()}
         disabled={loading}
-        className="flex items-center gap-2 rounded-lg bg-[#c49a50] px-4 py-2 text-sm font-semibold text-[#0a0908] transition-all hover:-translate-y-0.5 disabled:opacity-50"
+        className="flex items-center gap-2 rounded-lg bg-[#d62a0b] px-4 py-2 text-sm font-semibold text-[#ebe7e0] transition-all hover:-translate-y-0.5 disabled:opacity-50"
       >
         {loading ? (
           <>

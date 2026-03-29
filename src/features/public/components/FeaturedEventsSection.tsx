@@ -39,7 +39,7 @@ function FeaturedEventTile({
     <PublicReveal delayMs={index * 80}>
       <a
         href={`/e/${event.slug}`}
-        className="group relative block h-full overflow-hidden rounded-2xl border border-white/8 bg-[#0c0c10] transition-all duration-500 hover:border-[#d4ff00]/20"
+        className="group relative block h-full overflow-hidden rounded-2xl border border-white/8 bg-[#12100f] transition-all duration-500 hover:border-[#ae936f]/20"
       >
         <div className={large ? 'min-h-[32rem] md:min-h-[38rem]' : 'min-h-[20rem]'}>
           <img
@@ -48,10 +48,10 @@ function FeaturedEventTile({
             loading={index === 0 ? 'eager' : 'lazy'}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#060609] via-[#060609]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#070607] via-[#070607]/40 to-transparent" />
 
           <div className="relative z-10 flex h-full flex-col justify-end p-6 text-white md:p-7">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#d4ff00]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#d4ff00] backdrop-blur-md">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#ae936f]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#ae936f] backdrop-blur-md">
               {event.category || (isPortuguese ? 'Evento' : 'Event')}
             </div>
             <div
@@ -88,7 +88,7 @@ function FeaturedEventTile({
                     ? isPortuguese ? 'Acesso livre' : 'Free access'
                     : `${isPortuguese ? 'A partir de' : 'From'} ${formatPublicCurrency(event.minPrice, locale)}`}
               </div>
-              <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#d4ff00] opacity-0 transition-all group-hover:opacity-100">
+              <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#d62a0b] opacity-0 transition-all group-hover:opacity-100">
                 {isPortuguese ? 'Ver evento' : 'View event'}
                 <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </span>
@@ -110,8 +110,8 @@ export function FeaturedEventsSection({ events }: FeaturedEventsSectionProps) {
       <section className="px-5 py-16 md:px-8 lg:px-10">
         <div className="mx-auto max-w-[1440px]">
           <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-12 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#d4ff00]/10">
-              <CalendarDays className="h-7 w-7 text-[#d4ff00]/60" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#ae936f]/10">
+              <CalendarDays className="h-7 w-7 text-[#ae936f]/70" />
             </div>
             <h3 className="mt-5 text-xl font-bold text-white">
               {isPortuguese ? 'Nenhum evento publicado ainda' : 'No published events yet'}
@@ -121,7 +121,7 @@ export function FeaturedEventsSection({ events }: FeaturedEventsSectionProps) {
                 ? 'Quando novos eventos entrarem na plataforma, eles aparecerao aqui automaticamente.'
                 : 'As new events enter the platform, they will appear here automatically.'}
             </p>
-            <a href="/create-event" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#d4ff00] px-5 py-2.5 text-sm font-bold text-[#060609] hover:bg-[#e5ff4d]">
+            <a href="/create-event" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#d62a0b] px-5 py-2.5 text-sm font-bold text-[#ebe7e0] hover:bg-[#e14425]">
               {isPortuguese ? 'Criar evento' : 'Create event'}
               <ArrowRight className="h-4 w-4" />
             </a>
@@ -137,14 +137,14 @@ export function FeaturedEventsSection({ events }: FeaturedEventsSectionProps) {
         <PublicReveal>
           <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#d4ff00]/60">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#ae936f]/70">
                 {isPortuguese ? 'Selecao' : 'Selection'}
               </div>
               <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3.2rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
                 {isPortuguese ? 'Em destaque agora' : 'Featured right now'}
               </h2>
             </div>
-            <a href="/events" className="inline-flex items-center gap-2 text-sm font-medium text-white/40 transition-all hover:text-[#d4ff00]">
+            <a href="/events" className="inline-flex items-center gap-2 text-sm font-medium text-white/40 transition-all hover:text-[#ae936f]">
               {isPortuguese ? 'Ver todos' : 'View all'}
               <ArrowRight className="h-4 w-4" />
             </a>

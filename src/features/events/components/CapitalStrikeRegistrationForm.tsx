@@ -204,7 +204,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
 
             <button
               onClick={onBack}
-              className="mt-8 w-full rounded-full bg-[#c49a50] py-3 text-sm font-semibold text-[#0a0908] transition-all hover:-translate-y-0.5"
+              className="mt-8 w-full rounded-full bg-[#d62a0b] py-3 text-sm font-semibold text-[#ebe7e0] transition-all hover:-translate-y-0.5"
             >
               Voltar para home
             </button>
@@ -252,7 +252,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
                   }
                 }}
                 placeholder="Seu nome completo"
-                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#f0ebe2] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#c49a50]/40"
+                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#ebe7e0] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#ae936f]/40"
               />
               {errors.fullName && (
                 <p className="mt-1 text-xs text-[#c45c6a]">{errors.fullName}</p>
@@ -269,7 +269,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
                 value={formData.cpf}
                 onChange={handleCPFChange}
                 placeholder="000.000.000-00"
-                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 font-mono text-[#f0ebe2] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#c49a50]/40"
+                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 font-mono text-[#ebe7e0] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#ae936f]/40"
               />
               {errors.cpf && (
                 <p className="mt-1 text-xs text-[#c45c6a]">{errors.cpf}</p>
@@ -291,7 +291,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
                   }
                 }}
                 placeholder="seu@email.com"
-                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#f0ebe2] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#c49a50]/40"
+                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#ebe7e0] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#ae936f]/40"
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-[#c45c6a]">{errors.email}</p>
@@ -308,7 +308,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
                 value={formData.phone}
                 onChange={handlePhoneChange}
                 placeholder="(00) 00000-0000"
-                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 font-mono text-[#f0ebe2] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#c49a50]/40"
+                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 font-mono text-[#ebe7e0] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#ae936f]/40"
               />
               {errors.phone && (
                 <p className="mt-1 text-xs text-[#c45c6a]">{errors.phone}</p>
@@ -330,7 +330,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
                   }
                 }}
                 placeholder="Nome completo da mãe"
-                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#f0ebe2] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#c49a50]/40"
+                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#ebe7e0] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#ae936f]/40"
               />
               {errors.motherName && (
                 <p className="mt-1 text-xs text-[#c45c6a]">{errors.motherName}</p>
@@ -352,7 +352,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
                 }}
                 placeholder="Rua, número, complemento, cidade, estado, CEP"
                 rows={3}
-                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#f0ebe2] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#c49a50]/40"
+                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#ebe7e0] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#ae936f]/40"
               />
               {errors.address && (
                 <p className="mt-1 text-xs text-[#c45c6a]">{errors.address}</p>
@@ -369,7 +369,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
                 value={formData.squad}
                 onChange={(e) => setFormData((prev) => ({ ...prev, squad: e.target.value }))}
                 placeholder="Nome do seu esquadrão"
-                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#f0ebe2] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#c49a50]/40"
+                className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#ebe7e0] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#ae936f]/40"
               />
             </div>
 

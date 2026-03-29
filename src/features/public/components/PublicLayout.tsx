@@ -23,10 +23,10 @@ export function PublicLayout({
   className,
 }: PublicLayoutProps) {
   return (
-    <div className={cn('min-h-screen bg-[#060609] text-white public-editorial-shell', className)}>
+    <div className={cn('min-h-screen bg-[#070607] text-white public-editorial-shell', className)}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-[-12rem] top-[-14rem] h-[36rem] w-[36rem] rounded-full bg-[#d4ff00]/[0.03] blur-[120px]" />
-        <div className="absolute bottom-[-16rem] right-[-10rem] h-[32rem] w-[32rem] rounded-full bg-[#d4ff00]/[0.02] blur-[140px]" />
+        <div className="absolute left-[-12rem] top-[-14rem] h-[36rem] w-[36rem] rounded-full bg-[#d62a0b]/[0.05] blur-[120px]" />
+        <div className="absolute bottom-[-16rem] right-[-10rem] h-[32rem] w-[32rem] rounded-full bg-[#ae936f]/[0.04] blur-[140px]" />
         <div
           className="absolute inset-0 opacity-[0.025]"
           style={{

@@ -20,7 +20,7 @@ function mapTicketTypeToForm(ticketType: TicketType): TicketTypeFormData {
     name: ticketType.name ?? '',
     description: ticketType.description ?? '',
     sector: ticketType.sector ?? '',
-    color: ticketType.color ?? '#d4ff00',
+    color: ticketType.color ?? '#d62a0b',
     is_nominal: ticketType.is_nominal ?? true,
     is_transferable: ticketType.is_transferable ?? false,
     max_per_order: String(ticketType.max_per_order ?? 5),

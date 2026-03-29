@@ -43,7 +43,7 @@ export function TicketTypeCard({
       <div className="flex items-center gap-4 p-4">
         <GripVertical className="h-4 w-4 shrink-0 text-text-muted" />
 
-        <div className="h-3 w-3 shrink-0 rounded-full" style={{ background: ticketType.color ?? '#d4ff00' }} />
+        <div className="h-3 w-3 shrink-0 rounded-full" style={{ background: ticketType.color ?? '#d62a0b' }} />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">

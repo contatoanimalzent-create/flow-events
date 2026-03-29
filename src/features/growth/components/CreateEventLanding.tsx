@@ -48,7 +48,7 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <a
                   href="/login"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#c49a50] px-6 py-3 text-sm font-semibold text-[#0a0908] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(196,154,80,0.35)]"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#d62a0b] px-6 py-3 text-sm font-semibold text-[#ebe7e0] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(214,42,11,0.35)]"
                 >
                   {isPortuguese ? 'Entrar e criar evento' : 'Sign in and create event'}
                   <ArrowRight className="h-4 w-4" />
@@ -89,9 +89,9 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
               </div>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-[1.6rem] border border-[#c49a50]/25 bg-[#c49a50]/10 p-5">
-                  <div className="text-[11px] uppercase tracking-[0.24em] text-[#c49a50]/70">{isPortuguese ? 'Ingressos vendidos' : 'Tickets sold'}</div>
-                  <div className="mt-3 font-display text-[2.5rem] font-semibold leading-none tracking-[-0.05em] text-[#c49a50]">
+                <div className="rounded-[1.6rem] border border-[#ae936f]/25 bg-[#ae936f]/10 p-5">
+                  <div className="text-[11px] uppercase tracking-[0.24em] text-[#ae936f]/70">{isPortuguese ? 'Ingressos vendidos' : 'Tickets sold'}</div>
+                  <div className="mt-3 font-display text-[2.5rem] font-semibold leading-none tracking-[-0.05em] text-[#ae936f]">
                     {ticketsSold.toLocaleString(locale)}
                   </div>
                 </div>

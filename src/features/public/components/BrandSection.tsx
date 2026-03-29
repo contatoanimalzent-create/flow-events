@@ -1,25 +1,34 @@
 import { Compass, Gem, Orbit, Sparkles } from 'lucide-react'
+import { usePublicLocale } from '../lib/public-locale'
 import { PublicReveal } from './PublicReveal'
 
-const pillars = [
-  {
-    icon: Compass,
-    title: 'Events with intent',
-    description: 'Curated events across culture, gastronomy, music and lifestyle. Only what deserves your presence.',
-  },
-  {
-    icon: Orbit,
-    title: 'Purchase in seconds',
-    description: 'From discovery to QR code in a few clicks. No bureaucracy. No unnecessary friction.',
-  },
-  {
-    icon: Gem,
-    title: 'Control for producers',
-    description: 'Sell tickets, manage check-in, track revenue and understand your audience in one place.',
-  },
-]
-
 export function BrandSection() {
+  const { isPortuguese } = usePublicLocale()
+
+  const pillars = [
+    {
+      icon: Compass,
+      title: isPortuguese ? 'Eventos com criterio' : 'Events with intent',
+      description: isPortuguese
+        ? 'Eventos de cultura, gastronomia, musica e lifestyle com curadoria. So entra o que merece a sua presenca.'
+        : 'Curated events across culture, gastronomy, music and lifestyle. Only what deserves your presence.',
+    },
+    {
+      icon: Orbit,
+      title: isPortuguese ? 'Compra em segundos' : 'Purchase in seconds',
+      description: isPortuguese
+        ? 'Da descoberta ao QR code em poucos cliques. Sem burocracia. Sem atrito desnecessario.'
+        : 'From discovery to QR code in a few clicks. No bureaucracy. No unnecessary friction.',
+    },
+    {
+      icon: Gem,
+      title: isPortuguese ? 'Controle para produtores' : 'Control for producers',
+      description: isPortuguese
+        ? 'Venda ingressos, gerencie credenciamento, acompanhe receita e entenda seu publico em um unico lugar.'
+        : 'Sell tickets, manage check-in, track revenue and understand your audience in one place.',
+    },
+  ]
+
   return (
     <section className="px-5 py-14 md:px-10 lg:px-16 lg:py-20">
       <div className="mx-auto max-w-7xl">
@@ -28,13 +37,17 @@ export function BrandSection() {
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.06)] px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-[#6a6058]">
                 <Sparkles className="h-4 w-4" />
-                How it works
+                {isPortuguese ? 'Como funciona' : 'How it works'}
               </div>
               <h2 className="mt-6 font-display text-[clamp(3rem,5vw,5rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-[#f0ebe2]">
-                For people who chase great events. And for the teams who build them.
+                {isPortuguese
+                  ? 'Para quem corre atras de grandes eventos. E para os times que constroem tudo isso.'
+                  : 'For people who chase great events. And for the teams who build them.'}
               </h2>
               <p className="mt-6 max-w-lg text-base leading-8 text-[#9a9088] md:text-lg">
-                Animalz Events connects buyers and producers through a platform that is easy to use, strong to present and reliable when access matters.
+                {isPortuguese
+                  ? 'Animalz Events conecta compradores e produtores por uma plataforma facil de usar, forte na apresentacao e confiavel quando o acesso importa.'
+                  : 'Animalz Events connects buyers and producers through a platform that is easy to use, strong to present and reliable when access matters.'}
               </p>
             </div>
           </PublicReveal>

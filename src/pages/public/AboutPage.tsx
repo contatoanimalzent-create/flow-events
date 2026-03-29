@@ -57,7 +57,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                   },
                   {
                     icon: Globe,
-                    label: isPortuguese ? 'Para produtores' : 'For creators',
+                    label: isPortuguese ? 'Para criadores' : 'For creators',
                     text: isPortuguese
                       ? 'Publique seu evento, venda ingressos, gerencie credenciamento e acompanhe resultados em um unico lugar.'
                       : 'Publish your event, sell tickets, manage check-in and track results in one place.',
@@ -147,7 +147,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                   href="/create-event"
                   className="inline-flex items-center gap-2 rounded-full border border-white/18 px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/8"
                 >
-                  {isPortuguese ? 'Sou produtor' : 'I am a creator'}
+                  {isPortuguese ? 'Sou criador' : 'I am a creator'}
                 </a>
               </div>
             </div>

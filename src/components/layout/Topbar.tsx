@@ -32,6 +32,28 @@ function getSectionTitles(isPortuguese: boolean): Record<NavSection, string> {
   }
 }
 
+function getSectionDescriptions(isPortuguese: boolean): Record<NavSection, string> {
+  return {
+    dashboard: isPortuguese ? 'Receita, operacao e sinal comercial em uma unica leitura.' : 'Revenue, operations and commercial signal in one reading.',
+    events: isPortuguese ? 'Agenda, posicionamento, midia e publicacao dos eventos.' : 'Schedule, positioning, media and event publishing.',
+    tickets: isPortuguese ? 'Arquitetura de lotes, precificacao e ocupacao.' : 'Release architecture, pricing and occupancy.',
+    sales: isPortuguese ? 'Pedidos, pagamentos e emissao digital da jornada.' : 'Orders, payments and digital issuance across the journey.',
+    crm: isPortuguese ? 'Publico, relacionamento e recorrencia por evento.' : 'Audience, relationship and recurrence by event.',
+    checkin: isPortuguese ? 'Fluxo de acesso, filas, validacao e campo.' : 'Access flow, queues, validation and field operations.',
+    staff: isPortuguese ? 'Escala, presenca e time operacional no evento.' : 'Roster, attendance and operational event staff.',
+    suppliers: isPortuguese ? 'Base de parceiros, servicos e execucao terceirizada.' : 'Partners, services and outsourced execution base.',
+    products: isPortuguese ? 'Catalogo, PDV e consumo complementar no evento.' : 'Catalog, POS and ancillary event consumption.',
+    inventory: isPortuguese ? 'Controle de itens, ruptura e giro de estoque.' : 'Item control, stockouts and inventory turns.',
+    intelligence: isPortuguese ? 'Saude operacional, alertas e leitura executiva.' : 'Operational health, alerts and executive reads.',
+    communication: isPortuguese ? 'Campanhas, disparos e continuidade de audiencia.' : 'Campaigns, sends and audience continuity.',
+    financial: isPortuguese ? 'Margem, repasse, fechamento e previsibilidade.' : 'Margin, payouts, closing and predictability.',
+    billing: isPortuguese ? 'Planos, monetizacao e estrutura de cobranca.' : 'Plans, monetization and billing structure.',
+    growth: isPortuguese ? 'Aquisicao, indicacao e retorno comercial do produto.' : 'Acquisition, referral and product-led commercial return.',
+    help: isPortuguese ? 'Base operacional para treinar o time e padronizar execucao.' : 'Operational base to train teams and standardize execution.',
+    settings: isPortuguese ? 'Marca, dominio, permissoes e parametros da operacao.' : 'Brand, domain, permissions and operational settings.',
+  }
+}
+
 interface TopbarProps {
   onMenuToggle: () => void
   activeSection: NavSection
@@ -47,6 +69,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
   const [panelTab, setPanelTab] = useState<'notifications' | 'activity'>('notifications')
   const [searchQuery, setSearchQuery] = useState('')
   const sectionTitles = getSectionTitles(isPortuguese)
+  const sectionDescriptions = getSectionDescriptions(isPortuguese)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -71,7 +94,7 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
 
   return (
     <>
-      <header className="flex h-[72px] shrink-0 items-center gap-4 border-b border-[rgba(255,255,255,0.05)] bg-[linear-gradient(180deg,#0b0e13_0%,#090c11_100%)] px-6">
+      <header className="sticky top-0 z-30 flex min-h-[84px] shrink-0 items-center gap-4 border-b border-white/6 bg-[linear-gradient(180deg,rgba(11,14,19,0.92)_0%,rgba(9,12,17,0.86)_100%)] px-6 backdrop-blur-xl">
         <button
           onClick={onMenuToggle}
           className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-2 text-[#7b8390] transition-all hover:bg-[rgba(255,255,255,0.06)] hover:text-[#f5f7fa]"
@@ -79,11 +102,14 @@ export function Topbar({ onMenuToggle, activeSection }: TopbarProps) {
           <Menu className="h-5 w-5" />
         </button>
 
-        <div>
+        <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#d4ff00]/80">{access.role}</div>
           <h1 className="mt-0.5 font-display text-[1.9rem] font-semibold leading-none tracking-[-0.03em] text-[#f5f7fa]">
             {sectionTitles[activeSection]}
           </h1>
+          <p className="mt-1 hidden max-w-xl truncate text-xs text-white/42 xl:block">
+            {sectionDescriptions[activeSection]}
+          </p>
         </div>
 
         <div className="flex-1" />

@@ -111,14 +111,19 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
     <aside
       className={cn(
         'relative z-20 flex shrink-0 flex-col border-r transition-all duration-300',
-        'bg-[linear-gradient(180deg,#090c11_0%,#05070a_100%)] border-[rgba(255,255,255,0.05)]',
+        'bg-[linear-gradient(180deg,rgba(8,10,14,0.96)_0%,rgba(5,7,10,0.98)_100%)] border-[rgba(255,255,255,0.05)]',
         isOpen ? 'w-72' : 'w-20',
       )}
     >
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-0 top-0 h-48 w-full bg-[radial-gradient(circle_at_top,rgba(212,255,0,0.07),transparent_62%)]" />
+        <div className="absolute bottom-0 left-0 h-56 w-full bg-[radial-gradient(circle_at_bottom,rgba(196,154,80,0.08),transparent_68%)]" />
+      </div>
+
       {/* Logo */}
       <div
         className={cn(
-          'flex shrink-0 items-center border-b border-[rgba(255,255,255,0.06)]',
+          'relative z-10 flex shrink-0 items-center border-b border-[rgba(255,255,255,0.06)]',
           isOpen ? 'gap-4 px-6 py-5' : 'justify-center px-4 py-5',
         )}
       >
@@ -145,11 +150,11 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-5">
+      <nav className="relative z-10 flex-1 overflow-y-auto px-3 py-5">
         {isOpen
           ? visibleGroups.map((group) => (
               <div key={group.label} className="mb-6">
-                <div className="mb-2 px-3 text-[10px] uppercase tracking-[0.28em] text-[#6f7785]">
+                <div className="mb-2 px-3 text-[10px] uppercase tracking-[0.32em] text-[#7d8470]">
                   {group.label}
                 </div>
                 {group.items.map((item) => {
@@ -207,10 +212,10 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onToggle }: Sidebar
       </nav>
 
       {/* User profile */}
-      <div className={cn('shrink-0 border-t border-[rgba(255,255,255,0.06)]', isOpen ? 'p-4' : 'p-3')}>
+      <div className={cn('relative z-10 shrink-0 border-t border-[rgba(255,255,255,0.06)]', isOpen ? 'p-4' : 'p-3')}>
         {isOpen ? (
           <div
-            className="flex items-center gap-3 rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.03)] p-3 animate-fade-in"
+            className="flex items-center gap-3 rounded-[24px] border border-[rgba(255,255,255,0.06)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.02)_100%)] p-3.5 animate-fade-in shadow-[0_18px_44px_rgba(0,0,0,0.26)]"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d4ff00]/12 shrink-0">
               <span className="text-xs font-semibold text-[#d4ff00]">

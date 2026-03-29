@@ -396,7 +396,22 @@ export function SectionHeader({ eyebrow, title, description, actions, className,
 export function AdminShell({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={cn('admin-shell-foundation', className)} {...props}>
-      {children}
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0 opacity-[0.55]"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
+            backgroundSize: '72px 72px',
+          }}
+        />
+        <div className="absolute left-[-12rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-[#d4ff00]/[0.08] blur-[150px]" />
+        <div className="absolute right-[-10rem] top-[10rem] h-[30rem] w-[30rem] rounded-full bg-[#c49a50]/[0.09] blur-[160px]" />
+        <div className="absolute bottom-[-12rem] left-[24%] h-[28rem] w-[28rem] rounded-full bg-[#60708c]/[0.10] blur-[170px]" />
+      </div>
+      <div className="relative z-10 flex min-h-screen w-full">
+        {children}
+      </div>
     </div>
   )
 }

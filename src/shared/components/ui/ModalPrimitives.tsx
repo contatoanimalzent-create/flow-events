@@ -22,10 +22,10 @@ const SIZE_CLASSNAME: Record<NonNullable<ModalShellProps['size']>, string> = {
 
 export function ModalShell({ children, size = 'lg', className, panelClassName }: ModalShellProps) {
   return (
-    <div className={cn('fixed inset-0 z-[100] flex items-center justify-center bg-[#211d18]/18 p-4 backdrop-blur-sm', className)}>
+    <div className={cn('fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(3,4,6,0.82)] p-4 backdrop-blur-md', className)}>
       <div
         className={cn(
-          'animate-slide-up flex w-full flex-col overflow-hidden rounded-[28px] border border-bg-border bg-bg-secondary shadow-[0_28px_90px_rgba(50,38,20,0.18)]',
+          'animate-slide-up flex w-full flex-col overflow-hidden rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(13,17,22,0.98)_0%,rgba(9,12,17,0.96)_100%)] shadow-[0_36px_100px_rgba(0,0,0,0.56)]',
           SIZE_CLASSNAME[size],
           panelClassName,
         )}
@@ -46,16 +46,16 @@ interface ModalHeaderProps {
 
 export function ModalHeader({ title, subtitle, eyebrow, onClose, className }: ModalHeaderProps) {
   return (
-    <div className={cn('flex items-start justify-between gap-4 border-b border-bg-border px-6 py-5', className)}>
+    <div className={cn('flex items-start justify-between gap-4 border-b border-white/6 px-6 py-5', className)}>
       <div className="min-w-0">
-        {eyebrow ? <div className="text-[10px] uppercase tracking-[0.28em] text-text-muted">{eyebrow}</div> : null}
-        <h2 className="mt-1 font-display text-[2rem] leading-none tracking-[-0.04em] text-text-primary">{title}</h2>
-        {subtitle ? <p className="mt-2 max-w-2xl text-sm leading-6 text-text-muted">{subtitle}</p> : null}
+        {eyebrow ? <div className="text-[10px] uppercase tracking-[0.32em] text-[#c49a50]">{eyebrow}</div> : null}
+        <h2 className="mt-1 font-display text-[2rem] leading-none tracking-[-0.04em] text-[#f0ebe2]">{title}</h2>
+        {subtitle ? <p className="mt-2 max-w-2xl text-sm leading-6 text-white/52">{subtitle}</p> : null}
       </div>
       {onClose ? (
         <button
           onClick={onClose}
-          className="rounded-full border border-transparent p-2 text-text-muted transition-all hover:border-bg-border hover:bg-white hover:text-text-primary"
+          className="rounded-full border border-white/8 bg-white/[0.03] p-2 text-text-muted transition-all hover:border-[#d4ff00]/20 hover:bg-white/[0.06] hover:text-text-primary"
         >
           <X className="h-4 w-4" />
         </button>
@@ -79,7 +79,7 @@ interface ModalFooterProps {
 }
 
 export function ModalFooter({ children, className }: ModalFooterProps) {
-  return <div className={cn('flex items-center justify-between gap-3 border-t border-bg-border px-6 py-5', className)}>{children}</div>
+  return <div className={cn('flex items-center justify-between gap-3 border-t border-white/6 px-6 py-5', className)}>{children}</div>
 }
 
 interface FormSectionProps {
@@ -91,11 +91,11 @@ interface FormSectionProps {
 
 export function FormSection({ title, description, children, className }: FormSectionProps) {
   return (
-    <section className={cn('space-y-4 rounded-[24px] border border-bg-border bg-white/72 p-5 shadow-card', className)}>
+    <section className={cn('space-y-4 rounded-[24px] border border-white/8 bg-white/[0.03] p-5 shadow-[0_20px_50px_rgba(0,0,0,0.22)]', className)}>
       {title || description ? (
         <div>
           {title ? <div className="text-sm font-semibold text-text-primary">{title}</div> : null}
-          {description ? <div className="mt-1 text-xs leading-5 text-text-muted">{description}</div> : null}
+          {description ? <div className="mt-1 text-xs leading-5 text-white/46">{description}</div> : null}
         </div>
       ) : null}
       {children}
@@ -174,14 +174,14 @@ interface FormToggleCardProps {
 
 export function FormToggleCard({ title, description, checked, onToggle, className }: FormToggleCardProps) {
   return (
-    <div className={cn('flex items-center justify-between gap-4 rounded-[22px] border border-bg-border bg-bg-secondary/70 px-4 py-3', className)}>
+    <div className={cn('flex items-center justify-between gap-4 rounded-[22px] border border-white/8 bg-white/[0.03] px-4 py-3', className)}>
       <div>
         <div className="text-sm font-medium text-text-primary">{title}</div>
-        {description ? <div className="mt-1 text-xs text-text-muted">{description}</div> : null}
+        {description ? <div className="mt-1 text-xs text-white/46">{description}</div> : null}
       </div>
       <button
         onClick={onToggle}
-        className={cn('relative flex h-6 w-11 shrink-0 rounded-full transition-all', checked ? 'bg-brand-acid' : 'bg-bg-border')}
+        className={cn('relative flex h-6 w-11 shrink-0 rounded-full transition-all', checked ? 'bg-brand-acid shadow-glow-acid' : 'bg-bg-border')}
       >
         <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all', checked ? 'left-5' : 'left-0.5')} />
       </button>
@@ -202,7 +202,7 @@ export function ConfirmActionBox({ tone = 'default', title, description, childre
     <div
       className={cn(
         'rounded-[24px] border px-4 py-4',
-        tone === 'danger' ? 'border-status-error/20 bg-status-error/6' : 'border-bg-border bg-bg-secondary/70',
+        tone === 'danger' ? 'border-status-error/20 bg-status-error/6' : 'border-white/8 bg-white/[0.03]',
         className,
       )}
     >

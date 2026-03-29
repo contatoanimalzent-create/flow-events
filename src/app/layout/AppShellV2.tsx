@@ -91,10 +91,13 @@ export function AppShellV2() {
       />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar onMenuToggle={toggleSidebar} activeSection={activeSection} />
-        <main className="main-grid-bg flex-1 overflow-y-auto">
-          <Suspense fallback={<PageFallback />}>
-            <MotionPage>{renderSection(activeSection)}</MotionPage>
-          </Suspense>
+        <main className="relative flex-1 overflow-y-auto">
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-32 bg-[linear-gradient(180deg,rgba(5,7,10,0.92)_0%,rgba(5,7,10,0)_100%)]" />
+          <div className="main-grid-bg min-h-full">
+            <Suspense fallback={<PageFallback />}>
+              <MotionPage>{renderSection(activeSection)}</MotionPage>
+            </Suspense>
+          </div>
         </main>
       </div>
     </AdminShell>

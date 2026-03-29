@@ -32,7 +32,7 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.06)] px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-[#6a6058]">
                 <Sparkles className="h-4 w-4" />
-                {isPortuguese ? 'Para criadores' : 'For creators'}
+                {isPortuguese ? 'Para produtores' : 'For creators'}
               </div>
               <h1 className="mt-6 font-display text-[clamp(4rem,7vw,7rem)] font-semibold leading-[0.86] tracking-[-0.05em] text-[#f0ebe2]">
                 {isPortuguese
@@ -108,7 +108,7 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
       </section>
 
       <SocialProofBlock
-        title={isPortuguese ? 'Criadores que ja escolheram a plataforma estao vendendo.' : 'Creators already using the platform are selling.'}
+        title={isPortuguese ? 'Produtores que ja escolheram a plataforma estao vendendo.' : 'Creators already using the platform are selling.'}
         description={isPortuguese ? 'Eventos publicados, ingressos vendidos, publico fidelizado. Resultados reais de quem ja usa.' : 'Published events, sold tickets and loyal audiences. Real results from teams already using it.'}
         items={[
           {

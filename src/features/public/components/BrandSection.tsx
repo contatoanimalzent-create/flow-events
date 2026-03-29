@@ -22,7 +22,7 @@ export function BrandSection() {
     },
     {
       icon: Gem,
-      title: isPortuguese ? 'Controle para criadores' : 'Control for creators',
+      title: isPortuguese ? 'Controle para produtores' : 'Control for producers',
       description: isPortuguese
         ? 'Venda ingressos, gerencie credenciamento, acompanhe receita e entenda seu publico em um unico lugar.'
         : 'Sell tickets, manage check-in, track revenue and understand your audience in one place.',
@@ -46,8 +46,8 @@ export function BrandSection() {
               </h2>
               <p className="mt-6 max-w-lg text-base leading-8 text-[#9a9088] md:text-lg">
                 {isPortuguese
-                  ? 'Animalz Events conecta compradores e criadores por uma plataforma facil de usar, forte na apresentacao e confiavel quando o acesso importa.'
-                  : 'Animalz Events connects buyers and creators through a platform that is easy to use, strong to present and reliable when access matters.'}
+                  ? 'Animalz Events conecta compradores e produtores por uma plataforma facil de usar, forte na apresentacao e confiavel quando o acesso importa.'
+                  : 'Animalz Events connects buyers and producers through a platform that is easy to use, strong to present and reliable when access matters.'}
               </p>
             </div>
           </PublicReveal>

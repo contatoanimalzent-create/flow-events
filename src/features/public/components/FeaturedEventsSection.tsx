@@ -22,41 +22,6 @@ function getFallbackImage(event?: PublicEventSummary | null) {
   )
 }
 
-function EventMetaLine({
-  event,
-  locale,
-  isPortuguese,
-}: {
-  event: PublicEventSummary
-  locale: 'en-US' | 'pt-BR'
-  isPortuguese: boolean
-}) {
-  return (
-    <div className="mt-4 grid gap-3 text-sm text-white/76">
-      <div className="flex items-center gap-2">
-        <CalendarDays className="h-4 w-4 text-white/68" />
-        <span>
-          {formatPublicDate(event.starts_at, locale, {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-          })}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <MapPin className="h-4 w-4 text-white/68" />
-        <span>{[event.venue_name, event.city].filter(Boolean).join(' / ')}</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <Users className="h-4 w-4 text-white/68" />
-        <span>
-          {formatPublicNumber(event.sold_tickets, locale)} {isPortuguese ? 'sold' : 'sold'}
-        </span>
-      </div>
-    </div>
-  )
-}
-
 function FeaturedEventTile({
   event,
   large = false,
@@ -71,49 +36,61 @@ function FeaturedEventTile({
   isPortuguese: boolean
 }) {
   return (
-    <PublicReveal delayMs={index * 90}>
+    <PublicReveal delayMs={index * 80}>
       <a
         href={`/e/${event.slug}`}
-        className="group relative block h-full overflow-hidden rounded-[2.25rem] border border-[#0b1016]/10 bg-[#05080d] shadow-[0_24px_90px_rgba(11,16,22,0.18)]"
+        className="group relative block h-full overflow-hidden rounded-2xl border border-white/8 bg-[#0c0c10] transition-all duration-500 hover:border-[#d4ff00]/20"
       >
-        <div className={large ? 'min-h-[35rem] md:min-h-[42rem]' : 'min-h-[22rem] md:min-h-[20rem]'}>
+        <div className={large ? 'min-h-[32rem] md:min-h-[38rem]' : 'min-h-[20rem]'}>
           <img
             src={getFallbackImage(event)}
             alt={event.name}
             loading={index === 0 ? 'eager' : 'lazy'}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,8,13,0.12)_0%,rgba(5,8,13,0.2)_34%,rgba(5,8,13,0.88)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.16),transparent_28%)]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#060609] via-[#060609]/40 to-transparent" />
 
-          <div className="relative z-10 flex h-full flex-col justify-end p-6 text-white md:p-8">
-            <div className="inline-flex w-fit rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-white/80 backdrop-blur-md">
-              {event.category || (isPortuguese ? 'Experience' : 'Experience')}
+          <div className="relative z-10 flex h-full flex-col justify-end p-6 text-white md:p-7">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#d4ff00]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#d4ff00] backdrop-blur-md">
+              {event.category || 'Event'}
             </div>
             <div
               className={
                 large
-                  ? 'mt-5 max-w-xl font-display text-[3.8rem] font-semibold leading-[0.86] tracking-[-0.05em]'
-                  : 'mt-5 max-w-md font-display text-[2.55rem] font-semibold leading-[0.9] tracking-[-0.04em]'
+                  ? 'mt-4 max-w-xl font-display text-[clamp(2rem,4vw,3.2rem)] font-bold leading-[0.92] tracking-tight'
+                  : 'mt-4 max-w-md font-display text-[1.6rem] font-bold leading-[0.95] tracking-tight'
               }
             >
               {event.name}
             </div>
-            {event.subtitle ? <p className="mt-4 max-w-lg text-sm leading-7 text-white/74">{event.subtitle}</p> : null}
+            {event.subtitle && large ? <p className="mt-3 max-w-lg text-sm text-white/50">{event.subtitle}</p> : null}
 
-            <EventMetaLine event={event} locale={locale} isPortuguese={isPortuguese} />
+            <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-white/40">
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5" />
+                {formatPublicDate(event.starts_at, locale, { day: '2-digit', month: 'short', year: 'numeric' })}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5" />
+                {[event.venue_name, event.city].filter(Boolean).join(' · ')}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5" />
+                {formatPublicNumber(event.sold_tickets, locale)}
+              </span>
+            </div>
 
-            <div className="mt-6 flex items-center justify-between gap-4 border-t border-white/12 pt-5">
-              <div className="text-sm font-medium text-white/82">
+            <div className="mt-5 flex items-center justify-between gap-4 border-t border-white/8 pt-4">
+              <div className="text-sm font-medium text-white/60">
                 {event.minPrice === null
-                  ? 'On request'
+                  ? isPortuguese ? 'Sob consulta' : 'On request'
                   : event.minPrice === 0
-                    ? 'Free access'
-                    : `From ${formatPublicCurrency(event.minPrice, locale)}`}
+                    ? isPortuguese ? 'Acesso livre' : 'Free access'
+                    : `${isPortuguese ? 'A partir de' : 'From'} ${formatPublicCurrency(event.minPrice, locale)}`}
               </div>
-              <span className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.12em] text-white">
-                Open chapter
-                <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
+              <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#d4ff00] opacity-0 transition-all group-hover:opacity-100">
+                {isPortuguese ? 'Ver evento' : 'View event'}
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </span>
             </div>
           </div>
@@ -130,57 +107,57 @@ export function FeaturedEventsSection({ events }: FeaturedEventsSectionProps) {
 
   if (events.length === 0) {
     return (
-      <section className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
-        <div className="mx-auto max-w-[1920px]">
-          <EmptyState
-            title="No published experiences right now"
-            description="As soon as new events enter curation, this public showcase updates automatically."
-            className="min-h-[20rem]"
-          />
+      <section className="px-5 py-16 md:px-8 lg:px-10">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-12 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#d4ff00]/10">
+              <CalendarDays className="h-7 w-7 text-[#d4ff00]/60" />
+            </div>
+            <h3 className="mt-5 text-xl font-bold text-white">
+              {isPortuguese ? 'Nenhum evento publicado ainda' : 'No published events yet'}
+            </h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-white/40">
+              {isPortuguese
+                ? 'Quando novos eventos entrarem na plataforma, eles aparecerao aqui automaticamente.'
+                : 'As new events enter the platform, they will appear here automatically.'}
+            </p>
+            <a href="/create-event" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#d4ff00] px-5 py-2.5 text-sm font-bold text-[#060609] hover:bg-[#e5ff4d]">
+              {isPortuguese ? 'Criar evento' : 'Create event'}
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
         </div>
       </section>
     )
   }
 
   return (
-    <section className="px-5 py-10 md:px-10 lg:px-16 lg:py-14">
-      <div className="mx-auto max-w-[1920px]">
+    <section className="px-5 py-16 md:px-8 lg:px-10">
+      <div className="mx-auto max-w-[1440px]">
         <PublicReveal>
-          <div className="mb-8 grid gap-6 rounded-[2.5rem] border border-[#0b1016]/10 bg-[#fffaf3] p-8 shadow-[0_22px_70px_rgba(11,16,22,0.08)] lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-            <div className="max-w-3xl">
-              <div className="text-[11px] uppercase tracking-[0.36em] text-[#6d727a]">
-                Selected now
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#d4ff00]/60">
+                {isPortuguese ? 'Selecao' : 'Selection'}
               </div>
-              <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,5rem)] font-semibold uppercase leading-[0.86] tracking-[-0.05em] text-[#0b1016]">
-                A sharper showcase for what deserves attention right now.
+              <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3.2rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
+                {isPortuguese ? 'Em destaque agora' : 'Featured right now'}
               </h2>
             </div>
-            <div className="max-w-2xl text-base leading-8 text-[#5b6168]">
-              Instead of repeating the same module, the public layer now uses one master spotlight and a tighter sequence of supporting experiences.
-            </div>
+            <a href="/events" className="inline-flex items-center gap-2 text-sm font-medium text-white/40 transition-all hover:text-[#d4ff00]">
+              {isPortuguese ? 'Ver todos' : 'View all'}
+              <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
         </PublicReveal>
 
-        <div className="grid gap-6 xl:grid-cols-[1.18fr_0.82fr]">
+        <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
           {primaryEvent ? (
-            <FeaturedEventTile
-              event={primaryEvent}
-              large
-              index={0}
-              locale={locale}
-              isPortuguese={isPortuguese}
-            />
+            <FeaturedEventTile event={primaryEvent} large index={0} locale={locale} isPortuguese={isPortuguese} />
           ) : null}
-
-          <div className="grid gap-6">
+          <div className="grid gap-4">
             {secondaryEvents.map((event, index) => (
-              <FeaturedEventTile
-                key={event.id}
-                event={event}
-                index={index + 1}
-                locale={locale}
-                isPortuguese={isPortuguese}
-              />
+              <FeaturedEventTile key={event.id} event={event} index={index + 1} locale={locale} isPortuguese={isPortuguese} />
             ))}
           </div>
         </div>

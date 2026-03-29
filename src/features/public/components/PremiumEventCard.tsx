@@ -2,7 +2,6 @@ import { ArrowUpRight, CalendarDays, MapPin } from 'lucide-react'
 import { getEventAssetUrl } from '@/features/event-media'
 import type { PublicEventSummary } from '@/features/public/types/public.types'
 import { formatPublicCurrency, formatPublicDate, usePublicLocale } from '../lib/public-locale'
-import { PremiumBadge } from './PremiumBadge'
 import { PublicReveal } from './PublicReveal'
 
 interface PremiumEventCardProps {
@@ -20,13 +19,6 @@ function getFallbackImage(event: PublicEventSummary) {
   )
 }
 
-function getStatusLabel(status: string, isPortuguese: boolean) {
-  if (status === 'ongoing') return isPortuguese ? 'Ao vivo' : 'Live now'
-  if (status === 'published') return isPortuguese ? 'Proximo acesso' : 'Next access'
-  if (status === 'finished') return isPortuguese ? 'Encerrado' : 'Completed'
-  return isPortuguese ? 'Experiencia' : 'Experience'
-}
-
 export function PremiumEventCard({
   event,
   priority = false,
@@ -41,72 +33,52 @@ export function PremiumEventCard({
       <a
         href={`/e/${event.slug}`}
         aria-label={event.name}
-        className="group relative block h-full min-h-[31rem] overflow-hidden rounded-[2rem] border border-[#0b1016]/10 bg-[#05080d] shadow-[0_22px_70px_rgba(11,16,22,0.14)] transition-all duration-500 hover:-translate-y-1.5 hover:border-[#0b1016]/18 hover:shadow-[0_34px_100px_rgba(11,16,22,0.2)]"
+        className="group relative block h-full min-h-[26rem] overflow-hidden rounded-2xl border border-white/8 bg-[#0c0c10] transition-all duration-500 hover:border-[#d4ff00]/20"
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-[1.05]"
-          style={{ backgroundImage: `url("${coverImage}")` }}
+        <img
+          src={coverImage}
+          alt={event.name}
+          loading={priority ? 'eager' : 'lazy'}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,7,12,0.1)_0%,rgba(4,7,12,0.18)_34%,rgba(4,7,12,0.9)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(255,45,45,0.14),transparent_22%)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#060609] via-[#060609]/40 to-transparent" />
 
-        <div className="absolute left-5 top-5 z-10 flex flex-wrap gap-2">
-          <PremiumBadge tone="default" className="border-white/20 bg-white/12 text-white">
-            {getStatusLabel(event.status, isPortuguese)}
-          </PremiumBadge>
+        <div className="absolute left-4 top-4 z-10">
           {event.category ? (
-            <PremiumBadge tone="default" className="border-white/20 bg-black/12 text-white/80">
+            <span className="inline-flex items-center rounded-full bg-[#d4ff00]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#d4ff00] backdrop-blur-sm">
               {event.category}
-            </PremiumBadge>
+            </span>
           ) : null}
         </div>
 
-        <div className="relative z-10 flex h-full flex-col justify-end p-6 text-white md:p-7">
-          <div className="text-[11px] uppercase tracking-[0.3em] text-white/62">
-            {formatPublicDate(event.starts_at, locale, {
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric',
-            })}
-          </div>
-          <div className="mt-3 max-w-[11ch] font-display text-[2.4rem] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
+        <div className="relative z-10 flex h-full flex-col justify-end p-6 text-white">
+          <div className="font-display text-[1.8rem] font-bold leading-[0.95] tracking-tight text-white">
             {event.name}
           </div>
           {event.subtitle ? (
-            <p className="mt-3 max-w-sm text-sm leading-7 text-white/76">{event.subtitle}</p>
+            <p className="mt-2 max-w-sm text-sm text-white/50">{event.subtitle}</p>
           ) : null}
 
-          <div className="mt-5 grid gap-2 text-sm text-white/72">
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-white/58" />
-              <span>
-                {formatPublicDate(event.starts_at, locale, {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-white/58" />
-              <span>{[event.venue_name, event.city].filter(Boolean).join(' / ')}</span>
-            </div>
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/40">
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="h-3.5 w-3.5" />
+              {formatPublicDate(event.starts_at, locale, { day: '2-digit', month: 'short', year: 'numeric' })}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5" />
+              {[event.venue_name, event.city].filter(Boolean).join(' · ')}
+            </span>
           </div>
 
-          <div className="mt-6 flex items-center justify-between gap-4 border-t border-white/12 pt-5">
-            <span className="text-sm font-medium text-white/82">
+          <div className="mt-5 flex items-center justify-between gap-4 border-t border-white/8 pt-4">
+            <span className="text-sm font-medium text-white/60">
               {event.minPrice === null
-                ? isPortuguese
-                  ? 'Sob consulta'
-                  : 'On request'
+                ? isPortuguese ? 'Sob consulta' : 'On request'
                 : event.minPrice === 0
-                  ? isPortuguese
-                    ? 'Inscricao gratuita'
-                    : 'Free registration'
+                  ? isPortuguese ? 'Acesso livre' : 'Free access'
                   : `${isPortuguese ? 'A partir de' : 'From'} ${formatPublicCurrency(event.minPrice, locale)}`}
             </span>
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/18 bg-white/10 text-white transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all group-hover:border-[#d4ff00]/30 group-hover:text-[#d4ff00]">
               <ArrowUpRight className="h-4 w-4" />
             </span>
           </div>

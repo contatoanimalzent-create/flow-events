@@ -8,7 +8,6 @@ export type PublicRoute =
   | 'terms'
   | 'privacy'
   | 'contact'
-  | 'capital-strike'
   | { type: 'event'; slug: string }
 
 export function getInitialPublicRoute(): PublicRoute {
@@ -20,7 +19,6 @@ export function getInitialPublicRoute(): PublicRoute {
   if (path === '/about') return 'about'
   if (path === '/events') return 'events'
   if (path === '/create-event') return 'create-event'
-  if (path === '/capital-strike') return 'capital-strike'
   if (path === '/me' || path === '/account') return 'account'
 
   const eventMatch = path.match(/^\/e\/([^/]+)/)
@@ -32,5 +30,5 @@ export function getInitialPublicRoute(): PublicRoute {
 }
 
 export function isImmediatePublicRoute(route: PublicRoute) {
-  return typeof route === 'object' || route === 'events' || route === 'about' || route === 'create-event' || route === 'account' || route === 'terms' || route === 'privacy' || route === 'contact' || route === 'capital-strike'
+  return typeof route === 'object' || route === 'events' || route === 'about' || route === 'create-event' || route === 'account' || route === 'terms' || route === 'privacy' || route === 'contact'
 }

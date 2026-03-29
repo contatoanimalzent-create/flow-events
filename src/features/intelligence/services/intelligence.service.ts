@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import { financialService } from '@/features/financial/services'
 import type { AcknowledgeIntelligenceAlertInput, IntelligenceAlertStateRow, IntelligenceOverview } from '@/features/intelligence/types'
 import { buildIntelligenceOverview } from './intelligence.calculations'
@@ -21,14 +22,14 @@ export const intelligenceService = {
 
       assertIntelligenceResult(eventsResult)
 
-      const events = ((eventsResult.data as Record<string, unknown>[] | null) ?? []).map((row) => ({
+      const events = filterExampleEvents(((eventsResult.data as Record<string, unknown>[] | null) ?? []).map((row) => ({
         id: String(row.id),
         name: String(row.name ?? ''),
         starts_at: String(row.starts_at ?? ''),
         status: String(row.status ?? 'draft'),
         sold_tickets: Number(row.sold_tickets ?? 0),
         checked_in_count: Number(row.checked_in_count ?? 0),
-      }))
+      })))
 
       if (events.length === 0) {
         return {

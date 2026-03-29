@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import type { StaffEventScope, StaffFormData, StaffGateOption, StaffMemberRow, StaffStatus, StaffSummaryStats, StaffTimeEntryRow } from '@/features/staff/types'
 import { assertStaffResult, StaffServiceError } from './staff.errors'
 import { buildStaffPayload, mapStaffMemberRow, mapStaffTimeEntryRow } from './staff.payloads'
@@ -16,10 +17,10 @@ export const staffService = {
         .order('starts_at', { ascending: false })
 
       assertStaffResult(result)
-      return ((result.data as Array<Record<string, unknown>> | null) ?? []).map((row) => ({
+      return filterExampleEvents(((result.data as Array<Record<string, unknown>> | null) ?? []).map((row) => ({
         id: String(row.id),
         name: String(row.name ?? ''),
-      }))
+      })))
     }, { organizationId })
   },
 

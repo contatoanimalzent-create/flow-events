@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
 import { formatCurrency, formatNumber, slugify } from '@/shared/lib'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import type {
   CaptureLeadInput,
   GrowthOverview,
@@ -355,7 +356,7 @@ export const growthService = {
       if (conversionsResult.error) throw conversionsResult.error
       if (leadsResult.error) throw leadsResult.error
 
-      const events = (eventsResult.data ?? []) as Array<Record<string, unknown>>
+      const events = filterExampleEvents((eventsResult.data ?? []) as Array<Record<string, unknown>>)
       const orders = (ordersResult.data ?? []) as Array<Record<string, unknown>>
       const links = ((linksResult.data ?? []) as Array<Record<string, unknown>>).map(mapReferralLink)
       const conversions = ((conversionsResult.data ?? []) as Array<Record<string, unknown>>).map(mapReferralConversion)

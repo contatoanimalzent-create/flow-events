@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import type {
   EventFinancialClosureRow,
   EventPayoutRow,
@@ -42,14 +43,14 @@ export const financialService = {
 
       assertFinancialResult(eventsResult)
 
-      const events = ((eventsResult.data as Record<string, unknown>[] | null) ?? []).map((event) => ({
+      const events = filterExampleEvents(((eventsResult.data as Record<string, unknown>[] | null) ?? []).map((event) => ({
         id: String(event.id),
         name: String(event.name ?? ''),
         starts_at: String(event.starts_at ?? ''),
         status: (event.status as string | null | undefined) ?? null,
         total_capacity: event.total_capacity == null ? null : Number(event.total_capacity),
         sold_tickets: event.sold_tickets == null ? null : Number(event.sold_tickets),
-      }))
+      })))
 
       if (events.length === 0) {
         return buildEmptyFinancialOverview()

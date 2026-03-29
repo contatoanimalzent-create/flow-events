@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import type { Checkin as CheckinRecord } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import type {
   CheckInDigitalTicketInput,
   CheckinEventScope,
@@ -304,7 +305,7 @@ export const checkinService = {
         .order('starts_at', { ascending: true })
 
       assertCheckinResult(result)
-      return ((result.data as Array<Record<string, unknown>> | null) ?? []).map(mapCheckinEventScope)
+      return filterExampleEvents(((result.data as Array<Record<string, unknown>> | null) ?? [])).map(mapCheckinEventScope)
     }, { organizationId })
   },
 

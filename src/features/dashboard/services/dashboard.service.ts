@@ -4,6 +4,7 @@ import { campaignsService } from '@/features/campaigns/services'
 import { crmService } from '@/features/crm/services'
 import { financialService } from '@/features/financial/services'
 import { intelligenceService } from '@/features/intelligence/services'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import type {
   DashboardConversionPoint,
   DashboardCustomerRankingRow,
@@ -107,16 +108,17 @@ export const dashboardService = {
     return dashboardApi.request('get_overview', async () => {
       const threshold = buildThreshold(period)
 
-      const [eventsResult, financialOverview, campaignsOverview, intelligenceOverview, crmOverview, checkinsResult] = await Promise.all([
+      // Fallback values para cada serviço que pode falhar
+      const settled = await Promise.allSettled([
         supabase
           .from('events')
           .select('id,name,starts_at,status,total_capacity,sold_tickets')
           .eq('organization_id', organizationId)
           .order('starts_at', { ascending: false }),
-        financialService.getFinancialOverview(organizationId),
-        campaignsService.getOverview(organizationId),
-        intelligenceService.getOverview(organizationId),
-        crmService.getOverview(organizationId),
+        financialService.getFinancialOverview(organizationId).catch(err => ({ reports: [], summary: null })),
+        campaignsService.getOverview(organizationId).catch(err => ({ runs: [], summary: null })),
+        intelligenceService.getOverview(organizationId).catch(err => ({ alerts: [], summary: null })),
+        crmService.getOverview(organizationId).catch(err => ({ customers: [], summary: null })),
         supabase
           .from('checkins')
           .select('event_id,checked_in_at')
@@ -126,6 +128,14 @@ export const dashboardService = {
           .limit(5000),
       ])
 
+      // Extrai valores com fallback
+      const eventsResult = settled[0].status === 'fulfilled' ? settled[0].value : { data: null, error: null }
+      const financialOverview = settled[1].status === 'fulfilled' ? settled[1].value : { reports: [], summary: null }
+      const campaignsOverview = settled[2].status === 'fulfilled' ? settled[2].value : { runs: [], summary: null }
+      const intelligenceOverview = settled[3].status === 'fulfilled' ? settled[3].value : { alerts: [], summary: null }
+      const crmOverview = settled[4].status === 'fulfilled' ? settled[4].value : { customers: [], summary: null }
+      const checkinsResult = settled[5].status === 'fulfilled' ? settled[5].value : { data: null, error: null }
+
       if (eventsResult.error) {
         throw eventsResult.error
       }
@@ -134,14 +144,14 @@ export const dashboardService = {
         throw checkinsResult.error
       }
 
-      const allEvents: DashboardEventFilterOption[] = (((eventsResult.data as Record<string, unknown>[] | null) ?? [])).map((row) => ({
+      const allEvents: DashboardEventFilterOption[] = filterExampleEvents((((eventsResult.data as Record<string, unknown>[] | null) ?? [])).map((row) => ({
         id: String(row.id),
         name: String(row.name ?? ''),
         starts_at: String(row.starts_at ?? ''),
         status: (row.status as string | null | undefined) ?? null,
         total_capacity: row.total_capacity == null ? null : Number(row.total_capacity),
         sold_tickets: row.sold_tickets == null ? null : Number(row.sold_tickets),
-      }))
+      })))
 
       const filteredEvents = allEvents.filter((event) => {
         if (eventId !== 'all' && event.id !== eventId) {

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import type {
   CreateOrderDraftInput,
   DigitalTicketRow,
@@ -37,10 +38,10 @@ export const ordersService = {
         .order('starts_at', { ascending: false })
 
       assertOrdersResult(result)
-      return ((result.data as Record<string, unknown>[] | null) ?? []).map((row) => ({
+      return filterExampleEvents(((result.data as Record<string, unknown>[] | null) ?? []).map((row) => ({
         id: String(row.id),
         name: String(row.name ?? ''),
-      }))
+      })))
     }, { organizationId })
   },
 

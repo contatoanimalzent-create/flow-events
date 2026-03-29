@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { buildEventMediaPresentation } from '@/features/event-media'
 import type { EventAsset, TicketBatch, TicketType } from '@/lib/supabase'
+import { filterExampleEvents, isExampleEvent } from '@/shared/lib/example-events'
 import type { PublicEventDetail, PublicEventRecord, PublicEventSummary, PublicTicketType } from '@/features/public/types/public.types'
 
 const PUBLIC_EVENT_STATUSES = ['published', 'ongoing']
@@ -50,7 +51,7 @@ export const publicEventsService = {
       throw error
     }
 
-    const eventRows = (events ?? []) as PublicEventRecord[]
+    const eventRows = filterExampleEvents((events ?? []) as PublicEventRecord[])
 
     if (eventRows.length === 0) {
       return []
@@ -97,6 +98,10 @@ export const publicEventsService = {
     }
 
     const eventRecord = event as PublicEventRecord
+
+    if (isExampleEvent(eventRecord)) {
+      return null
+    }
 
     const [{ data: ticketTypes, error: ticketTypesError }, { data: batches, error: batchesError }, assets] = await Promise.all([
       supabase

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents, isExampleEvent } from '@/shared/lib/example-events'
 import type { EventEditorRecord, EventFormData, EventRow, EventStatus } from '@/features/events/types'
 import { assertEventsResult, EventsServiceError } from './events.errors'
 import { buildCreateEventPayload, buildDuplicateEventPayload, buildEventPayload, EVENT_LIST_SELECT } from './events.payloads'
@@ -16,7 +17,7 @@ export const eventsService = {
         .order('starts_at', { ascending: true })
 
       assertEventsResult(result)
-      return result.data ?? []
+      return filterExampleEvents((result.data ?? []) as EventRow[])
     }, { organizationId })
   },
 
@@ -24,7 +25,8 @@ export const eventsService = {
     return eventsApi.request('get_event_by_id', async () => {
       const result = await supabase.from('events').select('*').eq('id', eventId).single()
       assertEventsResult(result)
-      return (result.data as EventEditorRecord | null) ?? null
+      const event = (result.data as EventEditorRecord | null) ?? null
+      return isExampleEvent(event) ? null : event
     }, { eventId })
   },
 

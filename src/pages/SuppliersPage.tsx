@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
 import { ActionConfirmationDialog } from '@/shared/components'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
 import {
   Plus, Search, Edit2, Trash2, Loader2, X, AlertCircle,
@@ -100,7 +101,7 @@ export function SuppliersPage() {
       .from('events').select('id,name')
       .eq('organization_id', organization!.id)
       .order('starts_at', { ascending: false })
-    setEvents(data ?? [])
+    setEvents(filterExampleEvents((data ?? []) as EventItem[]))
   }
 
   async function fetchSuppliers() {

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import {
   calculateFeeBreakdown,
   getRemainingLimit,
@@ -224,7 +225,7 @@ export const billingService = {
         throw ordersResult.error
       }
 
-      const events = ((eventsResult.data as Record<string, unknown>[] | null) ?? [])
+      const events = filterExampleEvents(((eventsResult.data as Record<string, unknown>[] | null) ?? []))
       const eventIds = events.map((event) => String(event.id))
       const ticketTypesResult = eventIds.length > 0
         ? await supabase.from('ticket_types').select('id,event_id').in('event_id', eventIds)
@@ -311,7 +312,9 @@ export const billingService = {
         throw eventCountError
       }
 
-      const organizationEventIds = (((organizationEvents as Record<string, unknown>[] | null) ?? []).map((row) => String(row.id)))
+      const organizationEventIds = filterExampleEvents((((organizationEvents as Record<string, unknown>[] | null) ?? []).map((row) => ({
+        id: String(row.id),
+      })))).map((row) => row.id)
       const { data: ticketRows, error: ticketRowsError } = organizationEventIds.length > 0
         ? await supabase.from('ticket_types').select('event_id').in('event_id', organizationEventIds)
         : { data: [], error: null }

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import type {
   CrmOverview,
   CustomerDetailBundle,
@@ -103,7 +104,12 @@ async function buildSnapshot(organizationId: string) {
         .order('created_at', { ascending: false }),
       supabase.from('payments').select('order_id,status,amount').eq('organization_id', organizationId),
       supabase.from('digital_tickets').select('id,order_id,event_id,status,checked_in_at'),
-      supabase.from('checkins').select('digital_ticket_id,result,is_exit,checked_in_at').order('checked_in_at', { ascending: false }).limit(5000),
+      // Limita checkins aos últimos 30 dias (vs 5000 sem limite)
+      supabase.from('checkins')
+        .select('digital_ticket_id,result,is_exit,checked_in_at')
+        .gte('checked_in_at', new Date(Date.now() - 30 * 86_400_000).toISOString())
+        .order('checked_in_at', { ascending: false })
+        .limit(1000),
       supabase.from('events').select('id,name,starts_at,status').eq('organization_id', organizationId).order('starts_at', { ascending: false }),
       listStoredCustomers(organizationId),
     ])
@@ -154,7 +160,7 @@ async function buildSnapshot(organizationId: string) {
         is_exit: Boolean(row.is_exit),
         checked_in_at: String(row.checked_in_at ?? new Date().toISOString()),
       })),
-      events: (((eventsResult.data as Record<string, unknown>[] | null) ?? [])).map((row) => ({
+      events: filterExampleEvents((((eventsResult.data as Record<string, unknown>[] | null) ?? []))).map((row) => ({
         id: String(row.id),
         name: String(row.name ?? ''),
         starts_at: String(row.starts_at ?? ''),

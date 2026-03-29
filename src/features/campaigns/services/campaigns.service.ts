@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import { crmService } from '@/features/crm/services'
 import type {
   AudienceSegmentRow,
@@ -426,7 +427,7 @@ export const campaignsService = {
       const result = await supabase.from('events').select('id,name,starts_at,status').eq('organization_id', organizationId).order('starts_at', { ascending: false })
       assertCampaignsResult(result)
 
-      return ((result.data as Record<string, unknown>[] | null) ?? []).map((row) => ({
+      return filterExampleEvents(((result.data as Record<string, unknown>[] | null) ?? [])).map((row) => ({
         id: String(row.id),
         name: String(row.name ?? ''),
         starts_at: String(row.starts_at ?? ''),

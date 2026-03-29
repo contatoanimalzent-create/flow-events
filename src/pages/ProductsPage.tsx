@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
 import { ActionConfirmationDialog } from '@/shared/components'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import { formatCurrency, formatNumber, cn } from '@/lib/utils'
 import {
   Plus, Search, Edit2, Trash2, Loader2, X, AlertCircle,
@@ -90,7 +91,7 @@ export function ProductsPage() {
   async function fetchEvents() {
     const { data } = await supabase.from('events').select('id,name')
       .eq('organization_id', organization!.id).order('starts_at', { ascending: false })
-    const list = (data ?? []) as EventItem[]
+    const list = filterExampleEvents((data ?? []) as EventItem[])
     setEvents(list)
     if (list[0]) setSelectedEventId(list[0].id)
   }

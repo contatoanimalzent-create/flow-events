@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createApiClient } from '@/shared/api'
+import { filterExampleEvents } from '@/shared/lib/example-events'
 import type { TicketBatch, TicketBatchFormData, TicketSalesEvent, TicketType, TicketTypeFormData, TicketTypeWithBatches } from '@/features/tickets/types'
 import { assertTicketsResult, TicketsServiceError } from './tickets.errors'
 import { buildDuplicateBatchPayload, buildDuplicateTicketTypePayload, buildTicketBatchPayload, buildTicketTypePayload, mapTicketCatalog } from './tickets.payloads'
@@ -17,7 +18,7 @@ export const ticketsService = {
         .order('starts_at', { ascending: true })
 
       assertTicketsResult(result)
-      return (result.data as TicketSalesEvent[] | null) ?? []
+      return filterExampleEvents(((result.data as TicketSalesEvent[] | null) ?? []))
     }, { organizationId })
   },
 

@@ -95,9 +95,9 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
           <PublicReveal>
             <div className="grid gap-6 rounded-[2.8rem] border border-[#0b1016]/10 bg-[#fffaf3] px-8 py-10 shadow-[0_24px_80px_rgba(11,16,22,0.08)] lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-end">
               <div className="max-w-4xl">
-                <div className="text-[11px] uppercase tracking-[0.34em] text-[#6d727a]">Experiences calendar</div>
+                <div className="text-[11px] uppercase tracking-[0.34em] text-[#6d727a]">{isPortuguese ? 'Calendario de experiencias' : 'Experiences calendar'}</div>
                 <h1 className="mt-5 font-display text-[clamp(3.6rem,8vw,6.8rem)] font-semibold uppercase leading-[0.84] tracking-[-0.04em] text-[#0b1016]">
-                  {isPortuguese ? 'A more elegant event calendar.' : 'A more elegant event calendar.'}
+                  {isPortuguese ? 'Um calendario de eventos mais elegante.' : 'A more elegant event calendar.'}
                 </h1>
                 <p className="mt-5 max-w-2xl text-base leading-8 text-[#5b6168] md:text-lg">
                   {isPortuguese

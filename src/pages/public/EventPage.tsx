@@ -388,7 +388,7 @@ export function EventPage({ slug }: { slug: string }) {
                         {[
                         {
                           icon: MapPin,
-                          label: 'Venue',
+                          label: isPortuguese ? 'Local' : 'Venue',
                           value: event.venue_name || (isPortuguese ? 'Venue em curadoria' : 'Curated venue'),
                         },
                         {

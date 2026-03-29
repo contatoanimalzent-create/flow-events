@@ -11,9 +11,10 @@ interface RelatedExperiencesGridProps {
 
 export function RelatedExperiencesGrid({
   events,
-  title = 'Related experiences',
+  title,
 }: RelatedExperiencesGridProps) {
   const { isPortuguese } = usePublicLocale()
+  const resolvedTitle = title || (isPortuguese ? 'Experiencias relacionadas' : 'Related experiences')
   const visibleEvents = events.slice(0, 4)
 
   if (visibleEvents.length === 0) {
@@ -30,7 +31,7 @@ export function RelatedExperiencesGrid({
                 {isPortuguese ? 'Selecao recomendada' : 'Recommended next'}
               </div>
               <h2 className="mt-4 font-display text-[clamp(2rem,3vw,3.15rem)] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white">
-                {title}
+                {resolvedTitle}
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-white/58 md:text-base">
                 {isPortuguese

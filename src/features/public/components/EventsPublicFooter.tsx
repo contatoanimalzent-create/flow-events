@@ -146,7 +146,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
           </div>
 
           <div className="mt-10 flex flex-col gap-3 border-t border-white/[0.06] pt-6 text-xs text-white/20 md:flex-row md:items-center md:justify-between">
-            <p>&copy; {new Date().getFullYear()} Animalz Events. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Animalz Events. {isPortuguese ? 'Todos os direitos reservados.' : 'All rights reserved.'}</p>
             <p className="flex items-center gap-1.5">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#d4ff00]" />
               {isPortuguese ? 'Plataforma premium de eventos' : 'Premium events platform'}

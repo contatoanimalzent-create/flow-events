@@ -66,7 +66,7 @@ export function EventChaptersShowcase({ events }: EventChaptersShowcaseProps) {
 
                   <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
                     <div className="inline-flex items-center gap-2 rounded-full bg-[#d4ff00]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#d4ff00] backdrop-blur-sm">
-                      {event.city || 'Event'}
+                      {event.city || (isPortuguese ? 'Evento' : 'Event')}
                     </div>
                     <div
                       className={

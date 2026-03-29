@@ -52,7 +52,7 @@ function FeaturedEventTile({
 
           <div className="relative z-10 flex h-full flex-col justify-end p-6 text-white md:p-7">
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#d4ff00]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#d4ff00] backdrop-blur-md">
-              {event.category || 'Event'}
+              {event.category || (isPortuguese ? 'Evento' : 'Event')}
             </div>
             <div
               className={

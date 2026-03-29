@@ -64,7 +64,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
     null
 
   useSeoMeta({
-    title: isPortuguese ? 'Animalz Experiences | Premium event discovery' : 'Animalz Experiences | Premium event discovery',
+    title: isPortuguese ? 'Animalz Events | Descoberta de eventos premium' : 'Animalz Events | Premium event discovery',
     description: isPortuguese
       ? 'Uma camada de experiencias com hero cinematografico, descoberta editorial e compra premium.'
       : 'An experiences layer with cinematic hero media, editorial discovery and premium purchase flow.',

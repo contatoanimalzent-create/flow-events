@@ -118,7 +118,7 @@ export function EventsPublicHeader({
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-2 text-xs font-medium text-white/60 transition-all hover:border-white/20 hover:text-white"
               >
                 <Globe className="h-3.5 w-3.5" />
-                {locale === 'en-US' ? 'EN' : 'PT'}
+                {locale === 'en-US' ? 'EN' : 'BR'}
                 <ChevronDown className="h-3 w-3" />
               </button>
               {languageMenuOpen ? (

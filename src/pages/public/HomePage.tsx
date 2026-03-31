@@ -44,6 +44,9 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
     heroEvent?.cover_url ??
     null
 
+  const heroPoster = getEventCover(heroEvent)
+  const heroVideoSrc = '/videos/hero.mp4'
+
   const stats = useMemo(
     () => [
       {
@@ -104,17 +107,35 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                     'linear-gradient(90deg, rgba(7,6,7,0.95) 0%, rgba(7,6,7,0.84) 36%, rgba(7,6,7,0.42) 68%, rgba(7,6,7,0.7) 100%)',
                 }}
               />
-              <div
-                className="absolute inset-0 bg-cover bg-center"
+              <img
+                src={heroPoster}
+                alt={heroEvent?.name ?? 'Animalz Events'}
+                className="absolute inset-0 h-full w-full object-cover"
                 style={{
-                  backgroundImage: `url("${getEventCover(heroEvent)}")`,
                   transform: `scale(1.04) translateY(${scrollY * 0.08}px)`,
                   transition: 'transform 0.12s ease-out',
-                  opacity: heroEvent ? 0.54 : 0.18,
+                  opacity: heroEvent ? 0.26 : 0.12,
+                }}
+              />
+              <video
+                key={heroVideoSrc}
+                src={heroVideoSrc}
+                poster={heroPoster}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{
+                  transform: `scale(1.04) translateY(${scrollY * 0.08}px)`,
+                  transition: 'transform 0.12s ease-out',
+                  opacity: heroEvent ? 0.46 : 0.32,
                 }}
               />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(214,42,11,0.16),transparent_34%)]" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(174,147,111,0.14),transparent_32%)]" />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,6,7,0.06)_0%,rgba(7,6,7,0.22)_38%,rgba(7,6,7,0.56)_100%)]" />
               <div
                 className="absolute inset-0 opacity-[0.05]"
                 style={{

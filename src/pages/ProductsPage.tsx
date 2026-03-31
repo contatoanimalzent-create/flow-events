@@ -1,788 +1,171 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ElementType } from 'react'
+import { CheckCircle2, Coffee, Edit2, Grid3X3, List, Loader2, Minus, Package, Plus, Search, Shirt, ShoppingBag, ShoppingCart, Tag, Trash2, X, Zap } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
 import { ActionConfirmationDialog } from '@/shared/components'
 import { filterExampleEvents } from '@/shared/lib/example-events'
-import { formatCurrency, formatNumber, cn } from '@/lib/utils'
-import {
-  Plus, Search, Edit2, Trash2, Loader2, X, AlertCircle,
-  ShoppingCart, Package, Tag, BarChart3, Minus,
-  CheckCircle2, AlertTriangle, Grid3X3, List,
-  ShoppingBag, Coffee, Shirt, Zap, MoreHorizontal,
-} from 'lucide-react'
+import { cn } from '@/shared/lib'
+import { formatCurrency, formatNumber } from '@/lib/utils'
 
-/* ── Types ──────────────────────────────────────────────────── */
 type ProductCategory = 'bar' | 'food' | 'merch' | 'vip' | 'service' | 'other'
-
-interface Product {
-  id: string
-  organization_id: string
-  event_id?: string
-  name: string
-  sku?: string
-  description?: string
-  category: ProductCategory
-  price: number
-  cost_price?: number
-  stock_quantity: number
-  stock_alert_threshold?: number
-  is_active: boolean
-  image_url?: string
-  created_at: string
-}
-
-interface CartItem {
-  product: Product
-  qty: number
-}
-
+interface Product { id: string; organization_id: string; event_id?: string | null; name: string; sku?: string | null; description?: string | null; category: ProductCategory; price: number; cost_price?: number | null; stock_quantity: number; stock_alert_threshold?: number | null; is_active: boolean }
+interface CartItem { product: Product; qty: number }
 interface EventItem { id: string; name: string }
+interface ProductForm { name: string; sku: string; description: string; category: ProductCategory; price: string; cost_price: string; stock_quantity: string; stock_alert_threshold: string }
 
-interface ProductForm {
-  name: string
-  sku: string
-  description: string
-  category: ProductCategory
-  price: string
-  cost_price: string
-  stock_quantity: string
-  stock_alert_threshold: string
+const EMPTY_FORM: ProductForm = { name: '', sku: '', description: '', category: 'bar', price: '', cost_price: '', stock_quantity: '', stock_alert_threshold: '' }
+const CATEGORY_CONFIG: Record<ProductCategory, { label: string; icon: ElementType; accent: string }> = {
+  bar: { label: 'Bar e bebidas', icon: Coffee, accent: 'text-brand-blue' },
+  food: { label: 'Alimentacao', icon: ShoppingBag, accent: 'text-status-warning' },
+  merch: { label: 'Merch', icon: Shirt, accent: 'text-brand-purple' },
+  vip: { label: 'VIP', icon: Zap, accent: 'text-brand-acid' },
+  service: { label: 'Servicos', icon: Tag, accent: 'text-brand-teal' },
+  other: { label: 'Outros', icon: Package, accent: 'text-text-muted' },
 }
 
-const EMPTY_FORM: ProductForm = {
-  name: '', sku: '', description: '', category: 'bar',
-  price: '', cost_price: '', stock_quantity: '', stock_alert_threshold: '',
-}
-
-const CATEGORY_CONFIG: Record<ProductCategory, { label: string; icon: React.ElementType; color: string }> = {
-  bar:     { label: 'Bar & Bebidas',    icon: Coffee,      color: 'text-brand-blue' },
-  food:    { label: 'Alimentação',      icon: ShoppingBag, color: 'text-status-warning' },
-  merch:   { label: 'Merchandise',      icon: Shirt,       color: 'text-brand-purple' },
-  vip:     { label: 'VIP / Experiência',icon: Zap,         color: 'text-brand-acid' },
-  service: { label: 'Serviços',         icon: Tag,         color: 'text-brand-teal' },
-  other:   { label: 'Outros',           icon: Package,     color: 'text-text-muted' },
-}
-
-/* ── Main ───────────────────────────────────────────────────── */
 export function ProductsPage() {
   const { organization } = useAuthStore()
-  const [tab, setTab] = useState<'catalog' | 'pdv'>('catalog')
+  const [tab, setTab] = useState<'pdv' | 'catalog'>('pdv')
   const [events, setEvents] = useState<EventItem[]>([])
   const [selectedEventId, setSelectedEventId] = useState('')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [pdvSearch, setPdvSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<'all' | ProductCategory>('all')
   const [view, setView] = useState<'grid' | 'list'>('grid')
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [menuId, setMenuId] = useState<string | null>(null)
   const [pendingDeleteProduct, setPendingDeleteProduct] = useState<Product | null>(null)
-
-  // PDV state
   const [cart, setCart] = useState<CartItem[]>([])
-  const [pdvSearch, setPdvSearch] = useState('')
-  const [pdvCategory, setPdvCategory] = useState<'all' | ProductCategory>('all')
   const [orderPlaced, setOrderPlaced] = useState(false)
 
-  useEffect(() => { if (organization) { fetchEvents(); fetchProducts() } }, [organization])
-  useEffect(() => { if (organization) fetchProducts() }, [selectedEventId] )
+  useEffect(() => { if (organization) void fetchEvents() }, [organization])
+  useEffect(() => { if (organization) void fetchProducts() }, [organization, selectedEventId])
 
   async function fetchEvents() {
-    const { data } = await supabase.from('events').select('id,name')
-      .eq('organization_id', organization!.id).order('starts_at', { ascending: false })
+    const { data } = await supabase.from('events').select('id,name').eq('organization_id', organization!.id).order('starts_at', { ascending: false })
     const list = filterExampleEvents((data ?? []) as EventItem[])
     setEvents(list)
-    if (list[0]) setSelectedEventId(list[0].id)
+    if (!selectedEventId && list[0]) setSelectedEventId(list[0].id)
   }
 
   async function fetchProducts() {
     setLoading(true)
-    let q = supabase.from('products').select('*').eq('organization_id', organization!.id)
-    if (selectedEventId) q = q.eq('event_id', selectedEventId)
-    q = q.order('name')
-    const { data } = await q
+    let query = supabase.from('products').select('*').eq('organization_id', organization!.id)
+    if (selectedEventId) query = query.eq('event_id', selectedEventId)
+    const { data } = await query.order('name')
     setProducts((data ?? []) as Product[])
     setLoading(false)
   }
 
-  async function handleDelete(id: string) {
-    await supabase.from('products').delete().eq('id', id)
-    fetchProducts()
-    setMenuId(null)
-  }
-
-  async function handleToggleActive(id: string, current: boolean) {
-    await supabase.from('products').update({ is_active: !current }).eq('id', id)
-    fetchProducts()
-  }
-
-  // Cart actions
-  function addToCart(product: Product) {
-    if (!product.is_active) return
-    setCart(prev => {
-      const existing = prev.find(c => c.product.id === product.id)
-      if (existing) return prev.map(c => c.product.id === product.id ? { ...c, qty: c.qty + 1 } : c)
-      return [...prev, { product, qty: 1 }]
-    })
-  }
-
-  function removeFromCart(productId: string) {
-    setCart(prev => {
-      const existing = prev.find(c => c.product.id === productId)
-      if (existing && existing.qty > 1) return prev.map(c => c.product.id === productId ? { ...c, qty: c.qty - 1 } : c)
-      return prev.filter(c => c.product.id !== productId)
-    })
-  }
-
+  async function handleDelete(id: string) { await supabase.from('products').delete().eq('id', id); await fetchProducts() }
   function clearCart() { setCart([]) }
-
-  const cartTotal = cart.reduce((sum, c) => sum + c.product.price * c.qty, 0)
-  const cartItemCount = cart.reduce((sum, c) => sum + c.qty, 0)
-
-  async function placeOrder() {
-    if (cart.length === 0) return
-    // In a real implementation, this would create a PDV order in the database
+  function addToCart(product: Product) {
+    if (!product.is_active || product.stock_quantity === 0) return
+    setCart((current) => {
+      const existing = current.find((item) => item.product.id === product.id)
+      return existing ? current.map((item) => item.product.id === product.id ? { ...item, qty: item.qty + 1 } : item) : [...current, { product, qty: 1 }]
+    })
+  }
+  function removeFromCart(id: string) {
+    setCart((current) => {
+      const existing = current.find((item) => item.product.id === id)
+      if (!existing) return current
+      if (existing.qty === 1) return current.filter((item) => item.product.id !== id)
+      return current.map((item) => item.product.id === id ? { ...item, qty: item.qty - 1 } : item)
+    })
+  }
+  function placeOrder() {
+    if (!cart.length) return
     setOrderPlaced(true)
-    setTimeout(() => { setOrderPlaced(false); clearCart() }, 2500)
+    window.setTimeout(() => { setOrderPlaced(false); clearCart() }, 2200)
   }
 
-  const catalogFiltered = products.filter(p => {
-    if (categoryFilter !== 'all' && p.category !== categoryFilter) return false
-    if (!search) return true
+  const saleItems = products.filter((product) => product.is_active)
+  const averagePrice = saleItems.length ? saleItems.reduce((sum, product) => sum + product.price, 0) / saleItems.length : 0
+  const catalogItems = products.filter((product) => {
+    if (categoryFilter !== 'all' && product.category !== categoryFilter) return false
     const q = search.toLowerCase()
-    return p.name.toLowerCase().includes(q) || (p.sku ?? '').toLowerCase().includes(q)
+    return !q || product.name.toLowerCase().includes(q) || (product.sku ?? '').toLowerCase().includes(q)
   })
-
-  const pdvFiltered = products.filter(p => {
-    if (!p.is_active) return false
-    if (pdvCategory !== 'all' && p.category !== pdvCategory) return false
-    if (!pdvSearch) return true
-    return p.name.toLowerCase().includes(pdvSearch.toLowerCase())
+  const pdvItems = products.filter((product) => {
+    if (!product.is_active) return false
+    if (categoryFilter !== 'all' && product.category !== categoryFilter) return false
+    return !pdvSearch || product.name.toLowerCase().includes(pdvSearch.toLowerCase())
   })
-
-  const lowStockCount = products.filter(p =>
-    p.stock_quantity <= (p.stock_alert_threshold ?? 5) && p.stock_quantity > 0
-  ).length
-  const outOfStockCount = products.filter(p => p.stock_quantity === 0 && p.is_active).length
-  const totalValue = products.reduce((sum, p) => sum + p.price * p.stock_quantity, 0)
+  const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.qty, 0)
+  const cartItemCount = cart.reduce((sum, item) => sum + item.qty, 0)
 
   return (
-    <div className="p-6 space-y-5 max-w-[1400px] mx-auto" onClick={() => setMenuId(null)}>
-
-      {/* Header */}
-      <div className="flex items-start justify-between reveal">
+    <div className="admin-page">
+      <div className="admin-header">
         <div>
-          <h1 className="font-display text-4xl tracking-wide text-text-primary leading-none">
-            PRODUTOS & PDV<span className="text-brand-acid">.</span>
-          </h1>
-          <p className="text-text-muted text-xs mt-1 font-mono tracking-wider">
-            Catálogo de produtos e ponto de venda
-          </p>
+          <div className="admin-eyebrow">Comercial e operacao</div>
+          <h1 className="admin-title">PDV<span className="admin-title-accent">.</span></h1>
+          <p className="admin-subtitle">Aqui o time vende. Catalogo comercial, pedido rapido e caixa ficam juntos; saldo, ruptura e reposicao saem da frente e vivem em Estoque.</p>
         </div>
-        <div className="flex items-center gap-2">
-          {/* Tab switch */}
-          <div className="flex items-center border border-bg-border rounded-sm overflow-hidden">
-            {([
-              { key: 'catalog', label: '⊞ Catálogo' },
-              { key: 'pdv', label: '⊡ PDV' },
-            ] as const).map(t => (
-              <button key={t.key} onClick={() => setTab(t.key)}
-                className={cn('px-4 py-2 text-xs font-medium transition-all',
-                  tab === t.key ? 'bg-brand-acid text-bg-primary' : 'text-text-muted hover:text-text-primary')}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-          {tab === 'catalog' && (
-            <button onClick={() => { setEditingProduct(null); setShowForm(true) }}
-              className="btn-primary flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Novo produto
-            </button>
-          )}
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="card p-5"><div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">Uso correto</div><div className="mt-4 font-display text-[2rem] leading-none text-[#ebe7e0]">Venda e caixa.</div><p className="mt-4 text-sm leading-7 text-text-muted">Monte o catalogo, acelere atendimento e feche pedido sem misturar leitura de estoque.</p></div>
+          <div className="card p-5"><div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">Nao confundir</div><div className="mt-4 text-sm leading-7 text-text-secondary">PDV vende. Estoque controla saldo e ruptura. Se a duvida for reposicao, a equipe deve olhar Estoque.</div></div>
         </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 reveal" style={{ animationDelay: '40ms' }}>
+      {events.length > 1 ? <div className="admin-filterbar"><span className="text-xs font-mono uppercase tracking-[0.28em] text-text-muted">Evento</span>{events.map((event) => <button key={event.id} type="button" onClick={() => setSelectedEventId(event.id)} className={cn('rounded-full px-4 py-2 text-xs font-medium transition-all', selectedEventId === event.id ? 'bg-brand-acid text-[#090807]' : 'border border-white/8 text-text-secondary hover:text-text-primary')}>{event.name}</button>)}</div> : null}
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: 'Produtos', value: products.length, icon: Package, color: 'text-text-primary' },
-          { label: 'Estoque baixo', value: lowStockCount, icon: AlertTriangle, color: 'text-status-warning' },
-          { label: 'Sem estoque', value: outOfStockCount, icon: AlertCircle, color: 'text-status-error' },
-          { label: 'Valor em estoque', value: formatCurrency(totalValue), icon: BarChart3, color: 'text-brand-acid' },
-        ].map((s, i) => {
-          const Icon = s.icon
-          return (
-            <div key={i} className="card p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-mono tracking-widest text-text-muted uppercase">{s.label}</span>
-                <Icon className={cn('w-3.5 h-3.5', s.color)} />
-              </div>
-              <div className={cn('text-xl font-semibold', s.color)}>{s.value}</div>
-            </div>
-          )
-        })}
+          { label: 'Itens vendaveis', value: saleItems.length, tone: 'text-text-primary' },
+          { label: 'Categorias ativas', value: new Set(saleItems.map((item) => item.category)).size, tone: 'text-brand-acid' },
+          { label: 'Preco medio', value: formatCurrency(averagePrice), tone: 'text-brand-blue' },
+          { label: 'Carrinho atual', value: formatNumber(cartItemCount), tone: 'text-status-success' },
+        ].map((item) => <div key={item.label} className="card p-5"><div className="text-[11px] uppercase tracking-[0.28em] text-text-muted">{item.label}</div><div className={cn('mt-5 font-display text-[2.8rem] leading-none tracking-[-0.05em]', item.tone)}>{item.value}</div></div>)}
       </div>
 
-      {/* ── CATALOG TAB ─────────────────────────────────────────── */}
-      {tab === 'catalog' && (
-        <>
-          {/* Toolbar */}
-          <div className="flex items-center gap-3 flex-wrap reveal" style={{ animationDelay: '60ms' }}>
-            <div className="relative flex-1 min-w-[200px] max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
-              <input className="input pl-9 h-9 text-sm" placeholder="Buscar produto ou SKU..."
-                value={search} onChange={e => setSearch(e.target.value)} />
-            </div>
-            <div className="flex items-center gap-1 flex-wrap">
-              <button onClick={() => setCategoryFilter('all')}
-                className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all',
-                  categoryFilter === 'all' ? 'bg-brand-acid text-bg-primary' : 'text-text-muted hover:text-text-primary border border-transparent hover:border-bg-border')}>
-                Todos
-              </button>
-              {Object.entries(CATEGORY_CONFIG).map(([k, v]) => (
-                <button key={k} onClick={() => setCategoryFilter(k as ProductCategory)}
-                  className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all',
-                    categoryFilter === k ? 'bg-brand-acid text-bg-primary' : 'text-text-muted hover:text-text-primary border border-transparent hover:border-bg-border')}>
-                  {v.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex-1" />
-            <div className="flex items-center border border-bg-border rounded-sm overflow-hidden">
-              {(['grid', 'list'] as const).map(v => (
-                <button key={v} onClick={() => setView(v)}
-                  className={cn('px-3 py-1.5 text-xs transition-all',
-                    view === v ? 'bg-brand-acid/15 text-brand-acid' : 'text-text-muted hover:text-text-primary')}>
-                  {v === 'grid' ? <Grid3X3 className="w-3.5 h-3.5" /> : <List className="w-3.5 h-3.5" />}
-                </button>
-              ))}
-            </div>
-          </div>
+      <div className="admin-filterbar">
+        <div className="flex flex-wrap items-center gap-2">{[{ key: 'pdv', label: 'PDV rapido' }, { key: 'catalog', label: 'Catalogo comercial' }].map((item) => <button key={item.key} type="button" onClick={() => setTab(item.key as typeof tab)} className={cn('rounded-full px-4 py-2 text-xs font-medium transition-all', tab === item.key ? 'bg-brand-acid text-[#090807]' : 'border border-white/8 text-text-secondary hover:text-text-primary')}>{item.label}</button>)}</div>
+        <div className="ml-auto flex items-center gap-2"><button type="button" onClick={() => setView('grid')} className={cn('btn-secondary px-4', view === 'grid' && 'border-brand-acid/35')}><Grid3X3 className="h-4 w-4" /></button><button type="button" onClick={() => setView('list')} className={cn('btn-secondary px-4', view === 'list' && 'border-brand-acid/35')}><List className="h-4 w-4" /></button><button type="button" onClick={() => { setEditingProduct(null); setShowForm(true) }} className="btn-primary"><Plus className="h-4 w-4" />Novo item</button></div>
+      </div>
 
-          {loading && (
-            <div className="flex justify-center py-16">
-              <Loader2 className="w-6 h-6 text-brand-acid animate-spin" />
-            </div>
-          )}
+      <div className="admin-filterbar">
+        <div className="relative min-w-[220px] flex-1"><Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" /><input value={tab === 'pdv' ? pdvSearch : search} onChange={(event) => tab === 'pdv' ? setPdvSearch(event.target.value) : setSearch(event.target.value)} placeholder={tab === 'pdv' ? 'Buscar no PDV...' : 'Buscar item ou SKU...'} className="input h-11 rounded-full pl-11" /></div>
+        <div className="flex flex-wrap items-center gap-2"><button type="button" onClick={() => setCategoryFilter('all')} className={cn('rounded-full px-4 py-2 text-xs font-medium transition-all', categoryFilter === 'all' ? 'bg-brand-acid text-[#090807]' : 'border border-white/8 text-text-secondary hover:text-text-primary')}>Tudo</button>{Object.entries(CATEGORY_CONFIG).map(([key, config]) => <button key={key} type="button" onClick={() => setCategoryFilter(key as ProductCategory)} className={cn('rounded-full px-4 py-2 text-xs font-medium transition-all', categoryFilter === key ? 'bg-brand-acid text-[#090807]' : 'border border-white/8 text-text-secondary hover:text-text-primary')}>{config.label}</button>)}</div>
+      </div>
 
-          {!loading && catalogFiltered.length === 0 && (
-            <div className="card p-16 flex flex-col items-center justify-center text-center">
-              <Package className="w-10 h-10 text-text-muted mb-3" />
-              <div className="font-display text-2xl text-text-primary mb-1">
-                {search ? 'NENHUM RESULTADO' : 'NENHUM PRODUTO'}
-              </div>
-              <p className="text-sm text-text-muted mb-5">
-                {search ? 'Tente outros termos' : 'Adicione produtos para o catálogo e PDV'}
-              </p>
-              {!search && (
-                <button onClick={() => setShowForm(true)} className="btn-primary">+ Novo produto</button>
-              )}
-            </div>
-          )}
+      {loading ? <div className="card flex items-center justify-center py-24"><Loader2 className="h-6 w-6 animate-spin text-brand-acid" /></div> : tab === 'pdv' ? <PdvPanel items={pdvItems} view={view} cart={cart} cartTotal={cartTotal} cartItemCount={cartItemCount} orderPlaced={orderPlaced} addToCart={addToCart} removeFromCart={removeFromCart} clearCart={clearCart} placeOrder={placeOrder} /> : <CatalogPanel items={catalogItems} view={view} onEdit={(product) => { setEditingProduct(product); setShowForm(true) }} onDelete={setPendingDeleteProduct} />}
 
-          {/* Grid view */}
-          {!loading && view === 'grid' && catalogFiltered.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {catalogFiltered.map((p, i) => {
-                const catCfg = CATEGORY_CONFIG[p.category]
-                const CatIcon = catCfg.icon
-                const isLowStock = p.stock_quantity <= (p.stock_alert_threshold ?? 5) && p.stock_quantity > 0
-                const isOutOfStock = p.stock_quantity === 0
-                return (
-                  <div key={p.id} className={cn('card overflow-hidden group reveal transition-all',
-                    !p.is_active && 'opacity-50')} style={{ animationDelay: `${i * 30}ms` }}>
-                    <div className="h-28 bg-bg-surface flex items-center justify-center relative overflow-hidden">
-                      {p.image_url ? (
-                        <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <CatIcon className={cn('w-8 h-8', catCfg.color, 'opacity-40')} />
-                      )}
-                      <span className={cn('absolute top-2 left-2 text-[9px] font-mono px-1.5 py-0.5 rounded-sm',
-                        'bg-bg-primary/70 backdrop-blur-sm', catCfg.color)}>
-                        {catCfg.label}
-                      </span>
-                      {isOutOfStock && (
-                        <span className="absolute top-2 right-2 text-[9px] font-mono px-1.5 py-0.5 rounded-sm bg-status-error/80 text-white">
-                          ESGOTADO
-                        </span>
-                      )}
-                      {isLowStock && !isOutOfStock && (
-                        <span className="absolute top-2 right-2 text-[9px] font-mono px-1.5 py-0.5 rounded-sm bg-status-warning/80 text-white">
-                          BAIXO
-                        </span>
-                      )}
-                      <div className="absolute inset-0 bg-bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <button onClick={e => { e.stopPropagation(); setEditingProduct(p); setShowForm(true) }}
-                          className="p-2 rounded-sm bg-bg-card text-text-primary hover:text-brand-acid transition-colors">
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={e => { e.stopPropagation(); setPendingDeleteProduct(p) }}
-                          className="p-2 rounded-sm bg-bg-card text-text-primary hover:text-status-error transition-colors">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="p-3">
-                      <div className="font-medium text-[12px] text-text-primary truncate">{p.name}</div>
-                      {p.sku && <div className="text-[10px] text-text-muted font-mono">{p.sku}</div>}
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="font-mono font-bold text-brand-acid text-sm">{formatCurrency(p.price)}</span>
-                        <span className={cn('text-[10px] font-mono',
-                          isOutOfStock ? 'text-status-error' : isLowStock ? 'text-status-warning' : 'text-text-muted')}>
-                          {p.stock_quantity} un
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+      {showForm ? <ProductFormModal organizationId={organization!.id} events={events} product={editingProduct} defaultEventId={selectedEventId} onClose={() => { setShowForm(false); setEditingProduct(null) }} onSaved={() => { void fetchProducts(); setShowForm(false); setEditingProduct(null) }} /> : null}
 
-          {/* List view */}
-          {!loading && view === 'list' && catalogFiltered.length > 0 && (
-            <div className="card overflow-hidden reveal">
-              <table className="w-full">
-                <thead className="border-b border-bg-border">
-                  <tr>{['Produto', 'Categoria', 'Preço', 'Custo', 'Estoque', 'Status', 'Ações'].map(h => (
-                    <th key={h} className="table-header">{h}</th>
-                  ))}</tr>
-                </thead>
-                <tbody>
-                  {catalogFiltered.map(p => {
-                    const catCfg = CATEGORY_CONFIG[p.category]
-                    const CatIcon = catCfg.icon
-                    const isLowStock = p.stock_quantity <= (p.stock_alert_threshold ?? 5) && p.stock_quantity > 0
-                    const isOutOfStock = p.stock_quantity === 0
-                    const margin = p.cost_price && p.price
-                      ? Math.round(((p.price - p.cost_price) / p.price) * 100) : null
-                    return (
-                      <tr key={p.id} className={cn('table-row', !p.is_active && 'opacity-50')}>
-                        <td className="table-cell">
-                          <div className="font-medium text-[13px]">{p.name}</div>
-                          {p.sku && <div className="text-[10px] text-text-muted font-mono">{p.sku}</div>}
-                        </td>
-                        <td className="table-cell">
-                          <span className={cn('flex items-center gap-1.5 text-xs', catCfg.color)}>
-                            <CatIcon className="w-3 h-3" /> {catCfg.label}
-                          </span>
-                        </td>
-                        <td className="table-cell font-mono font-bold text-brand-acid">
-                          {formatCurrency(p.price)}
-                        </td>
-                        <td className="table-cell">
-                          {p.cost_price ? (
-                            <div>
-                              <div className="font-mono text-xs text-text-secondary">{formatCurrency(p.cost_price)}</div>
-                              {margin !== null && (
-                                <div className="text-[10px] text-status-success">Margem: {margin}%</div>
-                              )}
-                            </div>
-                          ) : <span className="text-xs text-text-muted">—</span>}
-                        </td>
-                        <td className="table-cell">
-                          <span className={cn('font-mono text-sm font-medium',
-                            isOutOfStock ? 'text-status-error' : isLowStock ? 'text-status-warning' : 'text-text-primary')}>
-                            {formatNumber(p.stock_quantity)}
-                          </span>
-                          {isLowStock && !isOutOfStock && (
-                            <AlertTriangle className="inline-block w-3 h-3 ml-1 text-status-warning" />
-                          )}
-                        </td>
-                        <td className="table-cell">
-                          <button onClick={() => handleToggleActive(p.id, p.is_active)}
-                            className={cn('text-[10px] font-mono px-2 py-1 rounded-sm border transition-all',
-                              p.is_active
-                                ? 'border-status-success/30 text-status-success bg-status-success/8'
-                                : 'border-bg-border text-text-muted')}>
-                            {p.is_active ? 'Ativo' : 'Inativo'}
-                          </button>
-                        </td>
-                        <td className="table-cell">
-                          <div className="flex items-center gap-1">
-                            <button onClick={() => { setEditingProduct(p); setShowForm(true) }}
-                              className="p-1.5 rounded-sm text-text-muted hover:text-brand-acid hover:bg-brand-acid/8 transition-all">
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button onClick={() => setPendingDeleteProduct(p)}
-                              className="p-1.5 rounded-sm text-text-muted hover:text-status-error hover:bg-status-error/8 transition-all">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* ── PDV TAB ─────────────────────────────────────────────── */}
-      {tab === 'pdv' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 reveal">
-          {/* Product grid */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
-                <input className="input pl-9 h-9 text-sm" placeholder="Buscar produto..."
-                  value={pdvSearch} onChange={e => setPdvSearch(e.target.value)} />
-              </div>
-              <div className="flex items-center gap-1 flex-wrap">
-                <button onClick={() => setPdvCategory('all')}
-                  className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all',
-                    pdvCategory === 'all' ? 'bg-brand-acid text-bg-primary' : 'text-text-muted border border-transparent hover:border-bg-border')}>
-                  Todos
-                </button>
-                {Object.entries(CATEGORY_CONFIG).map(([k, v]) => {
-                  const Icon = v.icon
-                  return (
-                    <button key={k} onClick={() => setPdvCategory(k as ProductCategory)}
-                      className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-1',
-                        pdvCategory === k ? 'bg-brand-acid text-bg-primary' : 'text-text-muted border border-transparent hover:border-bg-border')}>
-                      <Icon className="w-3 h-3" /> {v.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {pdvFiltered.length === 0 ? (
-              <div className="card p-12 flex flex-col items-center text-center">
-                <Package className="w-8 h-8 text-text-muted mb-2" />
-                <p className="text-sm text-text-muted">Nenhum produto disponível</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {pdvFiltered.map(p => {
-                  const cartItem = cart.find(c => c.product.id === p.id)
-                  const isOutOfStock = p.stock_quantity === 0
-                  const catCfg = CATEGORY_CONFIG[p.category]
-                  const CatIcon = catCfg.icon
-                  return (
-                    <button key={p.id} onClick={() => !isOutOfStock && addToCart(p)}
-                      disabled={isOutOfStock}
-                      className={cn(
-                        'card p-3 text-left transition-all duration-150 relative group',
-                        isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:border-brand-acid/40 hover:shadow-glow-acid active:scale-95 cursor-pointer',
-                        cartItem && 'border-brand-acid/30 bg-brand-acid/3'
-                      )}>
-                      <div className="flex items-center justify-center h-10 mb-2">
-                        <CatIcon className={cn('w-6 h-6', catCfg.color, 'opacity-60')} />
-                      </div>
-                      <div className="text-[12px] font-medium text-text-primary leading-tight mb-1 line-clamp-2">
-                        {p.name}
-                      </div>
-                      <div className="font-mono font-bold text-brand-acid text-sm">
-                        {formatCurrency(p.price)}
-                      </div>
-                      {cartItem && (
-                        <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-acid rounded-full flex items-center justify-center">
-                          <span className="text-[10px] font-bold text-bg-primary">{cartItem.qty}</span>
-                        </div>
-                      )}
-                      {isOutOfStock && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-bg-card/80 rounded-sm">
-                          <span className="text-[10px] font-mono text-status-error">ESGOTADO</span>
-                        </div>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Cart */}
-          <div className="card flex flex-col h-fit sticky top-4">
-            <div className="p-4 border-b border-bg-border flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4 text-brand-acid" />
-                <span className="font-display text-lg leading-none">PEDIDO<span className="text-brand-acid">.</span></span>
-              </div>
-              {cart.length > 0 && (
-                <button onClick={clearCart} className="text-[11px] text-text-muted hover:text-status-error transition-colors font-mono">
-                  Limpar
-                </button>
-              )}
-            </div>
-
-            {orderPlaced ? (
-              <div className="flex-1 flex flex-col items-center justify-center py-12 gap-3">
-                <CheckCircle2 className="w-12 h-12 text-status-success" />
-                <div className="font-display text-xl text-status-success">PEDIDO REALIZADO</div>
-                <p className="text-xs text-text-muted text-center">Aguardando pagamento...</p>
-              </div>
-            ) : cart.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center py-12 text-center">
-                <ShoppingCart className="w-8 h-8 text-text-muted mb-2 opacity-30" />
-                <p className="text-sm text-text-muted">Clique nos produtos para adicionar</p>
-              </div>
-            ) : (
-              <>
-                <div className="flex-1 p-4 space-y-2 max-h-64 overflow-y-auto">
-                  {cart.map(item => (
-                    <div key={item.product.id} className="flex items-center gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[12px] font-medium text-text-primary truncate">{item.product.name}</div>
-                        <div className="text-[11px] font-mono text-text-muted">
-                          {formatCurrency(item.product.price)} × {item.qty} = <span className="text-brand-acid font-semibold">{formatCurrency(item.product.price * item.qty)}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button onClick={() => removeFromCart(item.product.id)}
-                          className="w-6 h-6 rounded-sm bg-bg-surface flex items-center justify-center text-text-muted hover:text-text-primary transition-colors">
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="w-5 text-center text-xs font-mono font-bold text-text-primary">{item.qty}</span>
-                        <button onClick={() => addToCart(item.product)}
-                          className="w-6 h-6 rounded-sm bg-bg-surface flex items-center justify-center text-text-muted hover:text-brand-acid transition-colors">
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="p-4 border-t border-bg-border space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-muted">{cartItemCount} item{cartItemCount !== 1 ? 's' : ''}</span>
-                    <span className="font-mono font-bold text-lg text-brand-acid">{formatCurrency(cartTotal)}</span>
-                  </div>
-
-                  {/* Payment method buttons */}
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { label: 'PIX', color: 'text-status-success' },
-                      { label: 'Crédito', color: 'text-brand-blue' },
-                      { label: 'Débito', color: 'text-brand-purple' },
-                    ].map(pm => (
-                      <button key={pm.label} onClick={placeOrder}
-                        className={cn(
-                          'py-3 rounded-sm border border-bg-border text-xs font-bold transition-all hover:scale-105 active:scale-95',
-                          pm.color, 'hover:border-current bg-bg-surface hover:bg-bg-card'
-                        )}>
-                        {pm.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button onClick={placeOrder}
-                    className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm font-bold">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Finalizar pedido
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Form Modal */}
-      {showForm && (
-        <ProductFormModal
-          organizationId={organization!.id}
-          events={events}
-          product={editingProduct}
-          defaultEventId={selectedEventId}
-          onClose={() => { setShowForm(false); setEditingProduct(null) }}
-          onSaved={() => { fetchProducts(); setShowForm(false); setEditingProduct(null) }}
-        />
-      )}
-
-      <ActionConfirmationDialog
-        open={Boolean(pendingDeleteProduct)}
-        title="Remover produto do catalogo"
-        description={pendingDeleteProduct ? `O item ${pendingDeleteProduct.name} sera removido do catalogo e do PDV.` : undefined}
-        impact="Historicos operacionais podem perder a referencia visual deste SKU e a equipe precisara cadastrar novamente para voltar a vender."
-        confirmLabel="Excluir produto"
-        onCancel={() => setPendingDeleteProduct(null)}
-        onConfirm={async () => {
-          if (!pendingDeleteProduct) {
-            return
-          }
-
-          await handleDelete(pendingDeleteProduct.id)
-          setPendingDeleteProduct(null)
-        }}
-      />
+      <ActionConfirmationDialog open={Boolean(pendingDeleteProduct)} title="Excluir item comercial" description={pendingDeleteProduct ? `O item ${pendingDeleteProduct.name} deixara de aparecer no catalogo comercial e no PDV.` : undefined} impact="Historicos antigos podem perder a referencia visual deste item e a equipe precisara cadastrar novamente para voltar a vender." confirmLabel="Excluir item" onCancel={() => setPendingDeleteProduct(null)} onConfirm={async () => { if (!pendingDeleteProduct) return; await handleDelete(pendingDeleteProduct.id); setPendingDeleteProduct(null) }} />
     </div>
   )
 }
 
-/* ── Form Modal ─────────────────────────────────────────────── */
-function ProductFormModal({ organizationId, events, product, defaultEventId, onClose, onSaved }: {
-  organizationId: string
-  events: EventItem[]
-  product: Product | null
-  defaultEventId: string
-  onClose: () => void
-  onSaved: () => void
-}) {
-  const [form, setForm] = useState<ProductForm>(
-    product ? {
-      name: product.name,
-      sku: product.sku ?? '',
-      description: product.description ?? '',
-      category: product.category,
-      price: product.price.toString(),
-      cost_price: product.cost_price?.toString() ?? '',
-      stock_quantity: product.stock_quantity.toString(),
-      stock_alert_threshold: product.stock_alert_threshold?.toString() ?? '',
-    } : { ...EMPTY_FORM }
-  )
+function PdvPanel({ items, view, cart, cartTotal, cartItemCount, orderPlaced, addToCart, removeFromCart, clearCart, placeOrder }: { items: Product[]; view: 'grid' | 'list'; cart: CartItem[]; cartTotal: number; cartItemCount: number; orderPlaced: boolean; addToCart: (product: Product) => void; removeFromCart: (id: string) => void; clearCart: () => void; placeOrder: () => void }) {
+  return <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]"><div>{!items.length ? <div className="card px-6 py-16 text-center text-sm text-text-muted">Nenhum item comercial disponivel neste recorte.</div> : view === 'grid' ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{items.map((product) => { const category = CATEGORY_CONFIG[product.category]; const Icon = category.icon; const soldOut = product.stock_quantity === 0; const cartItem = cart.find((item) => item.product.id === product.id); return <button key={product.id} type="button" onClick={() => addToCart(product)} className={cn('card p-5 text-left transition-all duration-200', soldOut ? 'cursor-not-allowed opacity-45' : 'hover:-translate-y-1 hover:border-brand-acid/30')}><div className="flex items-start justify-between gap-4"><div><div className={cn('inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03]', category.accent)}><Icon className="h-5 w-5" /></div><div className="mt-4 font-display text-[2rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">{product.name}</div><div className="mt-2 text-xs text-text-muted">{category.label}</div></div>{cartItem ? <div className="rounded-full bg-brand-acid px-3 py-1 text-xs font-semibold text-[#090807]">{cartItem.qty}</div> : null}</div><div className="mt-6 flex items-end justify-between"><div className="font-mono text-xl font-bold text-brand-acid">{formatCurrency(product.price)}</div><div className="text-xs text-text-muted">{soldOut ? 'Sem estoque' : `${formatNumber(product.stock_quantity)} disponivel`}</div></div></button> })}</div> : <div className="card overflow-hidden"><table className="w-full"><thead className="border-b border-bg-border"><tr>{['Item', 'Categoria', 'Preco', 'Disponivel', 'Status'].map((header) => <th key={header} className="table-header">{header}</th>)}</tr></thead><tbody>{items.map((product) => <tr key={product.id} className="table-row cursor-pointer" onClick={() => addToCart(product)}><td className="table-cell"><div className="font-medium text-text-primary">{product.name}</div><div className="mt-1 text-xs font-mono text-text-muted">{product.sku || 'Sem SKU'}</div></td><td className="table-cell text-text-secondary">{CATEGORY_CONFIG[product.category].label}</td><td className="table-cell font-mono text-brand-acid">{formatCurrency(product.price)}</td><td className="table-cell font-mono text-text-primary">{formatNumber(product.stock_quantity)}</td><td className="table-cell"><span className={cn('inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]', product.stock_quantity === 0 ? 'bg-status-error/12 text-status-error' : 'bg-status-success/12 text-status-success')}>{product.stock_quantity === 0 ? 'Indisponivel' : 'Vendendo'}</span></td></tr>)}</tbody></table></div>}</div><div className="card sticky top-6 h-fit overflow-hidden"><div className="border-b border-bg-border px-5 py-5"><div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">Caixa rapido</div><div className="mt-3 flex items-center justify-between"><div className="font-display text-[2rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">Pedido</div>{cart.length ? <button type="button" onClick={clearCart} className="text-xs font-medium text-text-muted transition-colors hover:text-status-error">Limpar</button> : null}</div></div>{orderPlaced ? <div className="flex flex-col items-center justify-center gap-4 px-6 py-14"><CheckCircle2 className="h-12 w-12 text-status-success" /><div className="font-display text-[2rem] leading-none text-status-success">Pedido fechado.</div><div className="text-sm text-text-muted">Operacao pronta para o proximo atendimento.</div></div> : !cart.length ? <div className="flex flex-col items-center justify-center gap-4 px-6 py-14 text-center"><ShoppingCart className="h-10 w-10 text-text-muted" /><div className="text-sm leading-7 text-text-muted">Adicione itens do lado esquerdo para montar o pedido da forma mais rapida possivel.</div></div> : <><div className="max-h-[340px] space-y-3 overflow-y-auto px-5 py-5">{cart.map((item) => <div key={item.product.id} className="rounded-[1.4rem] border border-white/8 bg-white/[0.03] px-4 py-4"><div className="flex items-start justify-between gap-3"><div><div className="font-medium text-text-primary">{item.product.name}</div><div className="mt-1 text-xs font-mono text-text-muted">{formatCurrency(item.product.price)} por unidade</div></div><div className="font-mono text-sm text-brand-acid">{formatCurrency(item.product.price * item.qty)}</div></div><div className="mt-4 flex items-center gap-2"><button type="button" onClick={() => removeFromCart(item.product.id)} className="btn-secondary h-9 w-9 rounded-full px-0"><Minus className="h-4 w-4" /></button><div className="min-w-[2rem] text-center font-mono text-sm text-text-primary">{item.qty}</div><button type="button" onClick={() => addToCart(item.product)} className="btn-secondary h-9 w-9 rounded-full px-0"><Plus className="h-4 w-4" /></button></div></div>)}</div><div className="border-t border-bg-border px-5 py-5"><div className="flex items-center justify-between text-sm text-text-secondary"><span>{cartItemCount} item(s)</span><span className="font-mono text-xl font-bold text-brand-acid">{formatCurrency(cartTotal)}</span></div><div className="mt-4 grid grid-cols-3 gap-2">{['PIX', 'Credito', 'Debito'].map((method) => <button key={method} type="button" onClick={placeOrder} className="btn-secondary px-0 py-3 text-xs">{method}</button>)}</div><button type="button" onClick={placeOrder} className="btn-primary mt-4 w-full justify-center"><CheckCircle2 className="h-4 w-4" />Finalizar pedido</button></div></>}</div></div>
+}
+
+function CatalogPanel({ items, view, onEdit, onDelete }: { items: Product[]; view: 'grid' | 'list'; onEdit: (product: Product) => void; onDelete: (product: Product) => void }) {
+  if (!items.length) return <div className="card px-6 py-16 text-center text-sm text-text-muted">Nenhum item cadastrado para este recorte.</div>
+  if (view === 'grid') return <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">{items.map((product) => { const category = CATEGORY_CONFIG[product.category]; const Icon = category.icon; return <div key={product.id} className={cn('card p-5', !product.is_active && 'opacity-55')}><div className="flex items-start justify-between gap-3"><div className={cn('inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03]', category.accent)}><Icon className="h-5 w-5" /></div><div className="flex items-center gap-2"><button type="button" onClick={() => onEdit(product)} className="btn-secondary h-9 w-9 rounded-full px-0"><Edit2 className="h-4 w-4" /></button><button type="button" onClick={() => onDelete(product)} className="btn-secondary h-9 w-9 rounded-full px-0"><Trash2 className="h-4 w-4" /></button></div></div><div className="mt-4 font-display text-[2rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">{product.name}</div><div className="mt-2 text-xs text-text-muted">{product.sku || 'Sem SKU'}</div><div className="mt-6 flex items-center justify-between"><div className="font-mono text-lg font-bold text-brand-acid">{formatCurrency(product.price)}</div><div className="text-xs text-text-secondary">{category.label}</div></div><div className="mt-4 text-xs leading-6 text-text-muted">{product.description || 'Item comercial pronto para venda no PDV.'}</div><div className="mt-5 flex items-center justify-between text-xs"><span className={cn('rounded-full px-3 py-1 font-semibold uppercase tracking-[0.18em]', product.is_active ? 'bg-status-success/12 text-status-success' : 'bg-white/8 text-text-muted')}>{product.is_active ? 'Ativo no PDV' : 'Pausado'}</span><span className="font-mono text-text-secondary">{formatNumber(product.stock_quantity)} un</span></div></div> })}</div>
+  return <div className="card overflow-hidden"><table className="w-full"><thead className="border-b border-bg-border"><tr>{['Item', 'Categoria', 'Preco', 'Disponivel', 'Status', 'Acoes'].map((header) => <th key={header} className="table-header">{header}</th>)}</tr></thead><tbody>{items.map((product) => <tr key={product.id} className={cn('table-row', !product.is_active && 'opacity-55')}><td className="table-cell"><div className="font-medium text-text-primary">{product.name}</div><div className="mt-1 text-xs font-mono text-text-muted">{product.sku || 'Sem SKU'}</div></td><td className="table-cell text-text-secondary">{CATEGORY_CONFIG[product.category].label}</td><td className="table-cell font-mono text-brand-acid">{formatCurrency(product.price)}</td><td className="table-cell font-mono text-text-primary">{formatNumber(product.stock_quantity)}</td><td className="table-cell"><span className={cn('rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]', product.is_active ? 'bg-status-success/12 text-status-success' : 'bg-white/8 text-text-muted')}>{product.is_active ? 'Ativo' : 'Pausado'}</span></td><td className="table-cell"><div className="flex items-center gap-2"><button type="button" onClick={() => onEdit(product)} className="btn-secondary h-9 w-9 rounded-full px-0"><Edit2 className="h-4 w-4" /></button><button type="button" onClick={() => onDelete(product)} className="btn-secondary h-9 w-9 rounded-full px-0"><Trash2 className="h-4 w-4" /></button></div></td></tr>)}</tbody></table></div>
+}
+
+function ProductFormModal({ organizationId, events, product, defaultEventId, onClose, onSaved }: { organizationId: string; events: EventItem[]; product: Product | null; defaultEventId: string; onClose: () => void; onSaved: () => void }) {
+  const [form, setForm] = useState<ProductForm>(product ? { name: product.name, sku: product.sku ?? '', description: product.description ?? '', category: product.category, price: String(product.price), cost_price: product.cost_price ? String(product.cost_price) : '', stock_quantity: String(product.stock_quantity), stock_alert_threshold: product.stock_alert_threshold ? String(product.stock_alert_threshold) : '' } : EMPTY_FORM)
   const [eventId, setEventId] = useState(product?.event_id ?? defaultEventId)
   const [isActive, setIsActive] = useState(product?.is_active ?? true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-
-  const set = (k: keyof ProductForm, v: string) => setForm(f => ({ ...f, [k]: v }))
-
-  const priceNum = parseFloat(form.price) || 0
-  const costNum = parseFloat(form.cost_price) || 0
-  const margin = priceNum > 0 && costNum > 0 ? Math.round(((priceNum - costNum) / priceNum) * 100) : null
-
+  const setField = <K extends keyof ProductForm,>(field: K, value: ProductForm[K]) => setForm((current) => ({ ...current, [field]: value }))
   async function handleSave() {
-    if (!form.name.trim()) { setError('Nome do produto é obrigatório'); return }
-    if (!form.price || isNaN(parseFloat(form.price))) { setError('Preço inválido'); return }
-    if (!form.stock_quantity || isNaN(parseInt(form.stock_quantity))) { setError('Estoque inválido'); return }
+    if (!form.name.trim()) return setError('Nome do item e obrigatorio.')
+    if (!form.price || Number.isNaN(Number(form.price))) return setError('Preco invalido.')
     setSaving(true); setError('')
-
-    const payload = {
-      organization_id: organizationId,
-      event_id: eventId || null,
-      name: form.name.trim(),
-      sku: form.sku || null,
-      description: form.description || null,
-      category: form.category,
-      price: parseFloat(form.price),
-      cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
-      stock_quantity: parseInt(form.stock_quantity),
-      stock_alert_threshold: form.stock_alert_threshold ? parseInt(form.stock_alert_threshold) : null,
-      is_active: isActive,
-    }
-
-    const { error: err } = product
-      ? await supabase.from('products').update(payload).eq('id', product.id)
-      : await supabase.from('products').insert(payload)
-
-    if (err) { setError(err.message); setSaving(false); return }
+    const payload = { organization_id: organizationId, event_id: eventId || null, name: form.name.trim(), sku: form.sku || null, description: form.description || null, category: form.category, price: Number(form.price), cost_price: form.cost_price ? Number(form.cost_price) : null, stock_quantity: Number(form.stock_quantity || 0), stock_alert_threshold: form.stock_alert_threshold ? Number(form.stock_alert_threshold) : null, is_active: isActive }
+    const { error: saveError } = product ? await supabase.from('products').update(payload).eq('id', product.id) : await supabase.from('products').insert(payload)
+    if (saveError) { setError(saveError.message); setSaving(false); return }
     onSaved()
   }
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bg-primary/80 backdrop-blur-sm">
-      <div className="w-full max-w-xl bg-bg-card border border-bg-border rounded-sm overflow-hidden animate-slide-up shadow-card">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-bg-border">
-          <h2 className="font-display text-xl leading-none">
-            {product ? 'EDITAR PRODUTO' : 'NOVO PRODUTO'}<span className="text-brand-acid">.</span>
-          </h2>
-          <button onClick={onClose} className="p-1.5 text-text-muted hover:text-text-primary hover:bg-bg-surface rounded-sm transition-all">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="p-6 space-y-4 max-h-[68vh] overflow-y-auto">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <label className="input-label">Nome do produto *</label>
-              <input className="input" placeholder="ex: Cerveja Long Neck, Camiseta P, Combo VIP..."
-                value={form.name} onChange={e => set('name', e.target.value)} autoFocus />
-            </div>
-            <div>
-              <label className="input-label">SKU / Código</label>
-              <input className="input" placeholder="ex: BAR-001"
-                value={form.sku} onChange={e => set('sku', e.target.value)} />
-            </div>
-            <div>
-              <label className="input-label">Categoria</label>
-              <select className="input" value={form.category} onChange={e => set('category', e.target.value as ProductCategory)}>
-                {Object.entries(CATEGORY_CONFIG).map(([k, v]) => (
-                  <option key={k} value={k}>{v.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {events.length > 0 && (
-            <div>
-              <label className="input-label">Evento vinculado</label>
-              <select className="input" value={eventId} onChange={e => setEventId(e.target.value)}>
-                <option value="">Nenhum (catálogo geral)</option>
-                {events.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-              </select>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="input-label">Preço de venda (R$) *</label>
-              <input type="number" className="input" placeholder="0,00" min={0} step={0.01}
-                value={form.price} onChange={e => set('price', e.target.value)} />
-            </div>
-            <div>
-              <label className="input-label">Preço de custo (R$)</label>
-              <input type="number" className="input" placeholder="0,00" min={0} step={0.01}
-                value={form.cost_price} onChange={e => set('cost_price', e.target.value)} />
-            </div>
-          </div>
-
-          {margin !== null && (
-            <div className="flex items-center gap-2 p-2 bg-status-success/8 border border-status-success/20 rounded-sm text-xs text-status-success">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Margem de lucro: <span className="font-bold">{margin}%</span>
-              <span className="text-text-muted ml-1">({formatCurrency(priceNum - costNum)} por unidade)</span>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="input-label">Estoque inicial *</label>
-              <input type="number" className="input" placeholder="ex: 100" min={0}
-                value={form.stock_quantity} onChange={e => set('stock_quantity', e.target.value)} />
-            </div>
-            <div>
-              <label className="input-label">Alerta quando abaixo de</label>
-              <input type="number" className="input" placeholder="ex: 10" min={0}
-                value={form.stock_alert_threshold} onChange={e => set('stock_alert_threshold', e.target.value)} />
-            </div>
-          </div>
-
-          <div>
-            <label className="input-label">Descrição</label>
-            <textarea className="input resize-none" rows={2}
-              placeholder="Detalhes opcionais do produto..."
-              value={form.description} onChange={e => set('description', e.target.value)} />
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-bg-surface rounded-sm border border-bg-border">
-            <span className="text-sm text-text-secondary">Disponível no PDV</span>
-            <button onClick={() => setIsActive(!isActive)}
-              className={cn('w-9 h-5 rounded-full transition-all duration-200 relative flex-shrink-0', isActive ? 'bg-brand-acid' : 'bg-bg-border')}>
-              <span className={cn('absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all duration-200', isActive ? 'left-4' : 'left-0.5')} />
-            </button>
-          </div>
-
-          {error && (
-            <div className="flex items-center gap-2 text-xs text-status-error bg-status-error/8 border border-status-error/20 rounded-sm px-3 py-2.5">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />{error}
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between px-6 py-4 border-t border-bg-border">
-          <button onClick={onClose} className="btn-secondary text-sm">Cancelar</button>
-          <button onClick={handleSave} disabled={saving}
-            className="btn-primary flex items-center gap-2 text-sm min-w-[140px] justify-center">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : (product ? '✓ Salvar' : '✓ Criar produto')}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+  return <div className="fixed inset-0 z-[90] flex items-center justify-center bg-[rgba(7,6,7,0.76)] p-4 backdrop-blur-md"><div className="w-full max-w-3xl overflow-hidden rounded-[2rem] border border-white/8 bg-[#12100f] shadow-[0_30px_120px_rgba(0,0,0,0.62)]"><div className="flex items-start justify-between border-b border-white/6 px-6 py-5"><div><div className="text-[10px] uppercase tracking-[0.34em] text-[#ae936f]">Catalogo comercial</div><div className="mt-3 font-display text-[2.3rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">{product ? 'Editar item.' : 'Novo item.'}</div><p className="mt-3 text-sm leading-6 text-text-muted">Cadastre o item para venda. Saldo e threshold existem para apoio, mas a leitura operacional profunda sai para Estoque.</p></div><button type="button" onClick={onClose} className="btn-secondary h-10 w-10 rounded-full px-0"><X className="h-4 w-4" /></button></div><div className="grid gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_280px]"><div className="space-y-4"><div className="grid gap-4 md:grid-cols-2"><div className="md:col-span-2"><label className="input-label">Nome do item</label><input className="input" value={form.name} onChange={(event) => setField('name', event.target.value)} placeholder="Ex: Combo premium, agua, camiseta" /></div><div><label className="input-label">SKU</label><input className="input" value={form.sku} onChange={(event) => setField('sku', event.target.value)} placeholder="Ex: PDV-001" /></div><div><label className="input-label">Categoria</label><select className="input" value={form.category} onChange={(event) => setField('category', event.target.value as ProductCategory)}>{Object.entries(CATEGORY_CONFIG).map(([key, config]) => <option key={key} value={key}>{config.label}</option>)}</select></div></div>{events.length ? <div><label className="input-label">Evento vinculado</label><select className="input" value={eventId} onChange={(event) => setEventId(event.target.value)}><option value="">Catalogo geral</option>{events.map((event) => <option key={event.id} value={event.id}>{event.name}</option>)}</select></div> : null}<div className="grid gap-4 md:grid-cols-2"><div><label className="input-label">Preco de venda</label><input className="input" type="number" min={0} step={0.01} value={form.price} onChange={(event) => setField('price', event.target.value)} /></div><div><label className="input-label">Preco de custo</label><input className="input" type="number" min={0} step={0.01} value={form.cost_price} onChange={(event) => setField('cost_price', event.target.value)} /></div></div><div className="grid gap-4 md:grid-cols-2"><div><label className="input-label">Saldo inicial</label><input className="input" type="number" min={0} value={form.stock_quantity} onChange={(event) => setField('stock_quantity', event.target.value)} /></div><div><label className="input-label">Threshold de alerta</label><input className="input" type="number" min={0} value={form.stock_alert_threshold} onChange={(event) => setField('stock_alert_threshold', event.target.value)} /></div></div><div><label className="input-label">Descricao</label><textarea className="input min-h-[120px] resize-y" value={form.description} onChange={(event) => setField('description', event.target.value)} /></div></div><div className="space-y-4"><div className="card p-5"><div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">Checklist rapido</div><div className="mt-4 space-y-3 text-sm leading-6 text-text-secondary"><div>1. Nomeie o item de forma clara para o operador.</div><div>2. Defina o preco comercial.</div><div>3. Ative apenas se puder vender agora.</div></div></div><div className="card p-5"><div className="flex items-center justify-between"><span className="text-sm font-medium text-text-primary">Disponivel no PDV</span><button type="button" onClick={() => setIsActive((current) => !current)} className={cn('relative h-7 w-14 rounded-full transition-all', isActive ? 'bg-brand-acid' : 'bg-white/10')}><span className={cn('absolute top-1 h-5 w-5 rounded-full bg-white transition-all', isActive ? 'left-8' : 'left-1')} /></button></div><div className="mt-3 text-xs leading-6 text-text-muted">Ativar coloca o item no PDV. Pausar remove do caixa sem apagar o cadastro.</div></div>{error ? <div className="rounded-[1.4rem] border border-status-error/20 bg-status-error/10 px-4 py-3 text-sm text-status-error">{error}</div> : null}</div></div><div className="flex items-center justify-between border-t border-white/6 px-6 py-5"><button type="button" onClick={onClose} className="btn-secondary">Cancelar</button><button type="button" onClick={handleSave} disabled={saving} className="btn-primary min-w-[160px] justify-center">{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}{saving ? 'Salvando...' : product ? 'Salvar item' : 'Criar item'}</button></div></div></div>
 }

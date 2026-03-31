@@ -1,6 +1,7 @@
 import { Suspense, lazy, useState } from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
+import { OperationalAssistant } from '@/features/ai/OperationalAssistant'
 import { AdminShell, LoadingState } from '@/shared/components'
 import { useAppLocale } from '@/shared/i18n/app-locale'
 import { MotionPage } from '@/shared/motion'
@@ -16,6 +17,7 @@ const CheckinPage = lazy(() => import('@/pages/CheckinPage').then((module) => ({
 const StaffPage = lazy(() => import('@/pages/StaffPage').then((module) => ({ default: module.StaffPage })))
 const SuppliersPage = lazy(() => import('@/pages/SuppliersPage').then((module) => ({ default: module.SuppliersPage })))
 const ProductsPage = lazy(() => import('@/pages/ProductsPage').then((module) => ({ default: module.ProductsPage })))
+const InventoryPage = lazy(() => import('@/pages/InventoryPage').then((module) => ({ default: module.InventoryPage })))
 const IntelligencePage = lazy(() => import('@/pages/IntelligencePage').then((module) => ({ default: module.IntelligencePage })))
 const FinancialPage = lazy(() => import('@/pages/FinancialPage').then((module) => ({ default: module.FinancialPage })))
 const BillingPage = lazy(() => import('@/pages/BillingPage').then((module) => ({ default: module.BillingPage })))
@@ -55,8 +57,9 @@ function renderSection(activeSection: NavSection) {
     case 'suppliers':
       return <SuppliersPage />
     case 'products':
-    case 'inventory':
       return <ProductsPage />
+    case 'inventory':
+      return <InventoryPage />
     case 'intelligence':
       return <IntelligencePage />
     case 'financial':
@@ -79,20 +82,26 @@ function renderSection(activeSection: NavSection) {
 export function AppShellV2() {
   const [activeSection, setActiveSection] = useState<NavSection>(defaultNavSection)
   const sidebarOpen = useUIStore((state) => state.sidebarOpen)
+  const setSidebarOpen = useUIStore((state) => state.setSidebarOpen)
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
+
+  function handleNavigate(section: NavSection) {
+    setActiveSection(section)
+    setSidebarOpen(false)
+  }
 
   return (
     <AdminShell>
       <Sidebar
         activeSection={activeSection}
-        onNavigate={setActiveSection}
+        onNavigate={handleNavigate}
         isOpen={sidebarOpen}
-        onToggle={toggleSidebar}
+        onClose={() => setSidebarOpen(false)}
       />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar
           onMenuToggle={toggleSidebar}
-          onNavigate={setActiveSection}
+          onNavigate={handleNavigate}
           activeSection={activeSection}
         />
         <main className="relative flex-1 overflow-y-auto">
@@ -104,6 +113,7 @@ export function AppShellV2() {
           </div>
         </main>
       </div>
+      <OperationalAssistant activeSection={activeSection} onNavigate={handleNavigate} />
     </AdminShell>
   )
 }

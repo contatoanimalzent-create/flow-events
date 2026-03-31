@@ -62,7 +62,20 @@ export function HelpPage() {
           <span className="text-brand-acid">.</span>
         </h1>
         <p className="text-xs font-mono tracking-wider text-text-muted">
-          {t('Documentation, guides and support', 'Documentacao, guias e suporte')}
+          {t('AI assistance, guides and support', 'AI assistente, guias e suporte')}
+        </p>
+      </div>
+
+      <div className="mb-6 card p-6">
+        <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">{t('Operational AI', 'AI operacional')}</div>
+        <h2 className="mt-3 font-display text-3xl leading-none text-text-primary">
+          {t('Help inside every module.', 'Ajuda dentro de cada modulo.')}
+        </h2>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-text-secondary">
+          {t(
+            'Open the AI assistant in the admin shell to ask where to work, how to register staff, when to use POS, or how to separate sales from inventory.',
+            'Abra a AI no shell interno para perguntar onde operar, como cadastrar staff, quando usar PDV ou como separar venda de estoque.',
+          )}
         </p>
       </div>
 

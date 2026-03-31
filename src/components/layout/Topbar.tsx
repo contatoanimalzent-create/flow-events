@@ -134,7 +134,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
 
             <button
               onClick={onMenuToggle}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-[#ebe7e0] transition-all hover:border-[#ae936f]/25 hover:text-[#ae936f]"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-[#ebe7e0] transition-all hover:border-[#ae936f]/25 hover:text-[#ae936f] lg:hidden"
               title={t('Open navigation', 'Abrir navegacao')}
             >
               <Menu className="h-4 w-4" />

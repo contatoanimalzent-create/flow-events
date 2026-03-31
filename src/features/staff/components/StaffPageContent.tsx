@@ -58,12 +58,12 @@ export function StaffPageContent() {
     <div className="admin-page">
       <div className="admin-header">
         <div>
-          <div className="admin-eyebrow">Operations workforce</div>
+          <div className="admin-eyebrow">Operacao de pessoas</div>
           <h1 className="admin-title">
             Staff<span className="admin-title-accent">.</span>
           </h1>
           <p className="admin-subtitle">
-            {stats.total} membro{stats.total !== 1 ? 's' : ''}
+            Cadastre pessoas da operacao, defina area e turno, e libere acesso operacional com clareza. Use Staff para equipe; use Credenciamento para publico.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -81,9 +81,49 @@ export function StaffPageContent() {
               }}
               className="btn-primary flex items-center gap-2"
             >
-              <Plus className="h-4 w-4" /> Adicionar
+              <Plus className="h-4 w-4" /> Cadastrar membro
             </button>
           ) : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        {[
+          {
+            title: '1. Identificacao',
+            description: 'Nome, contato e documento para o time saber exatamente quem esta entrando na operacao.',
+          },
+          {
+            title: '2. Alocacao',
+            description: 'Defina funcao, area, turno e portaria para a pessoa cair no lugar certo sem retrabalho.',
+          },
+          {
+            title: '3. Acesso',
+            description: 'Libere permissoes, emita credencial e acompanhe presenca direto da mesma area.',
+          },
+        ].map((item) => (
+          <div key={item.title} className="card p-5">
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">{item.title}</div>
+            <p className="mt-4 text-sm leading-7 text-text-secondary">{item.description}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="card p-5">
+        <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">Quando usar este modulo</div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          <div>
+            <div className="font-medium text-text-primary">Staff</div>
+            <div className="mt-2 text-sm leading-7 text-text-muted">Equipe, escala, credencial, presencia e permissao operacional.</div>
+          </div>
+          <div>
+            <div className="font-medium text-text-primary">Credenciamento</div>
+            <div className="mt-2 text-sm leading-7 text-text-muted">Fluxo de acesso do publico, validacao e leitura de entrada.</div>
+          </div>
+          <div>
+            <div className="font-medium text-text-primary">Fornecedores</div>
+            <div className="mt-2 text-sm leading-7 text-text-muted">Parceiros externos, contratos e execucao terceirizada.</div>
+          </div>
         </div>
       </div>
 
@@ -143,7 +183,7 @@ export function StaffPageContent() {
           action={
             !search && statusFilter === 'all' && canManageStaff ? (
               <button onClick={() => setShowForm(true)} className="btn-primary">
-                + Adicionar
+                + Cadastrar membro
               </button>
             ) : undefined
           }

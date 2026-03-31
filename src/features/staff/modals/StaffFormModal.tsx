@@ -64,7 +64,7 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
             <span className="admin-title-accent">.</span>
           </>
         }
-        subtitle="Cadastro operacional de equipe com alocacao, turno e permissoes."
+        subtitle="Cadastre em tres blocos: identificacao, alocacao operacional e acesso."
         onClose={onClose}
       />
 
@@ -75,6 +75,15 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
       ) : (
         <>
           <ModalBody>
+            <div className="mb-6 rounded-[24px] border border-bg-border bg-bg-secondary/55 p-4">
+              <div className="text-[11px] uppercase tracking-[0.28em] text-[#ae936f]">Ordem recomendada</div>
+              <div className="mt-3 grid gap-3 md:grid-cols-3">
+                <div className="text-sm leading-6 text-text-secondary">1. Preencha dados basicos para identificar a pessoa.</div>
+                <div className="text-sm leading-6 text-text-secondary">2. Defina funcao, area, turno e portaria de trabalho.</div>
+                <div className="text-sm leading-6 text-text-secondary">3. Libere permissoes e observacoes para a operacao.</div>
+              </div>
+            </div>
+
             <FormSection title="Dados pessoais">
               <div className="space-y-4">
                 {rows.slice(0, 3).map((row, rowIndex) => (

@@ -73,8 +73,8 @@ export function HelpPage() {
         </h2>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-text-secondary">
           {t(
-            'Open the AI assistant in the admin shell to ask where to work, how to register staff, when to use POS, or how to separate sales from inventory.',
-            'Abra a AI no shell interno para perguntar onde operar, como cadastrar staff, quando usar PDV ou como separar venda de estoque.',
+            'Open the AI assistant in the admin shell to ask where to work, how to register staff, when to use POS, or how to separate sales from inventory. It now keeps operational memory from previous questions to improve the next answers.',
+            'Abra a AI no shell interno para perguntar onde operar, como cadastrar staff, quando usar PDV ou como separar venda de estoque. Ela agora guarda memoria operacional das duvidas anteriores para responder melhor nas proximas.',
           )}
         </p>
       </div>

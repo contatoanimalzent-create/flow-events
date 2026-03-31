@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react'
-import { ArrowRight, Bot, MessageSquare, Send, Sparkles, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowRight, Bot, Loader2, MessageSquare, Send, Sparkles, X } from 'lucide-react'
 import type { NavSection } from '@/app/layout'
+import { useAuthStore } from '@/features/auth'
+import { assistantService } from '@/features/ai/services/assistant.service'
 import { cn } from '@/shared/lib'
 
 interface OperationalAssistantProps {
@@ -8,16 +10,12 @@ interface OperationalAssistantProps {
   onNavigate: (section: NavSection) => void
 }
 
-interface AssistantReply {
-  content: string
-  actions?: Array<{ label: string; section: NavSection }>
-}
-
 interface AssistantMessage {
   id: string
   role: 'assistant' | 'user'
   content: string
   actions?: Array<{ label: string; section: NavSection }>
+  meta?: string
 }
 
 const SECTION_TITLES: Record<NavSection, string> = {
@@ -60,139 +58,212 @@ const SECTION_PROMPTS: Record<NavSection, string[]> = {
   settings: ['Onde ajustar marca?', 'Como trocar dominio?', 'Como rever permissoes?'],
 }
 
-function createDefaultReply(section: NavSection): AssistantReply {
-  const title = SECTION_TITLES[section]
-
-  switch (section) {
-    case 'products':
-      return {
-        content:
-          'Aqui voce vende. Use PDV para montar o catalogo comercial, abrir pedido rapido e treinar a equipe de caixa. Se a sua duvida for saldo, ruptura ou reposicao, a area certa e Estoque.',
-        actions: [
-          { label: 'Abrir Estoque', section: 'inventory' },
-          { label: 'Abrir Staff', section: 'staff' },
-        ],
-      }
-    case 'inventory':
-      return {
-        content:
-          'Aqui voce controla disponibilidade. Estoque serve para entender saldo, ruptura, prioridade de reposicao e valor parado. Venda rapida e operacao de caixa continuam no PDV.',
-        actions: [
-          { label: 'Abrir PDV', section: 'products' },
-          { label: 'Abrir Financeiro', section: 'financial' },
-        ],
-      }
-    case 'staff':
-      return {
-        content:
-          'Staff e o modulo de pessoas da operacao. Cadastre dados basicos, defina area e turno, depois libere permissoes e credencial. Publico entra por Credenciamento; equipe opera por Staff.',
-        actions: [
-          { label: 'Abrir Credenciamento', section: 'checkin' },
-          { label: 'Abrir Ajuda', section: 'help' },
-        ],
-      }
-    default:
-      return {
-        content: `Estou olhando ${title}. Posso te orientar sobre o objetivo desse modulo, o proximo passo operacional e qual outra area usar quando essa nao for a tela certa.`,
-        actions: [
-          { label: 'Abrir Ajuda', section: 'help' },
-          { label: 'Voltar ao Painel', section: 'dashboard' },
-        ],
-      }
-  }
-}
-
-function generateReply(query: string, section: NavSection): AssistantReply {
+function buildSuggestedActions(query: string, section: NavSection) {
   const normalized = query.toLowerCase()
 
   if (normalized.includes('pdv') || normalized.includes('venda') || normalized.includes('caixa')) {
-    return {
-      content:
-        'PDV fica responsavel por vender rapido: selecionar item, montar pedido, cobrar e concluir atendimento. Quando a pergunta for saldo disponivel, alerta de ruptura ou reposicao, use Estoque.',
-      actions: [{ label: 'Ir para PDV', section: 'products' }, { label: 'Ir para Estoque', section: 'inventory' }],
-    }
+    return [
+      { label: 'Ir para PDV', section: 'products' as const },
+      { label: 'Ir para Estoque', section: 'inventory' as const },
+    ]
   }
 
   if (normalized.includes('estoque') || normalized.includes('ruptura') || normalized.includes('repos')) {
-    return {
-      content:
-        'Estoque e o centro de controle dos itens. Ele mostra saldo, threshold, itens criticos e risco operacional. O time comercial continua vendendo no PDV, sem misturar a leitura.',
-      actions: [{ label: 'Abrir Estoque', section: 'inventory' }, { label: 'Abrir Financeiro', section: 'financial' }],
-    }
+    return [
+      { label: 'Abrir Estoque', section: 'inventory' as const },
+      { label: 'Abrir Financeiro', section: 'financial' as const },
+    ]
   }
 
   if (normalized.includes('staff') || normalized.includes('equipe') || normalized.includes('cadastro') || normalized.includes('credencial')) {
-    return {
-      content:
-        'Para staff, pense em tres passos: identificar a pessoa, alocar em area e turno, e liberar acesso operacional. Se a pessoa vai operar o evento, ela nasce em Staff; se vai apenas entrar no evento, a logica e outra.',
-      actions: [{ label: 'Abrir Staff', section: 'staff' }, { label: 'Abrir Credenciamento', section: 'checkin' }],
-    }
+    return [
+      { label: 'Abrir Staff', section: 'staff' as const },
+      { label: 'Abrir Credenciamento', section: 'checkin' as const },
+    ]
   }
 
-  if (normalized.includes('financeiro') || normalized.includes('margem') || normalized.includes('repasse')) {
-    return {
-      content:
-        'Financeiro concentra margem, repasse e fechamento. Use esta area para leitura de resultado; PDV e Estoque alimentam a operacao, mas o fechamento acontece no Financeiro.',
-      actions: [{ label: 'Abrir Financeiro', section: 'financial' }, { label: 'Abrir PDV', section: 'products' }],
-    }
+  if (section === 'products') {
+    return [
+      { label: 'Abrir Estoque', section: 'inventory' as const },
+      { label: 'Abrir Staff', section: 'staff' as const },
+    ]
   }
 
-  if (normalized.includes('onde') || normalized.includes('qual') || normalized.includes('usar')) {
-    return createDefaultReply(section)
+  if (section === 'inventory') {
+    return [
+      { label: 'Abrir PDV', section: 'products' as const },
+      { label: 'Abrir Financeiro', section: 'financial' as const },
+    ]
   }
 
-  return {
-    content:
-      'Posso te orientar com proximo passo, diferenca entre modulos e fluxo operacional. Se quiser ir direto ao ponto, pergunte por cadastro de staff, venda no PDV, ruptura de estoque ou leitura financeira.',
-    actions: createDefaultReply(section).actions,
+  if (section === 'staff') {
+    return [
+      { label: 'Abrir Credenciamento', section: 'checkin' as const },
+      { label: 'Abrir Ajuda', section: 'help' as const },
+    ]
   }
+
+  return [
+    { label: 'Abrir Ajuda', section: 'help' as const },
+    { label: 'Voltar ao Painel', section: 'dashboard' as const },
+  ]
+}
+
+function buildFallbackReply(query: string, section: NavSection) {
+  const normalized = query.toLowerCase()
+
+  if (normalized.includes('pdv') || normalized.includes('venda') || normalized.includes('caixa')) {
+    return 'PDV fica responsavel por vender rapido: selecionar item, montar pedido, cobrar e concluir atendimento. Quando a pergunta for saldo disponivel, alerta de ruptura ou reposicao, use Estoque.'
+  }
+
+  if (normalized.includes('estoque') || normalized.includes('ruptura') || normalized.includes('repos')) {
+    return 'Estoque e o centro de controle dos itens. Ele mostra saldo, threshold, itens criticos e risco operacional. O time comercial continua vendendo no PDV, sem misturar a leitura.'
+  }
+
+  if (normalized.includes('staff') || normalized.includes('equipe') || normalized.includes('cadastro') || normalized.includes('credencial')) {
+    return 'Para staff, pense em tres passos: identificar a pessoa, alocar em area e turno, e liberar acesso operacional. Se a pessoa vai operar o evento, ela nasce em Staff; se vai apenas entrar no evento, a logica e outra.'
+  }
+
+  return `Estou olhando ${SECTION_TITLES[section]}. Posso te orientar sobre o objetivo desse modulo, o proximo passo operacional e qual outra area usar quando essa nao for a tela certa.`
+}
+
+function getConversationStorageKey(organizationId?: string | null) {
+  return `animalz-operational-ai-thread:${organizationId ?? 'global'}`
+}
+
+function createConversationId() {
+  if (typeof window !== 'undefined' && window.crypto?.randomUUID) {
+    return window.crypto.randomUUID()
+  }
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
+    const random = Math.floor(Math.random() * 16)
+    const value = character === 'x' ? random : (random & 0x3) | 0x8
+    return value.toString(16)
+  })
 }
 
 export function OperationalAssistant({ activeSection, onNavigate }: OperationalAssistantProps) {
+  const organization = useAuthStore((state) => state.organization)
+  const profile = useAuthStore((state) => state.profile)
+  const user = useAuthStore((state) => state.user)
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const defaultReply = useMemo(() => createDefaultReply(activeSection), [activeSection])
-  const [messages, setMessages] = useState<AssistantMessage[]>([
-    {
-      id: 'assistant-welcome',
-      role: 'assistant',
-      content: defaultReply.content,
-      actions: defaultReply.actions,
-    },
-  ])
+  const [isLoading, setIsLoading] = useState(false)
+  const [conversationId, setConversationId] = useState('')
+  const [messages, setMessages] = useState<AssistantMessage[]>([])
 
   const promptSuggestions = SECTION_PROMPTS[activeSection]
+  const welcomeMessage = useMemo<AssistantMessage>(() => {
+    const section = SECTION_TITLES[activeSection]
 
-  function pushAssistantReply(reply: AssistantReply) {
-    setMessages((current) => [
-      ...current,
-      {
-        id: `assistant-${Date.now()}`,
-        role: 'assistant',
-        content: reply.content,
-        actions: reply.actions,
-      },
-    ])
-  }
-
-  function handlePrompt(prompt: string) {
-    const userMessage: AssistantMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: prompt,
+    return {
+      id: `assistant-welcome-${activeSection}`,
+      role: 'assistant',
+      content: `Estou acompanhando ${section}. Posso te orientar no modulo atual, diferenciar areas parecidas do produto e usar a memoria das duvidas anteriores da operacao para responder melhor.`,
+      actions: buildSuggestedActions(section, activeSection),
+      meta: 'Memoria operacional ativa',
     }
+  }, [activeSection])
 
-    setMessages((current) => [...current, userMessage])
-    pushAssistantReply(generateReply(prompt, activeSection))
-  }
+  useEffect(() => {
+    setMessages((current) => {
+      if (!current.length) {
+        return [welcomeMessage]
+      }
 
-  function handleSubmit() {
-    if (!query.trim()) {
+      const first = current[0]
+      if (first?.id?.startsWith('assistant-welcome-')) {
+        return [welcomeMessage, ...current.slice(1)]
+      }
+
+      return [welcomeMessage, ...current]
+    })
+  }, [welcomeMessage])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
       return
     }
 
-    handlePrompt(query.trim())
+    const storageKey = getConversationStorageKey(organization?.id)
+    const existing = window.localStorage.getItem(storageKey)
+
+    if (existing) {
+      setConversationId(existing)
+      return
+    }
+
+    const nextConversationId = createConversationId()
+    window.localStorage.setItem(storageKey, nextConversationId)
+    setConversationId(nextConversationId)
+  }, [organization?.id])
+
+  async function askAssistant(prompt: string) {
+    const trimmedPrompt = prompt.trim()
+
+    if (!trimmedPrompt) {
+      return
+    }
+
+    const userMessage: AssistantMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: trimmedPrompt,
+    }
+
+    setMessages((current) => [...current, userMessage])
+    setIsLoading(true)
+
+    try {
+      if (!organization?.id || !conversationId) {
+        throw new Error('AI ainda sem contexto da organizacao')
+      }
+
+      const result = await assistantService.ask({
+        message: trimmedPrompt,
+        section: activeSection,
+        conversationId,
+        organizationId: organization.id,
+        organizationName: organization.name,
+        userId: user?.id ?? profile?.id ?? null,
+        userRole: profile?.role ?? null,
+      })
+
+      setMessages((current) => [
+        ...current,
+        {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          content: result.content,
+          actions: buildSuggestedActions(trimmedPrompt, activeSection),
+          meta: result.learnedFromMemories > 0 ? `Aprendeu com ${result.learnedFromMemories} memoria(s)` : 'Nova memoria registrada',
+        },
+      ])
+    } catch (error) {
+      setMessages((current) => [
+        ...current,
+        {
+          id: `assistant-fallback-${Date.now()}`,
+          role: 'assistant',
+          content: buildFallbackReply(trimmedPrompt, activeSection),
+          actions: buildSuggestedActions(trimmedPrompt, activeSection),
+          meta: 'Fallback local enquanto a chave nova nao entra',
+        },
+      ])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  async function handleSubmit() {
+    if (!query.trim() || isLoading) {
+      return
+    }
+
+    const prompt = query.trim()
     setQuery('')
+    await askAssistant(prompt)
   }
 
   return (
@@ -224,7 +295,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                   {SECTION_TITLES[activeSection]}
                 </h3>
                 <p className="mt-3 text-sm leading-6 text-[#b8b0a8]/72">
-                  Responde duvidas rapidas e te aponta o modulo certo da operacao.
+                  Presente no app inteiro, com memoria das duvidas operacionais da sua equipe.
                 </p>
               </div>
               <button
@@ -243,8 +314,9 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                 <button
                   key={prompt}
                   type="button"
-                  onClick={() => handlePrompt(prompt)}
-                  className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-xs font-medium text-[#b8b0a8] transition-all hover:border-[#ae936f]/25 hover:text-[#ebe7e0]"
+                  onClick={() => void askAssistant(prompt)}
+                  disabled={isLoading}
+                  className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-xs font-medium text-[#b8b0a8] transition-all hover:border-[#ae936f]/25 hover:text-[#ebe7e0] disabled:opacity-45"
                 >
                   {prompt}
                 </button>
@@ -267,6 +339,8 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                 </div>
                 <p>{message.content}</p>
 
+                {message.meta ? <div className="mt-3 text-[11px] uppercase tracking-[0.2em] text-[#8e847d]">{message.meta}</div> : null}
+
                 {message.actions?.length ? (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {message.actions.map((action) => (
@@ -284,6 +358,15 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                 ) : null}
               </div>
             ))}
+
+            {isLoading ? (
+              <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] px-4 py-4 text-sm text-[#ebe7e0]">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-4 w-4 animate-spin text-[#ae936f]" />
+                  Pensando com base no contexto do app e nas memorias anteriores...
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div className="border-t border-white/6 px-5 py-4">
@@ -293,7 +376,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') {
-                    handleSubmit()
+                    void handleSubmit()
                   }
                 }}
                 placeholder="Pergunte sobre modulo, fluxo ou proximo passo..."
@@ -301,8 +384,9 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
               />
               <button
                 type="button"
-                onClick={handleSubmit}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#d62a0b] text-[#090807] transition-all hover:-translate-y-0.5"
+                onClick={() => void handleSubmit()}
+                disabled={isLoading}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#d62a0b] text-[#090807] transition-all hover:-translate-y-0.5 disabled:opacity-45"
               >
                 <Send className="h-4 w-4" />
               </button>

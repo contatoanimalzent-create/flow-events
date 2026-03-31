@@ -45,7 +45,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
     null
 
   const heroPoster = getEventCover(heroEvent)
-  const heroVideoSrc = '/videos/hero.mp4'
+  const heroVideoSrc = '/videos/video.mp4'
 
   const stats = useMemo(
     () => [

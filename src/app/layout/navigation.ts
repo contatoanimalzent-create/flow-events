@@ -16,5 +16,7 @@ export type NavSection =
   | 'growth'
   | 'help'
   | 'settings'
+  | 'registrations'
+  | 'sponsors'
 
 export const defaultNavSection: NavSection = 'dashboard'

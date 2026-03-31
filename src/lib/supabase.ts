@@ -76,6 +76,8 @@ export type Database = {
       campaign_automation_rules:        { Row: CampaignAutomationRule;         Insert: Partial<CampaignAutomationRule>;         Update: Partial<CampaignAutomationRule> }
       campaign_automation_executions:   { Row: CampaignAutomationExecution;    Insert: Partial<CampaignAutomationExecution>;    Update: Partial<CampaignAutomationExecution> }
       event_assets:                     { Row: EventAsset;                     Insert: Partial<EventAsset>;                     Update: Partial<EventAsset> }
+      capital_strike_registrations:     { Row: CapitalStrikeRegistration;      Insert: Partial<CapitalStrikeRegistration>;      Update: Partial<CapitalStrikeRegistration> }
+      sponsors:                         { Row: Sponsor;                        Insert: Partial<Sponsor>;                        Update: Partial<Sponsor> }
     }
   }
 }
@@ -1050,19 +1052,62 @@ export interface EventAsset {
   asset_type: AssetType
   usage_type: AssetUsage
   provider: AssetProvider
-  provider_asset_id?: string | null   // Cloudinary public_id, S3 key, etc.
+  provider_asset_id?: string | null
   url: string
   secure_url?: string | null
   thumbnail_url?: string | null
   width?: number | null
   height?: number | null
-  duration?: number | null             // seconds (video only)
+  duration?: number | null
   mime_type?: string | null
   alt_text?: string | null
   caption?: string | null
   sort_order: number
   is_active: boolean
   created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ─── Inscricoes (External Registrations — Capital Strike) ────────────────────
+
+export type CapitalStrikeArmy = 'coalizao' | 'alianca'
+
+export interface CapitalStrikeRegistration {
+  id: string
+  full_name: string
+  cpf: string
+  email: string
+  phone: string
+  mother_name: string
+  address: string
+  squad?: string | null
+  army: CapitalStrikeArmy
+  created_at: string
+  updated_at?: string | null
+}
+
+// ─── Sponsors ────────────────────────────────────────────────────────────────
+
+export type SponsorTier = 'title' | 'gold' | 'silver' | 'bronze' | 'media' | 'support'
+export type SponsorStatus = 'prospect' | 'negotiating' | 'confirmed' | 'active' | 'completed' | 'cancelled'
+
+export interface Sponsor {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  company_name: string
+  contact_name?: string | null
+  contact_email?: string | null
+  contact_phone?: string | null
+  tier: SponsorTier
+  status: SponsorStatus
+  investment_value?: number | null
+  deliverables?: string | null
+  logo_url?: string | null
+  website_url?: string | null
+  notes?: string | null
+  contract_signed_at?: string | null
   created_at: string
   updated_at: string
 }

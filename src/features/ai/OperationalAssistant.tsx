@@ -36,6 +36,8 @@ const SECTION_TITLES: Record<NavSection, string> = {
   growth: 'Crescimento',
   help: 'Ajuda',
   settings: 'Configuracoes',
+  registrations: 'Inscricoes',
+  sponsors: 'Patrocinios',
 }
 
 const SECTION_PROMPTS: Record<NavSection, string[]> = {
@@ -56,6 +58,8 @@ const SECTION_PROMPTS: Record<NavSection, string[]> = {
   growth: ['Como ativar aquisicao?', 'Onde acompanho canais?', 'Como ler retorno?'],
   help: ['Quero ajuda geral', 'Quais modulos devo usar?', 'Como treinar a equipe?'],
   settings: ['Onde ajustar marca?', 'Como trocar dominio?', 'Como rever permissoes?'],
+  registrations: ['Como ver inscricoes do Capital Strike?', 'Como filtrar por exercito?', 'Como exportar lista?'],
+  sponsors: ['Como organizar cotas?', 'Onde acompanho patrocinadores ativos?', 'Como registrar entregas de marca?'],
 }
 
 function buildSuggestedActions(query: string, section: NavSection) {
@@ -82,6 +86,13 @@ function buildSuggestedActions(query: string, section: NavSection) {
     ]
   }
 
+  if (normalized.includes('patrocin') || normalized.includes('cota') || normalized.includes('marca parceira')) {
+    return [
+      { label: 'Abrir Patrocinios', section: 'sponsors' as const },
+      { label: 'Abrir Financeiro', section: 'financial' as const },
+    ]
+  }
+
   if (section === 'products') {
     return [
       { label: 'Abrir Estoque', section: 'inventory' as const },
@@ -100,6 +111,13 @@ function buildSuggestedActions(query: string, section: NavSection) {
     return [
       { label: 'Abrir Credenciamento', section: 'checkin' as const },
       { label: 'Abrir Ajuda', section: 'help' as const },
+    ]
+  }
+
+  if (section === 'sponsors') {
+    return [
+      { label: 'Abrir Financeiro', section: 'financial' as const },
+      { label: 'Voltar ao Painel', section: 'dashboard' as const },
     ]
   }
 
@@ -122,6 +140,10 @@ function buildFallbackReply(query: string, section: NavSection) {
 
   if (normalized.includes('staff') || normalized.includes('equipe') || normalized.includes('cadastro') || normalized.includes('credencial')) {
     return 'Para staff, pense em tres passos: identificar a pessoa, alocar em area e turno, e liberar acesso operacional. Se a pessoa vai operar o evento, ela nasce em Staff; se vai apenas entrar no evento, a logica e outra.'
+  }
+
+  if (normalized.includes('patrocin') || normalized.includes('cota') || normalized.includes('marca parceira')) {
+    return 'Patrocinios concentram cotas comerciais, status de negociacao, entregas prometidas e investimento por marca. Quando a conversa for fornecedor operacional ou terceirizacao da execucao, use Fornecedores.'
   }
 
   return `Estou olhando ${SECTION_TITLES[section]}. Posso te orientar sobre o objetivo desse modulo, o proximo passo operacional e qual outra area usar quando essa nao for a tela certa.`

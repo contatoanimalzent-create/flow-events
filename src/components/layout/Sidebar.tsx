@@ -1,7 +1,9 @@
 import {
   BrainCircuit,
   CalendarDays,
+  ClipboardList,
   DollarSign,
+  Handshake,
   HelpCircle,
   LayoutDashboard,
   MessageSquare,
@@ -101,6 +103,18 @@ function createNavGroups(isPortuguese: boolean): NavGroup[] {
           label: isPortuguese ? 'Fornecedores' : 'Suppliers',
           blurb: isPortuguese ? 'Parceiros e execucao terceirizada.' : 'Partners and outsourced execution.',
           icon: Truck,
+        },
+        {
+          id: 'registrations',
+          label: isPortuguese ? 'Inscricoes' : 'Registrations',
+          blurb: isPortuguese ? 'Capital Strike e eventos externos.' : 'Capital Strike and external events.',
+          icon: ClipboardList,
+        },
+        {
+          id: 'sponsors',
+          label: isPortuguese ? 'Patrocinios' : 'Sponsors',
+          blurb: isPortuguese ? 'Cotas, entregas de marca e negociacao.' : 'Sponsorship tiers, deliverables and negotiations.',
+          icon: Handshake,
         },
       ],
     },

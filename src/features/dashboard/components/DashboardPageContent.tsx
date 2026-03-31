@@ -7,6 +7,7 @@ import { DashboardConversionChart } from './DashboardConversionChart'
 import { DashboardCustomerRankingTable } from './DashboardCustomerRankingTable'
 import { DashboardEventRankingTable } from './DashboardEventRankingTable'
 import { DashboardExecutiveCards } from './DashboardExecutiveCards'
+import { DashboardInscricoesPanel } from './DashboardInscricoesPanel'
 import { DashboardPerformancePanel } from './DashboardPerformancePanel'
 import { DashboardRevenueChart } from './DashboardRevenueChart'
 
@@ -148,6 +149,8 @@ export function DashboardPageContent() {
           </div>
 
           <DashboardCustomerRankingTable rows={dashboard.overview.customerRanking} />
+
+          <DashboardInscricoesPanel />
         </>
       )}
     </div>

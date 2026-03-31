@@ -25,6 +25,8 @@ const CommunicationPage = lazy(() => import('@/pages/CommunicationPage').then((m
 const GrowthPage = lazy(() => import('@/pages/GrowthPage').then((module) => ({ default: module.GrowthPage })))
 const HelpPage = lazy(() => import('@/pages/HelpPage').then((module) => ({ default: module.HelpPage })))
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((module) => ({ default: module.SettingsPage })))
+const RegistrationsPage = lazy(() => import('@/pages/RegistrationsPage').then((module) => ({ default: module.RegistrationsPage })))
+const SponsorsPage = lazy(() => import('@/pages/SponsorsPage').then((module) => ({ default: module.SponsorsPage })))
 
 function PageFallback() {
   const { t } = useAppLocale()
@@ -74,6 +76,10 @@ function renderSection(activeSection: NavSection) {
       return <HelpPage />
     case 'settings':
       return <SettingsPage />
+    case 'registrations':
+      return <RegistrationsPage />
+    case 'sponsors':
+      return <SponsorsPage />
     default:
       return <DashboardPage />
   }

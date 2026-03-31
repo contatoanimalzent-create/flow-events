@@ -1,6 +1,7 @@
 export { DashboardConversionChart } from './DashboardConversionChart'
 export { DashboardCustomerRankingTable } from './DashboardCustomerRankingTable'
 export { DashboardEventRankingTable } from './DashboardEventRankingTable'
+export { DashboardInscricoesPanel } from './DashboardInscricoesPanel'
 export { DashboardExecutiveCards } from './DashboardExecutiveCards'
 export { DashboardPageContent } from './DashboardPageContent'
 export { DashboardPerformancePanel } from './DashboardPerformancePanel'

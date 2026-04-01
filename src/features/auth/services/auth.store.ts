@@ -11,6 +11,9 @@ interface AuthState {
   loading: boolean
   initialized: boolean
   signIn: (email: string, password: string) => Promise<AuthActionResult>
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<AuthActionResult & { needsEmailConfirmation?: boolean }>
+  signInWithGoogle: () => Promise<AuthActionResult>
+  setupOrganization: (orgName: string) => Promise<AuthActionResult>
   signOut: () => Promise<void>
   updatePassword: (password: string) => Promise<AuthActionResult>
   fetchProfile: (userId: string) => Promise<void>
@@ -44,6 +47,42 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     set({ user })
     await get().fetchProfile(user.id)
+  },
+
+  signUp: async (email, password, firstName, lastName) => {
+    set({ loading: true })
+    const { data, error } = await authService.signUp(email, password, firstName, lastName)
+    if (error) {
+      set({ loading: false })
+      return { error: error.message }
+    }
+    const needsEmailConfirmation = Boolean(data.user && !data.session)
+    if (data.session && data.user) {
+      await get().bootstrapSession(data.user)
+    }
+    set({ loading: false })
+    return { needsEmailConfirmation }
+  },
+
+  signInWithGoogle: async () => {
+    const { error } = await authService.signInWithGoogle()
+    if (error) return { error: error.message }
+    return {}
+  },
+
+  setupOrganization: async (orgName) => {
+    const { user } = get()
+    if (!user) return { error: 'Usuário não autenticado' }
+    set({ loading: true })
+    const result = await authService.createOrganizationForUser(user.id, orgName, user.email)
+    if (result.error) {
+      set({ loading: false })
+      return { error: result.error }
+    }
+    await get().fetchProfile(user.id)
+    set({ loading: false })
+    localStorage.removeItem('fe_pending_org')
+    return {}
   },
 
   signIn: async (email, password) => {

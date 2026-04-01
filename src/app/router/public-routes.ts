@@ -5,6 +5,7 @@ export type PublicRoute =
   | 'create-event'
   | 'account'
   | 'login'
+  | 'signup'
   | 'terms'
   | 'privacy'
   | 'contact'
@@ -20,6 +21,7 @@ export function getInitialPublicRoute(): PublicRoute {
   if (path === '/events') return 'events'
   if (path === '/create-event') return 'create-event'
   if (path === '/me' || path === '/account') return 'account'
+  if (path === '/signup' || path === '/register') return 'signup'
 
   const eventMatch = path.match(/^\/e\/([^/]+)/)
   if (eventMatch) {
@@ -30,5 +32,5 @@ export function getInitialPublicRoute(): PublicRoute {
 }
 
 export function isImmediatePublicRoute(route: PublicRoute) {
-  return typeof route === 'object' || route === 'events' || route === 'about' || route === 'create-event' || route === 'account' || route === 'terms' || route === 'privacy' || route === 'contact'
+  return typeof route === 'object' || route === 'events' || route === 'about' || route === 'create-event' || route === 'account' || route === 'terms' || route === 'privacy' || route === 'contact' || route === 'signup'
 }

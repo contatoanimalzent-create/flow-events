@@ -1,4 +1,5 @@
 export { AuthLoadingGate } from './AuthLoadingGate'
 export { AuthProvider } from './AuthProvider'
 export { RequireAuth } from './RequireAuth'
+export { RequireOrganization } from './RequireOrganization'
 export { RequirePasswordChange } from './RequirePasswordChange'

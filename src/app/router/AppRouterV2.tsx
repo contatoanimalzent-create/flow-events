@@ -3,6 +3,7 @@ import { AppShellV2 } from '@/app/layout'
 import {
   AuthLoadingGate,
   RequireAuth,
+  RequireOrganization,
   RequirePasswordChange,
   useAuthStore,
 } from '@/features/auth'
@@ -18,6 +19,7 @@ export function AppRouterV2() {
       <PublicRouteView
         route={publicRoute}
         onLogin={() => setPublicRoute('login')}
+        onSignup={() => setPublicRoute('signup')}
         onBackToHome={() => setPublicRoute('home')}
       />
     )
@@ -30,13 +32,16 @@ export function AppRouterV2() {
           <PublicRouteView
             route={publicRoute}
             onLogin={() => setPublicRoute('login')}
+            onSignup={() => setPublicRoute('signup')}
             onBackToHome={() => setPublicRoute('home')}
           />
         }
       >
         {user ? (
           <RequirePasswordChange>
-            <AppShellV2 />
+            <RequireOrganization>
+              <AppShellV2 />
+            </RequireOrganization>
           </RequirePasswordChange>
         ) : null}
       </RequireAuth>

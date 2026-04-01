@@ -11,6 +11,7 @@ const EventPage = lazy(() => import('@/pages/public/EventPage').then((m) => ({ d
 const EventsCatalogPage = lazy(() => import('@/pages/public/EventsCatalogPage').then((m) => ({ default: m.EventsCatalogPage })))
 const HomePage = lazy(() => import('@/pages/public/HomePage').then((m) => ({ default: m.HomePage })))
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage').then((m) => ({ default: m.LoginPage })))
+const SignupPage = lazy(() => import('@/pages/auth/SignupPage').then((m) => ({ default: m.SignupPage })))
 const PrivacyPage = lazy(() => import('@/pages/public/PrivacyPage').then((m) => ({ default: m.PrivacyPage })))
 const TermsPage = lazy(() => import('@/pages/public/TermsPage').then((m) => ({ default: m.TermsPage })))
 
@@ -21,10 +22,11 @@ function PublicFallback() {
 interface PublicRouteViewProps {
   route: PublicRoute
   onLogin: () => void
+  onSignup: () => void
   onBackToHome: () => void
 }
 
-export function PublicRouteView({ route, onLogin, onBackToHome }: PublicRouteViewProps) {
+export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: PublicRouteViewProps) {
   const user = useAuthStore((state) => state.user)
 
   return (
@@ -43,12 +45,14 @@ export function PublicRouteView({ route, onLogin, onBackToHome }: PublicRouteVie
         <CreateEventPage onLogin={onLogin} />
       ) : route === 'account' ? (
         <AuthLoadingGate>
-          {user ? <AccountPage /> : <LoginPage onBack={onBackToHome} />}
+          {user ? <AccountPage /> : <LoginPage onBack={onBackToHome} onSignup={onSignup} />}
         </AuthLoadingGate>
       ) : route === 'events' ? (
         <EventsCatalogPage onLogin={onLogin} />
       ) : route === 'login' ? (
-        <LoginPage onBack={onBackToHome} />
+        <LoginPage onBack={onBackToHome} onSignup={onSignup} />
+      ) : route === 'signup' ? (
+        <SignupPage onBack={onBackToHome} onLogin={onLogin} />
       ) : (
         <HomePage onLogin={onLogin} />
       )}

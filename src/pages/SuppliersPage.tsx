@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 
 /* ── Types ──────────────────────────────────────────────────── */
-type SupplierStatus = 'prospect' | 'negotiating' | 'contracted' | 'active' | 'completed' | 'cancelled'
+type SupplierStatus = 'prospect' | 'negotiating' | 'contracted' | 'confirmed' | 'active' | 'finished' | 'cancelled'
 type DocStatus = 'pending' | 'sent' | 'signed' | 'expired'
 
 const SERVICE_TYPES = [
@@ -66,8 +66,9 @@ const STATUS_CONFIG: Record<SupplierStatus, { label: string; color: string; bg: 
   prospect:    { label: 'Prospecto',    color: 'text-text-muted',       bg: 'bg-bg-border/50',       icon: Clock },
   negotiating: { label: 'Negociando',   color: 'text-status-warning',   bg: 'bg-status-warning/8',   icon: Clock },
   contracted:  { label: 'Contratado',   color: 'text-brand-blue',       bg: 'bg-brand-blue/8',       icon: FileText },
+  confirmed:   { label: 'Confirmado',   color: 'text-brand-purple',     bg: 'bg-brand-purple/8',     icon: CheckCircle2 },
   active:      { label: 'Ativo',        color: 'text-brand-acid',       bg: 'bg-brand-acid/8',       icon: CheckCircle2 },
-  completed:   { label: 'Concluído',    color: 'text-status-success',   bg: 'bg-status-success/8',   icon: CheckCircle2 },
+  finished:    { label: 'Concluido',    color: 'text-status-success',   bg: 'bg-status-success/8',   icon: CheckCircle2 },
   cancelled:   { label: 'Cancelado',    color: 'text-status-error',     bg: 'bg-status-error/8',     icon: XCircle },
 }
 
@@ -135,10 +136,10 @@ export function SuppliersPage() {
       (s.service_type ?? '').toLowerCase().includes(q)
   })
 
-  const totalContracted = suppliers.filter(s => ['contracted', 'active'].includes(s.status)).length
+  const totalContracted = suppliers.filter(s => ['contracted', 'confirmed', 'active'].includes(s.status)).length
   const totalActive = suppliers.filter(s => s.status === 'active').length
   const totalValue = suppliers
-    .filter(s => ['contracted', 'active', 'completed'].includes(s.status))
+    .filter(s => ['contracted', 'confirmed', 'active', 'finished'].includes(s.status))
     .reduce((sum, s) => sum + (s.contract_value ?? 0), 0)
   const pendingDocs = suppliers.filter(s => s.doc_status === 'pending' && s.status === 'contracted').length
 
@@ -230,7 +231,7 @@ export function SuppliersPage() {
         </select>
 
         <div className="flex items-center gap-1 flex-wrap">
-          {(['all', 'prospect', 'negotiating', 'contracted', 'active', 'completed', 'cancelled'] as const).map(s => (
+          {(['all', 'prospect', 'negotiating', 'contracted', 'confirmed', 'active', 'finished', 'cancelled'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all',
                 statusFilter === s ? 'bg-brand-acid text-bg-primary' :
@@ -473,7 +474,7 @@ function SupplierFormModal({ organizationId, events, supplier, defaultEventId, o
       contact_name: form.contact_name || null,
       email: form.email || null,
       phone: form.phone || null,
-      service_type: form.service_type || null,
+      service_type: form.service_type || 'Outro',
       contract_value: form.contract_value ? parseFloat(form.contract_value) : null,
       payment_terms: form.payment_terms || null,
       status,

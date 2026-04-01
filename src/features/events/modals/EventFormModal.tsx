@@ -232,6 +232,36 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
 
             {step === 4 ? (
               <>
+                {/* ── Specs de mídia ───────────────────────────────── */}
+                <div className="rounded-[20px] border border-brand-acid/20 bg-brand-acid/5 p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="h-3.5 w-3.5 text-brand-acid shrink-0" />
+                    <span className="text-[11px] font-mono uppercase tracking-widest text-brand-acid">Especificacoes de midia</span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {([
+                      { label: 'Capa do evento',     spec: '1920 × 1080 px', detail: 'JPG/PNG/WebP · max 5 MB · 16:9',  icon: '🖼️' },
+                      { label: 'Banner mobile',      spec: '1080 × 1350 px', detail: 'JPG/PNG/WebP · max 5 MB · 4:5',   icon: '📱' },
+                      { label: 'Thumb / miniatura',  spec: '800 × 800 px',   detail: 'JPG/PNG · max 2 MB · 1:1',        icon: '🔲' },
+                      { label: 'Logo do evento',     spec: '400 × 400 px',   detail: 'PNG transparente · max 1 MB · 1:1', icon: '🎯' },
+                      { label: 'Video hero (loop)',  spec: '1920 × 1080 px', detail: 'MP4/WebM · max 50 MB · max 60s',  icon: '🎬' },
+                      { label: 'Video reel/vertical',spec: '1080 × 1920 px', detail: 'MP4 · max 30 MB · 9:16',         icon: '📹' },
+                    ] as const).map((item) => (
+                      <div key={item.label} className="flex items-start gap-2.5 rounded-[14px] border border-bg-border bg-bg-secondary/60 px-3 py-2.5">
+                        <span className="text-base leading-none mt-0.5">{item.icon}</span>
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-semibold text-text-primary">{item.label}</div>
+                          <div className="text-[11px] font-mono text-brand-acid">{item.spec}</div>
+                          <div className="text-[10px] text-text-muted mt-0.5">{item.detail}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-text-muted leading-relaxed">
+                    Use arquivos otimizados para carregamento rapido na pagina publica. Arquivos acima do limite serao rejeitados automaticamente.
+                  </p>
+                </div>
+
                 <FormSection title="Cover e hero" description="Esses campos seguem como fallback de compatibilidade para a landing.">
                   {form.cover_url ? (
                     <div className="relative h-40 overflow-hidden rounded-[24px]">

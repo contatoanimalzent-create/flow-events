@@ -23,7 +23,8 @@ export default {
           navy:   '#0d1b35',   /* primary brand / sidebar */
           blue:   '#1e3a8a',   /* deep blue accent */
           sky:    '#3b82f6',   /* interactive blue */
-          acid:   '#d62a0b',   /* red CTA — kept */
+          acid:   '#d62a0b',   /* red CTA */
+          yellow: '#D4FF00',   /* acid yellow — editorial hero accent */
           teal:   '#ae936f',   /* warm gold accent */
           purple: '#d9bca0',
         },
@@ -52,8 +53,9 @@ export default {
       fontFamily: {
         sans:    ['Manrope', 'system-ui', 'sans-serif'],
         mono:    ['IBM Plex Mono', 'monospace'],
-        display: ['Barlow Condensed', 'sans-serif'],
+        display: ['Bebas Neue', 'Barlow Condensed', 'sans-serif'],
         serif:   ['Barlow Condensed', 'sans-serif'],
+        ui:      ['Manrope', 'system-ui', 'sans-serif'],
       },
       borderRadius: { sm: '12px', xl: '18px', '2xl': '24px' },
       boxShadow: {
@@ -69,6 +71,7 @@ export default {
         /* Glow effects */
         'glow-navy':      '0 8px 32px rgba(13,27,53,0.35)',
         'glow-acid':      '0 8px 28px rgba(214,42,11,0.30)',
+        'glow-yellow':    '0 8px 40px rgba(212,255,0,0.35)',
         'glow-sky':       '0 8px 28px rgba(59,130,246,0.28)',
         'glow-teal':      '0 8px 28px rgba(174,147,111,0.22)',
         'glow-error':     '0 8px 28px rgba(220,38,38,0.28)',
@@ -85,6 +88,8 @@ export default {
         'pulse-glow': 'pulseGlow 2.4s ease-in-out infinite',
         'shimmer':    'shimmer 2s linear infinite',
         'press':      'press 0.12s ease-out',
+        'hero-word':  'heroWord 0.7s cubic-bezier(0.16,1,0.3,1) both',
+        'card-float': 'cardFloat 5s ease-in-out infinite',
       },
       keyframes: {
         fadeIn:    { from: { opacity: '0' },                      to: { opacity: '1' } },
@@ -94,6 +99,8 @@ export default {
         pulseGlow: { '0%,100%': { opacity: '0.4', transform: 'scale(0.97)' }, '50%': { opacity: '1', transform: 'scale(1.03)' } },
         shimmer:   { from: { backgroundPosition: '-200% 0' }, to: { backgroundPosition: '200% 0' } },
         press:     { '0%': { transform: 'scale(1)' }, '50%': { transform: 'scale(0.97)' }, '100%': { transform: 'scale(1)' } },
+        heroWord:  { from: { opacity: '0', transform: 'translateY(60px) skewY(3deg)' }, to: { opacity: '1', transform: 'translateY(0) skewY(0deg)' } },
+        cardFloat: { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-10px)' } },
       },
       backgroundImage: {
         'gradient-navy':  'linear-gradient(135deg, #0d1b35 0%, #142d56 100%)',

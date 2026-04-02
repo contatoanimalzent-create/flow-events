@@ -21,14 +21,15 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
   }
 
   return (
-    <footer className="border-t border-white/[0.06] bg-[#070607]">
+    <footer className="border-t border-bg-border bg-white">
       {/* Newsletter section */}
       <div className="px-5 py-16 md:px-8 lg:px-10">
         <div className="mx-auto max-w-[1440px]">
-          <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-8 lg:p-10">
+          {/* Newsletter card */}
+          <div className="rounded-3xl border border-bg-border bg-brand-navy p-8 lg:p-10">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#ae936f]/70">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-white/50">
                   {isPortuguese ? 'Novidades' : 'Newsletter'}
                 </div>
                 <h3 className="mt-4 font-display text-[clamp(1.8rem,3vw,2.6rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
@@ -36,7 +37,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                     ? 'Receba novos eventos antes de todo mundo.'
                     : 'Get new events before everyone else.'}
                 </h3>
-                <p className="mt-3 max-w-md text-sm text-white/40">
+                <p className="mt-3 max-w-md text-sm text-white/50">
                   {isPortuguese
                     ? 'Entre na lista e saiba primeiro sobre experiencias exclusivas.'
                     : 'Join the list and be the first to know about exclusive experiences.'}
@@ -49,12 +50,12 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={isPortuguese ? 'Seu melhor email' : 'Your best email'}
-                  className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm text-white outline-none transition-all placeholder:text-white/25 focus:border-[#ae936f]/30"
+                  className="flex-1 rounded-xl border border-white/15 bg-white/10 px-5 py-3 text-sm text-white outline-none transition-all placeholder:text-white/30 focus:border-white/30 focus:bg-white/15"
                   required
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#d62a0b] px-5 py-3 text-sm font-bold text-[#ebe7e0] transition-all hover:bg-[#e14425]"
+                  className="inline-flex items-center gap-2 rounded-xl bg-brand-acid px-5 py-3 text-sm font-bold text-white transition-all hover:bg-[#e14425]"
                 >
                   {subscribed ? '✓' : <ArrowRight className="h-4 w-4" />}
                 </button>
@@ -62,9 +63,10 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             </div>
           </div>
 
+          {/* Categories */}
           {categories.length > 0 ? (
             <div className="mt-10">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/25">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-text-muted">
                 {isPortuguese ? 'Categorias' : 'Categories'}
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -73,7 +75,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                     key={category}
                     type="button"
                     onClick={() => onCategoryClick?.(category)}
-                    className="rounded-full border border-white/8 bg-white/[0.03] px-4 py-2 text-xs text-white/50 transition-all hover:border-[#ae936f]/20 hover:text-white"
+                    className="rounded-full border border-bg-border bg-bg-secondary px-4 py-2 text-xs text-text-secondary transition-all hover:border-brand-navy/20 hover:text-text-primary"
                   >
                     {category}
                   </button>
@@ -82,20 +84,21 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             </div>
           ) : null}
 
-          <div className="mt-12 grid gap-8 border-t border-white/[0.06] pt-10 lg:grid-cols-[1fr_0.6fr_0.6fr_0.6fr]">
+          {/* Main footer links */}
+          <div className="mt-12 grid gap-8 border-t border-bg-border pt-10 lg:grid-cols-[1fr_0.6fr_0.6fr_0.6fr]">
             <div>
               <a href="/" className="inline-flex items-center gap-3">
                 <img src="/logo.png" alt="Animalz Events" className="h-9 w-auto" />
-                <span className="text-sm font-bold uppercase tracking-[0.15em] text-white">
-                  Animalz<span className="text-[#d62a0b]">.</span>events
+                <span className="text-sm font-bold uppercase tracking-[0.15em] text-brand-navy">
+                  Animalz<span className="text-brand-acid">.</span>events
                 </span>
               </a>
-              <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/30">
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-text-secondary">
                 {isPortuguese
                   ? 'Plataforma premium de eventos. Descoberta, venda e operacao em um so lugar.'
                   : 'Premium events platform. Discovery, sales and operations in one place.'}
               </p>
-              <div className="mt-4 space-y-2 text-sm text-white/25">
+              <div className="mt-4 space-y-2 text-sm text-text-muted">
                 <div className="flex items-center gap-2">
                   <Globe className="h-3.5 w-3.5" /> events.animalzgroup.com
                 </div>
@@ -108,7 +111,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               </div>
             </div>
 
-            {[ 
+            {[
               {
                 title: isPortuguese ? 'Plataforma' : 'Platform',
                 links: [
@@ -133,10 +136,16 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               },
             ].map((section) => (
               <div key={section.title}>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/25">{section.title}</div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-text-muted">
+                  {section.title}
+                </div>
                 <div className="mt-4 grid gap-3">
                   {section.links.map((link) => (
-                    <a key={link.label} href={link.href} className="text-sm text-white/40 transition-colors hover:text-[#ae936f]">
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="text-sm text-text-secondary transition-colors hover:text-brand-navy"
+                    >
                       {link.label}
                     </a>
                   ))}
@@ -145,10 +154,14 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             ))}
           </div>
 
-          <div className="mt-10 flex flex-col gap-3 border-t border-white/[0.06] pt-6 text-xs text-white/20 md:flex-row md:items-center md:justify-between">
-            <p>&copy; {new Date().getFullYear()} Animalz Events. {isPortuguese ? 'Todos os direitos reservados.' : 'All rights reserved.'}</p>
+          {/* Bottom bar */}
+          <div className="mt-10 flex flex-col gap-3 border-t border-bg-border pt-6 text-xs text-text-muted md:flex-row md:items-center md:justify-between">
+            <p>
+              &copy; {new Date().getFullYear()} Animalz Events.{' '}
+              {isPortuguese ? 'Todos os direitos reservados.' : 'All rights reserved.'}
+            </p>
             <p className="flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#d62a0b]" />
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-acid" />
               {isPortuguese ? 'Plataforma premium de eventos' : 'Premium events platform'}
             </p>
           </div>

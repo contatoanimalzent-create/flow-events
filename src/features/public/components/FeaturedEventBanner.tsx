@@ -25,7 +25,7 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
     <section className="px-5 py-8 md:px-10 lg:px-16 lg:py-10">
       <div className="mx-auto max-w-7xl">
         <PublicReveal>
-          <div className="relative overflow-hidden rounded-[2.7rem] border border-white/8 bg-[#0b0f15] shadow-[0_28px_90px_rgba(0,0,0,0.32)]">
+          <div className="relative overflow-hidden rounded-[2.7rem] border border-brand-navy/10 bg-brand-navy shadow-[0_28px_90px_rgba(13,27,53,0.25)]">
             {coverImage ? (
               <>
                 <img
@@ -33,15 +33,15 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                   alt={event.name}
                   className="absolute inset-y-0 right-0 h-full w-full object-cover lg:w-[50%]"
                 />
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,8,12,0.98)_0%,rgba(6,8,12,0.92)_42%,rgba(6,8,12,0.32)_72%,rgba(6,8,12,0.18)_100%)]" />
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,27,53,0.98)_0%,rgba(13,27,53,0.92)_42%,rgba(13,27,53,0.32)_72%,rgba(13,27,53,0.15)_100%)]" />
               </>
             ) : null}
 
             <div
-              className="absolute inset-0 opacity-40"
+              className="absolute inset-0 opacity-[0.04]"
               style={{
                 backgroundImage:
-                  'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
+                  'linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)',
                 backgroundSize: '96px 96px',
               }}
             />
@@ -49,8 +49,8 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
             <div className="relative z-10 grid gap-10 p-8 md:p-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-8 lg:p-14">
               <div className="max-w-3xl">
                 {showLabel ? (
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/66">
-                    <span className="h-2 w-2 rounded-full bg-[#ff2d2d]" />
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-white/70">
+                    <span className="h-2 w-2 rounded-full bg-brand-acid" />
                     {isPortuguese ? 'Acesso em destaque' : 'Featured access'}
                   </span>
                 ) : null}
@@ -59,10 +59,12 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                   {event.name}
                 </h2>
 
-                <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 md:text-lg">
-                  {event.subtitle || event.short_description || (isPortuguese
-                    ? 'Uma experiencia pensada para transformar compra em expectativa e presenca em memoria.'
-                    : 'An experience designed to turn purchase into anticipation and attendance into memory.')}
+                <p className="mt-6 max-w-2xl text-base leading-8 text-white/65 md:text-lg">
+                  {event.subtitle ||
+                    event.short_description ||
+                    (isPortuguese
+                      ? 'Uma experiencia pensada para transformar compra em expectativa e presenca em memoria.'
+                      : 'An experience designed to turn purchase into anticipation and attendance into memory.')}
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
@@ -90,12 +92,15 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                     const Icon = item.icon
 
                     return (
-                      <div key={item.label} className="flex items-center gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.06] px-4 py-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ff2d2d]/12">
-                          <Icon className="h-4 w-4 text-[#ff6a5c]" />
+                      <div
+                        key={item.label}
+                        className="flex items-center gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.07] px-4 py-4"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-acid/15">
+                          <Icon className="h-4 w-4 text-brand-acid" />
                         </div>
                         <div>
-                          <div className="text-[10px] uppercase tracking-[0.24em] text-white/46">{item.label}</div>
+                          <div className="text-[10px] uppercase tracking-[0.24em] text-white/45">{item.label}</div>
                           <div className="mt-1 text-sm font-medium text-white">{item.value}</div>
                         </div>
                       </div>
@@ -106,23 +111,38 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                 <div className="mt-10 flex flex-wrap items-center gap-4">
                   <a
                     href={`/e/${event.slug}`}
-                    className="inline-flex items-center gap-3 rounded-full bg-[#ff2d2d] px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-500 hover:-translate-y-1 hover:bg-[#ff4133]"
+                    className="inline-flex items-center gap-3 rounded-full bg-brand-acid px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-[0_4px_20px_rgba(214,42,11,0.3)] transition-all duration-500 hover:-translate-y-1 hover:bg-[#e14425]"
                   >
                     {isPortuguese ? 'Ver experiencia' : 'View experience'}
                     <ArrowRight className="h-4 w-4" />
                   </a>
-                  <div className="text-sm text-white/70">{priceLabel}</div>
+                  <div className="text-sm font-medium text-white/65">{priceLabel}</div>
                 </div>
               </div>
 
               <div className="grid gap-4 self-end">
                 {[
-                  { label: isPortuguese ? 'Status' : 'Status', value: event.status === 'ongoing' ? (isPortuguese ? 'Ao vivo' : 'Live') : isPortuguese ? 'Proxima abertura' : 'Next release' },
-                  { label: isPortuguese ? 'Categoria' : 'Category', value: event.category || (isPortuguese ? 'Experiencia premium' : 'Premium experience') },
-                  { label: isPortuguese ? 'Compra' : 'Purchase', value: isPortuguese ? 'Fluxo protegido e direto' : 'Protected and direct flow' },
+                  {
+                    label: isPortuguese ? 'Status' : 'Status',
+                    value:
+                      event.status === 'ongoing'
+                        ? isPortuguese ? 'Ao vivo' : 'Live'
+                        : isPortuguese ? 'Proxima abertura' : 'Next release',
+                  },
+                  {
+                    label: isPortuguese ? 'Categoria' : 'Category',
+                    value: event.category || (isPortuguese ? 'Experiencia premium' : 'Premium experience'),
+                  },
+                  {
+                    label: isPortuguese ? 'Compra' : 'Purchase',
+                    value: isPortuguese ? 'Fluxo protegido e direto' : 'Protected and direct flow',
+                  },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-[1.6rem] border border-white/10 bg-black/24 p-5 backdrop-blur-sm">
-                    <div className="text-[10px] uppercase tracking-[0.28em] text-white/42">{item.label}</div>
+                  <div
+                    key={item.label}
+                    className="rounded-[1.6rem] border border-white/10 bg-white/[0.06] p-5 backdrop-blur-sm"
+                  >
+                    <div className="text-[10px] uppercase tracking-[0.28em] text-white/40">{item.label}</div>
                     <div className="mt-3 font-display text-[1.9rem] font-semibold leading-[0.94] tracking-[-0.03em] text-white">
                       {item.value}
                     </div>

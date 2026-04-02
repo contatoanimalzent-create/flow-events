@@ -39,8 +39,8 @@ export function EventsSearchInput({ value, onChange, isPending = false, tone = '
           className={cn(
             'w-full rounded-full px-12 py-3.5 text-sm outline-none transition-all duration-300',
             isDark
-              ? 'border border-white/12 bg-white/6 text-[#f0ebe2] placeholder:text-white/30 focus:border-white/20 focus:bg-white/10 focus:shadow-[0_12px_24px_rgba(0,0,0,0.3)]'
-              : 'border border-[#ddd1bf] bg-white/78 text-[#1f1a15] placeholder:text-[#a2927e] focus:border-[#b79e74] focus:bg-white focus:shadow-[0_12px_24px_rgba(48,35,18,0.08)]'
+              ? 'border border-white/12 bg-white/6 text-white placeholder:text-white/30 focus:border-white/20 focus:bg-white/10'
+              : 'border border-bg-border bg-white text-text-primary placeholder:text-text-muted shadow-sm focus:border-brand-navy/30 focus:shadow-[0_0_0_3px_rgba(13,27,53,0.06)]'
           )}
         />
         {isPending ? (

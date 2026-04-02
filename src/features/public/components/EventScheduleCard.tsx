@@ -48,11 +48,11 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
 
         <div className="flex min-w-0 flex-col justify-between p-6 md:p-7">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-[#ff2d2d]/24 bg-[#ff2d2d]/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white">
+            <span className="rounded-full border border-brand-acid/25 bg-brand-acid/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-brand-acid">
               {index < 3 ? (isPortuguese ? 'Alta demanda' : 'High demand') : isPortuguese ? 'Venda aberta' : 'Now selling'}
             </span>
             {event.category ? (
-              <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/58">
+              <span className="rounded-full border border-bg-border bg-bg-secondary px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-text-muted">
                 {event.category}
               </span>
             ) : null}
@@ -69,7 +69,7 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
 
           <div className="mt-6 grid gap-3 text-sm text-[#5b6168] md:grid-cols-2">
             <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-[#ff6a5c]" />
+              <CalendarDays className="h-4 w-4 text-brand-acid" />
               <span>
                 {formatPublicDate(event.starts_at, locale, {
                   day: '2-digit',
@@ -79,20 +79,20 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-[#ff6a5c]" />
+              <MapPin className="h-4 w-4 text-brand-acid" />
               <span>{[event.venue_name, event.city].filter(Boolean).join(' / ')}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col justify-between border-t border-[#0b1016]/10 bg-[#0b1016] p-6 lg:border-l lg:border-t-0">
+        <div className="flex flex-col justify-between border-t border-brand-navy/10 bg-brand-navy p-6 lg:border-l lg:border-t-0">
           <div>
             <div className="text-[10px] uppercase tracking-[0.26em] text-white/44">Ticketing</div>
             <div className="mt-3 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-white">
               {priceLabel}
             </div>
             <div className="mt-3 flex items-center gap-2 text-sm text-white/62">
-              <Ticket className="h-4 w-4 text-[#ff6a5c]" />
+              <Ticket className="h-4 w-4 text-brand-acid" />
               {formatPublicNumber(event.sold_tickets, locale)} {isPortuguese ? 'acessos vendidos' : 'accesses sold'}
             </div>
           </div>

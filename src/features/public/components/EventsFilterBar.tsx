@@ -36,36 +36,32 @@ interface FilterSelectProps {
   tone?: 'light' | 'dark'
 }
 
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-  tone = 'light',
-}: FilterSelectProps) {
+function FilterSelect({ label, value, onChange, options, tone = 'light' }: FilterSelectProps) {
   const isDark = tone === 'dark'
 
   return (
     <label className="block min-w-[11rem]">
-      <div className={cn(
-        'mb-3 text-[10px] font-semibold uppercase tracking-[0.28em]',
-        isDark ? 'text-white/50' : 'text-[#8e7f68]'
-      )}>
+      <div
+        className={cn(
+          'mb-3 text-[10px] font-semibold uppercase tracking-[0.28em]',
+          isDark ? 'text-white/50' : 'text-text-muted',
+        )}
+      >
         {label}
       </div>
       <select
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         className={cn(
           'w-full rounded-full px-4 py-3.5 text-sm outline-none transition-all duration-300',
           isDark
-            ? 'border border-white/12 bg-white/6 text-[#f0ebe2] focus:border-white/20 focus:bg-white/10 focus:shadow-[0_12px_24px_rgba(0,0,0,0.3)]'
-            : 'border border-[#2a313d] bg-[#121722] text-white focus:border-[#ff2d2d]/44 focus:bg-[#151b27] focus:shadow-[0_12px_24px_rgba(0,0,0,0.28)]'
+            ? 'border border-white/12 bg-white/6 text-white focus:border-white/20 focus:bg-white/10'
+            : 'border border-bg-border bg-white text-text-primary shadow-sm focus:border-brand-navy/30 focus:shadow-[0_0_0_3px_rgba(13,27,53,0.06)]',
         )}
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
           </option>
         ))}
       </select>
@@ -90,37 +86,42 @@ export function EventsFilterBar({
 }: EventsFilterBarProps) {
   const { isPortuguese } = usePublicLocale()
   const isDark = tone === 'dark'
-  const hasActiveFilters = Boolean(search) || city !== 'all' || dateRange !== 'all' || category !== 'all'
+  const hasActiveFilters =
+    Boolean(search) || city !== 'all' || dateRange !== 'all' || category !== 'all'
 
   return (
     <PublicReveal delayMs={80}>
-      <div className={cn(
-        'rounded-[2rem] border p-5 md:p-6',
-        isDark
-          ? 'border-white/10 bg-white/5 shadow-[0_18px_55px_rgba(0,0,0,0.2)]'
-          : 'border-[#1e2430] bg-[linear-gradient(180deg,rgba(10,13,18,0.95),rgba(15,19,27,0.92))] shadow-[0_18px_55px_rgba(0,0,0,0.28)]'
-      )}>
+      <div
+        className={cn(
+          'rounded-[2rem] border p-5 md:p-6',
+          isDark
+            ? 'border-white/10 bg-white/5'
+            : 'border-bg-border bg-white shadow-card',
+        )}
+      >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            {isDark ? (
-              <div className="inline-flex rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-medium text-white/70">
-                {resultCount} {isPortuguese ? 'experiencias' : 'experiences'}
-              </div>
-            ) : (
-              <PremiumBadge tone="default" className="border-white/10 bg-white/[0.05] text-white/76">
-                {resultCount} {isPortuguese ? 'experiencias' : 'experiences'}
-              </PremiumBadge>
-            )}
+            <span
+              className={cn(
+                'inline-flex rounded-full px-4 py-2 text-sm font-medium',
+                isDark
+                  ? 'border border-white/12 bg-white/8 text-white/70'
+                  : 'border border-bg-border bg-bg-secondary text-text-secondary',
+              )}
+            >
+              {resultCount} {isPortuguese ? 'experiencias' : 'experiences'}
+            </span>
             {isPending ? (
-              isDark ? (
-                <div className="inline-flex rounded-full border border-white/12 bg-[#ae936f]/20 px-4 py-2 text-sm font-medium text-[#ae936f]">
-                  {isPortuguese ? 'Atualizando selecao' : 'Updating selection'}
-                </div>
-              ) : (
-                <PremiumBadge tone="accent" className="border-[#ff2d2d]/24 bg-[#ff2d2d]/12 text-white">
-                  {isPortuguese ? 'Atualizando selecao' : 'Updating selection'}
-                </PremiumBadge>
-              )
+              <span
+                className={cn(
+                  'inline-flex rounded-full px-4 py-2 text-sm font-medium',
+                  isDark
+                    ? 'border border-white/12 bg-white/10 text-white/70'
+                    : 'border border-brand-navy/15 bg-brand-navy/8 text-brand-navy',
+                )}
+              >
+                {isPortuguese ? 'Atualizando selecao' : 'Updating selection'}
+              </span>
             ) : null}
           </div>
 
@@ -136,8 +137,8 @@ export function EventsFilterBar({
               className={cn(
                 'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300',
                 isDark
-                  ? 'border border-white/12 bg-white/8 text-white/70 hover:-translate-y-0.5 hover:bg-white/12 hover:text-white'
-                  : 'border border-white/10 bg-white/[0.05] text-white/70 hover:-translate-y-0.5 hover:bg-white/[0.08] hover:text-white'
+                  ? 'border border-white/12 bg-white/8 text-white/70 hover:bg-white/12 hover:text-white'
+                  : 'border border-bg-border bg-bg-secondary text-text-secondary hover:border-brand-navy/20 hover:text-text-primary',
               )}
             >
               <RotateCcw className="h-4 w-4" />
@@ -152,7 +153,10 @@ export function EventsFilterBar({
             label={isPortuguese ? 'Cidade' : 'City'}
             value={city}
             onChange={onCityChange}
-            options={[{ label: isPortuguese ? 'Todas as cidades' : 'All cities', value: 'all' }, ...cityOptions.map((item) => ({ label: item, value: item }))]}
+            options={[
+              { label: isPortuguese ? 'Todas as cidades' : 'All cities', value: 'all' },
+              ...cityOptions.map((item) => ({ label: item, value: item })),
+            ]}
             tone={tone}
           />
           <FilterSelect
@@ -175,7 +179,10 @@ export function EventsFilterBar({
             label={isPortuguese ? 'Categoria' : 'Category'}
             value={category}
             onChange={onCategoryChange}
-            options={[{ label: isPortuguese ? 'Todas as categorias' : 'All categories', value: 'all' }, ...categoryOptions.map((item) => ({ label: item, value: item }))]}
+            options={[
+              { label: isPortuguese ? 'Todas as categorias' : 'All categories', value: 'all' },
+              ...categoryOptions.map((item) => ({ label: item, value: item })),
+            ]}
             tone={tone}
           />
         </div>

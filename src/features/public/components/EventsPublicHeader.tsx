@@ -59,7 +59,9 @@ export function EventsPublicHeader({
         onClick={() => { setLocale(option); setLanguageMenuOpen(false) }}
         className={cn(
           'w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors',
-          selected ? 'bg-[#d62a0b] text-[#ebe7e0]' : 'text-white/60 hover:bg-white/10 hover:text-white',
+          selected
+            ? 'bg-brand-navy text-white'
+            : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary',
         )}
       >
         {label}
@@ -72,11 +74,14 @@ export function EventsPublicHeader({
       <header
         className={cn(
           'sticky top-0 z-50 transition-all duration-500',
-          isScrolled ? 'bg-[#070607]/90 shadow-[0_1px_0_rgba(174,147,111,0.08)] backdrop-blur-2xl' : 'bg-transparent',
+          isScrolled
+            ? 'bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.08),0_4px_16px_rgba(15,23,42,0.06)] backdrop-blur-xl'
+            : 'bg-white/80 backdrop-blur-md',
           className,
         )}
       >
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-5 px-5 py-4 md:px-8 lg:px-10">
+          {/* Logo */}
           <a href="/" className="group inline-flex items-center gap-3" aria-label="Animalz Events">
             <img
               src="/logo.png"
@@ -86,11 +91,12 @@ export function EventsPublicHeader({
                 compact ? 'h-8 md:h-9' : 'h-9 md:h-10',
               )}
             />
-            <span className="hidden text-sm font-bold uppercase tracking-[0.15em] text-white sm:block">
-              Animalz<span className="text-[#d62a0b]">.</span>events
+            <span className="hidden text-sm font-bold uppercase tracking-[0.15em] text-brand-navy sm:block">
+              Animalz<span className="text-brand-acid">.</span>events
             </span>
           </a>
 
+          {/* Desktop nav */}
           <nav className="hidden items-center gap-1 xl:flex">
             {navLinks.map((link) => (
               <a
@@ -99,8 +105,8 @@ export function EventsPublicHeader({
                 className={cn(
                   'rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-300',
                   isActive(link.href)
-                    ? 'bg-white/10 text-white'
-                    : 'text-white/50 hover:bg-white/5 hover:text-white',
+                    ? 'bg-brand-navy text-white'
+                    : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary',
                 )}
               >
                 {link.label}
@@ -111,38 +117,49 @@ export function EventsPublicHeader({
           <div className="flex items-center gap-2">
             {actionSlot ? <div className="hidden xl:flex">{actionSlot}</div> : null}
 
+            {/* Language picker */}
             <div className="relative hidden md:block">
               <button
                 type="button"
                 onClick={() => setLanguageMenuOpen((c) => !c)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-2 text-xs font-medium text-white/60 transition-all hover:border-white/20 hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-full border border-bg-border px-3 py-2 text-xs font-medium text-text-secondary transition-all hover:border-brand-navy/30 hover:text-text-primary"
               >
                 <Globe className="h-3.5 w-3.5" />
                 {locale === 'en-US' ? 'EN' : 'BR'}
                 <ChevronDown className="h-3 w-3" />
               </button>
               {languageMenuOpen ? (
-                <div className="absolute right-0 top-[calc(100%+0.5rem)] w-36 rounded-2xl border border-white/10 bg-[#111114] p-2 shadow-2xl">
+                <div className="absolute right-0 top-[calc(100%+0.5rem)] w-36 rounded-2xl border border-bg-border bg-white p-2 shadow-card-deep">
                   {renderLanguageOption('en-US', 'English')}
                   {renderLanguageOption('pt-BR', 'Portugues')}
                 </div>
               ) : null}
             </div>
 
+            {/* Auth button */}
             {user ? (
-              <a href="/me" className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-medium text-white/70 hover:border-[#ae936f]/30 hover:text-white">
-                <UserRound className="h-3.5 w-3.5" /> {isPortuguese ? 'Conta' : 'Account'}
+              <a
+                href="/me"
+                className="inline-flex items-center gap-2 rounded-full border border-bg-border px-4 py-2 text-xs font-medium text-text-secondary transition-all hover:border-brand-navy/30 hover:text-text-primary"
+              >
+                <UserRound className="h-3.5 w-3.5" />
+                {isPortuguese ? 'Conta' : 'Account'}
               </a>
             ) : onLogin ? (
-              <button type="button" onClick={onLogin} className="hidden rounded-full bg-[#d62a0b] px-5 py-2 text-xs font-bold uppercase tracking-wider text-[#ebe7e0] transition-all hover:bg-[#e14425] sm:inline-flex">
+              <button
+                type="button"
+                onClick={onLogin}
+                className="hidden rounded-full bg-brand-navy px-5 py-2 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-ink-800 hover:shadow-glow-navy sm:inline-flex"
+              >
                 {isPortuguese ? 'Entrar' : 'Sign in'}
               </button>
             ) : null}
 
+            {/* Hamburger */}
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white transition-all hover:border-[#ae936f]/30 hover:text-[#ae936f]"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-bg-border text-text-secondary transition-all hover:border-brand-navy/30 hover:text-brand-navy"
             >
               <Menu className="h-4 w-4" />
             </button>
@@ -150,38 +167,45 @@ export function EventsPublicHeader({
         </div>
       </header>
 
-      {/* FULLSCREEN MENU */}
+      {/* FULLSCREEN MENU — white */}
       {menuOpen ? (
-        <div className="fixed inset-0 z-[90] overflow-y-auto bg-[#070607] text-white">
+        <div className="fixed inset-0 z-[90] overflow-y-auto bg-white">
+          {/* Subtle grid texture */}
           <div
-            className="pointer-events-none absolute inset-0 opacity-[0.03]"
+            className="pointer-events-none absolute inset-0 opacity-[0.025]"
             style={{
-              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(174,147,111,0.18) 1px, transparent 0)',
+              backgroundImage:
+                'radial-gradient(circle at 1px 1px, rgba(13,27,53,0.25) 1px, transparent 0)',
               backgroundSize: '40px 40px',
             }}
           />
+          {/* Navy accent orb */}
+          <div className="pointer-events-none absolute right-[-6rem] top-[-8rem] h-[32rem] w-[32rem] rounded-full bg-brand-navy/[0.06] blur-[100px]" />
 
           <div className="relative z-10 min-h-screen px-5 py-5 md:px-8 lg:px-10">
             <div className="mx-auto max-w-[1440px]">
+              {/* Header row */}
               <div className="flex items-center justify-between gap-6">
                 <a href="/" className="inline-flex items-center gap-3">
                   <img src="/logo.png" alt="Animalz Events" className="h-9 w-auto" />
-                  <span className="text-sm font-bold uppercase tracking-[0.15em] text-white">
-                    Animalz<span className="text-[#d62a0b]">.</span>events
+                  <span className="text-sm font-bold uppercase tracking-[0.15em] text-brand-navy">
+                    Animalz<span className="text-brand-acid">.</span>events
                   </span>
                 </a>
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white transition-all hover:border-[#ae936f]/40 hover:text-[#ae936f]"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-bg-border text-text-secondary transition-all hover:border-brand-navy/30 hover:text-brand-navy"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
+              {/* Two-column layout */}
               <div className="mt-12 grid gap-16 lg:grid-cols-[1.1fr_0.9fr]">
+                {/* Left: nav links */}
                 <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#ae936f]/70">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-text-muted">
                     {isPortuguese ? 'Navegacao' : 'Navigation'}
                   </div>
                   <nav className="mt-8 grid gap-2">
@@ -191,31 +215,35 @@ export function EventsPublicHeader({
                         href={link.href}
                         onClick={() => setMenuOpen(false)}
                         className={cn(
-                          'group flex items-center justify-between gap-6 rounded-2xl px-4 py-5 transition-all duration-300 hover:bg-white/[0.04]',
-                          isActive(link.href) ? 'text-white' : 'text-white/40 hover:text-white',
+                          'group flex items-center justify-between gap-6 rounded-2xl px-4 py-5 transition-all duration-300 hover:bg-bg-secondary',
+                          isActive(link.href) ? 'text-brand-navy' : 'text-text-muted hover:text-text-primary',
                         )}
                       >
                         <div className="flex items-baseline gap-4">
-                          <span className="text-xs font-mono text-[#ae936f]/50">0{index + 1}</span>
+                          <span className="font-mono text-xs text-text-muted">0{index + 1}</span>
                           <span className="font-display text-[clamp(2rem,4vw,3.5rem)] font-bold uppercase leading-none tracking-tight">
                             {link.label}
                           </span>
                         </div>
-                        <ArrowRight className="h-5 w-5 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1" />
+                        <ArrowRight className="h-5 w-5 opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
                       </a>
                     ))}
                   </nav>
 
                   <div className="mt-10 flex flex-wrap gap-3">
                     {user ? (
-                      <a href="/me" className="inline-flex items-center gap-2 rounded-full border border-white/12 px-5 py-3 text-sm text-white/70 hover:text-white">
-                        <UserRound className="h-4 w-4" /> {isPortuguese ? 'Minha conta' : 'My account'}
+                      <a
+                        href="/me"
+                        className="inline-flex items-center gap-2 rounded-full border border-bg-border px-5 py-3 text-sm text-text-secondary hover:text-text-primary"
+                      >
+                        <UserRound className="h-4 w-4" />
+                        {isPortuguese ? 'Minha conta' : 'My account'}
                       </a>
                     ) : onLogin ? (
                       <button
                         type="button"
                         onClick={() => { onLogin(); setMenuOpen(false) }}
-                        className="inline-flex items-center gap-2 rounded-full bg-[#d62a0b] px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#ebe7e0] hover:bg-[#e14425]"
+                        className="inline-flex items-center gap-2 rounded-full bg-brand-navy px-6 py-3 text-sm font-bold uppercase tracking-wider text-white hover:bg-ink-800"
                       >
                         {isPortuguese ? 'Entrar' : 'Sign in'}
                         <ArrowRight className="h-4 w-4" />
@@ -224,38 +252,43 @@ export function EventsPublicHeader({
                   </div>
                 </div>
 
+                {/* Right: featured events + language */}
                 <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#ae936f]/70">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-text-muted">
                     {isPortuguese ? 'Eventos em destaque' : 'Featured events'}
                   </div>
                   <div className="mt-6 grid gap-3">
                     {chapterEvents.length === 0 ? (
-                      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-6 text-center">
-                        <p className="text-sm text-white/30">{isPortuguese ? 'Em breve' : 'Coming soon'}</p>
+                      <div className="rounded-2xl border border-bg-border bg-bg-secondary p-6 text-center">
+                        <p className="text-sm text-text-muted">
+                          {isPortuguese ? 'Em breve' : 'Coming soon'}
+                        </p>
                       </div>
-                    ) : chapterEvents.map((event, index) => (
-                      <a
-                        key={event.id}
-                        href={`/e/${event.slug}`}
-                        onClick={() => setMenuOpen(false)}
-                        className="group flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] p-4 transition-all hover:border-[#ae936f]/20 hover:bg-white/[0.04]"
-                      >
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#ae936f]/10 font-mono text-sm font-bold text-[#ae936f]">
-                          0{index + 1}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="truncate font-semibold text-white">{event.name}</div>
-                          <div className="mt-1 text-xs text-white/40">
-                            {[event.venue_name, event.city].filter(Boolean).join(' · ')}
+                    ) : (
+                      chapterEvents.map((event, index) => (
+                        <a
+                          key={event.id}
+                          href={`/e/${event.slug}`}
+                          onClick={() => setMenuOpen(false)}
+                          className="group flex items-center gap-4 rounded-2xl border border-bg-border bg-white p-4 shadow-card transition-all hover:border-brand-navy/20 hover:shadow-card-hover"
+                        >
+                          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-brand-navy/10 font-mono text-sm font-bold text-brand-navy">
+                            0{index + 1}
                           </div>
-                        </div>
-                        <ArrowRight className="ml-auto h-4 w-4 flex-shrink-0 text-white/20 transition-all group-hover:text-[#d62a0b] group-hover:translate-x-1" />
-                      </a>
-                    ))}
+                          <div className="min-w-0">
+                            <div className="truncate font-semibold text-text-primary">{event.name}</div>
+                            <div className="mt-1 text-xs text-text-muted">
+                              {[event.venue_name, event.city].filter(Boolean).join(' · ')}
+                            </div>
+                          </div>
+                          <ArrowRight className="ml-auto h-4 w-4 flex-shrink-0 text-text-muted transition-all group-hover:translate-x-1 group-hover:text-brand-acid" />
+                        </a>
+                      ))
+                    )}
                   </div>
 
-                  <div className="mt-8 rounded-2xl border border-white/8 bg-white/[0.02] p-5">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/30">
+                  <div className="mt-8 rounded-2xl border border-bg-border bg-bg-secondary p-5">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-text-muted">
                       {isPortuguese ? 'Idioma' : 'Language'}
                     </div>
                     <div className="mt-3 grid gap-2">

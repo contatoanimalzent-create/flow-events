@@ -683,7 +683,7 @@ export function StaffApplicationsPanel({ eventId }: Props) {
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.02] py-14 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/8 bg-white/[0.04]">
-            <Users className="h-6 w-6 text-white/28" />
+            <UserX className="h-6 w-6 text-white/28" />
           </div>
           <p className="text-sm font-medium text-white/42">
             {search || tab !== 'all' ? 'Nenhuma inscrição encontrada.' : 'Nenhuma inscrição recebida ainda.'}

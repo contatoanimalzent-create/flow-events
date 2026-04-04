@@ -315,7 +315,7 @@ export function VenueMapBuilder({ eventId, readOnly = false }: VenueMapBuilderPr
                         ? 'ring-2 ring-offset-1'
                         : 'hover:bg-gray-100'
                     }`}
-                    style={drawMode === type ? { background: `${cfg.fill}20`, ringColor: cfg.fill, color: cfg.stroke } : {}}
+                    style={drawMode === type ? { background: `${cfg.fill}20`, color: cfg.stroke, outlineColor: cfg.fill } : {}}
                   >
                     <span
                       className="h-2.5 w-2.5 rounded-sm shrink-0"

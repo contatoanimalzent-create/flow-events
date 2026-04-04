@@ -1,4 +1,5 @@
 export { PaginationControls } from './PaginationControls'
+export { PulseHero } from './PulseHero'
 export {
   AdminActionBar,
   AdminFeedbackStates,

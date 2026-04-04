@@ -1140,3 +1140,62 @@ export interface Sponsor {
   created_at: string
   updated_at: string
 }
+
+// ─── Financial Entries ────────────────────────────────────────────────────────
+
+export type FinancialEntryKind = 'revenue' | 'cost'
+
+export interface FinancialEntry {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  kind: FinancialEntryKind
+  category?: string | null
+  description?: string | null
+  amount: number
+  currency: string
+  reference_date: string
+  reference_id?: string | null
+  reference_type?: string | null
+  is_reconciled: boolean
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ─── Vendors ──────────────────────────────────────────────────────────────────
+
+export type VendorStatus = 'active' | 'inactive' | 'pending'
+
+export interface Vendor {
+  id: string
+  organization_id: string
+  name: string
+  category?: string | null
+  contact_name?: string | null
+  contact_email?: string | null
+  contact_phone?: string | null
+  document?: string | null
+  status: VendorStatus
+  notes?: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ─── Person Event Profiles ────────────────────────────────────────────────────
+
+export type PersonEventRole = 'attendee' | 'staff' | 'vendor'
+
+export interface PersonEventProfile {
+  id: string
+  organization_id: string
+  event_id: string
+  profile_id?: string | null
+  email: string
+  full_name?: string | null
+  phone?: string | null
+  role: PersonEventRole
+  metadata?: Record<string, unknown> | null
+  created_at: string
+  updated_at: string
+}

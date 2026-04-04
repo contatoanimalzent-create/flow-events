@@ -62,7 +62,7 @@ interface TimelineItem {
   longitude?: number | null
 }
 
-type PageStatus = 'loading' | 'error' | 'idle' | 'active' | 'paused'
+type PageStatus = 'loading' | 'error' | 'idle' | 'active' | 'paused' | 'completed'
 
 // ---------------------------------------------------------------------------
 // Geofence helpers
@@ -283,7 +283,12 @@ export function StaffTimeclockPage() {
             .eq('session_id', s.id)
             .order('recorded_at', { ascending: true })
 
-          const entries = (entryData ?? []) as TimelineItem[]
+          const entries = (entryData ?? []).map((e) => ({
+            type: e.entry_type as EntryType,
+            recorded_at: e.recorded_at,
+            latitude: e.latitude ?? null,
+            longitude: e.longitude ?? null,
+          })) as TimelineItem[]
           setTimeline(entries)
 
           setPageStatus(s.status === 'paused' ? 'paused' : 'active')

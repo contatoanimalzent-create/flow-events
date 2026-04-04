@@ -21,26 +21,24 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
   }
 
   return (
-    <footer className="border-t border-bg-border bg-white">
-      {/* Newsletter section */}
+    <footer className="border-t border-white/8 bg-[#06070a]">
       <div className="px-5 py-16 md:px-8 lg:px-10">
-        <div className="mx-auto max-w-[1440px]">
-          {/* Newsletter card */}
-          <div className="rounded-3xl border border-bg-border bg-brand-navy p-8 lg:p-10">
+        <div className="mx-auto max-w-[1540px]">
+          <div className="rounded-[2.4rem] border border-white/8 bg-[linear-gradient(135deg,rgba(92,30,178,0.16)_0%,rgba(15,17,24,0.96)_40%,rgba(199,155,68,0.1)_100%)] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.32)] lg:p-10">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-white/50">
-                  {isPortuguese ? 'Novidades' : 'Newsletter'}
+                <div className="text-[10px] uppercase tracking-[0.38em] text-[#d8c39a]">
+                  {isPortuguese ? 'Radar Animalz' : 'Animalz radar'}
                 </div>
-                <h3 className="mt-4 font-display text-[clamp(1.8rem,3vw,2.6rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
+                <h3 className="mt-4 font-display text-[clamp(2rem,3vw,3rem)] uppercase leading-[0.9] tracking-[-0.04em] text-[#fff8ef]">
                   {isPortuguese
-                    ? 'Receba novos eventos antes de todo mundo.'
-                    : 'Get new events before everyone else.'}
+                    ? 'Receba proximos eventos e aberturas de acesso.'
+                    : 'Get upcoming events and access openings.'}
                 </h3>
-                <p className="mt-3 max-w-md text-sm text-white/50">
+                <p className="mt-3 max-w-xl text-sm leading-7 text-white/58">
                   {isPortuguese
-                    ? 'Entre na lista e saiba primeiro sobre experiencias exclusivas.'
-                    : 'Join the list and be the first to know about exclusive experiences.'}
+                    ? 'Novidades publicas, experiencias em destaque e avisos de lancamento em uma camada mais seletiva.'
+                    : 'Public launches, featured experiences and release alerts in a more selective layer.'}
                 </p>
               </div>
 
@@ -50,23 +48,22 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={isPortuguese ? 'Seu melhor email' : 'Your best email'}
-                  className="flex-1 rounded-xl border border-white/15 bg-white/10 px-5 py-3 text-sm text-white outline-none transition-all placeholder:text-white/30 focus:border-white/30 focus:bg-white/15"
+                  className="flex-1 rounded-full border border-white/12 bg-white/[0.06] px-5 py-3 text-sm text-[#fff8ef] outline-none transition-all placeholder:text-white/30 focus:border-[#c79b44]/35 focus:bg-white/[0.08]"
                   required
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-xl bg-brand-acid px-5 py-3 text-sm font-bold text-white transition-all hover:bg-[#e14425]"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#f5f0e8] px-5 py-3 text-sm font-bold uppercase tracking-[0.18em] text-[#0a0b0f] transition-all hover:bg-[#c79b44]"
                 >
-                  {subscribed ? '✓' : <ArrowRight className="h-4 w-4" />}
+                  {subscribed ? 'OK' : <ArrowRight className="h-4 w-4" />}
                 </button>
               </form>
             </div>
           </div>
 
-          {/* Categories */}
           {categories.length > 0 ? (
             <div className="mt-10">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-text-muted">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-[#d8c39a]">
                 {isPortuguese ? 'Categorias' : 'Categories'}
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -75,7 +72,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                     key={category}
                     type="button"
                     onClick={() => onCategoryClick?.(category)}
-                    className="rounded-full border border-bg-border bg-bg-secondary px-4 py-2 text-xs text-text-secondary transition-all hover:border-brand-navy/20 hover:text-text-primary"
+                    className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs text-white/64 transition-all hover:border-[#c79b44]/25 hover:text-white"
                   >
                     {category}
                   </button>
@@ -84,26 +81,25 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             </div>
           ) : null}
 
-          {/* Main footer links */}
-          <div className="mt-12 grid gap-8 border-t border-bg-border pt-10 lg:grid-cols-[1fr_0.6fr_0.6fr_0.6fr]">
+          <div className="mt-12 grid gap-8 border-t border-white/8 pt-10 lg:grid-cols-[1fr_0.6fr_0.6fr_0.6fr]">
             <div>
               <a href="/" className="inline-flex items-center gap-3">
-                <img src="/logo.png" alt="Animalz Events" className="h-9 w-auto" />
-                <span className="text-sm font-bold uppercase tracking-[0.15em] text-brand-navy">
-                  Animalz<span className="text-brand-acid">.</span>events
+                <img src="/logo.png" alt="Animalz Events" className="h-10 w-auto" />
+                <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[#fff8ef]">
+                  Animalz.Events
                 </span>
               </a>
-              <p className="mt-4 max-w-sm text-sm leading-relaxed text-text-secondary">
+              <p className="mt-4 max-w-sm text-sm leading-7 text-white/56">
                 {isPortuguese
-                  ? 'Plataforma premium de eventos. Descoberta, venda e operacao em um so lugar.'
-                  : 'Premium events platform. Discovery, sales and operations in one place.'}
+                  ? 'Plataforma premium para descoberta, venda, operacao e governanca de eventos.'
+                  : 'Premium platform for discovery, sales, operations and governance in events.'}
               </p>
-              <div className="mt-4 space-y-2 text-sm text-text-muted">
+              <div className="mt-5 space-y-2 text-sm text-white/44">
                 <div className="flex items-center gap-2">
                   <Globe className="h-3.5 w-3.5" /> events.animalzgroup.com
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="h-3.5 w-3.5" /> +1 469 862 9040
+                  <Phone className="h-3.5 w-3.5" /> +55 11 99999-0000
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-3.5 w-3.5" /> contato@animalzevents.com
@@ -121,14 +117,14 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                 ],
               },
               {
-                title: isPortuguese ? 'Produtores' : 'Creators',
+                title: isPortuguese ? 'Produtor' : 'Producer',
                 links: [
+                  { label: isPortuguese ? 'Login' : 'Login', href: '/login' },
                   { label: isPortuguese ? 'Criar evento' : 'Create event', href: '/create-event' },
-                  { label: isPortuguese ? 'Sobre' : 'About', href: '/about' },
                 ],
               },
               {
-                title: isPortuguese ? 'Juridico' : 'Legal',
+                title: isPortuguese ? 'Legal' : 'Legal',
                 links: [
                   { label: isPortuguese ? 'Privacidade' : 'Privacy', href: '/privacy' },
                   { label: isPortuguese ? 'Termos' : 'Terms', href: '/terms' },
@@ -136,15 +132,13 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               },
             ].map((section) => (
               <div key={section.title}>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-text-muted">
-                  {section.title}
-                </div>
+                <div className="text-[10px] uppercase tracking-[0.3em] text-[#d8c39a]">{section.title}</div>
                 <div className="mt-4 grid gap-3">
                   {section.links.map((link) => (
                     <a
                       key={link.label}
                       href={link.href}
-                      className="text-sm text-text-secondary transition-colors hover:text-brand-navy"
+                      className="text-sm text-white/56 transition-colors hover:text-white"
                     >
                       {link.label}
                     </a>
@@ -154,15 +148,14 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             ))}
           </div>
 
-          {/* Bottom bar */}
-          <div className="mt-10 flex flex-col gap-3 border-t border-bg-border pt-6 text-xs text-text-muted md:flex-row md:items-center md:justify-between">
+          <div className="mt-10 flex flex-col gap-3 border-t border-white/8 pt-6 text-xs text-white/38 md:flex-row md:items-center md:justify-between">
             <p>
               &copy; {new Date().getFullYear()} Animalz Events.{' '}
               {isPortuguese ? 'Todos os direitos reservados.' : 'All rights reserved.'}
             </p>
             <p className="flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-acid" />
-              {isPortuguese ? 'Plataforma premium de eventos' : 'Premium events platform'}
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#c79b44]" />
+              {isPortuguese ? 'Operacao premium de eventos' : 'Premium event operations'}
             </p>
           </div>
         </div>

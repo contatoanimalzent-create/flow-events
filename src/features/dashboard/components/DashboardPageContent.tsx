@@ -23,17 +23,17 @@ export function DashboardPageContent() {
     <div className="admin-page">
       <div className="admin-header">
         <div>
-          <div className="admin-eyebrow">Executive overview</div>
+          <div className="admin-eyebrow">Command center</div>
           <h1 className="admin-title">
             Dashboard<span className="admin-title-accent">.</span>
           </h1>
-          <p className="admin-subtitle">Visao executiva de receita, operacao, clientes e campanhas.</p>
+          <p className="admin-subtitle">Visao executiva de receita, operacao, acesso, clientes e governanca do evento.</p>
         </div>
         <div className="novare-stage-panel-dark">
-          <div className="novare-stage-label">Operations command</div>
-          <div className="novare-stage-title">Receita, ocupacao e saude operacional em uma unica leitura.</div>
+          <div className="novare-stage-label">Executive cockpit</div>
+          <div className="novare-stage-title">Receita, ocupacao, risco e ritmo operacional em uma unica leitura.</div>
           <div className="novare-stage-copy">
-            Painel executivo para produtores que precisam enxergar caixa, conversao, check-in e risco sem alternar entre modulos.
+            Painel premium para produtores que precisam enxergar caixa, conversao, check-in, alertas e saude da operacao sem alternar entre modulos.
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button onClick={() => void dashboard.refresh()} className="btn-primary flex items-center gap-2 text-xs">
@@ -60,7 +60,7 @@ export function DashboardPageContent() {
               key={value}
               onClick={() => dashboard.setPeriod(value)}
               className={cn(
-                'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
+              'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
                 dashboard.period === value ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >

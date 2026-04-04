@@ -10,6 +10,8 @@ export type PublicRoute =
   | 'privacy'
   | 'contact'
   | { type: 'event'; slug: string }
+  | { type: 'staff-join'; token: string }
+  | { type: 'timeclock'; eventId: string; credentialToken: string }
 
 export function getInitialPublicRoute(): PublicRoute {
   const path = window.location.pathname
@@ -28,9 +30,35 @@ export function getInitialPublicRoute(): PublicRoute {
     return { type: 'event', slug: eventMatch[1] }
   }
 
+  const staffJoinMatch = path.match(/^\/staff\/join\/([^/]+)/)
+  if (staffJoinMatch) {
+    return { type: 'staff-join', token: staffJoinMatch[1] }
+  }
+
+  if (path === '/timeclock') {
+    const params = new URLSearchParams(window.location.search)
+    const eventId = params.get('event_id') ?? ''
+    const credentialToken = params.get('credential_token') ?? ''
+    if (eventId) return { type: 'timeclock', eventId, credentialToken }
+  }
+
   return 'home'
 }
 
 export function isImmediatePublicRoute(route: PublicRoute) {
-  return typeof route === 'object' || route === 'events' || route === 'about' || route === 'create-event' || route === 'account' || route === 'terms' || route === 'privacy' || route === 'contact' || route === 'signup'
+  return (
+    typeof route === 'object' ||
+    route === 'events' ||
+    route === 'about' ||
+    route === 'create-event' ||
+    route === 'account' ||
+    route === 'terms' ||
+    route === 'privacy' ||
+    route === 'contact' ||
+    route === 'signup'
+  )
+}
+
+export function isStaffJoinRoute(route: PublicRoute): route is { type: 'staff-join'; token: string } {
+  return typeof route === 'object' && route.type === 'staff-join'
 }

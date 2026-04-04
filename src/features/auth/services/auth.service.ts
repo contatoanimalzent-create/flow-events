@@ -17,6 +17,10 @@ export const authService = {
       provider: 'google',
       options: { redirectTo: window.location.origin },
     }),
+  resetPasswordForEmail: (email: string) =>
+    supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    }),
   signOut: () => supabase.auth.signOut(),
   updatePassword: (password: string) => supabase.auth.updateUser({ password }),
   getProfileById: async (userId: string): Promise<Profile | null> => {

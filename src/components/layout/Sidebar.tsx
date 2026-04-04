@@ -61,7 +61,7 @@ function createNavGroups(isPortuguese: boolean): NavGroup[] {
     {
       label: isPortuguese ? 'Campo e pessoas' : 'Field and people',
       items: [
-        { id: 'crm',           label: isPortuguese ? 'Relacionamento' : 'CRM',           blurb: isPortuguese ? 'Publico e audiencias.'           : 'Audience and retention.',         icon: Users       },
+        { id: 'crm',           label: isPortuguese ? 'Participantes' : 'Participants',   blurb: isPortuguese ? 'Publico, CRM e audiencias.'     : 'Audience, CRM and retention.',    icon: Users       },
         { id: 'checkin',       label: isPortuguese ? 'Credenciamento' : 'Check-in',      blurb: isPortuguese ? 'Acesso e validacao.'             : 'Access and validation.',          icon: ScanLine    },
         { id: 'staff',         label: isPortuguese ? 'Staff'          : 'Staff',         blurb: isPortuguese ? 'Cadastro e escala.'              : 'Roster and shifts.',              icon: Users       },
         { id: 'suppliers',     label: isPortuguese ? 'Fornecedores'   : 'Suppliers',     blurb: isPortuguese ? 'Parceiros.'                      : 'Partners.',                       icon: Truck       },
@@ -84,7 +84,7 @@ function createNavGroups(isPortuguese: boolean): NavGroup[] {
     {
       label: isPortuguese ? 'Sistema' : 'System',
       items: [
-        { id: 'settings', label: isPortuguese ? 'Configuracoes' : 'Settings', blurb: isPortuguese ? 'Marca e permissoes.' : 'Brand and permissions.', icon: Settings   },
+        { id: 'settings', label: isPortuguese ? 'Governanca' : 'Governance', blurb: isPortuguese ? 'Marca, permissoes e documentos.' : 'Brand, permissions and documents.', icon: Settings   },
         { id: 'help',     label: isPortuguese ? 'Ajuda'         : 'Help',     blurb: isPortuguese ? 'Suporte.'            : 'Support.',               icon: HelpCircle },
       ],
     },
@@ -113,9 +113,9 @@ function NavButton({
         'group flex w-full items-start gap-3 rounded-[14px] border px-3 py-2.5 text-left transition-all duration-200',
         isActive
           ? [
-              'border-[rgba(214,42,11,0.28)]',
-              'bg-[linear-gradient(180deg,rgba(214,42,11,0.18)_0%,rgba(214,42,11,0.08)_100%)]',
-              'shadow-[0_3px_16px_rgba(214,42,11,0.18),0_1px_4px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08)]',
+              'border-[rgba(92,30,178,0.34)]',
+              'bg-[linear-gradient(180deg,rgba(92,30,178,0.18)_0%,rgba(199,155,68,0.06)_100%)]',
+              'shadow-[0_3px_18px_rgba(92,30,178,0.2),0_1px_4px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08)]',
             ]
           : [
               'border-transparent',
@@ -131,10 +131,10 @@ function NavButton({
           'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-200',
           isActive
             ? [
-                'border-[rgba(214,42,11,0.35)]',
-                'bg-[radial-gradient(circle_at_35%_30%,rgba(214,42,11,0.30),rgba(214,42,11,0.12))]',
-                'text-[#ffe0da]',
-                'shadow-[0_0_12px_rgba(214,42,11,0.28),0_2px_6px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.14)]',
+                'border-[rgba(92,30,178,0.35)]',
+                'bg-[radial-gradient(circle_at_35%_30%,rgba(92,30,178,0.32),rgba(92,30,178,0.12))]',
+                'text-[#f4ecff]',
+                'shadow-[0_0_12px_rgba(92,30,178,0.28),0_2px_6px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.14)]',
               ]
             : [
                 'border-[rgba(255,255,255,0.10)]',
@@ -194,7 +194,7 @@ function SidebarNav({
           {/* Group label */}
           <div
             className="mb-2 px-3 text-[9px] font-semibold uppercase tracking-[0.38em]"
-            style={{ color: 'rgba(174,147,111,0.65)' }}
+            style={{ color: 'rgba(216,195,154,0.72)' }}
           >
             {group.label}
           </div>
@@ -259,12 +259,12 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
             boxShadow: '0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12)',
           }}
         >
-          <img src="/logo.png" alt="Flow Events" className="h-7 w-auto object-contain" />
+          <img src="/logo.png" alt="Animalz Events" className="h-7 w-auto object-contain" />
         </div>
         <div className="min-w-0">
           <div
             className="text-[9px] font-semibold uppercase tracking-[0.38em]"
-            style={{ color: 'rgba(174,147,111,0.75)' }}
+            style={{ color: 'rgba(216,195,154,0.75)' }}
           >
             {isPortuguese ? 'Area do produtor' : 'Producer area'}
           </div>
@@ -272,7 +272,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
             className="mt-0.5 font-display text-[1.5rem] leading-none tracking-[-0.03em]"
             style={{ color: '#f8fafc' }}
           >
-            Flow Events
+            Animalz Events
           </div>
         </div>
       </div>
@@ -300,10 +300,10 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
         <div
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
           style={{
-            background: 'radial-gradient(circle at 35% 30%, rgba(214,42,11,0.35), rgba(214,42,11,0.15))',
-            border: '1px solid rgba(214,42,11,0.35)',
-            color: '#ffd0ca',
-            boxShadow: '0 0 12px rgba(214,42,11,0.22), 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+            background: 'radial-gradient(circle at 35% 30%, rgba(92,30,178,0.34), rgba(92,30,178,0.16))',
+            border: '1px solid rgba(92,30,178,0.35)',
+            color: '#f2e9ff',
+            boxShadow: '0 0 12px rgba(92,30,178,0.22), 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
           }}
         >
           {initials || '?'}
@@ -354,7 +354,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
     backgroundImage: `
       repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.013) 1px, rgba(255,255,255,0.013) 2px),
       repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.009) 1px, rgba(255,255,255,0.009) 2px),
-      linear-gradient(180deg, #0f1e3d 0%, #0a1428 100%)
+      linear-gradient(180deg, #0c1018 0%, #080b12 100%)
     `,
     backgroundSize: '2px 2px, 2px 2px, 100% 100%',
   }
@@ -424,7 +424,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
                   className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden"
                   style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 2px 8px rgba(0,0,0,0.35)' }}
                 >
-                  <img src="/logo.png" alt="Flow Events" className="h-6 w-auto object-contain" />
+                  <img src="/logo.png" alt="Animalz Events" className="h-6 w-auto object-contain" />
                 </div>
                 <div
                   className="font-display text-[1.8rem] leading-none tracking-[-0.03em]"

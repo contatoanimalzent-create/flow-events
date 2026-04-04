@@ -71,7 +71,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
               className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
             <div className="hidden min-w-0 xl:block">
-              <div className="text-[10px] uppercase tracking-[0.42em] text-[#ae936f]">{access.role}</div>
+              <div className="text-[10px] uppercase tracking-[0.42em] text-[#d8c39a]">{access.role}</div>
               <div className="font-display text-[1.4rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">
                 Animalz.Events
               </div>
@@ -86,7 +86,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
                 className={cn(
                   'rounded-full px-5 py-3 text-[13px] font-medium transition-all duration-300',
                   activeSection === item.id
-                    ? 'bg-white/10 text-[#ebe7e0]'
+                    ? 'bg-[linear-gradient(180deg,rgba(92,30,178,0.18),rgba(92,30,178,0.1))] text-[#ebe7e0]'
                     : 'text-[#8e847d] hover:bg-white/5 hover:text-[#ebe7e0]',
                 )}
               >
@@ -98,7 +98,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setShowSearch(true)}
-              className="hidden items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2.5 text-sm text-[#8e847d] transition-all hover:border-[#ae936f]/25 hover:text-[#ebe7e0] md:flex"
+              className="hidden items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2.5 text-sm text-[#8e847d] transition-all hover:border-[#c79b44]/25 hover:text-[#ebe7e0] md:flex"
             >
               <Search className="h-4 w-4" />
               <span>{t('Search...', 'Buscar...')}</span>
@@ -107,7 +107,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
 
             <button
               onClick={() => setLocale(locale === 'en-US' ? 'pt-BR' : 'en-US')}
-              className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.22em] text-[#8e847d] transition-all hover:border-[#ae936f]/25 hover:text-[#ebe7e0]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.22em] text-[#8e847d] transition-all hover:border-[#c79b44]/25 hover:text-[#ebe7e0]"
               title={t('Switch language', 'Trocar idioma')}
             >
               <Globe className="h-4 w-4" />
@@ -116,11 +116,11 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
 
             <button
               onClick={() => setShowNotifications((current) => !current)}
-              className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-[#8e847d] transition-all hover:border-[#ae936f]/25 hover:text-[#ebe7e0]"
+              className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-[#8e847d] transition-all hover:border-[#c79b44]/25 hover:text-[#ebe7e0]"
             >
               <Bell className="h-4 w-4" />
               {notifications.unreadCount > 0 ? (
-                <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#d62a0b]" />
+                <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#7d49e6]" />
               ) : null}
             </button>
 
@@ -134,7 +134,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
 
             <button
               onClick={onMenuToggle}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-[#ebe7e0] transition-all hover:border-[#ae936f]/25 hover:text-[#ae936f] lg:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-[#ebe7e0] transition-all hover:border-[#c79b44]/25 hover:text-[#d8c39a] lg:hidden"
               title={t('Open navigation', 'Abrir navegacao')}
             >
               <Menu className="h-4 w-4" />
@@ -147,7 +147,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 pt-24 backdrop-blur-md">
           <div className="w-full max-w-3xl overflow-hidden rounded-[2rem] border border-white/8 bg-[#12100f] shadow-[0_30px_120px_rgba(0,0,0,0.65)]">
             <div className="flex items-center gap-3 border-b border-white/6 px-5 py-4">
-              <Search className="h-5 w-5 text-[#8e847d]" />
+              <Search className="h-5 w-5 text-[#d8c39a]" />
               <input
                 autoFocus
                 value={searchQuery}
@@ -179,7 +179,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
         <div className="absolute right-6 top-[96px] z-40 w-[420px] overflow-hidden rounded-[2rem] border border-white/8 bg-[#12100f] shadow-[0_30px_120px_rgba(0,0,0,0.65)]">
           <div className="flex items-center justify-between border-b border-white/6 px-5 py-5">
             <div>
-              <div className="text-[10px] uppercase tracking-[0.34em] text-[#ae936f]">{access.role}</div>
+              <div className="text-[10px] uppercase tracking-[0.34em] text-[#d8c39a]">{access.role}</div>
               <h3 className="mt-2 font-display text-[2rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">
                 {t('Internal center', 'Centro interno')}
               </h3>
@@ -198,7 +198,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
               className={cn(
                 'rounded-full px-4 py-2 text-xs font-medium transition-all',
                 panelTab === 'notifications'
-                  ? 'bg-[#d62a0b] text-[#ebe7e0]'
+                  ? 'bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] text-[#ebe7e0]'
                   : 'text-[#8e847d] hover:bg-white/5 hover:text-[#ebe7e0]',
               )}
             >

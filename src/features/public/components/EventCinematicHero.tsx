@@ -43,7 +43,7 @@ export function EventCinematicHero({
             fallbackImage={fallbackImage}
             scrollY={scrollY}
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,45,45,0.18),transparent_28%),linear-gradient(104deg,rgba(5,7,10,0.9)_0%,rgba(5,7,10,0.56)_40%,rgba(5,7,10,0.22)_66%,rgba(5,7,10,0.88)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(92,30,178,0.26),transparent_28%),radial-gradient(circle_at_82%_20%,rgba(199,155,68,0.16),transparent_20%),linear-gradient(104deg,rgba(5,7,10,0.9)_0%,rgba(5,7,10,0.56)_40%,rgba(5,7,10,0.22)_66%,rgba(5,7,10,0.88)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,7,10,0.08)_0%,rgba(5,7,10,0)_28%,rgba(5,7,10,0.9)_100%)]" />
 
           <div className="relative z-10 flex min-h-[calc(100svh-7.25rem)] flex-col justify-between p-7 text-white md:p-10 lg:p-14">
@@ -79,7 +79,7 @@ export function EventCinematicHero({
                 <PublicReveal className="mt-8 flex flex-wrap items-center gap-4" delayMs={120}>
                   <a
                     href="#tickets"
-                    className="inline-flex items-center gap-3 rounded-full bg-[#ff2d2d] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-500 hover:-translate-y-1 hover:bg-[#ff4133] hover:shadow-[0_20px_44px_rgba(255,45,45,0.24)]"
+                    className="inline-flex items-center gap-3 rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_44px_rgba(92,30,178,0.28)]"
                   >
                     {isFreeMode ? (isPortuguese ? 'Garantir inscricao' : 'Reserve registration') : (isPortuguese ? 'Comprar ingressos' : 'Buy tickets')}
                     <ArrowRight className="h-4 w-4" />
@@ -132,8 +132,8 @@ export function EventCinematicHero({
 
                       return (
                         <div key={item.label} className="flex items-center gap-3 rounded-[1.4rem] border border-white/10 bg-white/[0.04] px-4 py-3">
-                          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-[#ff2d2d]/10">
-                            <Icon className="h-4 w-4 text-[#ff6a5c]" />
+                          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-[#5c1eb2]/12">
+                            <Icon className="h-4 w-4 text-[#d8c39a]" />
                           </div>
                           <div>
                             <div className="text-[10px] uppercase tracking-[0.24em] text-white/46">{item.label}</div>

@@ -6,24 +6,24 @@ export default {
       colors: {
         /* ── Admin light theme ── */
         bg: {
-          primary:   '#f8fafc',
-          secondary: '#f1f5f9',
-          card:      '#ffffff',
-          surface:   '#ffffff',
-          border:    '#e2e8f0',
-          elevated:  '#f1f5f9',
+          primary:   '#06070a',
+          secondary: '#0d1017',
+          card:      '#12161f',
+          surface:   '#181d27',
+          border:    '#272d38',
+          elevated:  '#1d2330',
         },
         text: {
-          primary:   '#0f172a',
-          secondary: '#475569',
-          muted:     '#94a3b8',
+          primary:   '#f5f0e8',
+          secondary: '#b6ac9e',
+          muted:     '#7c8495',
         },
         /* ── Brand ── */
         brand: {
-          navy:   '#0d1b35',   /* primary brand / sidebar */
-          blue:   '#1e3a8a',   /* deep blue accent */
-          sky:    '#3b82f6',   /* interactive blue */
-          acid:   '#d62a0b',   /* red CTA */
+          navy:   '#0d1118',
+          blue:   '#31405f',
+          sky:    '#7c94d8',
+          acid:   '#5c1eb2',
           yellow: '#D4FF00',   /* acid yellow — editorial hero accent */
           teal:   '#ae936f',   /* warm gold accent */
           purple: '#d9bca0',
@@ -70,8 +70,8 @@ export default {
         'pressed':        '0 1px 3px rgba(15,23,42,0.15) inset, 0 -1px 0 rgba(255,255,255,0.4) inset',
         /* Glow effects */
         'glow-navy':      '0 8px 32px rgba(13,27,53,0.35)',
-        'glow-acid':      '0 8px 28px rgba(214,42,11,0.30)',
-        'glow-yellow':    '0 8px 40px rgba(212,255,0,0.35)',
+        'glow-acid':      '0 14px 38px rgba(92,30,178,0.34)',
+        'glow-yellow':    '0 12px 36px rgba(199,155,68,0.24)',
         'glow-sky':       '0 8px 28px rgba(59,130,246,0.28)',
         'glow-teal':      '0 8px 28px rgba(174,147,111,0.22)',
         'glow-error':     '0 8px 28px rgba(220,38,38,0.28)',
@@ -104,7 +104,7 @@ export default {
       },
       backgroundImage: {
         'gradient-navy':  'linear-gradient(135deg, #0d1b35 0%, #142d56 100%)',
-        'gradient-acid':  'linear-gradient(135deg, #d62a0b 0%, #f04820 100%)',
+        'gradient-acid':  'linear-gradient(135deg, #4a1794 0%, #7a3ff0 100%)',
         'gradient-sky':   'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
         'gradient-light': 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
         'gradient-card':  'linear-gradient(180deg, #ffffff 0%, #fafbfc 100%)',

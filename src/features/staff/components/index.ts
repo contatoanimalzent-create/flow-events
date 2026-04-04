@@ -1,3 +1,7 @@
 export { StaffMemberTableRow } from './StaffMemberRow'
 export { StaffPageContent } from './StaffPageContent'
 export { StaffStatsGrid } from './StaffStatsGrid'
+export { StaffApplicationsPanel } from './StaffApplicationsPanel'
+export { CredentialCard } from './CredentialCard'
+export type { CredentialData } from './CredentialCard'
+export { VenueMapBuilder } from './VenueMapBuilder'

@@ -241,10 +241,10 @@ export function SettingsPage() {
       {/* Header */}
       <div className="reveal">
         <h1 className="font-display text-4xl tracking-wide text-text-primary leading-none">
-          CONFIGURAÇÕES<span className="text-brand-acid">.</span>
+          GOVERNANÇA<span className="text-brand-acid">.</span>
         </h1>
         <p className="text-text-muted text-xs mt-1 font-mono tracking-wider">
-          Organizacao, marca branca, planos e equipe
+          Organizacao, marca, permissoes, integracoes e trilha operacional
         </p>
       </div>
 

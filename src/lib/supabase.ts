@@ -78,6 +78,35 @@ export type Database = {
       event_assets:                     { Row: EventAsset;                     Insert: Partial<EventAsset>;                     Update: Partial<EventAsset> }
       capital_strike_registrations:     { Row: CapitalStrikeRegistration;      Insert: Partial<CapitalStrikeRegistration>;      Update: Partial<CapitalStrikeRegistration> }
       sponsors:                         { Row: Sponsor;                        Insert: Partial<Sponsor>;                        Update: Partial<Sponsor> }
+      // ── Operational schema (20260403) ──────────────────────────────────────
+      event_editions:                   { Row: EventEdition;                   Insert: Partial<EventEdition>;                   Update: Partial<EventEdition> }
+      venues:                           { Row: Venue;                          Insert: Partial<Venue>;                          Update: Partial<Venue> }
+      venue_maps:                       { Row: VenueMap;                       Insert: Partial<VenueMap>;                       Update: Partial<VenueMap> }
+      venue_zones:                      { Row: VenueZone;                      Insert: Partial<VenueZone>;                      Update: Partial<VenueZone> }
+      venue_items:                      { Row: VenueItem;                      Insert: Partial<VenueItem>;                      Update: Partial<VenueItem> }
+      stages:                           { Row: Stage;                          Insert: Partial<Stage>;                          Update: Partial<Stage> }
+      stands:                           { Row: Stand;                          Insert: Partial<Stand>;                          Update: Partial<Stand> }
+      checkpoints:                      { Row: Checkpoint;                     Insert: Partial<Checkpoint>;                     Update: Partial<Checkpoint> }
+      teams:                            { Row: Team;                           Insert: Partial<Team>;                           Update: Partial<Team> }
+      shifts:                           { Row: Shift;                          Insert: Partial<Shift>;                          Update: Partial<Shift> }
+      staff_invite_links:               { Row: StaffInviteLink;                Insert: Partial<StaffInviteLink>;                Update: Partial<StaffInviteLink> }
+      staff_applications:               { Row: StaffApplication;               Insert: Partial<StaffApplication>;               Update: Partial<StaffApplication> }
+      credentials:                      { Row: Credential;                     Insert: Partial<Credential>;                     Update: Partial<Credential> }
+      credential_access_rules:          { Row: CredentialAccessRule;           Insert: Partial<CredentialAccessRule>;           Update: Partial<CredentialAccessRule> }
+      qr_tokens:                        { Row: QrToken;                        Insert: Partial<QrToken>;                        Update: Partial<QrToken> }
+      checkin_logs:                     { Row: CheckinLog;                     Insert: Partial<CheckinLog>;                     Update: Partial<CheckinLog> }
+      event_geofences:                  { Row: EventGeofence;                  Insert: Partial<EventGeofence>;                  Update: Partial<EventGeofence> }
+      timeclock_sessions:               { Row: TimeclockSession;               Insert: Partial<TimeclockSession>;               Update: Partial<TimeclockSession> }
+      timeclock_entries:                { Row: TimeclockEntry;                 Insert: Partial<TimeclockEntry>;                 Update: Partial<TimeclockEntry> }
+      timeclock_exceptions:             { Row: TimeclockException;             Insert: Partial<TimeclockException>;             Update: Partial<TimeclockException> }
+      email_templates:                  { Row: EmailTemplate;                  Insert: Partial<EmailTemplate>;                  Update: Partial<EmailTemplate> }
+      whatsapp_templates:               { Row: WhatsappTemplate;               Insert: Partial<WhatsappTemplate>;               Update: Partial<WhatsappTemplate> }
+      communications_log:               { Row: CommunicationsLog;              Insert: Partial<CommunicationsLog>;              Update: Partial<CommunicationsLog> }
+      notification_jobs:                { Row: NotificationJob;                Insert: Partial<NotificationJob>;                Update: Partial<NotificationJob> }
+      documents:                        { Row: Document;                       Insert: Partial<Document>;                       Update: Partial<Document> }
+      financial_entries:                { Row: FinancialEntry;                 Insert: Partial<FinancialEntry>;                 Update: Partial<FinancialEntry> }
+      vendors:                          { Row: Vendor;                         Insert: Partial<Vendor>;                         Update: Partial<Vendor> }
+      person_event_profiles:            { Row: PersonEventProfile;             Insert: Partial<PersonEventProfile>;             Update: Partial<PersonEventProfile> }
     }
   }
 }

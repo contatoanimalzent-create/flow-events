@@ -17,7 +17,7 @@ interface CartItem {
 export function TicketAvailabilityBadge({ available }: { available: number }) {
   const { isPortuguese } = usePublicLocale()
   if (available <= 0) {
-    return <PremiumBadge tone="accent" className="border-[#ff2d2d]/28 bg-[#ff2d2d]/12 text-white">{isPortuguese ? 'Esgotado' : 'Sold out'}</PremiumBadge>
+    return <PremiumBadge tone="accent" className="border-[#5c1eb2]/28 bg-[#5c1eb2]/16 text-white">{isPortuguese ? 'Esgotado' : 'Sold out'}</PremiumBadge>
   }
 
   if (available <= 20) {
@@ -50,7 +50,7 @@ export function TicketOptionCard({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <div className="h-2.5 w-2.5 rounded-full" style={{ background: ticketType.color || '#ff2d2d' }} />
+            <div className="h-2.5 w-2.5 rounded-full" style={{ background: ticketType.color || '#5c1eb2' }} />
             <div className="text-[11px] uppercase tracking-[0.26em] text-white/46">{ticketType.name}</div>
           </div>
           <div className="mt-4 font-display text-[2rem] font-semibold uppercase leading-[0.92] tracking-[-0.03em] text-white">
@@ -102,7 +102,7 @@ export function TicketOptionCard({
             type="button"
             onClick={onAdd}
             disabled={isDisabled}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#ff2d2d] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ff4133] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] text-white transition-all duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Plus className="h-4 w-4" />
           </button>
@@ -160,7 +160,7 @@ export function StickyPurchaseCTA({
 
             document.getElementById('tickets')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
           }}
-          className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-white"
+          className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-white"
         >
           {cartQty > 0 ? (isPortuguese ? 'Finalizar compra' : 'Checkout') : isPortuguese ? 'Ver ingressos' : 'View tickets'}
           <ChevronRight className="h-4 w-4" />
@@ -247,7 +247,7 @@ export function EventTicketPanelPremium({
             <PublicReveal delayMs={140}>
               <div className="rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-7 shadow-[0_18px_55px_rgba(0,0,0,0.26)]">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ff2d2d]/12 text-[#ff6a5c]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#5c1eb2]/14 text-[#d8c39a]">
                     <Ticket className="h-5 w-5" />
                   </div>
                   <div>
@@ -318,7 +318,7 @@ export function EventTicketPanelPremium({
                   type="button"
                   onClick={onCheckout}
                   disabled={cartQty === 0}
-                  className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#ff2d2d] px-5 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ff4133] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] px-5 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {isPortuguese ? 'Ir para a compra' : 'Go to checkout'}
                   <ChevronRight className="h-4 w-4" />
@@ -333,7 +333,7 @@ export function EventTicketPanelPremium({
                       : isPortuguese ? 'Entrada sustentada por QR code antifraude' : 'Entry supported by anti-fraud QR code',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-3">
-                      <Sparkles className="mt-1 h-4 w-4 text-[#ff6a5c]" />
+                      <Sparkles className="mt-1 h-4 w-4 text-[#d8c39a]" />
                       <span>{item}</span>
                     </div>
                   ))}

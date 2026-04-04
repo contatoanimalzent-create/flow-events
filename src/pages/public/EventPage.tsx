@@ -76,7 +76,7 @@ function NotFoundState({ isPortuguese }: { isPortuguese: boolean }) {
           </p>
           <a
             href="/events"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-5 py-3 text-sm font-medium uppercase tracking-[0.12em] text-white"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] px-5 py-3 text-sm font-medium uppercase tracking-[0.12em] text-white"
           >
             {isPortuguese ? 'Voltar para experiencias' : 'Back to experiences'}
             <ArrowRight className="h-4 w-4" />
@@ -305,7 +305,7 @@ export function EventPage({ slug }: { slug: string }) {
             onClick={() => setLiked((current) => !current)}
             className={[
               'flex h-11 w-11 items-center justify-center rounded-full border transition-colors',
-              liked ? 'border-[#ff2d2d]/28 bg-[#ff2d2d]/14 text-white' : 'border-white/10 bg-white/[0.06] text-white',
+              liked ? 'border-[#5c1eb2]/28 bg-[#5c1eb2]/16 text-white' : 'border-white/10 bg-white/[0.06] text-white',
             ].join(' ')}
           >
             <Heart className={['h-4 w-4', liked ? 'fill-current' : ''].join(' ')} />
@@ -314,7 +314,7 @@ export function EventPage({ slug }: { slug: string }) {
             <button
               type="button"
               onClick={() => setStep('checkout')}
-              className="inline-flex items-center gap-2 rounded-full bg-[#ff2d2d] px-4 py-2.5 text-sm font-medium uppercase tracking-[0.12em] text-white"
+              className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] px-4 py-2.5 text-sm font-medium uppercase tracking-[0.12em] text-white"
             >
               <Ticket className="h-4 w-4" />
               {cartQty} {isPortuguese ? `selecionado${cartQty > 1 ? 's' : ''}` : `selected${cartQty > 1 ? '' : ''}`}
@@ -408,7 +408,7 @@ export function EventPage({ slug }: { slug: string }) {
                         return (
                           <div key={item.label} className="rounded-[1.4rem] border border-white/8 bg-white/[0.05] p-4">
                             <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.26em] text-white/46">
-                              <Icon className="h-4 w-4 text-[#ff6a5c]" />
+                              <Icon className="h-4 w-4 text-[#d8c39a]" />
                               {item.label}
                             </div>
                             <div className="mt-3 text-sm font-medium text-white">{item.value}</div>
@@ -483,7 +483,7 @@ export function EventPage({ slug }: { slug: string }) {
 
                     document.getElementById('tickets')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff2d2d] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white"
                 >
                   {cartQty > 0 ? (isPortuguese ? 'Ir para a compra' : 'Go to checkout') : isPortuguese ? 'Selecionar ingressos' : 'Select tickets'}
                   <ArrowRight className="h-4 w-4" />

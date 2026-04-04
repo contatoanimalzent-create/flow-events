@@ -4,6 +4,8 @@ import { AuthLoadingGate, useAuthStore } from '@/features/auth'
 import { LoadingState } from '@/shared/components'
 
 const AboutPage = lazy(() => import('@/pages/public/AboutPage').then((m) => ({ default: m.AboutPage })))
+const StaffJoinPage = lazy(() => import('@/pages/public/StaffJoinPage').then((m) => ({ default: m.StaffJoinPage })))
+const StaffTimeclockPage = lazy(() => import('@/pages/public/StaffTimeclockPage').then((m) => ({ default: m.StaffTimeclockPage })))
 const ContactPage = lazy(() => import('@/pages/public/ContactPage').then((m) => ({ default: m.ContactPage })))
 const AccountPage = lazy(() => import('@/pages/public/AccountPage').then((m) => ({ default: m.AccountPage })))
 const CreateEventPage = lazy(() => import('@/pages/public/CreateEventPage').then((m) => ({ default: m.CreateEventPage })))
@@ -31,7 +33,11 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
 
   return (
     <Suspense fallback={<PublicFallback />}>
-      {typeof route === 'object' && route.type === 'event' ? (
+      {typeof route === 'object' && route.type === 'staff-join' ? (
+        <StaffJoinPage />
+      ) : typeof route === 'object' && route.type === 'timeclock' ? (
+        <StaffTimeclockPage />
+      ) : typeof route === 'object' && route.type === 'event' ? (
         <EventPage slug={route.slug} />
       ) : route === 'terms' ? (
         <TermsPage />

@@ -1,3 +1,4 @@
+export { EventCard } from './EventCard'
 export { PaginationControls } from './PaginationControls'
 export { PulseHero } from './PulseHero'
 export {

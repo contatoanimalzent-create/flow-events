@@ -1141,6 +1141,415 @@ export interface Sponsor {
   updated_at: string
 }
 
+// ─── Venues ───────────────────────────────────────────────────────────────────
+
+export interface Venue {
+  id: string
+  organization_id: string
+  name: string
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  country?: string | null
+  capacity?: number | null
+  floor_plan_url?: string | null
+  notes?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface VenueMap {
+  id: string
+  venue_id: string
+  name: string
+  floor?: number | null
+  map_image_url?: string | null
+  width_px?: number | null
+  height_px?: number | null
+  scale_meters_per_px?: number | null
+  created_at: string
+  updated_at: string
+}
+
+export type VenueZoneType = 'general' | 'vip' | 'backstage' | 'staff' | 'restricted' | 'food' | 'parking'
+
+export interface VenueZone {
+  id: string
+  venue_map_id: string
+  name: string
+  zone_type: VenueZoneType
+  color?: string | null
+  polygon_coords?: Array<{ x: number; y: number }> | null
+  capacity?: number | null
+  created_at: string
+  updated_at: string
+}
+
+export type VenueItemKind = 'stage' | 'stand' | 'checkpoint'
+
+export interface VenueItem {
+  id: string
+  venue_map_id: string
+  zone_id?: string | null
+  kind: VenueItemKind
+  name: string
+  x_px?: number | null
+  y_px?: number | null
+  width_px?: number | null
+  height_px?: number | null
+  rotation_deg?: number | null
+  metadata?: Record<string, unknown> | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Stage {
+  id: string
+  venue_map_id: string
+  zone_id?: string | null
+  name: string
+  x_px?: number | null
+  y_px?: number | null
+  width_px?: number | null
+  height_px?: number | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Stand {
+  id: string
+  venue_map_id: string
+  zone_id?: string | null
+  name: string
+  number?: string | null
+  x_px?: number | null
+  y_px?: number | null
+  width_px?: number | null
+  height_px?: number | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Checkpoint {
+  id: string
+  venue_map_id: string
+  zone_id?: string | null
+  name: string
+  x_px?: number | null
+  y_px?: number | null
+  created_at: string
+  updated_at: string
+}
+
+// ─── Event Editions ───────────────────────────────────────────────────────────
+
+export interface EventEdition {
+  id: string
+  event_id: string
+  organization_id: string
+  name: string
+  edition_number?: number | null
+  starts_at: string
+  ends_at: string
+  venue_id?: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// ─── Event Geofences ──────────────────────────────────────────────────────────
+
+export interface EventGeofence {
+  id: string
+  event_id: string
+  organization_id: string
+  name: string
+  fence_type: 'circle' | 'polygon'
+  center_lat?: number | null
+  center_lng?: number | null
+  radius_meters?: number | null
+  polygon_coords?: Array<{ lat: number; lng: number }> | null
+  buffer_seconds: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// ─── Staff ────────────────────────────────────────────────────────────────────
+
+export interface Team {
+  id: string
+  event_id: string
+  organization_id: string
+  name: string
+  description?: string | null
+  color?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Shift {
+  id: string
+  event_id: string
+  organization_id: string
+  name: string
+  starts_at: string
+  ends_at: string
+  description?: string | null
+  max_staff?: number | null
+  created_at: string
+  updated_at: string
+}
+
+export interface StaffInviteLink {
+  id: string
+  event_id: string
+  organization_id: string
+  token: string
+  role_type: string
+  team_id?: string | null
+  shift_id?: string | null
+  custom_fields?: unknown
+  expires_at?: string | null
+  is_active: boolean
+  used_count: number
+  max_uses?: number | null
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type StaffApplicationStatus = 'pending' | 'approved' | 'rejected' | 'waitlisted'
+
+export interface StaffApplication {
+  id: string
+  event_id: string
+  organization_id?: string | null
+  invite_link_id?: string | null
+  role_type: string
+  team_id?: string | null
+  shift_id?: string | null
+  full_name: string
+  email: string
+  phone?: string | null
+  document_number?: string | null
+  birth_date?: string | null
+  bio?: string | null
+  experience?: string | null
+  t_shirt_size?: string | null
+  custom_field_answers?: Record<string, unknown> | null
+  terms_accepted: boolean
+  terms_accepted_at?: string | null
+  status: StaffApplicationStatus
+  reviewed_by?: string | null
+  reviewed_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ─── Credentials ──────────────────────────────────────────────────────────────
+
+export type CredentialFormat = 'badge' | 'qrcode'
+export type CredentialState = 'active' | 'revoked'
+
+export interface Credential {
+  id: string
+  staff_id: string
+  type: string
+  format: CredentialFormat
+  status: CredentialState
+  issued_at: string
+  expires_at?: string | null
+  created_at?: string
+}
+
+export interface CredentialAccessRule {
+  id: string
+  credential_id: string
+  zone_id: string
+  valid_from?: string | null
+  valid_until?: string | null
+  created_at: string
+}
+
+export interface QrToken {
+  id: string
+  token: string
+  ref_type: string
+  ref_id: string
+  event_id: string
+  is_active: boolean
+  expires_at?: string | null
+  used_count: number
+  max_uses?: number | null
+  created_at: string
+}
+
+// ─── Check-in ─────────────────────────────────────────────────────────────────
+
+export type CheckinLogAction = 'entry' | 'exit' | 'denied'
+export type CheckinLogResult = 'valid' | 'duplicated' | 'invalid'
+
+export interface CheckinLog {
+  id: string
+  event_id: string
+  qr_token?: string | null
+  credential_id?: string | null
+  action: CheckinLogAction
+  denial_reason?: string | null
+  gate_id?: string | null
+  checkpoint_id?: string | null
+  operator_id?: string | null
+  device_id?: string | null
+  lat?: number | null
+  lng?: number | null
+  accuracy?: number | null
+  occurred_at: string
+  metadata?: Record<string, unknown> | null
+}
+
+// ─── Timeclock ────────────────────────────────────────────────────────────────
+
+export type TimeclockPunchType = 'start' | 'pause' | 'resume' | 'end'
+export type TimeclockSessionStatus = 'open' | 'closed' | 'exception'
+
+export interface TimeclockSession {
+  id: string
+  organization_id: string
+  event_id: string
+  staff_member_id: string
+  opened_at: string
+  closed_at?: string | null
+  total_minutes?: number | null
+  status: TimeclockSessionStatus
+  created_at: string
+  updated_at: string
+}
+
+export interface TimeclockEntry {
+  id: string
+  session_id: string
+  punch_type: TimeclockPunchType
+  recorded_at: string
+  latitude?: number | null
+  longitude?: number | null
+  accuracy?: number | null
+  device_id?: string | null
+  note?: string | null
+}
+
+export type TimeclockExceptionStatus = 'pending' | 'approved' | 'rejected'
+
+export interface TimeclockException {
+  id: string
+  session_id: string
+  staff_member_id: string
+  event_id: string
+  organization_id: string
+  reason: string
+  requested_minutes?: number | null
+  status: TimeclockExceptionStatus
+  reviewed_by?: string | null
+  reviewed_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ─── Email Templates ──────────────────────────────────────────────────────────
+
+export interface EmailTemplate {
+  id: string
+  organization_id: string
+  slug: string
+  name: string
+  subject: string
+  html_body: string
+  text_body?: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// ─── WhatsApp Templates ───────────────────────────────────────────────────────
+
+export interface WhatsappTemplate {
+  id: string
+  organization_id?: string | null
+  slug: string
+  name: string
+  body_template: string
+  meta_template_name?: string | null
+  meta_content_sid?: string | null
+  language_code: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// ─── Communications Log ───────────────────────────────────────────────────────
+
+export type CommunicationsChannel = 'email' | 'whatsapp' | 'sms' | 'push'
+export type CommunicationsStatus = 'queued' | 'sent' | 'delivered' | 'failed' | 'bounced'
+
+export interface CommunicationsLog {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  profile_id?: string | null
+  channel: CommunicationsChannel
+  template_slug?: string | null
+  template_vars?: Record<string, unknown> | null
+  recipient_email?: string | null
+  recipient_phone?: string | null
+  provider: string
+  provider_message_id?: string | null
+  status: CommunicationsStatus
+  channel_used?: string | null
+  error_message?: string | null
+  sent_at?: string | null
+  created_at: string
+  metadata?: Record<string, unknown> | null
+}
+
+// ─── Notification Jobs ────────────────────────────────────────────────────────
+
+export type NotificationJobStatus = 'queued' | 'processing' | 'done' | 'failed'
+
+export interface NotificationJob {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  job_type: string
+  channels: string[]
+  recipients: Array<{ name: string; email?: string; phone?: string; profile_id?: string }>
+  template_vars: Record<string, string>
+  status: NotificationJobStatus
+  attempts: number
+  max_attempts: number
+  scheduled_for: string
+  last_error?: string | null
+  metadata?: Record<string, unknown> | null
+  created_at: string
+  updated_at?: string | null
+}
+
+// ─── Documents ────────────────────────────────────────────────────────────────
+
+export type DocumentStatus = 'draft' | 'published' | 'archived'
+
+export interface Document {
+  id: string
+  organization_id: string
+  event_id?: string | null
+  title: string
+  slug?: string | null
+  content?: string | null
+  status: DocumentStatus
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
 // ─── Financial Entries ────────────────────────────────────────────────────────
 
 export type FinancialEntryKind = 'revenue' | 'cost'

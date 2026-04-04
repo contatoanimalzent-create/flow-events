@@ -25,6 +25,24 @@ export const Theme = {
     xl: '2rem',
     xxl: '3rem',
   },
+  grid: {
+    maxWidth: '78rem',
+    gutters: {
+      mobile: '1.25rem',
+      tablet: '2rem',
+      desktop: '3rem',
+    },
+    columns: {
+      mobile: 4,
+      tablet: 8,
+      desktop: 12,
+    },
+    gap: {
+      sm: '1rem',
+      md: '1.5rem',
+      lg: '2rem',
+    },
+  },
 } as const
 
 export type ThemeValue = typeof Theme
@@ -58,6 +76,16 @@ function createThemeVariables(theme: ThemeValue) {
     '--pulse-spacing-lg': theme.spacing.lg,
     '--pulse-spacing-xl': theme.spacing.xl,
     '--pulse-spacing-xxl': theme.spacing.xxl,
+    '--pulse-grid-max-width': theme.grid.maxWidth,
+    '--pulse-grid-gutter-mobile': theme.grid.gutters.mobile,
+    '--pulse-grid-gutter-tablet': theme.grid.gutters.tablet,
+    '--pulse-grid-gutter-desktop': theme.grid.gutters.desktop,
+    '--pulse-grid-columns-mobile': String(theme.grid.columns.mobile),
+    '--pulse-grid-columns-tablet': String(theme.grid.columns.tablet),
+    '--pulse-grid-columns-desktop': String(theme.grid.columns.desktop),
+    '--pulse-grid-gap-sm': theme.grid.gap.sm,
+    '--pulse-grid-gap-md': theme.grid.gap.md,
+    '--pulse-grid-gap-lg': theme.grid.gap.lg,
   } as const
 }
 

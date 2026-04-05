@@ -94,7 +94,7 @@ export function PulseHero({
           position: absolute;
           width: 11.5rem;
           height: 11.5rem;
-          border-radius: 999px;
+          border-radius: var(--pulse-radius-full);
           background: radial-gradient(circle, var(--pulse-overlay-soft) 0%, var(--pulse-surface-accent) 42%, transparent 72%);
           filter: blur(8px);
           animation: pulse-hero-ring 2.8s ease-in-out infinite;
@@ -105,7 +105,7 @@ export function PulseHero({
           position: relative;
           z-index: 1;
           border: 0;
-          border-radius: 999px;
+          border-radius: var(--pulse-radius-full);
           padding: 0.95rem 1.75rem;
           background: var(--pulse-button-primary-bg);
           color: var(--pulse-color-text-on-accent);

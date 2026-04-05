@@ -101,7 +101,7 @@ export function Layout({
           position: relative;
           width: 2.5rem;
           height: 2.5rem;
-          border-radius: 999px;
+          border-radius: var(--pulse-radius-full);
           background:
             radial-gradient(circle, var(--pulse-overlay-soft) 0%, var(--pulse-surface-accent) 46%, transparent 72%);
           display: inline-flex;
@@ -112,7 +112,7 @@ export function Layout({
         .pulse-layout__brand-core,
         .pulse-layout__brand-ring {
           position: absolute;
-          border-radius: 999px;
+          border-radius: var(--pulse-radius-full);
         }
 
         .pulse-layout__brand-core {
@@ -164,7 +164,7 @@ export function Layout({
           justify-content: center;
           min-height: 2.6rem;
           padding: 0 0.95rem;
-          border-radius: 999px;
+          border-radius: var(--pulse-radius-full);
           border: 0;
           background: transparent;
           color: var(--pulse-color-text-secondary);
@@ -195,7 +195,7 @@ export function Layout({
           right: 0.9rem;
           bottom: 0.38rem;
           height: 2px;
-          border-radius: 999px;
+          border-radius: var(--pulse-radius-full);
           background: var(--pulse-color-primary-accent);
         }
 

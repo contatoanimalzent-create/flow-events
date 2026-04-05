@@ -25,7 +25,7 @@ export function ModalShell({ children, size = 'lg', className, panelClassName }:
     <div className={cn('pulse-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4', className)}>
       <div
         className={cn(
-          'pulse-modal-panel animate-slide-up flex w-full flex-col overflow-hidden rounded-[30px]',
+          'pulse-modal-panel animate-slide-up flex w-full flex-col overflow-hidden rounded-[var(--pulse-radius-lg)]',
           SIZE_CLASSNAME[size],
           panelClassName,
         )}
@@ -55,7 +55,7 @@ export function ModalHeader({ title, subtitle, eyebrow, onClose, className }: Mo
       {onClose ? (
         <button
           onClick={onClose}
-          className="pulse-modal-close rounded-full p-2 transition-all"
+          className="pulse-modal-close rounded-[var(--pulse-radius-full)] p-2 transition-all"
         >
           <X className="h-4 w-4" />
         </button>
@@ -91,7 +91,7 @@ interface FormSectionProps {
 
 export function FormSection({ title, description, children, className }: FormSectionProps) {
   return (
-    <section className={cn('pulse-form-section space-y-4 rounded-[24px] p-5', className)}>
+    <section className={cn('pulse-form-section space-y-4 rounded-[var(--pulse-radius-lg)] p-5', className)}>
       {title || description ? (
         <div>
           {title ? <div className="pulse-form-title text-sm font-semibold">{title}</div> : null}
@@ -161,7 +161,7 @@ interface FormErrorProps {
 }
 
 export function FormError({ children, className }: FormErrorProps) {
-  return <div className={cn('pulse-form-error rounded-2xl px-3 py-2 text-xs', className)}>{children}</div>
+  return <div className={cn('pulse-form-error rounded-[var(--pulse-radius-md)] px-3 py-2 text-xs', className)}>{children}</div>
 }
 
 interface FormToggleCardProps {
@@ -174,16 +174,16 @@ interface FormToggleCardProps {
 
 export function FormToggleCard({ title, description, checked, onToggle, className }: FormToggleCardProps) {
   return (
-    <div className={cn('pulse-toggle-card flex items-center justify-between gap-4 rounded-[22px] px-4 py-3', className)}>
+    <div className={cn('pulse-toggle-card flex items-center justify-between gap-4 rounded-[var(--pulse-radius-lg)] px-4 py-3', className)}>
       <div>
         <div className="pulse-form-title text-sm font-medium">{title}</div>
         {description ? <div className="pulse-form-description mt-1 text-xs">{description}</div> : null}
       </div>
       <button
         onClick={onToggle}
-        className={cn('pulse-toggle-switch relative flex h-6 w-11 shrink-0 rounded-full transition-all', checked && 'pulse-toggle-switch--checked')}
+        className={cn('pulse-toggle-switch relative flex h-6 w-11 shrink-0 rounded-[var(--pulse-radius-full)] transition-all', checked && 'pulse-toggle-switch--checked')}
       >
-        <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all', checked ? 'left-5' : 'left-0.5')} />
+        <span className={cn('absolute top-0.5 h-5 w-5 rounded-[var(--pulse-radius-full)] bg-white transition-all', checked ? 'left-5' : 'left-0.5')} />
       </button>
     </div>
   )
@@ -201,7 +201,7 @@ export function ConfirmActionBox({ tone = 'default', title, description, childre
   return (
     <div
       className={cn(
-        'pulse-confirm-box rounded-[24px] border px-4 py-4',
+        'pulse-confirm-box rounded-[var(--pulse-radius-lg)] border px-4 py-4',
         tone === 'danger' && 'pulse-confirm-box--danger',
         className,
       )}
@@ -229,7 +229,7 @@ export function FeedbackBanner({ tone = 'info', title, message, className }: Fee
         : 'pulse-feedback-banner--info'
 
   return (
-    <div className={cn('pulse-feedback-banner rounded-2xl border px-4 py-3', toneClassName, className)}>
+    <div className={cn('pulse-feedback-banner rounded-[var(--pulse-radius-md)] border px-4 py-3', toneClassName, className)}>
       {title ? <div className="text-sm font-semibold">{title}</div> : null}
       <div className={cn('text-sm leading-6', title ? 'mt-1' : '')}>{message}</div>
     </div>

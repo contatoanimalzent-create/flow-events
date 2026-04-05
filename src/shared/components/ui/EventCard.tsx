@@ -16,7 +16,7 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
           width: 100%;
           overflow: hidden;
           border: 1px solid var(--pulse-color-border);
-          border-radius: 1.5rem;
+          border-radius: var(--pulse-radius-lg);
           background: linear-gradient(180deg, var(--pulse-surface-base) 0%, var(--pulse-surface-muted) 100%);
           box-shadow: var(--pulse-shadow-soft);
           cursor: pointer;
@@ -100,7 +100,7 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
 
         @media (max-width: 640px) {
           .pulse-event-card {
-            border-radius: 1.25rem;
+            border-radius: var(--pulse-radius-md);
           }
 
           .pulse-event-card__content {

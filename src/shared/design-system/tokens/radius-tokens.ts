@@ -1,10 +1,8 @@
 export const radiusTokens = {
-  xs: 12,
-  sm: 16,
-  md: 22,
-  lg: 28,
-  xl: 36,
-  full: 999,
+  sm: '6px',
+  md: '12px',
+  lg: '20px',
+  full: '999px',
 } as const
 
 export type RadiusTokens = typeof radiusTokens

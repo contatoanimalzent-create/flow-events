@@ -1,6 +1,6 @@
 import { ArrowRight, BarChart3, LayoutDashboard, QrCode } from 'lucide-react'
 import { useMemo, useRef } from 'react'
-import { PublicLayout, PublicReveal, usePublicEvents, type PublicEventSummary } from '@/features/public'
+import { PublicLayout, PublicReveal, useEventsQuery, type PublicEventSummary } from '@/features/public'
 import { formatPublicDate, usePublicLocale } from '@/features/public/lib/public-locale'
 import { EventCard, PulseHero } from '@/shared/components'
 import { useSeoMeta } from '@/shared/lib'
@@ -57,12 +57,12 @@ function BenefitCard({
 
 export function HomePage({ onLogin }: { onLogin: () => void }) {
   const { isPortuguese, locale } = usePublicLocale()
-  const publicEventsQuery = usePublicEvents()
+  const publicEventsQuery = useEventsQuery()
   const upcomingEventsRef = useRef<HTMLElement | null>(null)
 
   const liveEvents = useMemo<HomeEventCardModel[]>(
     () =>
-      (publicEventsQuery.data ?? []).slice(0, 3).map((event) => ({
+      publicEventsQuery.data.slice(0, 3).map((event) => ({
         id: event.id,
         imageUrl: getEventCover(event),
         eventName: event.name,

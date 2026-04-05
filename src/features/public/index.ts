@@ -1,4 +1,6 @@
 export * from './components'
+export * from './hooks/useEventsQuery'
 export * from './hooks/usePublicEvents'
+export * from './services/events.service'
 export * from './services/public-events.service'
 export * from './types/public.types'

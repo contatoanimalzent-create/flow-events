@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { eventsService } from '@/features/public/services/events.service'
 import { publicEventsService } from '@/features/public/services/public-events.service'
 
 export const publicEventsKeys = {
@@ -10,7 +11,7 @@ export const publicEventsKeys = {
 export function usePublicEvents() {
   return useQuery({
     queryKey: publicEventsKeys.list(),
-    queryFn: () => publicEventsService.listPublicEvents(),
+    queryFn: () => eventsService.list(),
   })
 }
 

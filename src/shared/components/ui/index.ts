@@ -1,9 +1,11 @@
 export { AppSection, AppShell } from './AppShell'
 export { EventCard } from './EventCard'
+export { FeaturedEvents } from './FeaturedEvents'
 export { Layout } from './Layout'
 export { PaginationControls } from './PaginationControls'
 export { PremiumEventHero } from './PremiumEventHero'
 export { PulseHero } from './PulseHero'
+export type { FeaturedEventsItem, FeaturedEventsProps } from './FeaturedEvents'
 export {
   AdminActionBar,
   AdminFeedbackStates,

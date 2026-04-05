@@ -2,7 +2,7 @@ import { ArrowRight, BarChart3, LayoutDashboard, QrCode } from 'lucide-react'
 import { useMemo, useRef } from 'react'
 import { PublicLayout, PublicReveal, useEventsQuery, type PublicEventSummary } from '@/features/public'
 import { formatPublicDate, usePublicLocale } from '@/features/public/lib/public-locale'
-import { EventCard, PulseHero } from '@/shared/components'
+import { FeaturedEvents, PulseHero } from '@/shared/components'
 import { useSeoMeta } from '@/shared/lib'
 
 interface HomeEventCardModel {
@@ -11,6 +11,8 @@ interface HomeEventCardModel {
   eventName: string
   date: string
   location: string
+  badge?: string
+  badgeTone?: 'default' | 'live' | 'warning'
   href: string
 }
 
@@ -58,7 +60,7 @@ function BenefitCard({
 export function HomePage({ onLogin }: { onLogin: () => void }) {
   const { isPortuguese, locale } = usePublicLocale()
   const publicEventsQuery = useEventsQuery()
-  const upcomingEventsRef = useRef<HTMLElement | null>(null)
+  const upcomingEventsRef = useRef<HTMLDivElement | null>(null)
 
   const liveEvents = useMemo<HomeEventCardModel[]>(
     () =>
@@ -72,6 +74,12 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           month: 'long',
         }),
         location: getEventLocation(event, isPortuguese),
+        badge:
+          event.status === 'published'
+            ? isPortuguese
+              ? 'Destaque'
+              : 'Featured'
+            : undefined,
         href: `/e/${event.slug}`,
       })),
     [publicEventsQuery.data, locale, isPortuguese],
@@ -85,6 +93,8 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
         eventName: isPortuguese ? 'Pulse Summit 2026' : 'Pulse Summit 2026',
         date: isPortuguese ? '12 de maio' : 'May 12',
         location: isPortuguese ? 'Sao Paulo / Expo Hall' : 'Sao Paulo / Expo Hall',
+        badge: isPortuguese ? 'Ao vivo' : 'Live',
+        badgeTone: 'live',
         href: '/events',
       },
       {
@@ -93,6 +103,8 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
         eventName: isPortuguese ? 'Creator Lab Sessions' : 'Creator Lab Sessions',
         date: isPortuguese ? '18 de maio' : 'May 18',
         location: isPortuguese ? 'Rio de Janeiro / Pier Stage' : 'Rio de Janeiro / Pier Stage',
+        badge: isPortuguese ? 'Ultimos ingressos' : 'Last tickets',
+        badgeTone: 'warning',
         href: '/events',
       },
       {
@@ -101,6 +113,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
         eventName: isPortuguese ? 'Future Nights Experience' : 'Future Nights Experience',
         date: isPortuguese ? '24 de maio' : 'May 24',
         location: isPortuguese ? 'Belo Horizonte / Distrito Pulse' : 'Belo Horizonte / Pulse District',
+        badge: isPortuguese ? 'Selecionado' : 'Curated',
         href: '/events',
       },
     ],
@@ -290,7 +303,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           transform: translateX(2px);
         }
 
-        .pulse-home__cards-grid,
         .pulse-home__benefits-grid {
           display: grid;
           grid-template-columns: repeat(var(--pulse-grid-columns-mobile, 4), minmax(0, 1fr));
@@ -298,7 +310,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           margin-top: var(--pulse-spacing-xl, 2rem);
         }
 
-        .pulse-home__card-item,
         .pulse-home__benefit-item {
           grid-column: span 4;
         }
@@ -351,7 +362,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           }
 
           .pulse-home__hero-strip,
-          .pulse-home__cards-grid,
           .pulse-home__benefits-grid {
             grid-template-columns: repeat(var(--pulse-grid-columns-tablet, 8), minmax(0, 1fr));
           }
@@ -360,7 +370,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
             grid-column: span 4;
           }
 
-          .pulse-home__card-item,
           .pulse-home__benefit-item {
             grid-column: span 4;
           }
@@ -378,14 +387,12 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
           }
 
           .pulse-home__hero-strip,
-          .pulse-home__cards-grid,
           .pulse-home__benefits-grid {
             grid-template-columns: repeat(var(--pulse-grid-columns-desktop, 12), minmax(0, 1fr));
             gap: var(--pulse-grid-gap-lg, 2rem);
           }
 
           .pulse-home__hero-stat,
-          .pulse-home__card-item,
           .pulse-home__benefit-item {
             grid-column: span 4;
           }
@@ -451,54 +458,27 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
             </div>
           </div>
 
-          <section ref={upcomingEventsRef} className="pulse-home__section">
-            <div className="pulse-home__shell">
-              <PublicReveal>
-                <div className="pulse-home__surface">
-                  <div className="pulse-home__section-head">
-                    <div className="pulse-home__eyebrow">
-                      {isPortuguese ? 'Proximos Eventos' : 'Upcoming Events'}
-                    </div>
-                    <div className="pulse-home__heading-row">
-                      <div>
-                        <h2 className="pulse-home__title">
-                          {isPortuguese
-                            ? 'Eventos desenhados para uma operacao fluida.'
-                            : 'Events designed for a smoother operation.'}
-                        </h2>
-                        <p className="pulse-home__copy">
-                          {isPortuguese
-                            ? 'Use os eventos publicados quando a consulta estiver ativa ou apresente a experiencia com dados de exemplo enquanto o catalogo cresce.'
-                            : 'Use published events when the query is active, or showcase the experience with sample data while the catalog grows.'}
-                        </p>
-                      </div>
-
-                      <a className="pulse-home__link" href="/events">
-                        {isPortuguese ? 'Abrir catalogo completo' : 'Open full catalog'}
-                        <ArrowRight size={16} aria-hidden="true" />
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="pulse-home__cards-grid">
-                    {upcomingEvents.map((event, index) => (
-                      <PublicReveal key={event.id} delayMs={index * 80}>
-                        <div className="pulse-home__card-item">
-                          <EventCard
-                            imageUrl={event.imageUrl}
-                            eventName={event.eventName}
-                            date={event.date}
-                            location={event.location}
-                            onClick={() => navigateTo(event.href)}
-                          />
-                        </div>
-                      </PublicReveal>
-                    ))}
-                  </div>
-                </div>
-              </PublicReveal>
-            </div>
-          </section>
+          <div ref={upcomingEventsRef}>
+            <FeaturedEvents
+              title={isPortuguese ? 'Eventos em destaque' : 'Featured events'}
+              description={
+                isPortuguese
+                  ? 'Uma selecao premium com eventos prontos para conversao, descoberta rapida e navegacao fluida.'
+                  : 'A premium selection of events ready for conversion, fast discovery and smooth navigation.'
+              }
+              columns={upcomingEvents.length >= 4 ? 4 : 3}
+              events={upcomingEvents.map((event) => ({
+                id: event.id,
+                imageUrl: event.imageUrl,
+                eventName: event.eventName,
+                date: event.date,
+                location: event.location,
+                badge: event.badge,
+                badgeTone: event.badgeTone,
+                onClick: () => navigateTo(event.href),
+              }))}
+            />
+          </div>
 
           <section className="pulse-home__section">
             <div className="pulse-home__shell">

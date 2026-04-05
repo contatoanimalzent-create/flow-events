@@ -25,8 +25,8 @@ export function PulseHero({
           align-items: center;
           justify-content: center;
           background:
-            radial-gradient(circle at top, rgba(0, 123, 255, 0.18), transparent 42%),
-            linear-gradient(180deg, rgba(0, 19, 60, 0.88) 0%, rgba(0, 51, 160, 0.94) 100%);
+            radial-gradient(circle at top, var(--pulse-surface-accent), transparent 42%),
+            linear-gradient(180deg, var(--pulse-color-primary-base) 0%, var(--pulse-button-primary-bg) 100%);
         }
 
         .pulse-hero__video,
@@ -43,13 +43,13 @@ export function PulseHero({
         }
 
         .pulse-hero__overlay {
-          background: rgba(0, 51, 160, 0.8);
+          background: var(--pulse-overlay-backdrop);
         }
 
         .pulse-hero__ambient {
           background:
-            radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.12), transparent 28%),
-            radial-gradient(circle at 50% 75%, rgba(0, 123, 255, 0.18), transparent 22%);
+            radial-gradient(circle at 50% 35%, var(--pulse-overlay-soft), transparent 28%),
+            radial-gradient(circle at 50% 75%, var(--pulse-surface-accent), transparent 22%);
           mix-blend-mode: screen;
         }
 
@@ -59,7 +59,7 @@ export function PulseHero({
           width: min(100%, 56rem);
           padding: 2rem 1.5rem;
           text-align: center;
-          color: #ffffff;
+          color: var(--pulse-color-text-inverse);
         }
 
         .pulse-hero__title {
@@ -74,7 +74,8 @@ export function PulseHero({
         .pulse-hero__subtitle {
           margin: 1.25rem auto 0;
           max-width: 42rem;
-          color: #e5edf8;
+          color: var(--pulse-color-text-inverse);
+          opacity: 0.86;
           font-family: var(--pulse-font-family, Inter, sans-serif);
           font-size: clamp(1rem, 2vw, 1.3rem);
           line-height: 1.75;
@@ -94,8 +95,7 @@ export function PulseHero({
           width: 11.5rem;
           height: 11.5rem;
           border-radius: 999px;
-          background:
-            radial-gradient(circle, rgba(0, 123, 255, 0.38) 0%, rgba(0, 123, 255, 0.16) 42%, transparent 72%);
+          background: radial-gradient(circle, var(--pulse-overlay-soft) 0%, var(--pulse-surface-accent) 42%, transparent 72%);
           filter: blur(8px);
           animation: pulse-hero-ring 2.8s ease-in-out infinite;
           pointer-events: none;
@@ -107,15 +107,15 @@ export function PulseHero({
           border: 0;
           border-radius: 999px;
           padding: 0.95rem 1.75rem;
-          background: var(--pulse-color-primary-accent, #007BFF);
-          color: #ffffff;
+          background: var(--pulse-button-primary-bg);
+          color: var(--pulse-color-text-on-accent);
           font-family: var(--pulse-font-family, Inter, sans-serif);
           font-size: 0.95rem;
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
           cursor: pointer;
-          box-shadow: 0 18px 42px rgba(0, 123, 255, 0.32);
+          box-shadow: var(--pulse-shadow-soft);
           transition:
             transform 180ms ease,
             box-shadow 180ms ease,
@@ -123,12 +123,13 @@ export function PulseHero({
         }
 
         .pulse-hero__cta:hover {
+          background: var(--pulse-button-primary-hover);
           transform: translateY(-2px) scale(1.01);
-          box-shadow: 0 22px 52px rgba(0, 123, 255, 0.42);
+          box-shadow: var(--pulse-shadow-hover);
         }
 
         .pulse-hero__cta:focus-visible {
-          outline: 3px solid rgba(255, 255, 255, 0.7);
+          outline: 3px solid var(--pulse-focus-ring);
           outline-offset: 4px;
         }
 

@@ -1,5 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import { useEffect, useState, type ReactNode } from 'react'
+import { pulseBrandHref, pulseInstitutionalLinks, pulsePrimaryNavigation } from '@/shared/config/navigation'
 import { cn } from '@/shared/lib'
 
 interface LayoutProps {
@@ -48,11 +49,10 @@ export function Layout({
     return () => window.removeEventListener('popstate', syncPath)
   }, [currentPathOverride])
 
-  const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Eventos', href: '/events' },
-    { label: 'Login', href: '/login', onClick: onLogin },
-  ]
+  const navItems = pulsePrimaryNavigation.map((item) => ({
+    ...item,
+    onClick: item.href === '/login' ? onLogin : undefined,
+  }))
 
   return (
     <>
@@ -62,18 +62,18 @@ export function Layout({
           display: flex;
           flex-direction: column;
           background:
-            radial-gradient(circle at top, rgba(0, 123, 255, 0.08), transparent 28%),
-            linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
-          color: var(--pulse-color-text-primary, #000000);
+            radial-gradient(circle at top, var(--pulse-surface-accent), transparent 28%),
+            linear-gradient(180deg, var(--pulse-color-background) 0%, var(--pulse-surface-muted) 100%);
+          color: var(--pulse-color-text-primary);
         }
 
         .pulse-layout__header {
           position: sticky;
           top: 0;
           z-index: 40;
-          background: rgba(255, 255, 255, 0.94);
-          border-bottom: 1px solid rgba(229, 229, 229, 0.9);
-          box-shadow: 0 12px 30px rgba(0, 26, 84, 0.08);
+          background: var(--pulse-surface-base);
+          border-bottom: 1px solid var(--pulse-color-border);
+          box-shadow: var(--pulse-shadow-soft);
           backdrop-filter: blur(16px);
         }
 
@@ -103,7 +103,7 @@ export function Layout({
           height: 2.5rem;
           border-radius: 999px;
           background:
-            radial-gradient(circle, rgba(0, 123, 255, 0.24) 0%, rgba(0, 123, 255, 0.08) 46%, transparent 72%);
+            radial-gradient(circle, var(--pulse-overlay-soft) 0%, var(--pulse-surface-accent) 46%, transparent 72%);
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -118,14 +118,14 @@ export function Layout({
         .pulse-layout__brand-core {
           width: 0.72rem;
           height: 0.72rem;
-          background: var(--pulse-color-primary-accent, #007BFF);
-          box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.28);
+          background: var(--pulse-color-primary-accent);
+          box-shadow: var(--pulse-shadow-soft);
         }
 
         .pulse-layout__brand-ring {
           width: 1.6rem;
           height: 1.6rem;
-          border: 2px solid rgba(0, 123, 255, 0.28);
+          border: 2px solid var(--pulse-overlay-soft);
           animation: pulse-layout-ring 2.4s ease-in-out infinite;
         }
 
@@ -136,7 +136,7 @@ export function Layout({
         }
 
         .pulse-layout__brand-name {
-          color: var(--pulse-color-primary-base, #0033A0);
+          color: var(--pulse-color-primary-base);
           font-family: var(--pulse-font-family, Inter, sans-serif);
           font-size: 1.18rem;
           font-weight: 800;
@@ -145,7 +145,7 @@ export function Layout({
         }
 
         .pulse-layout__brand-tagline {
-          color: var(--pulse-color-text-secondary, #333333);
+          color: var(--pulse-color-text-secondary);
           font-family: var(--pulse-font-family, Inter, sans-serif);
           font-size: 0.76rem;
           line-height: 1.3;
@@ -167,7 +167,7 @@ export function Layout({
           border-radius: 999px;
           border: 0;
           background: transparent;
-          color: var(--pulse-color-text-secondary, #333333);
+          color: var(--pulse-color-text-secondary);
           font-family: var(--pulse-font-family, Inter, sans-serif);
           font-size: 0.95rem;
           font-weight: 600;
@@ -180,12 +180,12 @@ export function Layout({
         }
 
         .pulse-layout__nav-link:hover {
-          color: var(--pulse-color-primary-base, #0033A0);
-          background: rgba(0, 123, 255, 0.06);
+          color: var(--pulse-color-primary-base);
+          background: var(--pulse-button-ghost-hover);
         }
 
         .pulse-layout__nav-link--active {
-          color: var(--pulse-color-primary-base, #0033A0);
+          color: var(--pulse-color-primary-base);
         }
 
         .pulse-layout__nav-link--active::after {
@@ -196,7 +196,7 @@ export function Layout({
           bottom: 0.38rem;
           height: 2px;
           border-radius: 999px;
-          background: var(--pulse-color-primary-accent, #007BFF);
+          background: var(--pulse-color-primary-accent);
         }
 
         .pulse-layout__content {
@@ -206,8 +206,8 @@ export function Layout({
         }
 
         .pulse-layout__footer {
-          border-top: 1px solid rgba(229, 229, 229, 0.9);
-          background: rgba(255, 255, 255, 0.88);
+          border-top: 1px solid var(--pulse-color-border);
+          background: var(--pulse-surface-base);
         }
 
         .pulse-layout__footer-row {
@@ -220,7 +220,7 @@ export function Layout({
 
         .pulse-layout__footer-copy,
         .pulse-layout__footer-link {
-          color: var(--pulse-color-text-secondary, #333333);
+          color: var(--pulse-color-text-secondary);
           font-family: var(--pulse-font-family, Inter, sans-serif);
           font-size: 0.82rem;
           line-height: 1.5;
@@ -238,7 +238,7 @@ export function Layout({
         }
 
         .pulse-layout__footer-link:hover {
-          color: var(--pulse-color-primary-base, #0033A0);
+          color: var(--pulse-color-primary-base);
         }
 
         @keyframes pulse-layout-ring {
@@ -286,7 +286,7 @@ export function Layout({
         <header className="pulse-layout__header">
           <div className="pulse-layout__shell">
             <div className="pulse-layout__header-row">
-              <a href="/" className="pulse-layout__brand" aria-label="Pulse">
+              <a href={pulseBrandHref} className="pulse-layout__brand" aria-label="Pulse">
                 <span className="pulse-layout__brand-mark" aria-hidden="true">
                   <span className="pulse-layout__brand-ring" />
                   <span className="pulse-layout__brand-core" />
@@ -346,12 +346,11 @@ export function Layout({
               <div className="pulse-layout__footer-copy">Pulse platform for live experiences.</div>
 
               <div className="pulse-layout__footer-links">
-                <a href="/terms" className="pulse-layout__footer-link">
-                  Termos
-                </a>
-                <a href="/privacy" className="pulse-layout__footer-link">
-                  Privacidade
-                </a>
+                {pulseInstitutionalLinks.map((link) => (
+                  <a key={link.href} href={link.href} className="pulse-layout__footer-link">
+                    {link.label}
+                  </a>
+                ))}
               </div>
             </div>
           </div>

@@ -274,7 +274,7 @@ export function EmptyState({ title, description, action, icon, className }: Base
       action={action}
       icon={icon ?? <Inbox className="h-8 w-8" />}
       className={className}
-      iconClassName="text-text-muted"
+      iconClassName="text-[var(--pulse-color-text-muted)]"
     />
   )
 }
@@ -287,7 +287,7 @@ export function ErrorState({ title, description, action, icon, className }: Base
       action={action}
       icon={icon ?? <AlertTriangle className="h-8 w-8" />}
       className={className}
-      iconClassName="text-status-error"
+      iconClassName="text-[var(--pulse-status-error)]"
     />
   )
 }
@@ -300,7 +300,7 @@ export function InfoState({ title, description, action, icon, className }: BaseS
       action={action}
       icon={icon ?? <Info className="h-8 w-8" />}
       className={className}
-      iconClassName="text-brand-blue"
+      iconClassName="text-[var(--pulse-status-info)]"
     />
   )
 }
@@ -313,7 +313,7 @@ export function PermissionBlockedState({ title, description, action, icon, class
       action={action}
       icon={icon ?? <Lock className="h-8 w-8" />}
       className={className}
-      iconClassName="text-status-warning"
+      iconClassName="text-[var(--pulse-status-warning)]"
     />
   )
 }
@@ -329,7 +329,7 @@ export function LoadingState({
       description={description}
       icon={<Loader2 className="h-8 w-8 animate-spin" />}
       className={className}
-      iconClassName="text-brand-acid"
+      iconClassName="text-[var(--pulse-color-primary-accent)]"
     />
   )
 }
@@ -401,13 +401,13 @@ export function AdminShell({ className, children, ...props }: HTMLAttributes<HTM
           className="absolute inset-0 opacity-[0.3]"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+              'linear-gradient(var(--pulse-surface-accent) 1px, transparent 1px), linear-gradient(90deg, var(--pulse-surface-accent) 1px, transparent 1px)',
             backgroundSize: '64px 64px',
           }}
         />
-        <div className="absolute left-[-10rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[#d62a0b]/[0.09] blur-[150px]" />
-        <div className="absolute right-[-8rem] top-[18%] h-[24rem] w-[24rem] rounded-full bg-[#ae936f]/[0.08] blur-[150px]" />
-        <div className="absolute bottom-[-10rem] left-[34%] h-[24rem] w-[24rem] rounded-full bg-[#9ba1a6]/[0.06] blur-[170px]" />
+        <div className="absolute left-[-10rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full blur-[150px]" style={{ background: 'var(--pulse-surface-accent)' }} />
+        <div className="absolute right-[-8rem] top-[18%] h-[24rem] w-[24rem] rounded-full blur-[150px]" style={{ background: 'var(--pulse-overlay-soft)' }} />
+        <div className="absolute bottom-[-10rem] left-[34%] h-[24rem] w-[24rem] rounded-full blur-[170px]" style={{ background: 'var(--pulse-button-secondary-hover)' }} />
       </div>
       <div className="relative z-10 flex min-h-screen w-full">
         {children}

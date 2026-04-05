@@ -22,10 +22,10 @@ const SIZE_CLASSNAME: Record<NonNullable<ModalShellProps['size']>, string> = {
 
 export function ModalShell({ children, size = 'lg', className, panelClassName }: ModalShellProps) {
   return (
-    <div className={cn('fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(7,6,7,0.82)] p-4 backdrop-blur-md', className)}>
+    <div className={cn('pulse-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4', className)}>
       <div
         className={cn(
-          'animate-slide-up flex w-full flex-col overflow-hidden rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(18,16,15,0.98)_0%,rgba(11,10,10,0.96)_100%)] shadow-[0_36px_100px_rgba(0,0,0,0.56)]',
+          'pulse-modal-panel animate-slide-up flex w-full flex-col overflow-hidden rounded-[30px]',
           SIZE_CLASSNAME[size],
           panelClassName,
         )}
@@ -46,16 +46,16 @@ interface ModalHeaderProps {
 
 export function ModalHeader({ title, subtitle, eyebrow, onClose, className }: ModalHeaderProps) {
   return (
-    <div className={cn('flex items-start justify-between gap-4 border-b border-white/6 px-6 py-5', className)}>
+    <div className={cn('pulse-modal-header flex items-start justify-between gap-4 border-b px-6 py-5', className)}>
       <div className="min-w-0">
-        {eyebrow ? <div className="text-[10px] uppercase tracking-[0.32em] text-[#ae936f]">{eyebrow}</div> : null}
-        <h2 className="mt-1 font-display text-[2rem] leading-none tracking-[-0.04em] text-[#ebe7e0]">{title}</h2>
-        {subtitle ? <p className="mt-2 max-w-2xl text-sm leading-6 text-[#b8b0a8]/70">{subtitle}</p> : null}
+        {eyebrow ? <div className="pulse-modal-eyebrow text-[10px] uppercase tracking-[0.32em]">{eyebrow}</div> : null}
+        <h2 className="pulse-modal-title mt-1 font-display leading-none tracking-[-0.04em]">{title}</h2>
+        {subtitle ? <p className="pulse-modal-subtitle mt-2 max-w-2xl text-sm leading-6">{subtitle}</p> : null}
       </div>
       {onClose ? (
         <button
           onClick={onClose}
-          className="rounded-full border border-white/8 bg-white/[0.03] p-2 text-text-muted transition-all hover:border-[#d62a0b]/20 hover:bg-white/[0.06] hover:text-text-primary"
+          className="pulse-modal-close rounded-full p-2 transition-all"
         >
           <X className="h-4 w-4" />
         </button>
@@ -79,7 +79,7 @@ interface ModalFooterProps {
 }
 
 export function ModalFooter({ children, className }: ModalFooterProps) {
-  return <div className={cn('flex items-center justify-between gap-3 border-t border-white/6 px-6 py-5', className)}>{children}</div>
+  return <div className={cn('pulse-modal-footer flex items-center justify-between gap-3 border-t px-6 py-5', className)}>{children}</div>
 }
 
 interface FormSectionProps {
@@ -91,11 +91,11 @@ interface FormSectionProps {
 
 export function FormSection({ title, description, children, className }: FormSectionProps) {
   return (
-    <section className={cn('space-y-4 rounded-[24px] border border-white/8 bg-white/[0.03] p-5 shadow-[0_20px_50px_rgba(0,0,0,0.22)]', className)}>
+    <section className={cn('pulse-form-section space-y-4 rounded-[24px] p-5', className)}>
       {title || description ? (
         <div>
-          {title ? <div className="text-sm font-semibold text-text-primary">{title}</div> : null}
-          {description ? <div className="mt-1 text-xs leading-5 text-white/46">{description}</div> : null}
+          {title ? <div className="pulse-form-title text-sm font-semibold">{title}</div> : null}
+          {description ? <div className="pulse-form-description mt-1 text-xs leading-5">{description}</div> : null}
         </div>
       ) : null}
       {children}
@@ -152,7 +152,7 @@ interface FormHintProps {
 }
 
 export function FormHint({ children, className }: FormHintProps) {
-  return <p className={cn('text-[11px] leading-5 text-text-muted', className)}>{children}</p>
+  return <p className={cn('pulse-form-hint text-[11px] leading-5', className)}>{children}</p>
 }
 
 interface FormErrorProps {
@@ -161,7 +161,7 @@ interface FormErrorProps {
 }
 
 export function FormError({ children, className }: FormErrorProps) {
-  return <div className={cn('rounded-2xl border border-status-error/20 bg-status-error/8 px-3 py-2 text-xs text-status-error', className)}>{children}</div>
+  return <div className={cn('pulse-form-error rounded-2xl px-3 py-2 text-xs', className)}>{children}</div>
 }
 
 interface FormToggleCardProps {
@@ -174,14 +174,14 @@ interface FormToggleCardProps {
 
 export function FormToggleCard({ title, description, checked, onToggle, className }: FormToggleCardProps) {
   return (
-    <div className={cn('flex items-center justify-between gap-4 rounded-[22px] border border-white/8 bg-white/[0.03] px-4 py-3', className)}>
+    <div className={cn('pulse-toggle-card flex items-center justify-between gap-4 rounded-[22px] px-4 py-3', className)}>
       <div>
-        <div className="text-sm font-medium text-text-primary">{title}</div>
-        {description ? <div className="mt-1 text-xs text-white/46">{description}</div> : null}
+        <div className="pulse-form-title text-sm font-medium">{title}</div>
+        {description ? <div className="pulse-form-description mt-1 text-xs">{description}</div> : null}
       </div>
       <button
         onClick={onToggle}
-        className={cn('relative flex h-6 w-11 shrink-0 rounded-full transition-all', checked ? 'bg-brand-acid shadow-glow-acid' : 'bg-bg-border')}
+        className={cn('pulse-toggle-switch relative flex h-6 w-11 shrink-0 rounded-full transition-all', checked && 'pulse-toggle-switch--checked')}
       >
         <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all', checked ? 'left-5' : 'left-0.5')} />
       </button>
@@ -201,13 +201,13 @@ export function ConfirmActionBox({ tone = 'default', title, description, childre
   return (
     <div
       className={cn(
-        'rounded-[24px] border px-4 py-4',
-        tone === 'danger' ? 'border-status-error/20 bg-status-error/6' : 'border-white/8 bg-white/[0.03]',
+        'pulse-confirm-box rounded-[24px] border px-4 py-4',
+        tone === 'danger' && 'pulse-confirm-box--danger',
         className,
       )}
     >
-      <div className={cn('text-sm font-semibold', tone === 'danger' ? 'text-status-error' : 'text-text-primary')}>{title}</div>
-      {description ? <div className="mt-1 text-xs leading-5 text-text-muted">{description}</div> : null}
+      <div className={cn('pulse-confirm-title text-sm font-semibold', tone === 'danger' && 'text-[var(--pulse-status-error)]')}>{title}</div>
+      {description ? <div className="pulse-confirm-description mt-1 text-xs leading-5">{description}</div> : null}
       {children ? <div className="mt-3">{children}</div> : null}
     </div>
   )
@@ -223,13 +223,13 @@ interface FeedbackBannerProps {
 export function FeedbackBanner({ tone = 'info', title, message, className }: FeedbackBannerProps) {
   const toneClassName =
     tone === 'success'
-      ? 'border-status-success/20 bg-status-success/8 text-status-success'
+      ? 'pulse-feedback-banner--success'
       : tone === 'error'
-        ? 'border-status-error/20 bg-status-error/8 text-status-error'
-        : 'border-brand-blue/20 bg-brand-blue/8 text-brand-blue'
+        ? 'pulse-feedback-banner--error'
+        : 'pulse-feedback-banner--info'
 
   return (
-    <div className={cn('rounded-2xl border px-4 py-3', toneClassName, className)}>
+    <div className={cn('pulse-feedback-banner rounded-2xl border px-4 py-3', toneClassName, className)}>
       {title ? <div className="text-sm font-semibold">{title}</div> : null}
       <div className={cn('text-sm leading-6', title ? 'mt-1' : '')}>{message}</div>
     </div>

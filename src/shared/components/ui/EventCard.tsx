@@ -15,13 +15,10 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
         .pulse-event-card {
           width: 100%;
           overflow: hidden;
-          border: 1px solid var(--pulse-color-border, #E5E5E5);
+          border: 1px solid var(--pulse-color-border);
           border-radius: 1.5rem;
-          background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(249, 251, 255, 0.98) 100%);
-          box-shadow:
-            0 12px 30px rgba(0, 0, 0, 0.08),
-            0 2px 10px rgba(0, 51, 160, 0.05);
+          background: linear-gradient(180deg, var(--pulse-surface-base) 0%, var(--pulse-surface-muted) 100%);
+          box-shadow: var(--pulse-shadow-soft);
           cursor: pointer;
           text-align: left;
           transition:
@@ -32,14 +29,12 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
 
         .pulse-event-card:hover {
           transform: translateY(-3px);
-          border-color: rgba(0, 123, 255, 0.25);
-          box-shadow:
-            0 20px 48px rgba(0, 0, 0, 0.12),
-            0 10px 24px rgba(0, 51, 160, 0.1);
+          border-color: var(--pulse-color-primary-accent);
+          box-shadow: var(--pulse-shadow-hover);
         }
 
         .pulse-event-card:focus-visible {
-          outline: 3px solid rgba(0, 123, 255, 0.3);
+          outline: 3px solid var(--pulse-focus-ring);
           outline-offset: 4px;
         }
 
@@ -47,8 +42,7 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
           position: relative;
           aspect-ratio: 16 / 10;
           overflow: hidden;
-          background:
-            linear-gradient(135deg, rgba(0, 51, 160, 0.14) 0%, rgba(0, 123, 255, 0.08) 100%);
+          background: linear-gradient(135deg, var(--pulse-overlay-soft) 0%, var(--pulse-surface-accent) 100%);
         }
 
         .pulse-event-card__image {
@@ -67,7 +61,7 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
           content: '';
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 51, 160, 0.08) 100%);
+          background: linear-gradient(180deg, transparent 0%, var(--pulse-surface-accent) 100%);
         }
 
         .pulse-event-card__content {
@@ -76,7 +70,7 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
 
         .pulse-event-card__title {
           margin: 0;
-          color: var(--pulse-color-text-primary, #000000);
+          color: var(--pulse-color-text-primary);
           font-family: var(--pulse-font-family, Inter, sans-serif);
           font-size: 1.1rem;
           font-weight: 700;
@@ -93,7 +87,7 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
           display: flex;
           align-items: center;
           gap: 0.65rem;
-          color: var(--pulse-color-text-secondary, #333333);
+          color: var(--pulse-color-text-secondary);
           font-family: var(--pulse-font-family, Inter, sans-serif);
           font-size: 0.95rem;
           line-height: 1.45;
@@ -101,7 +95,7 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
 
         .pulse-event-card__icon {
           flex: none;
-          color: var(--pulse-color-primary-base, #0033A0);
+          color: var(--pulse-color-primary-base);
         }
 
         @media (max-width: 640px) {

@@ -1,4 +1,5 @@
 export { EventCard } from './EventCard'
+export { Layout } from './Layout'
 export { PaginationControls } from './PaginationControls'
 export { PulseHero } from './PulseHero'
 export {

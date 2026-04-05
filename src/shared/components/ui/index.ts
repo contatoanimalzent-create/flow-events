@@ -1,3 +1,4 @@
+export { AppSection, AppShell } from './AppShell'
 export { EventCard } from './EventCard'
 export { Layout } from './Layout'
 export { PaginationControls } from './PaginationControls'

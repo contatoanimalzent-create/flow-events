@@ -5,10 +5,20 @@ interface EventCardProps {
   eventName: string
   date: string
   location: string
+  badge?: string
+  badgeTone?: 'default' | 'live' | 'warning'
   onClick: () => void
 }
 
-export function EventCard({ imageUrl, eventName, date, location, onClick }: EventCardProps) {
+export function EventCard({
+  imageUrl,
+  eventName,
+  date,
+  location,
+  badge,
+  badgeTone = 'default',
+  onClick,
+}: EventCardProps) {
   return (
     <>
       <style>{`
@@ -24,13 +34,14 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
           transition:
             transform 180ms ease,
             box-shadow 180ms ease,
-            border-color 180ms ease;
+            border-color 180ms ease,
+            background-color 180ms ease;
         }
 
         .pulse-event-card:hover {
-          transform: translateY(-3px);
+          transform: translateY(-5px);
           border-color: var(--pulse-color-primary-accent);
-          box-shadow: var(--pulse-shadow-hover);
+          box-shadow: var(--pulse-shadow-medium);
         }
 
         .pulse-event-card:focus-visible {
@@ -43,6 +54,59 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
           aspect-ratio: 16 / 10;
           overflow: hidden;
           background: linear-gradient(135deg, var(--pulse-overlay-soft) 0%, var(--pulse-surface-accent) 100%);
+        }
+
+        .pulse-event-card__badge {
+          position: absolute;
+          left: 1rem;
+          top: 1rem;
+          z-index: 1;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          min-height: 2rem;
+          padding: 0 0.8rem;
+          border-radius: var(--pulse-radius-full);
+          border: 1px solid var(--pulse-color-border);
+          background: color-mix(in srgb, var(--pulse-color-background) 84%, transparent);
+          color: var(--pulse-color-primary-base);
+          font-family: var(--pulse-font-family);
+          font-size: var(--pulse-font-size-caption);
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          backdrop-filter: blur(14px);
+          box-shadow: var(--pulse-shadow-soft);
+        }
+
+        .pulse-event-card__badge::before {
+          content: '';
+          width: 0.5rem;
+          height: 0.5rem;
+          border-radius: var(--pulse-radius-full);
+          background: var(--pulse-color-primary-accent);
+          flex: none;
+        }
+
+        .pulse-event-card__badge--live {
+          border-color: var(--pulse-status-success-border);
+          background: color-mix(in srgb, var(--pulse-status-success-surface) 72%, var(--pulse-color-background));
+          color: var(--pulse-status-success);
+        }
+
+        .pulse-event-card__badge--live::before {
+          background: var(--pulse-status-success);
+          box-shadow: 0 0 0 4px color-mix(in srgb, var(--pulse-status-success-surface) 72%, transparent);
+        }
+
+        .pulse-event-card__badge--warning {
+          border-color: var(--pulse-status-warning-border);
+          background: color-mix(in srgb, var(--pulse-status-warning-surface) 72%, var(--pulse-color-background));
+          color: var(--pulse-status-warning);
+        }
+
+        .pulse-event-card__badge--warning::before {
+          background: var(--pulse-status-warning);
         }
 
         .pulse-event-card__image {
@@ -61,35 +125,36 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
           content: '';
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, transparent 0%, var(--pulse-surface-accent) 100%);
+          background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--pulse-color-primary-base) 18%, transparent) 100%);
         }
 
         .pulse-event-card__content {
-          padding: 1.15rem 1.15rem 1.2rem;
+          padding: 1.2rem 1.2rem 1.25rem;
         }
 
         .pulse-event-card__title {
           margin: 0;
           color: var(--pulse-color-text-primary);
           font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 1.1rem;
+          font-size: 1.15rem;
           font-weight: 700;
-          line-height: 1.35;
+          line-height: 1.3;
+          letter-spacing: -0.02em;
         }
 
         .pulse-event-card__meta {
-          margin-top: 0.95rem;
+          margin-top: 1rem;
           display: grid;
-          gap: 0.7rem;
+          gap: 0.75rem;
         }
 
         .pulse-event-card__meta-row {
           display: flex;
           align-items: center;
-          gap: 0.65rem;
+          gap: 0.7rem;
           color: var(--pulse-color-text-secondary);
           font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 0.95rem;
+          font-size: 0.94rem;
           line-height: 1.45;
         }
 
@@ -101,6 +166,11 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
         @media (max-width: 640px) {
           .pulse-event-card {
             border-radius: var(--pulse-radius-md);
+          }
+
+          .pulse-event-card__badge {
+            left: 0.85rem;
+            top: 0.85rem;
           }
 
           .pulse-event-card__content {
@@ -119,6 +189,19 @@ export function EventCard({ imageUrl, eventName, date, location, onClick }: Even
 
       <button type="button" className="pulse-event-card" onClick={onClick}>
         <div className="pulse-event-card__media">
+          {badge ? (
+            <span
+              className={[
+                'pulse-event-card__badge',
+                badgeTone === 'live' ? 'pulse-event-card__badge--live' : '',
+                badgeTone === 'warning' ? 'pulse-event-card__badge--warning' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              {badge}
+            </span>
+          ) : null}
           <img className="pulse-event-card__image" src={imageUrl} alt={eventName} />
         </div>
 

@@ -1,344 +1,473 @@
 import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Types
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
-interface ValidateCheckinPayload {
-  qr_token: string
-  event_id: string
-  operator_id: string
-  device_id?: string
-  gate_id?: string
-  checkpoint_id?: string
-  lat?: number
-  lng?: number
-  accuracy?: number
-  manual_override?: boolean
+interface RequestBody {
+  credentialToken: string
+  checkpointId: string
 }
 
-type DenialReason =
-  | 'token_not_found'
-  | 'token_inactive'
-  | 'token_expired'
-  | 'max_uses_reached'
-  | 'credential_revoked'
-  | 'credential_not_yet_valid'
-  | 'credential_expired'
-  | 'zone_not_allowed'
-  | 'wrong_event'
-  | 'ticket_not_valid'
+type CheckinResult = 'valid' | 'duplicated' | 'invalid'
 
-// ---------------------------------------------------------------------------
+interface CheckinResponse {
+  result: CheckinResult
+  message: string
+  checkin_log_id?: string | null
+  credential_id?: string | null
+  holder_name?: string | null
+  zone_name?: string | null
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Helpers
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
-async function getGateZone(
-  supabase: ReturnType<typeof createSupabaseAdminClient>,
-  gate_id?: string,
-  checkpoint_id?: string,
-): Promise<string | null> {
-  if (gate_id) {
-    const { data } = await supabase
-      .from('gates')
-      .select('zone')
-      .eq('id', gate_id)
-      .single()
-    return data?.zone ?? null
-  }
-  if (checkpoint_id) {
-    const { data } = await supabase
-      .from('checkpoints')
-      .select('zone')
-      .eq('id', checkpoint_id)
-      .single()
-    return data?.zone ?? null
-  }
-  return null
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
 }
 
-async function isOperatorAdmin(
-  supabase: ReturnType<typeof createSupabaseAdminClient>,
-  operator_id: string,
-  event_id: string,
-): Promise<boolean> {
-  // Check profiles for super-admin role
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', operator_id)
-    .single()
-
-  if (profile?.role === 'admin' || profile?.role === 'super_admin') return true
-
-  // Check event-level staff member role
-  const { data: staffMember } = await supabase
-    .from('staff_members')
-    .select('role')
-    .eq('profile_id', operator_id)
-    .eq('event_id', event_id)
-    .single()
-
-  return staffMember?.role === 'admin' || staffMember?.role === 'coordinator'
+function errorResponse(message: string, status: number, code?: string): Response {
+  return jsonResponse({ error: message, ...(code ? { code } : {}) }, status)
 }
 
-// ---------------------------------------------------------------------------
-// Handler
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Handler
+// ─────────────────────────────────────────────────────────────────────────────
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request): Promise<Response> => {
+
+  // ── CORS preflight ─────────────────────────────────────────────────────────
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   if (req.method !== 'POST') {
-    return Response.json({ error: 'Method not allowed' }, { status: 405, headers: corsHeaders })
+    return errorResponse('Method not allowed. Use POST.', 405, 'METHOD_NOT_ALLOWED')
   }
 
-  const supabase = createSupabaseAdminClient()
-  const now = new Date()
-  const nowIso = now.toISOString()
-
-  let body: ValidateCheckinPayload
-
+  // ── Parse body ─────────────────────────────────────────────────────────────
+  let body: RequestBody
   try {
     body = await req.json()
   } catch {
-    return Response.json({ error: 'Invalid JSON body' }, { status: 400, headers: corsHeaders })
+    return errorResponse('Invalid JSON body.', 400, 'INVALID_JSON')
   }
 
-  // -------------------------------------------------------------------------
-  // Input validation
-  // -------------------------------------------------------------------------
-  if (!body.qr_token || !body.event_id || !body.operator_id) {
-    return Response.json(
-      { error: 'qr_token, event_id, and operator_id are required' },
-      { status: 400, headers: corsHeaders },
-    )
+  const { credentialToken, checkpointId } = body
+
+  if (!credentialToken || typeof credentialToken !== 'string') {
+    return errorResponse('credentialToken is required.', 400, 'MISSING_CREDENTIAL_TOKEN')
+  }
+  if (!checkpointId || typeof checkpointId !== 'string') {
+    return errorResponse('checkpointId is required.', 400, 'MISSING_CHECKPOINT_ID')
   }
 
-  // Helper to write a denial log and return the structured error response
-  async function deny(
-    reason: DenialReason,
-    contextData: Record<string, unknown> = {},
-    credentialId?: string,
-  ): Promise<Response> {
-    const { data: logRow } = await supabase
+  const admin = createSupabaseAdminClient()
+  const now = new Date()
+  const nowIso = now.toISOString()
+
+  // ── Helper: write checkin_log and return response ──────────────────────────
+  async function writeLog(params: {
+    result: CheckinResult
+    message: string
+    credentialId: string | null
+    eventId: string | null
+    zoneId: string | null
+    zoneName: string | null
+    holderName: string | null
+    denialReason?: string | null
+  }): Promise<Response> {
+    const { data: logRow } = await admin
       .from('checkin_logs')
       .insert({
-        event_id: body.event_id,
-        qr_token: body.qr_token,
-        credential_id: credentialId ?? null,
-        action: 'denied',
-        denial_reason: reason,
-        gate_id: body.gate_id ?? null,
-        checkpoint_id: body.checkpoint_id ?? null,
-        operator_id: body.operator_id,
-        device_id: body.device_id ?? null,
-        lat: body.lat ?? null,
-        lng: body.lng ?? null,
-        accuracy: body.accuracy ?? null,
-        occurred_at: nowIso,
-        metadata: contextData,
+        event_id:      params.eventId,
+        credential_id: params.credentialId,
+        qr_token:      credentialToken,
+        checkpoint_id: checkpointId,
+        action:        params.result === 'valid' ? 'entry' : 'denied',
+        denial_reason: params.denialReason ?? null,
+        occurred_at:   nowIso,
+        metadata: {
+          result:      params.result,
+          zone_id:     params.zoneId,
+          zone_name:   params.zoneName,
+          holder_name: params.holderName,
+        },
       })
       .select('id')
       .single()
 
-    return Response.json(
-      {
-        allowed: false,
-        denial_reason: reason,
-        checkin_log_id: logRow?.id ?? null,
-        ...contextData,
-      },
-      { status: 200, headers: corsHeaders },
-    )
+    const resp: CheckinResponse = {
+      result:         params.result,
+      message:        params.message,
+      checkin_log_id: logRow?.id ?? null,
+      credential_id:  params.credentialId,
+      holder_name:    params.holderName,
+      zone_name:      params.zoneName,
+    }
+    return jsonResponse(resp, 200)
   }
 
-  try {
-    // -----------------------------------------------------------------------
-    // 1. Fetch qr_token record
-    // -----------------------------------------------------------------------
-    const { data: tokenRow, error: tokenError } = await supabase
-      .from('qr_tokens')
-      .select('id, token, ref_type, ref_id, event_id, is_active, expires_at, used_count, max_uses')
-      .eq('token', body.qr_token)
-      .single()
+  // ── 1. Look up the QR token ────────────────────────────────────────────────
+  const { data: qrToken, error: qrError } = await admin
+    .from('qr_tokens')
+    .select('id, token, ref_type, ref_id, event_id, is_active, expires_at, used_count, max_uses')
+    .eq('token', credentialToken)
+    .maybeSingle()
 
-    if (tokenError || !tokenRow) {
-      return await deny('token_not_found')
-    }
+  if (qrError) {
+    console.error('[validate-checkin] qr_tokens lookup error:', qrError)
+    return errorResponse('Database error during token lookup.', 500, 'DB_ERROR')
+  }
 
-    // -----------------------------------------------------------------------
-    // 2. Validate token state
-    // -----------------------------------------------------------------------
-    if (!tokenRow.is_active) {
-      return await deny('token_inactive')
-    }
+  let credentialId: string | null = null
+  let eventId: string | null = null
 
-    if (tokenRow.expires_at && new Date(tokenRow.expires_at) < now) {
-      return await deny('token_expired', { expires_at: tokenRow.expires_at })
-    }
+  if (!qrToken) {
+    // Fallback: treat credentialToken as a direct credential UUID
+    const { data: directCred, error: directErr } = await admin
+      .from('credentials')
+      .select('id, staff_id, status, issued_at, expires_at, staff_members!inner(event_id)')
+      .eq('id', credentialToken)
+      .maybeSingle()
 
-    if (tokenRow.max_uses !== null && tokenRow.used_count >= tokenRow.max_uses) {
-      return await deny('max_uses_reached', { used_count: tokenRow.used_count, max_uses: tokenRow.max_uses })
-    }
-
-    // -----------------------------------------------------------------------
-    // 3. Resolve the credential or digital_ticket
-    // -----------------------------------------------------------------------
-    let personName: string | null = null
-    let credentialType: string = 'unknown'
-    let credentialId: string | null = null
-    let accessZones: string[] | null = null
-    let credentialEventId: string | null = null
-
-    if (tokenRow.ref_type === 'credential') {
-      const { data: cred, error: credError } = await supabase
-        .from('credentials')
-        .select('id, event_id, credential_type, access_zones, valid_from, valid_until, is_revoked, holder_name')
-        .eq('id', tokenRow.ref_id)
-        .single()
-
-      if (credError || !cred) {
-        return await deny('token_not_found')
-      }
-
-      credentialId = cred.id
-      credentialEventId = cred.event_id
-
-      if (cred.is_revoked) {
-        return await deny('credential_revoked', {}, cred.id)
-      }
-
-      if (cred.valid_from && new Date(cred.valid_from) > now) {
-        return await deny('credential_not_yet_valid', { valid_from: cred.valid_from }, cred.id)
-      }
-
-      if (cred.valid_until && new Date(cred.valid_until) < now) {
-        return await deny('credential_expired', { valid_until: cred.valid_until }, cred.id)
-      }
-
-      personName = cred.holder_name ?? null
-      credentialType = cred.credential_type ?? 'staff'
-      accessZones = cred.access_zones ?? []
-    } else if (tokenRow.ref_type === 'digital_ticket') {
-      const { data: ticket, error: ticketError } = await supabase
-        .from('digital_tickets')
-        .select('id, event_id, holder_name, status, order_id')
-        .eq('id', tokenRow.ref_id)
-        .single()
-
-      if (ticketError || !ticket) {
-        return await deny('token_not_found')
-      }
-
-      if (ticket.status === 'cancelled' || ticket.status === 'refunded') {
-        return await deny('ticket_not_valid', { ticket_status: ticket.status })
-      }
-
-      credentialEventId = ticket.event_id ?? null
-      personName = ticket.holder_name ?? null
-      credentialType = 'attendee'
-      accessZones = ['general']
-    } else {
-      return await deny('token_not_found')
-    }
-
-    // -----------------------------------------------------------------------
-    // 4. Cross-check event
-    // -----------------------------------------------------------------------
-    if (credentialEventId && credentialEventId !== body.event_id) {
-      return await deny('wrong_event', { expected_event: credentialEventId }, credentialId ?? undefined)
-    }
-
-    // -----------------------------------------------------------------------
-    // 5. Zone check
-    // -----------------------------------------------------------------------
-    const gateZone = await getGateZone(supabase, body.gate_id, body.checkpoint_id)
-
-    const zoneAllowed =
-      !gateZone ||
-      !accessZones ||
-      accessZones.length === 0 ||
-      accessZones.includes(gateZone) ||
-      accessZones.includes('all')
-
-    if (!zoneAllowed) {
-      // Check for manual override by an admin operator
-      if (body.manual_override) {
-        const isAdmin = await isOperatorAdmin(supabase, body.operator_id, body.event_id)
-        if (!isAdmin) {
-          return await deny(
-            'zone_not_allowed',
-            { gate_zone: gateZone, allowed_zones: accessZones, override_rejected: true },
-            credentialId ?? undefined,
-          )
-        }
-        // Admin override — fall through to allow
-      } else {
-        return await deny(
-          'zone_not_allowed',
-          { gate_zone: gateZone, allowed_zones: accessZones },
-          credentialId ?? undefined,
-        )
-      }
-    }
-
-    // -----------------------------------------------------------------------
-    // 6. All checks passed — commit the check-in
-    // -----------------------------------------------------------------------
-
-    // Increment used_count on qr_token
-    const { error: incrError } = await supabase
-      .from('qr_tokens')
-      .update({ used_count: (tokenRow.used_count ?? 0) + 1 })
-      .eq('id', tokenRow.id)
-
-    if (incrError) {
-      console.error('[validate-checkin] failed to increment used_count:', incrError.message)
-    }
-
-    // Insert successful checkin_log
-    const { data: logRow, error: logError } = await supabase
-      .from('checkin_logs')
-      .insert({
-        event_id: body.event_id,
-        qr_token: body.qr_token,
-        credential_id: credentialId ?? null,
-        action: 'entry',
-        denial_reason: null,
-        gate_id: body.gate_id ?? null,
-        checkpoint_id: body.checkpoint_id ?? null,
-        operator_id: body.operator_id,
-        device_id: body.device_id ?? null,
-        lat: body.lat ?? null,
-        lng: body.lng ?? null,
-        accuracy: body.accuracy ?? null,
-        occurred_at: nowIso,
-        metadata: body.manual_override ? { manual_override: true } : {},
+    if (directErr || !directCred) {
+      return await writeLog({
+        result: 'invalid',
+        message: 'Credential not found.',
+        credentialId: null,
+        eventId: null,
+        zoneId: null,
+        zoneName: null,
+        holderName: null,
+        denialReason: 'token_not_found',
       })
-      .select('id')
-      .single()
-
-    if (logError) {
-      console.error('[validate-checkin] failed to write checkin_log:', logError.message)
     }
 
-    return Response.json(
-      {
-        allowed: true,
-        person_name: personName,
-        credential_type: credentialType,
-        checkin_log_id: logRow?.id ?? null,
-        ...(body.manual_override ? { override_applied: true } : {}),
-      },
-      { status: 200, headers: corsHeaders },
-    )
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unexpected error'
-    console.error('[validate-checkin] unhandled error:', err)
-    return Response.json({ error: message }, { status: 500, headers: corsHeaders })
+    credentialId = directCred.id
+    const sm = directCred.staff_members as { event_id: string }
+    eventId = sm?.event_id ?? null
+  } else {
+    // ── 2. Validate QR token state ─────────────────────────────────────────
+    if (!qrToken.is_active) {
+      return await writeLog({
+        result: 'invalid',
+        message: 'This QR code is no longer active.',
+        credentialId: null,
+        eventId: qrToken.event_id,
+        zoneId: null,
+        zoneName: null,
+        holderName: null,
+        denialReason: 'token_inactive',
+      })
+    }
+
+    if (qrToken.expires_at && new Date(qrToken.expires_at) < now) {
+      return await writeLog({
+        result: 'invalid',
+        message: 'This QR code has expired.',
+        credentialId: null,
+        eventId: qrToken.event_id,
+        zoneId: null,
+        zoneName: null,
+        holderName: null,
+        denialReason: 'token_expired',
+      })
+    }
+
+    if (qrToken.max_uses !== null && (qrToken.used_count ?? 0) >= qrToken.max_uses) {
+      return await writeLog({
+        result: 'invalid',
+        message: 'This QR code has reached its usage limit.',
+        credentialId: null,
+        eventId: qrToken.event_id,
+        zoneId: null,
+        zoneName: null,
+        holderName: null,
+        denialReason: 'max_uses_reached',
+      })
+    }
+
+    if (qrToken.ref_type !== 'credential') {
+      return await writeLog({
+        result: 'invalid',
+        message: 'QR code does not reference a credential.',
+        credentialId: null,
+        eventId: qrToken.event_id,
+        zoneId: null,
+        zoneName: null,
+        holderName: null,
+        denialReason: 'invalid_ref_type',
+      })
+    }
+
+    credentialId = qrToken.ref_id
+    eventId = qrToken.event_id
   }
+
+  // ── 3. Fetch credential details ────────────────────────────────────────────
+  const { data: credential, error: credError } = await admin
+    .from('credentials')
+    .select(`
+      id,
+      staff_id,
+      type,
+      format,
+      status,
+      issued_at,
+      expires_at,
+      staff_members!inner (
+        id,
+        event_id,
+        name,
+        role
+      )
+    `)
+    .eq('id', credentialId!)
+    .maybeSingle()
+
+  if (credError) {
+    console.error('[validate-checkin] credential lookup error:', credError)
+    return errorResponse('Database error during credential lookup.', 500, 'DB_ERROR')
+  }
+
+  if (!credential) {
+    return await writeLog({
+      result: 'invalid',
+      message: 'Credential not found.',
+      credentialId,
+      eventId,
+      zoneId: null,
+      zoneName: null,
+      holderName: null,
+      denialReason: 'credential_not_found',
+    })
+  }
+
+  const staffMember = credential.staff_members as { id: string; event_id: string; name: string; role: string }
+  const holderName: string = staffMember?.name ?? 'Unknown'
+  const credEventId: string = staffMember?.event_id ?? eventId ?? ''
+
+  // ── 4. Validate credential status ─────────────────────────────────────────
+  if (credential.status === 'revoked') {
+    return await writeLog({
+      result: 'invalid',
+      message: 'This credential has been revoked.',
+      credentialId: credential.id,
+      eventId: credEventId,
+      zoneId: null,
+      zoneName: null,
+      holderName,
+      denialReason: 'credential_revoked',
+    })
+  }
+
+  if (credential.expires_at && new Date(credential.expires_at) < now) {
+    return await writeLog({
+      result: 'invalid',
+      message: 'This credential has expired.',
+      credentialId: credential.id,
+      eventId: credEventId,
+      zoneId: null,
+      zoneName: null,
+      holderName,
+      denialReason: 'credential_expired',
+    })
+  }
+
+  // ── 5. Fetch checkpoint and verify it exists ───────────────────────────────
+  const { data: checkpoint, error: cpError } = await admin
+    .from('checkpoints')
+    .select(`
+      id,
+      name,
+      venue_map_id,
+      zone_id,
+      venue_maps!inner (
+        id,
+        venue_id
+      )
+    `)
+    .eq('id', checkpointId)
+    .maybeSingle()
+
+  if (cpError) {
+    console.error('[validate-checkin] checkpoint lookup error:', cpError)
+    return errorResponse('Database error during checkpoint lookup.', 500, 'DB_ERROR')
+  }
+
+  if (!checkpoint) {
+    return await writeLog({
+      result: 'invalid',
+      message: 'Checkpoint not found.',
+      credentialId: credential.id,
+      eventId: credEventId,
+      zoneId: null,
+      zoneName: null,
+      holderName,
+      denialReason: 'checkpoint_not_found',
+    })
+  }
+
+  // ── 6. Fetch zone info ─────────────────────────────────────────────────────
+  const zoneId: string | null = checkpoint.zone_id ?? null
+  let zoneName: string | null = null
+
+  if (zoneId) {
+    const { data: zone } = await admin
+      .from('venue_zones')
+      .select('id, name, zone_type')
+      .eq('id', zoneId)
+      .maybeSingle()
+    zoneName = zone?.name ?? null
+  }
+
+  // ── 7. Validate event date/time window ────────────────────────────────────
+  const { data: event, error: eventError } = await admin
+    .from('events')
+    .select('id, starts_at, ends_at, status')
+    .eq('id', credEventId)
+    .maybeSingle()
+
+  if (eventError || !event) {
+    return await writeLog({
+      result: 'invalid',
+      message: 'Event not found.',
+      credentialId: credential.id,
+      eventId: credEventId,
+      zoneId,
+      zoneName,
+      holderName,
+      denialReason: 'event_not_found',
+    })
+  }
+
+  // Allow check-in within [starts_at - 2h, ends_at + 30min]
+  const windowStart = event.starts_at
+    ? new Date(new Date(event.starts_at).getTime() - 2 * 60 * 60 * 1000)
+    : null
+  const windowEnd = event.ends_at
+    ? new Date(new Date(event.ends_at).getTime() + 30 * 60 * 1000)
+    : null
+
+  if (windowStart && now < windowStart) {
+    return await writeLog({
+      result: 'invalid',
+      message: 'Check-in not yet available. The event has not started.',
+      credentialId: credential.id,
+      eventId: credEventId,
+      zoneId,
+      zoneName,
+      holderName,
+      denialReason: 'event_not_started',
+    })
+  }
+
+  if (windowEnd && now > windowEnd) {
+    return await writeLog({
+      result: 'invalid',
+      message: 'Check-in window has closed. The event has ended.',
+      credentialId: credential.id,
+      eventId: credEventId,
+      zoneId,
+      zoneName,
+      holderName,
+      denialReason: 'event_ended',
+    })
+  }
+
+  // ── 8. Zone access control via credential_access_rules ────────────────────
+  if (zoneId) {
+    const { data: accessRules, error: rulesError } = await admin
+      .from('credential_access_rules')
+      .select('zone_id, valid_from, valid_until')
+      .eq('credential_id', credential.id)
+
+    if (rulesError) {
+      console.error('[validate-checkin] access rules lookup error:', rulesError)
+      return errorResponse('Database error during access rule lookup.', 500, 'DB_ERROR')
+    }
+
+    // Only enforce if explicit rules exist (no rules = full access)
+    if (accessRules && accessRules.length > 0) {
+      const allowedRule = accessRules.find((r) => {
+        if (r.zone_id !== zoneId) return false
+        if (r.valid_from && new Date(r.valid_from) > now) return false
+        if (r.valid_until && new Date(r.valid_until) < now) return false
+        return true
+      })
+
+      if (!allowedRule) {
+        return await writeLog({
+          result: 'invalid',
+          message: `Access denied. No permission for zone: ${zoneName ?? zoneId}.`,
+          credentialId: credential.id,
+          eventId: credEventId,
+          zoneId,
+          zoneName,
+          holderName,
+          denialReason: 'zone_not_allowed',
+        })
+      }
+    }
+  }
+
+  // ── 9. Duplicate detection (same credential, last 5 minutes) ──────────────
+  const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000).toISOString()
+
+  const { data: recentLogs, error: dupError } = await admin
+    .from('checkin_logs')
+    .select('id, occurred_at')
+    .eq('credential_id', credential.id)
+    .eq('action', 'entry')
+    .gte('occurred_at', fiveMinAgo)
+    .order('occurred_at', { ascending: false })
+    .limit(1)
+
+  if (dupError) {
+    console.warn('[validate-checkin] duplicate check error (non-fatal):', dupError.message)
+  }
+
+  if (recentLogs && recentLogs.length > 0) {
+    return await writeLog({
+      result: 'duplicated',
+      message: `Duplicate check-in. ${holderName} already checked in recently.`,
+      credentialId: credential.id,
+      eventId: credEventId,
+      zoneId,
+      zoneName,
+      holderName,
+      denialReason: 'duplicated',
+    })
+  }
+
+  // ── 10. All checks passed — commit check-in ────────────────────────────────
+
+  // Increment QR token used_count (non-fatal)
+  if (qrToken) {
+    admin
+      .from('qr_tokens')
+      .update({ used_count: (qrToken.used_count ?? 0) + 1 })
+      .eq('id', qrToken.id)
+      .then(({ error }) => {
+        if (error) console.warn('[validate-checkin] used_count increment failed:', error.message)
+      })
+  }
+
+  return await writeLog({
+    result: 'valid',
+    message: `Welcome, ${holderName}! Check-in successful.`,
+    credentialId: credential.id,
+    eventId: credEventId,
+    zoneId,
+    zoneName,
+    holderName,
+    denialReason: null,
+  })
 })

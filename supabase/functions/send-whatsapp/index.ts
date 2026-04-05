@@ -1,18 +1,32 @@
 import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Types
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
-interface SendWhatsAppPayload {
-  to: string                                   // E.164 format, e.g. +5511999999999
-  template_slug: string
-  template_vars: Record<string, string>
-  organization_id: string
-  event_id?: string
-  profile_id?: string
-  fallback_sms?: boolean                       // default false
+/**
+ * POST body accepted by this function.
+ *
+ * Field names match the user-facing API spec:
+ *   { to, templateKey, variables, organizationId }
+ */
+interface RequestBody {
+  /** Recipient phone number — E.164 (e.g. "+5511999990000") or plain digits */
+  to: string
+  /** Key column value in whatsapp_templates for this organization */
+  templateKey: string
+  /** Named values for {{placeholder}} tokens in the template body */
+  variables?: Record<string, string | number | boolean>
+  /** UUID of the organization that owns the template */
+  organizationId: string
+  /** Optional: stored in communications_log.metadata for correlation */
+  eventId?: string | null
+  /**
+   * If true and the WhatsApp send fails, retry as a plain SMS.
+   * Requires TWILIO_WHATSAPP_NUMBER to also be usable as a SMS sender.
+   */
+  fallbackSms?: boolean
 }
 
 interface TwilioMessageResponse {
@@ -24,69 +38,13 @@ interface TwilioMessageResponse {
 
 type ChannelUsed = 'whatsapp' | 'sms'
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Replace {{key}} placeholders in a template string with vars values */
-function interpolateTemplate(template: string, vars: Record<string, string>): string {
-  return template.replace(/\{\{(\w+)\}\}/g, (_, key) => vars[key] ?? `{{${key}}}`)
-}
-
-/**
- * Send a message via Twilio REST API.
- * fromNumber should include the 'whatsapp:' prefix for WhatsApp channel.
- * toNumber should include 'whatsapp:' prefix for WhatsApp, plain E.164 for SMS.
- */
-async function sendViaTwilio(params: {
-  accountSid: string
-  authToken: string
-  from: string
-  to: string
-  body: string
-  contentSid?: string
-}): Promise<TwilioMessageResponse> {
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${params.accountSid}/Messages.json`
-
-  const formData = new URLSearchParams()
-  formData.append('From', params.from)
-  formData.append('To', params.to)
-
-  // If a ContentSid is provided (Meta template), use it; otherwise send body directly
-  if (params.contentSid) {
-    formData.append('ContentSid', params.contentSid)
-    // ContentSid approach can still include a Body for fallback rendering
-    formData.append('Body', params.body)
-  } else {
-    formData.append('Body', params.body)
-  }
-
-  const credentials = btoa(`${params.accountSid}:${params.authToken}`)
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${credentials}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: formData.toString(),
-  })
-
-  const json = await response.json() as TwilioMessageResponse
-
-  if (!response.ok) {
-    throw new TwilioError(
-      json.error_message ?? `Twilio responded with HTTP ${response.status}`,
-      json.error_code ?? response.status,
-      json,
-    )
-  }
-
-  return json
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// TwilioError — structured error from the Twilio REST API
+// ─────────────────────────────────────────────────────────────────────────────
 
 class TwilioError extends Error {
-  code: number
-  raw: unknown
+  readonly code: number
+  readonly raw: unknown
 
   constructor(message: string, code: number, raw: unknown) {
     super(message)
@@ -96,209 +54,287 @@ class TwilioError extends Error {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Handler
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
-Deno.serve(async (req) => {
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+}
+
+/**
+ * Normalise a raw phone string to E.164.
+ * Strips any leading "whatsapp:" prefix, then ensures a "+" prefix.
+ */
+function normalizePhone(raw: string): string {
+  let p = raw.trim()
+  if (p.startsWith('whatsapp:')) p = p.slice('whatsapp:'.length)
+  if (!p.startsWith('+')) p = `+${p}`
+  return p
+}
+
+/**
+ * Replace every {{key}} token in `template` with the matching value from
+ * `vars`.  Unresolved tokens are kept verbatim so callers can detect them.
+ */
+function interpolate(
+  template: string,
+  vars: Record<string, string | number | boolean>,
+): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key: string) =>
+    key in vars ? String(vars[key]) : match,
+  )
+}
+
+/**
+ * POST a message to the Twilio Messages API.
+ * Throws `TwilioError` on non-2xx responses.
+ */
+async function twilioSend(params: {
+  accountSid: string
+  authToken: string
+  from: string        // must include "whatsapp:" prefix for WA channel
+  to: string          // must include "whatsapp:" prefix for WA channel
+  body: string
+}): Promise<TwilioMessageResponse> {
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${params.accountSid}/Messages.json`
+
+  const form = new URLSearchParams({
+    From: params.from,
+    To:   params.to,
+    Body: params.body,
+  })
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization:  `Basic ${btoa(`${params.accountSid}:${params.authToken}`)}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: form.toString(),
+  })
+
+  const json = (await res.json()) as TwilioMessageResponse
+
+  if (!res.ok) {
+    throw new TwilioError(
+      json.error_message ?? `Twilio HTTP ${res.status}`,
+      json.error_code ?? res.status,
+      json,
+    )
+  }
+
+  return json
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Handler
+// ─────────────────────────────────────────────────────────────────────────────
+
+Deno.serve(async (req: Request): Promise<Response> => {
+
+  // ── CORS preflight ─────────────────────────────────────────────────────────
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   if (req.method !== 'POST') {
-    return Response.json({ error: 'Method not allowed' }, { status: 405, headers: corsHeaders })
+    return jsonResponse({ error: 'Method not allowed. Use POST.' }, 405)
   }
 
-  // -------------------------------------------------------------------------
-  // Read env vars early so we can fail fast
-  // -------------------------------------------------------------------------
-  const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID')
-  const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN')
-  const TWILIO_WHATSAPP_NUMBER = Deno.env.get('TWILIO_WHATSAPP_NUMBER') // e.g. whatsapp:+14155238886
+  // ── Env vars (fail-fast) ───────────────────────────────────────────────────
+  const ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID')
+  const AUTH_TOKEN  = Deno.env.get('TWILIO_AUTH_TOKEN')
+  const WA_NUMBER   = Deno.env.get('TWILIO_WHATSAPP_NUMBER') // "+14155238886" or "whatsapp:+14155..."
 
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_WHATSAPP_NUMBER) {
-    console.error('[send-whatsapp] Missing Twilio environment variables')
-    return Response.json(
-      { error: 'Server misconfiguration: Twilio credentials not set' },
-      { status: 500, headers: corsHeaders },
+  if (!ACCOUNT_SID || !AUTH_TOKEN || !WA_NUMBER) {
+    console.error('[send-whatsapp] Missing Twilio env vars')
+    return jsonResponse(
+      { error: 'Server configuration error: Twilio credentials not set.', code: 'TWILIO_CONFIG_MISSING' },
+      500,
     )
   }
 
-  let body: SendWhatsAppPayload
+  // ── Parse body ─────────────────────────────────────────────────────────────
+  let body: RequestBody
   try {
     body = await req.json()
   } catch {
-    return Response.json({ error: 'Invalid JSON body' }, { status: 400, headers: corsHeaders })
+    return jsonResponse({ error: 'Invalid JSON body.', code: 'INVALID_JSON' }, 400)
   }
 
-  // -------------------------------------------------------------------------
-  // Input validation
-  // -------------------------------------------------------------------------
-  const requiredFields: (keyof SendWhatsAppPayload)[] = ['to', 'template_slug', 'template_vars', 'organization_id']
-  const missing = requiredFields.filter((f) => !body[f])
+  const {
+    to,
+    templateKey,
+    variables   = {},
+    organizationId,
+    eventId     = null,
+    fallbackSms = false,
+  } = body
+
+  // ── Validate required fields ───────────────────────────────────────────────
+  const missing: string[] = []
+  if (!to             || typeof to             !== 'string') missing.push('to')
+  if (!templateKey    || typeof templateKey    !== 'string') missing.push('templateKey')
+  if (!organizationId || typeof organizationId !== 'string') missing.push('organizationId')
+
   if (missing.length > 0) {
-    return Response.json({ error: `Missing required fields: ${missing.join(', ')}` }, { status: 400, headers: corsHeaders })
+    return jsonResponse({ error: `Missing required fields: ${missing.join(', ')}.` }, 400)
   }
 
-  // Validate E.164 format
-  if (!/^\+\d{7,15}$/.test(body.to)) {
-    return Response.json({ error: 'to must be in E.164 format (e.g. +5511999999999)' }, { status: 400, headers: corsHeaders })
+  const recipientPhone = normalizePhone(to)
+
+  // Basic E.164 sanity check after normalisation
+  if (!/^\+\d{7,15}$/.test(recipientPhone)) {
+    return jsonResponse(
+      { error: `"to" must be a valid phone number in E.164 format (e.g. +5511999990000). Got: ${to}` },
+      400,
+    )
   }
 
-  const supabase = createSupabaseAdminClient()
-  const now = new Date().toISOString()
+  const admin  = createSupabaseAdminClient()
+  const nowIso = new Date().toISOString()
+
+  // ── 1. Fetch template (key + body are the only columns in current schema) ──
+  const { data: template, error: tmplErr } = await admin
+    .from('whatsapp_templates')
+    .select('id, key, body')
+    .eq('organization_id', organizationId)
+    .eq('key', templateKey)
+    .maybeSingle()
+
+  if (tmplErr) {
+    console.error('[send-whatsapp] template lookup error:', tmplErr)
+    return jsonResponse({ error: 'Database error while fetching template.', code: 'DB_ERROR' }, 500)
+  }
+
+  if (!template) {
+    return jsonResponse(
+      { error: `WhatsApp template "${templateKey}" not found for this organization.`, code: 'TEMPLATE_NOT_FOUND' },
+      404,
+    )
+  }
+
+  // ── 2. Interpolate {{placeholders}} ───────────────────────────────────────
+  const renderedBody = interpolate(template.body, variables)
+
+  const unresolved = [...renderedBody.matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1])
+  if (unresolved.length > 0) {
+    console.warn('[send-whatsapp] Unresolved placeholders after interpolation:', unresolved)
+  }
+
+  // ── 3. Build Twilio addresses ──────────────────────────────────────────────
+  const fromNormalized = normalizePhone(WA_NUMBER)
+  const waFrom = `whatsapp:${fromNormalized}`
+  const waTo   = `whatsapp:${recipientPhone}`
+
+  // ── 4. Send via Twilio (WhatsApp, with optional SMS fallback) ──────────────
+  let twilioRes: TwilioMessageResponse | null = null
+  let channelUsed: ChannelUsed = 'whatsapp'
+  let sendError: string | null = null
 
   try {
-    // -----------------------------------------------------------------------
-    // 1. Fetch the WhatsApp template
-    // -----------------------------------------------------------------------
-    const { data: template, error: templateError } = await supabase
-      .from('whatsapp_templates')
-      .select('id, slug, body_template, meta_template_name, meta_content_sid, is_active, language_code')
-      .eq('slug', body.template_slug)
-      .single()
+    twilioRes = await twilioSend({
+      accountSid: ACCOUNT_SID,
+      authToken:  AUTH_TOKEN,
+      from:       waFrom,
+      to:         waTo,
+      body:       renderedBody,
+    })
+  } catch (waErr: unknown) {
+    const waMsg = waErr instanceof TwilioError
+      ? `[${waErr.code}] ${waErr.message}`
+      : waErr instanceof Error ? waErr.message : String(waErr)
 
-    if (templateError || !template) {
-      return Response.json(
-        { error: `Template '${body.template_slug}' not found` },
-        { status: 404, headers: corsHeaders },
-      )
-    }
+    console.warn('[send-whatsapp] WhatsApp send failed:', waMsg)
+    sendError = waMsg
 
-    if (!template.is_active) {
-      return Response.json(
-        { error: `Template '${body.template_slug}' is not active` },
-        { status: 422, headers: corsHeaders },
-      )
-    }
+    // ── SMS fallback ─────────────────────────────────────────────────────────
+    if (fallbackSms) {
+      console.info('[send-whatsapp] Retrying as SMS for:', recipientPhone)
+      channelUsed = 'sms'
+      const smsFrom = fromNormalized  // plain E.164, no whatsapp: prefix
 
-    // -----------------------------------------------------------------------
-    // 2. Interpolate the template body
-    // -----------------------------------------------------------------------
-    const messageBody = interpolateTemplate(template.body_template, body.template_vars)
+      try {
+        twilioRes = await twilioSend({
+          accountSid: ACCOUNT_SID,
+          authToken:  AUTH_TOKEN,
+          from:       smsFrom,
+          to:         recipientPhone,
+          body:       renderedBody,
+        })
+        sendError = null  // SMS succeeded — clear error
+      } catch (smsErr: unknown) {
+        const smsMsg = smsErr instanceof TwilioError
+          ? `[${smsErr.code}] ${smsErr.message}`
+          : smsErr instanceof Error ? smsErr.message : String(smsErr)
 
-    // -----------------------------------------------------------------------
-    // 3. Attempt WhatsApp send
-    // -----------------------------------------------------------------------
-    let twilioResponse: TwilioMessageResponse | null = null
-    let channelUsed: ChannelUsed = 'whatsapp'
-    let sendError: string | null = null
-
-    const whatsappTo = `whatsapp:${body.to}`
-    const whatsappFrom = TWILIO_WHATSAPP_NUMBER.startsWith('whatsapp:')
-      ? TWILIO_WHATSAPP_NUMBER
-      : `whatsapp:${TWILIO_WHATSAPP_NUMBER}`
-
-    try {
-      twilioResponse = await sendViaTwilio({
-        accountSid: TWILIO_ACCOUNT_SID,
-        authToken: TWILIO_AUTH_TOKEN,
-        from: whatsappFrom,
-        to: whatsappTo,
-        body: messageBody,
-        contentSid: template.meta_content_sid ?? undefined,
-      })
-    } catch (waError: unknown) {
-      const errorMsg = waError instanceof Error ? waError.message : String(waError)
-      console.warn('[send-whatsapp] WhatsApp send failed:', errorMsg)
-      sendError = errorMsg
-
-      // -------------------------------------------------------------------
-      // 4. SMS fallback
-      // -------------------------------------------------------------------
-      if (body.fallback_sms) {
-        console.info('[send-whatsapp] Attempting SMS fallback for:', body.to)
-        channelUsed = 'sms'
-
-        // For SMS we need a regular Twilio number (not whatsapp: prefixed)
-        const smsFrom = TWILIO_WHATSAPP_NUMBER.replace(/^whatsapp:/, '')
-
-        try {
-          twilioResponse = await sendViaTwilio({
-            accountSid: TWILIO_ACCOUNT_SID,
-            authToken: TWILIO_AUTH_TOKEN,
-            from: smsFrom,
-            to: body.to, // plain E.164, no whatsapp: prefix
-            body: messageBody,
-          })
-          sendError = null // SMS succeeded
-        } catch (smsError: unknown) {
-          const smsErrorMsg = smsError instanceof Error ? smsError.message : String(smsError)
-          console.error('[send-whatsapp] SMS fallback also failed:', smsErrorMsg)
-          sendError = `WhatsApp: ${errorMsg} | SMS fallback: ${smsErrorMsg}`
-        }
+        console.error('[send-whatsapp] SMS fallback also failed:', smsMsg)
+        sendError = `WhatsApp: ${waMsg} | SMS fallback: ${smsMsg}`
       }
     }
-
-    // -----------------------------------------------------------------------
-    // 5. Determine final status
-    // -----------------------------------------------------------------------
-    const messageStatus: string = sendError
-      ? 'failed'
-      : (twilioResponse?.status ?? 'sent')
-
-    // -----------------------------------------------------------------------
-    // 6. Insert into communications_log
-    // -----------------------------------------------------------------------
-    const { data: logRow, error: logError } = await supabase
-      .from('communications_log')
-      .insert({
-        organization_id: body.organization_id,
-        event_id: body.event_id ?? null,
-        profile_id: body.profile_id ?? null,
-        channel: 'whatsapp',
-        template_slug: body.template_slug,
-        template_vars: body.template_vars,
-        recipient_phone: body.to,
-        provider: 'twilio',
-        provider_message_id: twilioResponse?.sid ?? null,
-        status: messageStatus,
-        channel_used: channelUsed,
-        error_message: sendError,
-        sent_at: sendError ? null : now,
-        created_at: now,
-        metadata: {
-          template_id: template.id,
-          language_code: template.language_code ?? null,
-          meta_template_name: template.meta_template_name ?? null,
-          fallback_sms: body.fallback_sms ?? false,
-          whatsapp_failed: channelUsed === 'sms',
-        },
-      })
-      .select('id')
-      .single()
-
-    if (logError) {
-      console.warn('[send-whatsapp] communications_log insert failed:', logError.message)
-    }
-
-    // -----------------------------------------------------------------------
-    // 7. Return result
-    // -----------------------------------------------------------------------
-    if (sendError && !twilioResponse) {
-      return Response.json(
-        {
-          success: false,
-          error: sendError,
-          log_id: logRow?.id ?? null,
-        },
-        { status: 502, headers: corsHeaders },
-      )
-    }
-
-    return Response.json(
-      {
-        success: true,
-        sid: twilioResponse?.sid ?? null,
-        status: twilioResponse?.status ?? messageStatus,
-        channel_used: channelUsed,
-        log_id: logRow?.id ?? null,
-      },
-      { status: 200, headers: corsHeaders },
-    )
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unexpected error'
-    console.error('[send-whatsapp] unhandled error:', err)
-    return Response.json({ error: message }, { status: 500, headers: corsHeaders })
   }
+
+  const finalStatus: 'sent' | 'failed' = sendError ? 'failed' : 'sent'
+
+  // ── 5. Log to communications_log ──────────────────────────────────────────
+  const { data: logRow, error: logErr } = await admin
+    .from('communications_log')
+    .insert({
+      organization_id: organizationId,
+      template_key:    templateKey,
+      channel:         'whatsapp',
+      recipient:       recipientPhone,
+      recipient_phone: recipientPhone,
+      status:          finalStatus,
+      message_sid:     twilioRes?.sid   ?? null,
+      body_preview:    renderedBody.slice(0, 500),
+      error_message:   sendError,
+      sent_at:         finalStatus === 'sent' ? nowIso : null,
+      metadata: {
+        template_id:             template.id,
+        variables,
+        event_id:                eventId,
+        channel_used:            channelUsed,
+        twilio_status:           twilioRes?.status ?? null,
+        fallback_sms_attempted:  fallbackSms,
+        whatsapp_failed:         channelUsed === 'sms',
+        unresolved_placeholders: unresolved.length > 0 ? unresolved : null,
+      },
+    })
+    .select('id')
+    .single()
+
+  if (logErr) {
+    // Non-fatal — delivery already attempted; don't fail the whole request
+    console.warn('[send-whatsapp] communications_log insert failed:', logErr.message)
+  }
+
+  // ── 6. Return result ───────────────────────────────────────────────────────
+  if (finalStatus === 'failed') {
+    return jsonResponse(
+      {
+        success:               false,
+        status:                'failed',
+        message_sid:           null,
+        communications_log_id: logRow?.id ?? null,
+        error:                 sendError,
+      },
+      502,
+    )
+  }
+
+  return jsonResponse({
+    success:               true,
+    status:                twilioRes?.status ?? 'sent',
+    message_sid:           twilioRes?.sid    ?? null,
+    communications_log_id: logRow?.id        ?? null,
+    to:                    recipientPhone,
+    channel_used:          channelUsed,
+    template_key:          templateKey,
+    ...(unresolved.length > 0 ? { unresolved_placeholders: unresolved } : {}),
+  })
 })

@@ -1,5 +1,7 @@
 import { useId } from 'react'
+import { motion } from 'framer-motion'
 import { cn } from '@/shared/lib'
+import { MotionReveal, useAnimationPreset } from '@/shared/motion'
 import { EventCard, type EventCardProps } from './EventCard'
 
 export interface FeaturedEventsItem extends EventCardProps {
@@ -22,6 +24,12 @@ export function FeaturedEvents({
   className,
 }: FeaturedEventsProps) {
   const titleId = useId()
+  const cardAnimation = useAnimationPreset('scaleIn', {
+    durationMs: 420,
+    distance: 16,
+    once: true,
+    amount: 0.12,
+  })
 
   return (
     <>
@@ -141,20 +149,28 @@ export function FeaturedEvents({
       >
         <div className="pulse-featured-events__inner">
           <div className="pulse-featured-events__surface">
-            <header className="pulse-featured-events__header">
+            <MotionReveal className="pulse-featured-events__header" preset="fadeIn" distance={0}>
               <h2 id={titleId} className="pulse-featured-events__title">
                 {title}
               </h2>
               {description ? (
                 <p className="pulse-featured-events__description">{description}</p>
               ) : null}
-            </header>
+            </MotionReveal>
 
             <div className="pulse-featured-events__grid">
-              {events.map((event) => (
-                <div key={event.id} className="pulse-featured-events__item">
+              {events.map((event, index) => (
+                <motion.div
+                  key={event.id}
+                  className="pulse-featured-events__item"
+                  initial={cardAnimation.initial}
+                  whileInView={cardAnimation.whileInView}
+                  viewport={cardAnimation.viewport}
+                  variants={cardAnimation.variants}
+                  transition={{ delay: index * 0.06 }}
+                >
                   <EventCard {...event} />
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

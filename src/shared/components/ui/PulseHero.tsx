@@ -1,3 +1,6 @@
+import { motion } from 'framer-motion'
+import { useAnimationPreset } from '@/shared/motion'
+
 interface PulseHeroProps {
   title: string
   subtitle: string
@@ -13,6 +16,11 @@ export function PulseHero({
   onCallToAction,
   backgroundVideoUrl,
 }: PulseHeroProps) {
+  const heroAnimation = useAnimationPreset('fadeIn', { durationMs: 620 })
+  const titleAnimation = useAnimationPreset('slideUp', { delayMs: 90, distance: 30, durationMs: 540 })
+  const subtitleAnimation = useAnimationPreset('slideUp', { delayMs: 170, distance: 24, durationMs: 500 })
+  const ctaAnimation = useAnimationPreset('scaleIn', { delayMs: 250, durationMs: 480 })
+
   return (
     <>
       <style>{`
@@ -185,7 +193,12 @@ export function PulseHero({
         }
       `}</style>
 
-      <section className="pulse-hero">
+      <motion.section
+        className="pulse-hero"
+        initial={heroAnimation.initial}
+        animate={heroAnimation.animate}
+        variants={heroAnimation.variants}
+      >
         <video
           className="pulse-hero__video"
           src={backgroundVideoUrl}
@@ -199,18 +212,37 @@ export function PulseHero({
         <div className="pulse-hero__overlay" />
         <div className="pulse-hero__ambient" />
 
-        <div className="pulse-hero__content">
-          <h1 className="pulse-hero__title">{title}</h1>
-          <p className="pulse-hero__subtitle">{subtitle}</p>
+        <motion.div className="pulse-hero__content" variants={heroAnimation.variants}>
+          <motion.h1
+            className="pulse-hero__title"
+            initial={titleAnimation.initial}
+            animate={titleAnimation.animate}
+            variants={titleAnimation.variants}
+          >
+            {title}
+          </motion.h1>
+          <motion.p
+            className="pulse-hero__subtitle"
+            initial={subtitleAnimation.initial}
+            animate={subtitleAnimation.animate}
+            variants={subtitleAnimation.variants}
+          >
+            {subtitle}
+          </motion.p>
 
-          <div className="pulse-hero__cta-wrap">
+          <motion.div
+            className="pulse-hero__cta-wrap"
+            initial={ctaAnimation.initial}
+            animate={ctaAnimation.animate}
+            variants={ctaAnimation.variants}
+          >
             <span className="pulse-hero__cta-glow" />
             <button type="button" className="pulse-hero__cta" onClick={onCallToAction}>
               {callToActionLabel}
             </button>
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </motion.div>
+      </motion.section>
     </>
   )
 }

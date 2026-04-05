@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Children, type ReactNode } from 'react'
+import { motion } from 'framer-motion'
 import { cn } from '@/shared/lib'
+import type { AnimationPresetName } from './animation.presets'
+import { motionDurations, motionStaggers } from './motion.tokens'
+import { useAnimationPreset } from './useAnimationPreset'
 
 interface MotionRevealProps {
   children: ReactNode
@@ -7,6 +11,8 @@ interface MotionRevealProps {
   delayMs?: number
   distance?: number
   once?: boolean
+  preset?: AnimationPresetName
+  amount?: number
 }
 
 export function MotionReveal({
@@ -15,49 +21,26 @@ export function MotionReveal({
   delayMs = 0,
   distance = 24,
   once = true,
+  preset = 'slideUp',
+  amount = 0.14,
 }: MotionRevealProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const node = ref.current
-    if (!node) {
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          if (once) {
-            observer.disconnect()
-          }
-        } else if (!once) {
-          setVisible(false)
-        }
-      },
-      { threshold: 0.14 },
-    )
-
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [once])
+  const animation = useAnimationPreset(preset, {
+    delayMs,
+    distance,
+    once,
+    amount,
+  })
 
   return (
-    <div
-      ref={ref}
+    <motion.div
       className={cn('motion-reveal', className)}
-      style={
-        {
-          '--motion-delay': `${delayMs}ms`,
-          '--motion-distance': `${distance}px`,
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translate3d(0, 0, 0)' : `translate3d(0, ${distance}px, 0)`,
-        } as CSSProperties
-      }
+      initial={animation.initial}
+      whileInView={animation.whileInView}
+      viewport={animation.viewport}
+      variants={animation.variants}
     >
       {children}
-    </div>
+    </motion.div>
   )
 }
 
@@ -65,13 +48,42 @@ interface MotionStaggerProps {
   children: ReactNode
   className?: string
   stepMs?: number
+  preset?: AnimationPresetName
 }
 
-export function MotionStagger({ children, className, stepMs = 110 }: MotionStaggerProps) {
+export function MotionStagger({ children, className, stepMs = motionStaggers.base, preset = 'slideUp' }: MotionStaggerProps) {
+  const childrenArray = Children.toArray(children)
+  const itemAnimation = useAnimationPreset(preset, {
+    durationMs: motionDurations.base,
+    once: true,
+    amount: 0.12,
+  })
+
   return (
-    <div className={cn('motion-stagger', className)} style={{ '--stagger-step': `${stepMs}ms` } as CSSProperties}>
-      {children}
-    </div>
+    <motion.div
+      className={cn('motion-stagger', className)}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.12 }}
+      variants={{
+        hidden: {},
+        visible: {
+          transition: {
+            staggerChildren: stepMs / 1000,
+          },
+        },
+      }}
+    >
+      {childrenArray.map((child, index) => (
+        <motion.div
+          key={index}
+          variants={itemAnimation.variants}
+          transition={{ delay: 0 }}
+        >
+          {child}
+        </motion.div>
+      ))}
+    </motion.div>
   )
 }
 
@@ -81,5 +93,18 @@ interface MotionPageProps {
 }
 
 export function MotionPage({ children, className }: MotionPageProps) {
-  return <div className={cn('motion-page', className)}>{children}</div>
+  const animation = useAnimationPreset('fadeIn', {
+    durationMs: motionDurations.base,
+  })
+
+  return (
+    <motion.div
+      className={cn('motion-page', className)}
+      initial={animation.initial}
+      animate={animation.animate}
+      variants={animation.variants}
+    >
+      {children}
+    </motion.div>
+  )
 }

@@ -24,7 +24,7 @@ const SECTION_TITLES: Record<NavSection, string> = {
   tickets: 'Ingressos',
   sales: 'Vendas',
   crm: 'Relacionamento',
-  checkin: 'Credenciamento',
+  checkin: 'Check-in',
   staff: 'Staff',
   suppliers: 'Fornecedores',
   products: 'PDV',
@@ -36,7 +36,7 @@ const SECTION_TITLES: Record<NavSection, string> = {
   growth: 'Crescimento',
   help: 'Ajuda',
   settings: 'Configuracoes',
-  registrations: 'Inscricoes',
+  registrations: 'Credenciamento',
   sponsors: 'Patrocinios',
 }
 
@@ -46,7 +46,7 @@ const SECTION_PROMPTS: Record<NavSection, string[]> = {
   tickets: ['Como montar lotes?', 'Onde mexo em precos?', 'Como abrir novos ingressos?'],
   sales: ['Como acompanhar pagamentos?', 'Onde vejo pedidos?', 'Como agir em venda travada?'],
   crm: ['Como organizar publico?', 'Onde encontro recorrencia?', 'Como trabalhar relacionamento?'],
-  checkin: ['Como configurar acesso?', 'Onde vejo filas e entradas?', 'Como liberar excecao?'],
+  checkin: ['Como acompanhar filas?', 'Onde vejo leituras em tempo real?', 'Como tratar uma excecao no acesso?'],
   staff: ['Como cadastrar a equipe?', 'Onde aloco por turno?', 'Como emitir credencial?'],
   suppliers: ['Como organizar fornecedores?', 'Onde controlar parceiros?', 'Como registrar entregas?'],
   products: ['Como vender no PDV?', 'Onde monto o catalogo?', 'Como separar PDV de estoque?'],
@@ -58,7 +58,7 @@ const SECTION_PROMPTS: Record<NavSection, string[]> = {
   growth: ['Como ativar aquisicao?', 'Onde acompanho canais?', 'Como ler retorno?'],
   help: ['Quero ajuda geral', 'Quais modulos devo usar?', 'Como treinar a equipe?'],
   settings: ['Onde ajustar marca?', 'Como trocar dominio?', 'Como rever permissoes?'],
-  registrations: ['Como ver inscricoes do Capital Strike?', 'Como filtrar por exercito?', 'Como exportar lista?'],
+  registrations: ['Como emitir credenciais?', 'Onde filtro listas e perfis?', 'Como exportar a base habilitada?'],
   sponsors: ['Como organizar cotas?', 'Onde acompanho patrocinadores ativos?', 'Como registrar entregas de marca?'],
 }
 
@@ -82,7 +82,7 @@ function buildSuggestedActions(query: string, section: NavSection) {
   if (normalized.includes('staff') || normalized.includes('equipe') || normalized.includes('cadastro') || normalized.includes('credencial')) {
     return [
       { label: 'Abrir Staff', section: 'staff' as const },
-      { label: 'Abrir Credenciamento', section: 'checkin' as const },
+      { label: 'Abrir Check-in', section: 'checkin' as const },
     ]
   }
 
@@ -109,7 +109,7 @@ function buildSuggestedActions(query: string, section: NavSection) {
 
   if (section === 'staff') {
     return [
-      { label: 'Abrir Credenciamento', section: 'checkin' as const },
+      { label: 'Abrir Check-in', section: 'checkin' as const },
       { label: 'Abrir Ajuda', section: 'help' as const },
     ]
   }

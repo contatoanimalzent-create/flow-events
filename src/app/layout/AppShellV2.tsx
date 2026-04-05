@@ -1,11 +1,11 @@
-import { Suspense, lazy, useState } from 'react'
-import { Sidebar } from '@/components/layout/Sidebar'
-import { Topbar } from '@/components/layout/Topbar'
+import { Suspense, lazy, useMemo, useState } from 'react'
 import { OperationalAssistant } from '@/features/ai/OperationalAssistant'
-import { AdminShell, LoadingState } from '@/shared/components'
+import { LoadingState } from '@/shared/components'
 import { useAppLocale } from '@/shared/i18n/app-locale'
 import { MotionPage } from '@/shared/motion'
 import { useUIStore } from '@/shared/store'
+import { AppGrid, AppGridItem, AppHeader, AppSidebar, PageContainer } from './components'
+import { getAppLayoutVariables } from './layout-tokens'
 import { defaultNavSection, type NavSection } from './navigation'
 
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then((module) => ({ default: module.DashboardPage })))
@@ -33,9 +33,12 @@ function PageFallback() {
 
   return (
     <LoadingState
-      title={t('Preparing the experience', 'Preparando a experiencia')}
-      description={t('We are assembling this area with the new visual foundation.', 'Estamos montando esta area com a nova fundacao visual.')}
-      className="mx-6 my-8"
+      title={t('Preparing the workspace', 'Preparando o workspace')}
+      description={t(
+        'We are loading the new internal Pulse foundation for this area.',
+        'Estamos carregando a nova fundacao interna do Pulse para esta area.',
+      )}
+      className="mx-auto my-10 max-w-2xl"
     />
   )
 }
@@ -85,11 +88,22 @@ function renderSection(activeSection: NavSection) {
   }
 }
 
-export function AppShellV2() {
+export function AppShell() {
   const [activeSection, setActiveSection] = useState<NavSection>(defaultNavSection)
   const sidebarOpen = useUIStore((state) => state.sidebarOpen)
+  const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
   const setSidebarOpen = useUIStore((state) => state.setSidebarOpen)
-  const toggleSidebar = useUIStore((state) => state.toggleSidebar)
+  const toggleSidebarCollapsed = useUIStore((state) => state.toggleSidebarCollapsed)
+
+  const shellVariables = useMemo(
+    () => ({
+      ...getAppLayoutVariables(),
+      '--pulse-app-sidebar-width': sidebarCollapsed
+        ? 'var(--pulse-app-sidebar-collapsed-width)'
+        : 'var(--pulse-app-sidebar-expanded-width)',
+    }),
+    [sidebarCollapsed],
+  )
 
   function handleNavigate(section: NavSection) {
     setActiveSection(section)
@@ -97,29 +111,60 @@ export function AppShellV2() {
   }
 
   return (
-    <AdminShell>
-      <Sidebar
-        activeSection={activeSection}
-        onNavigate={handleNavigate}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <Topbar
-          onMenuToggle={toggleSidebar}
-          onNavigate={handleNavigate}
+    <div
+      className="min-h-screen bg-[var(--pulse-app-shell-bg)] text-[var(--pulse-color-text-primary)]"
+      style={shellVariables}
+    >
+      <div className="relative min-h-screen overflow-x-clip">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[var(--pulse-app-shell-bg)]" />
+          <div
+            className="absolute inset-0 opacity-70"
+            style={{
+              backgroundImage:
+                'linear-gradient(var(--pulse-app-canvas-grid) 1px, transparent 1px), linear-gradient(90deg, var(--pulse-app-canvas-grid) 1px, transparent 1px)',
+              backgroundSize: '56px 56px',
+            }}
+          />
+          <div className="absolute right-[-8rem] top-[-6rem] h-[24rem] w-[24rem] rounded-full bg-[var(--pulse-app-canvas-glow)] blur-[140px]" />
+          <div className="absolute bottom-[-12rem] left-[25%] h-[28rem] w-[28rem] rounded-full bg-[var(--pulse-surface-accent)] blur-[180px]" />
+        </div>
+
+        <AppSidebar
           activeSection={activeSection}
+          onNavigate={handleNavigate}
+          isMobileOpen={sidebarOpen}
+          onCloseMobile={() => setSidebarOpen(false)}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={toggleSidebarCollapsed}
         />
-        <main className="relative flex-1 overflow-y-auto">
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-40 bg-[linear-gradient(180deg,rgba(7,6,7,0.94)_0%,rgba(7,6,7,0)_100%)]" />
-          <div className="main-grid-bg min-h-full">
-            <Suspense fallback={<PageFallback />}>
-              <MotionPage>{renderSection(activeSection)}</MotionPage>
-            </Suspense>
-          </div>
-        </main>
+
+        <div className="relative min-h-screen transition-[padding-left] duration-[var(--pulse-app-motion-duration)] lg:pl-[var(--pulse-app-sidebar-width)]">
+          <AppHeader
+            activeSection={activeSection}
+            onNavigate={handleNavigate}
+            onOpenMobileMenu={() => setSidebarOpen(true)}
+          />
+
+          <main className="relative">
+            <PageContainer as="div" size="wide" className="pb-[var(--pulse-app-content-padding-y)] pt-6 lg:pt-8">
+              <div className="overflow-hidden rounded-[2rem] border border-[color:var(--pulse-app-surface-border)] bg-[var(--pulse-app-content-bg)] shadow-[var(--pulse-shadow-medium)]">
+                <AppGrid className="p-4 md:p-5 xl:p-6">
+                  <AppGridItem span={12}>
+                    <Suspense fallback={<PageFallback />}>
+                      <MotionPage>{renderSection(activeSection)}</MotionPage>
+                    </Suspense>
+                  </AppGridItem>
+                </AppGrid>
+              </div>
+            </PageContainer>
+          </main>
+        </div>
+
+        <OperationalAssistant activeSection={activeSection} onNavigate={handleNavigate} />
       </div>
-      <OperationalAssistant activeSection={activeSection} onNavigate={handleNavigate} />
-    </AdminShell>
+    </div>
   )
 }
+
+export const AppShellV2 = AppShell

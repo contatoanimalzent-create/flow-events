@@ -1301,6 +1301,8 @@ export interface Shift {
   updated_at: string
 }
 
+export type StaffInviteSendStatus = 'pending' | 'sent' | 'failed' | 'expired' | 'skipped'
+
 export interface StaffInviteLink {
   id: string
   event_id: string
@@ -1317,6 +1319,12 @@ export interface StaffInviteLink {
   created_by?: string | null
   created_at: string
   updated_at: string
+  // batch-email columns (migration 20260405)
+  send_status: StaffInviteSendStatus
+  target_email?: string | null
+  target_name?: string | null
+  sent_at?: string | null
+  send_error?: string | null
 }
 
 export type StaffApplicationStatus = 'pending' | 'approved' | 'rejected' | 'waitlisted'
@@ -1488,49 +1496,51 @@ export interface WhatsappTemplate {
 
 // ─── Communications Log ───────────────────────────────────────────────────────
 
-export type CommunicationsChannel = 'email' | 'whatsapp' | 'sms' | 'push'
-export type CommunicationsStatus = 'queued' | 'sent' | 'delivered' | 'failed' | 'bounced'
+export type CommunicationsChannel = 'email' | 'whatsapp'
+export type CommunicationsStatus  = 'pending' | 'sent' | 'failed'
 
 export interface CommunicationsLog {
   id: string
   organization_id: string
-  event_id?: string | null
-  profile_id?: string | null
+  template_key: string
   channel: CommunicationsChannel
-  template_slug?: string | null
-  template_vars?: Record<string, unknown> | null
+  recipient: string
+  status: CommunicationsStatus
+  created_at: string
+  // extended columns (migration 20260405_extend_communications_log)
+  notification_job_id?: string | null
   recipient_email?: string | null
   recipient_phone?: string | null
-  provider: string
-  provider_message_id?: string | null
-  status: CommunicationsStatus
-  channel_used?: string | null
+  subject?: string | null
+  body_preview?: string | null
+  message_sid?: string | null
   error_message?: string | null
-  sent_at?: string | null
-  created_at: string
   metadata?: Record<string, unknown> | null
+  sent_at?: string | null
 }
 
 // ─── Notification Jobs ────────────────────────────────────────────────────────
 
-export type NotificationJobStatus = 'queued' | 'processing' | 'done' | 'failed'
+export type NotificationJobStatus = 'pending' | 'running' | 'completed' | 'failed'
+export type NotificationJobChannel = 'email' | 'whatsapp'
 
 export interface NotificationJob {
   id: string
   organization_id: string
-  event_id?: string | null
-  job_type: string
-  channels: string[]
-  recipients: Array<{ name: string; email?: string; phone?: string; profile_id?: string }>
-  template_vars: Record<string, string>
+  template_key: string
+  audience_segment_id?: string | null
+  scheduled_at: string
   status: NotificationJobStatus
-  attempts: number
-  max_attempts: number
-  scheduled_for: string
-  last_error?: string | null
-  metadata?: Record<string, unknown> | null
   created_at: string
-  updated_at?: string | null
+  // extended columns (migration 20260405_extend_notification_jobs)
+  channel: NotificationJobChannel
+  event_id?: string | null
+  variables: Record<string, string | number | boolean>
+  started_at?: string | null
+  completed_at?: string | null
+  error_message?: string | null
+  processed_count: number
+  failed_count: number
 }
 
 // ─── Documents ────────────────────────────────────────────────────────────────

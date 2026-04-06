@@ -1,7 +1,7 @@
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react'
 import { cn } from '@/shared/lib'
 
-type PageContainerSize = 'content' | 'wide' | 'full'
+type PageContainerSize = 'content' | 'full'
 
 interface PageContainerProps<T extends ElementType = 'section'> {
   as?: T
@@ -12,7 +12,6 @@ interface PageContainerProps<T extends ElementType = 'section'> {
 
 const sizeClassNames: Record<PageContainerSize, string> = {
   content: 'max-w-[var(--pulse-app-content-max-width)]',
-  wide: 'max-w-[var(--pulse-app-content-max-width-wide)]',
   full: 'max-w-none',
 }
 
@@ -28,7 +27,7 @@ export function PageContainer<T extends ElementType = 'section'>({
   return (
     <Component
       className={cn(
-        'mx-auto w-full px-[var(--pulse-app-content-padding-x-mobile)] lg:px-[var(--pulse-app-content-padding-x-desktop)]',
+        'mx-auto w-full px-[var(--pulse-app-content-padding-x-mobile)] py-[var(--pulse-app-content-padding-y)] lg:px-[var(--pulse-app-content-padding-x-desktop)]',
         sizeClassNames[size],
         className,
       )}

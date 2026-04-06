@@ -1,23 +1,18 @@
 import type { LucideIcon } from 'lucide-react'
 import {
-  BellRing,
+  BadgeCheck,
+  BriefcaseBusiness,
   CalendarDays,
-  ClipboardCheck,
-  CreditCard,
+  CircleHelp,
   LayoutDashboard,
-  MessageSquareMore,
+  MessageSquare,
   ScanLine,
   Settings2,
-  ShieldCheck,
+  Shield,
   Ticket,
-  Users,
-  Wallet,
-  BrainCircuit,
-  CircleHelp,
-  Handshake,
-  Package,
   TrendingUp,
-  UserRoundSearch,
+  UsersRound,
+  Wallet,
 } from 'lucide-react'
 
 export type NavSection =
@@ -81,100 +76,100 @@ function createItem(
 
 export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
   const labels = {
-    core: isPortuguese ? 'Nucleo operacional' : 'Operational core',
-    access: isPortuguese ? 'Fluxo e acesso' : 'Flow and access',
-    relationship: isPortuguese ? 'Receita e relacionamento' : 'Revenue and relationship',
+    operation: isPortuguese ? 'Operacao' : 'Operations',
+    people: isPortuguese ? 'Pessoas e acesso' : 'People and access',
+    business: isPortuguese ? 'Receita e relacionamento' : 'Revenue and relationship',
     system: isPortuguese ? 'Sistema' : 'System',
   }
 
   return [
     {
-      key: 'core',
-      label: labels.core,
+      key: 'operation',
+      label: labels.operation,
       items: [
         createItem(
           'dashboard',
           isPortuguese ? 'Dashboard' : 'Dashboard',
-          isPortuguese ? 'Painel' : 'Panel',
-          isPortuguese ? 'Visao executiva do produto e da operacao.' : 'Executive view of product and operations.',
-          labels.core,
+          isPortuguese ? 'Dash' : 'Dash',
+          isPortuguese ? 'Visao executiva do sistema.' : 'Executive view of the system.',
+          labels.operation,
           LayoutDashboard,
         ),
         createItem(
           'events',
           isPortuguese ? 'Eventos' : 'Events',
           isPortuguese ? 'Eventos' : 'Events',
-          isPortuguese ? 'Catalogo, agenda e controle central dos eventos.' : 'Catalog, schedule and central event control.',
-          labels.core,
+          isPortuguese ? 'Gestao central do portfolio de eventos.' : 'Central management for the event portfolio.',
+          labels.operation,
           CalendarDays,
         ),
         createItem(
           'tickets',
           isPortuguese ? 'Ingressos' : 'Tickets',
           isPortuguese ? 'Ingressos' : 'Tickets',
-          isPortuguese ? 'Lotes, disponibilidade e regras de venda.' : 'Releases, availability and selling rules.',
-          labels.core,
+          isPortuguese ? 'Lotes, regras e disponibilidade comercial.' : 'Releases, rules and commercial availability.',
+          labels.operation,
           Ticket,
+        ),
+        createItem(
+          'financial',
+          isPortuguese ? 'Financeiro' : 'Financial',
+          isPortuguese ? 'Financeiro' : 'Finance',
+          isPortuguese ? 'Receita, repasses e leitura financeira.' : 'Revenue, payouts and financial readouts.',
+          labels.operation,
+          Wallet,
         ),
       ],
     },
     {
-      key: 'access',
-      label: labels.access,
+      key: 'people',
+      label: labels.people,
       items: [
         createItem(
           'registrations',
           isPortuguese ? 'Credenciamento' : 'Credentialing',
           isPortuguese ? 'Credenciamento' : 'Credentials',
-          isPortuguese ? 'Listas, emissoes e fluxo de habilitacao.' : 'Lists, badge issuance and enablement flow.',
-          labels.access,
-          ShieldCheck,
+          isPortuguese ? 'Listas, emissoes e fluxos de habilitacao.' : 'Lists, badge issuing and enablement flows.',
+          labels.people,
+          BadgeCheck,
         ),
         createItem(
           'staff',
           isPortuguese ? 'Equipe' : 'Team',
           isPortuguese ? 'Equipe' : 'Team',
-          isPortuguese ? 'Pessoas, funcoes e distribuicao operacional.' : 'People, roles and operational allocation.',
-          labels.access,
-          Users,
+          isPortuguese ? 'Pessoas, cargos e operacao de campo.' : 'People, roles and field operations.',
+          labels.people,
+          BriefcaseBusiness,
         ),
         createItem(
           'checkin',
           isPortuguese ? 'Check-in' : 'Check-in',
           isPortuguese ? 'Check-in' : 'Check-in',
-          isPortuguese ? 'Entrada, leitura e controle de acesso em campo.' : 'Entry, scanning and field access control.',
-          labels.access,
+          isPortuguese ? 'Leitura, filas e validacao em campo.' : 'Scanning, queues and field validation.',
+          labels.people,
           ScanLine,
         ),
       ],
     },
     {
-      key: 'relationship',
-      label: labels.relationship,
+      key: 'business',
+      label: labels.business,
       items: [
-        createItem(
-          'financial',
-          isPortuguese ? 'Financeiro' : 'Financial',
-          isPortuguese ? 'Financeiro' : 'Finance',
-          isPortuguese ? 'Receita, margem e leitura de resultado.' : 'Revenue, margin and outcome readout.',
-          labels.relationship,
-          Wallet,
-        ),
         createItem(
           'crm',
           isPortuguese ? 'CRM' : 'CRM',
           isPortuguese ? 'CRM' : 'CRM',
-          isPortuguese ? 'Base de publico, relacionamento e recorrencia.' : 'Audience base, relationship and retention.',
-          labels.relationship,
-          UserRoundSearch,
+          isPortuguese ? 'Relacionamento com publico e recorrencia.' : 'Audience relationship and retention.',
+          labels.business,
+          UsersRound,
         ),
         createItem(
           'communication',
           isPortuguese ? 'Comunicacao' : 'Communication',
           isPortuguese ? 'Comunicacao' : 'Comms',
-          isPortuguese ? 'Campanhas, jornadas e mensagens do produto.' : 'Campaigns, journeys and product messaging.',
-          labels.relationship,
-          MessageSquareMore,
+          isPortuguese ? 'Mensagens, campanhas e operacao de comunicacao.' : 'Messages, campaigns and communication operations.',
+          labels.business,
+          MessageSquare,
         ),
       ],
     },
@@ -186,7 +181,7 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
           'settings',
           isPortuguese ? 'Configuracoes' : 'Settings',
           isPortuguese ? 'Configuracoes' : 'Settings',
-          isPortuguese ? 'Marca, governanca e preferencias do sistema.' : 'Brand, governance and system preferences.',
+          isPortuguese ? 'Preferencias, governanca e ajustes da conta.' : 'Preferences, governance and account settings.',
           labels.system,
           Settings2,
         ),
@@ -230,7 +225,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       isPortuguese ? 'Fornecedores' : 'Suppliers',
       isPortuguese ? 'Operacao terceirizada e parceiros de entrega.' : 'Third-party operations and delivery partners.',
       advancedGroupLabel,
-      Handshake,
+      CircleHelp,
       false,
     ),
     products: createItem(
@@ -239,7 +234,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       isPortuguese ? 'PDV' : 'POS',
       isPortuguese ? 'Catalogo, atendimento e venda assistida.' : 'Catalog, checkout and assisted sales.',
       advancedGroupLabel,
-      CreditCard,
+      TrendingUp,
       false,
     ),
     inventory: createItem(
@@ -248,7 +243,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       isPortuguese ? 'Estoque' : 'Inventory',
       isPortuguese ? 'Saldo, reposicao e ruptura operacional.' : 'Stock, replenishment and stockout monitoring.',
       advancedGroupLabel,
-      Package,
+      Shield,
       false,
     ),
     intelligence: createItem(
@@ -257,7 +252,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       isPortuguese ? 'Inteligencia' : 'Intel',
       isPortuguese ? 'Alertas, leitura executiva e saude da operacao.' : 'Alerts, executive readout and operational health.',
       advancedGroupLabel,
-      BrainCircuit,
+      CircleHelp,
       false,
     ),
     billing: createItem(
@@ -266,7 +261,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       isPortuguese ? 'Cobranca' : 'Billing',
       isPortuguese ? 'Planos, faturamento e monetizacao.' : 'Plans, billing and monetization.',
       advancedGroupLabel,
-      BellRing,
+      Wallet,
       false,
     ),
     growth: createItem(
@@ -293,7 +288,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       isPortuguese ? 'Patrocinios' : 'Sponsors',
       isPortuguese ? 'Relacionamento comercial com patrocinadores.' : 'Commercial relationship with sponsors.',
       advancedGroupLabel,
-      ClipboardCheck,
+      CircleHelp,
       false,
     ),
   }
@@ -305,8 +300,7 @@ export function getSectionBreadcrumbs(section: NavSection, isPortuguese: boolean
   const sectionMeta = getSectionMeta(section, isPortuguese)
 
   return [
-    { label: 'Pulse', current: false },
-    { label: sectionMeta.groupLabel, current: false },
+    { label: isPortuguese ? 'Dashboard' : 'Dashboard', current: false },
     { label: sectionMeta.label, current: true },
   ]
 }

@@ -82,6 +82,7 @@ export function AppGridItem({
   return (
     <div
       className={cn(
+        'min-w-0',
         columnSpanClassNames[span],
         tabletSpan ? tabletSpanClassNames[tabletSpan] : null,
         desktopSpan ? desktopSpanClassNames[desktopSpan] : null,

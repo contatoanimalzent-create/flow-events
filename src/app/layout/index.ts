@@ -1,5 +1,5 @@
-export { AppShell, AppShellV2 } from './AppShellV2'
-export { AppGrid, AppGridItem, AppHeader, AppSidebar, PageContainer } from './components'
+export { AppShell, AppShellV2 } from './AppShell'
+export { AppGrid, AppGridItem, AppHeader, AppSidebar, Header, Sidebar, PageContainer } from './components'
 export { defaultNavSection } from './navigation'
 export { appLayoutTokens, getAppLayoutVariables } from './layout-tokens'
 export type { NavSection } from './navigation'

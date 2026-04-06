@@ -5,24 +5,24 @@ import { typographyScale } from './typography/typography'
 const semanticTokens = {
   surfaceBase: colorTokens.background,
   surfaceMuted: colorTokens.surface,
-  surfaceAccent: 'rgba(47, 91, 255, 0.08)',
+  surfaceAccent: 'rgba(66, 133, 244, 0.08)',
   surfaceElevated: colorTokens.background,
-  overlaySoft: 'rgba(47, 91, 255, 0.14)',
-  overlayBackdrop: 'rgba(10, 26, 255, 0.72)',
+  overlaySoft: 'rgba(66, 133, 244, 0.14)',
+  overlayBackdrop: 'rgba(0, 87, 231, 0.72)',
   textInverse: '#FFFFFF',
   textMuted: colorTokens.textSecondary,
   textOnAccent: '#FFFFFF',
   inputBackground: colorTokens.background,
   inputMuted: colorTokens.surface,
   inputPlaceholder: colorTokens.textSecondary,
-  focusRing: 'rgba(47, 91, 255, 0.18)',
-  primaryHover: colorTokens.primarySoft,
+  focusRing: 'rgba(66, 133, 244, 0.18)',
+  primaryHover: colorTokens.primaryLight,
   primaryActive: colorTokens.primary,
   secondaryBackground: colorTokens.surface,
-  secondaryHover: '#EEF2FF',
-  secondaryActive: '#E0E7FF',
-  ghostHover: 'rgba(47, 91, 255, 0.08)',
-  ghostActive: 'rgba(47, 91, 255, 0.14)',
+  secondaryHover: '#EEF4FE',
+  secondaryActive: '#E3EEFD',
+  ghostHover: 'rgba(66, 133, 244, 0.08)',
+  ghostActive: 'rgba(66, 133, 244, 0.14)',
   shadowInset: shadowTokens.inset,
   statusSuccess: '#16A34A',
   statusSuccessSurface: 'rgba(22, 163, 74, 0.12)',
@@ -33,9 +33,9 @@ const semanticTokens = {
   statusError: '#DC2626',
   statusErrorSurface: 'rgba(220, 38, 38, 0.12)',
   statusErrorBorder: 'rgba(220, 38, 38, 0.24)',
-  statusInfo: colorTokens.primarySoft,
-  statusInfoSurface: 'rgba(47, 91, 255, 0.12)',
-  statusInfoBorder: 'rgba(47, 91, 255, 0.24)',
+  statusInfo: colorTokens.primaryLight,
+  statusInfoSurface: 'rgba(66, 133, 244, 0.12)',
+  statusInfoBorder: 'rgba(66, 133, 244, 0.24)',
 } as const
 
 export const Theme = {
@@ -71,7 +71,8 @@ export const Theme = {
   },
   semantic: semanticTokens,
   primaryBase: colorTokens.primary,
-  primaryAccent: colorTokens.primarySoft,
+  primaryLight: colorTokens.primaryLight,
+  primaryAccent: colorTokens.primaryLight,
   background: colorTokens.background,
   textPrimary: colorTokens.textPrimary,
   textSecondary: colorTokens.textSecondary,
@@ -80,6 +81,7 @@ export const Theme = {
 
 export type ThemeValue = typeof Theme
 export type ColorToken = keyof ThemeValue['colors']
+export type ThemeColorName = ColorToken | 'primaryBase' | 'primaryAccent' | 'primaryLight'
 
 interface ThemeProviderProps {
   children: ReactNode
@@ -88,14 +90,48 @@ interface ThemeProviderProps {
 
 const ThemeContext = createContext<ThemeValue | null>(null)
 
-export function getColor(token: ColorToken) {
-  return Theme.colors[token]
+export function getColor(name: string) {
+  const colorMap: Record<ThemeColorName, string> = {
+    ...Theme.colors,
+    primaryBase: Theme.primaryBase,
+    primaryAccent: Theme.primaryAccent,
+    primaryLight: Theme.primaryLight,
+  }
+
+  const color = colorMap[name as ThemeColorName]
+
+  if (!color) {
+    throw new Error(`Unknown theme color token: ${name}`)
+  }
+
+  return color
 }
 
 function createThemeVariables(theme: ThemeValue) {
   return {
+    '--color-primary': theme.colors.primary,
+    '--color-primary-light': theme.colors.primaryLight,
+    '--color-background': theme.colors.background,
+    '--color-surface': theme.colors.surface,
+    '--color-text-primary': theme.colors.textPrimary,
+    '--color-text-secondary': theme.colors.textSecondary,
+    '--color-border': theme.colors.border,
+    '--radius-sm': theme.radius.sm,
+    '--radius-md': theme.radius.md,
+    '--radius-lg': theme.radius.lg,
+    '--shadow-soft': theme.shadow.soft,
+    '--shadow-medium': theme.shadow.medium,
+    '--shadow-strong': theme.shadow.strong,
+    '--font-family': theme.typography.fontFamily,
+    '--font-size-h1': theme.typography.h1,
+    '--font-size-h2': theme.typography.h2,
+    '--font-size-h3': theme.typography.h3,
+    '--font-size-h4': theme.typography.h4,
+    '--font-size-body': theme.typography.body,
+    '--font-size-caption': theme.typography.caption,
     '--pulse-color-primary': theme.colors.primary,
-    '--pulse-color-primary-soft': theme.colors.primarySoft,
+    '--pulse-color-primary-soft': theme.colors.primaryLight,
+    '--pulse-color-primary-light': theme.colors.primaryLight,
     '--pulse-color-background': theme.colors.background,
     '--pulse-color-surface': theme.colors.surface,
     '--pulse-color-text-primary': theme.colors.textPrimary,

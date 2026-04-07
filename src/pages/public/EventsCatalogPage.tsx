@@ -8,7 +8,7 @@ export function EventsCatalogPage({ onLogin }: { onLogin: () => void }) {
   const events = publicEventsQuery.data ?? []
 
   useSeoMeta({
-    title: isPortuguese ? 'Experiencias | Animalz Events' : 'Experiences | Animalz Events',
+    title: isPortuguese ? 'Experiencias | Pulse' : 'Experiences | Pulse',
     description: isPortuguese
       ? 'Descubra eventos premium em uma navegacao pensada como curadoria, nao como lista tecnica.'
       : 'Discover premium events through navigation built as curation, not as a technical list.',

@@ -21,16 +21,16 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
   }
 
   return (
-    <footer className="border-t border-white/8 bg-[#06070a]">
+    <footer className="border-t border-white/8 bg-[#050505]">
       <div className="px-5 py-16 md:px-8 lg:px-10">
         <div className="mx-auto max-w-[1540px]">
-          <div className="rounded-[2.4rem] border border-white/8 bg-[linear-gradient(135deg,rgba(92,30,178,0.16)_0%,rgba(15,17,24,0.96)_40%,rgba(199,155,68,0.1)_100%)] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.32)] lg:p-10">
+          <div className="rounded-2xl border border-white/8 bg-[linear-gradient(135deg,rgba(0,87,231,0.16)_0%,rgba(10,10,10,0.96)_40%,rgba(10,26,255,0.08)_100%)] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.32)] lg:p-10">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.38em] text-[#d8c39a]">
-                  {isPortuguese ? 'Radar Animalz' : 'Animalz radar'}
+                <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
+                  {isPortuguese ? 'Radar Pulse' : 'Pulse radar'}
                 </div>
-                <h3 className="mt-4 font-display text-[clamp(2rem,3vw,3rem)] uppercase leading-[0.9] tracking-[-0.04em] text-[#fff8ef]">
+                <h3 className="mt-4 text-[clamp(2rem,3vw,3rem)] font-bold leading-[0.9] tracking-[-0.03em] text-white">
                   {isPortuguese
                     ? 'Receba proximos eventos e aberturas de acesso.'
                     : 'Get upcoming events and access openings.'}
@@ -48,12 +48,12 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={isPortuguese ? 'Seu melhor email' : 'Your best email'}
-                  className="flex-1 rounded-full border border-white/12 bg-white/[0.06] px-5 py-3 text-sm text-[#fff8ef] outline-none transition-all placeholder:text-white/30 focus:border-[#c79b44]/35 focus:bg-white/[0.08]"
+                  className="flex-1 rounded-full border border-white/12 bg-white/[0.06] px-5 py-3 text-sm text-white outline-none transition-all placeholder:text-white/30 focus:border-[#4285F4]/35 focus:bg-white/[0.08]"
                   required
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#f5f0e8] px-5 py-3 text-sm font-bold uppercase tracking-[0.18em] text-[#0a0b0f] transition-all hover:bg-[#c79b44]"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#0057E7] px-5 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white transition-all hover:bg-[#4285F4]"
                 >
                   {subscribed ? 'OK' : <ArrowRight className="h-4 w-4" />}
                 </button>
@@ -63,7 +63,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
 
           {categories.length > 0 ? (
             <div className="mt-10">
-              <div className="text-[10px] uppercase tracking-[0.3em] text-[#d8c39a]">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-[#4285F4]">
                 {isPortuguese ? 'Categorias' : 'Categories'}
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -72,7 +72,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                     key={category}
                     type="button"
                     onClick={() => onCategoryClick?.(category)}
-                    className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs text-white/64 transition-all hover:border-[#c79b44]/25 hover:text-white"
+                    className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs text-white/64 transition-all hover:border-[#4285F4]/25 hover:text-white"
                   >
                     {category}
                   </button>
@@ -84,9 +84,9 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
           <div className="mt-12 grid gap-8 border-t border-white/8 pt-10 lg:grid-cols-[1fr_0.6fr_0.6fr_0.6fr]">
             <div>
               <a href="/" className="inline-flex items-center gap-3">
-                <img src="/logo.png" alt="Animalz Events" className="h-10 w-auto" />
-                <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[#fff8ef]">
-                  Animalz.Events
+                <img src="/logo.png" alt="Pulse" className="h-10 w-auto" />
+                <span className="text-sm font-bold uppercase tracking-[0.18em] text-white">
+                  Pulse
                 </span>
               </a>
               <p className="mt-4 max-w-sm text-sm leading-7 text-white/56">
@@ -96,13 +96,13 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               </p>
               <div className="mt-5 space-y-2 text-sm text-white/44">
                 <div className="flex items-center gap-2">
-                  <Globe className="h-3.5 w-3.5" /> events.animalzgroup.com
+                  <Globe className="h-3.5 w-3.5" /> pulse.events
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="h-3.5 w-3.5" /> +55 11 99999-0000
                 </div>
                 <div className="flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5" /> contato@animalzevents.com
+                  <Mail className="h-3.5 w-3.5" /> contato@pulse.events
                 </div>
               </div>
             </div>
@@ -132,7 +132,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               },
             ].map((section) => (
               <div key={section.title}>
-                <div className="text-[10px] uppercase tracking-[0.3em] text-[#d8c39a]">{section.title}</div>
+                <div className="text-[10px] uppercase tracking-[0.3em] text-[#4285F4]">{section.title}</div>
                 <div className="mt-4 grid gap-3">
                   {section.links.map((link) => (
                     <a
@@ -150,11 +150,11 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
 
           <div className="mt-10 flex flex-col gap-3 border-t border-white/8 pt-6 text-xs text-white/38 md:flex-row md:items-center md:justify-between">
             <p>
-              &copy; {new Date().getFullYear()} Animalz Events.{' '}
+              &copy; {new Date().getFullYear()} Pulse.{' '}
               {isPortuguese ? 'Todos os direitos reservados.' : 'All rights reserved.'}
             </p>
             <p className="flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#c79b44]" />
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#0057E7]" />
               {isPortuguese ? 'Operacao premium de eventos' : 'Premium event operations'}
             </p>
           </div>

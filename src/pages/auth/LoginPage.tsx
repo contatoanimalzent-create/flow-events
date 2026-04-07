@@ -69,12 +69,12 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
   }
 
   return (
-    <div className="min-h-screen bg-[#050507] text-[#f5f0e8]">
+    <div className="min-h-screen bg-[#050505] text-white">
       <div className="grid min-h-screen lg:grid-cols-[0.92fr_1.08fr]">
         <div className="relative flex flex-col justify-between overflow-hidden border-b border-white/8 px-8 py-10 lg:border-b-0 lg:border-r lg:px-10 lg:py-12">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(92,30,178,0.26),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(199,155,68,0.16),transparent_22%),linear-gradient(180deg,#06070a_0%,#090b10_100%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,87,231,0.22),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(10,26,255,0.12),transparent_22%),linear-gradient(180deg,#050505_0%,#0A0A0A_100%)]" />
           <div
-            className="pointer-events-none absolute inset-0 opacity-[0.06]"
+            className="pointer-events-none absolute inset-0 opacity-[0.04]"
             style={{
               backgroundImage:
                 'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
@@ -86,7 +86,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
             {onBack ? (
               <button
                 onClick={onBack}
-                className="mb-12 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/44 transition-colors hover:text-[#d8c39a]"
+                className="mb-12 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/44 transition-colors hover:text-[#4285F4]"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 {t('Back', 'Voltar')}
@@ -95,16 +95,16 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
 
             <img
               src="/logo.png"
-              alt="Animalz Events"
+              alt="Pulse"
               className="h-20 w-auto object-contain"
-              style={{ filter: 'drop-shadow(0 0 18px rgba(92,30,178,0.22))' }}
+              style={{ filter: 'drop-shadow(0 0 18px rgba(0,87,231,0.22))' }}
             />
 
             <div className="mt-14">
-              <div className="text-[10px] uppercase tracking-[0.38em] text-[#d8c39a]">
+              <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
                 {recoveryMode ? t('Producer recovery', 'Recuperacao do produtor') : t('Producer access', 'Acesso do produtor')}
               </div>
-              <h1 className="mt-5 font-display text-[clamp(3.2rem,6vw,5.8rem)] uppercase leading-[0.88] tracking-[-0.05em] text-[#fff8ef]">
+              <h1 className="mt-5 text-[clamp(3.2rem,6vw,5.8rem)] font-bold leading-[0.88] tracking-[-0.04em] text-white">
                 {recoveryMode
                   ? t('Recover your operation.', 'Recupere sua operacao.')
                   : t('Enter the event cockpit.', 'Entre no cockpit do evento.')}
@@ -129,8 +129,8 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
               { value: 'QR', label: t('Access control', 'Controle de acesso') },
               { value: '24/7', label: t('Financial trace', 'Trilha financeira') },
             ].map((item) => (
-              <div key={item.label} className="rounded-[1.5rem] border border-white/8 bg-white/[0.04] p-4">
-                <div className="font-display text-[1.7rem] uppercase leading-none tracking-[-0.04em] text-[#fff8ef]">
+              <div key={item.label} className="rounded-2xl border border-white/8 bg-white/[0.04] p-4">
+                <div className="text-2xl font-bold uppercase leading-none tracking-[-0.03em] text-white">
                   {item.value}
                 </div>
                 <div className="mt-2 text-[11px] uppercase tracking-[0.24em] text-white/42">{item.label}</div>
@@ -141,17 +141,17 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
 
         <div className="relative flex items-center justify-center px-8 py-10 lg:px-10 lg:py-12">
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0)_100%)]" />
-          <div className="relative z-10 w-full max-w-[32rem] rounded-[2.3rem] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-7 shadow-[0_32px_120px_rgba(0,0,0,0.34)] backdrop-blur-xl md:p-8">
+          <div className="relative z-10 w-full max-w-[32rem] rounded-2xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-7 shadow-[0_32px_120px_rgba(0,0,0,0.34)] backdrop-blur-xl md:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.34em] text-[#d8c39a]">
+                <div className="text-[10px] uppercase tracking-[0.34em] text-[#4285F4]">
                   {recoveryMode ? t('Recovery flow', 'Fluxo de recuperacao') : t('Secure sign in', 'Entrada segura')}
                 </div>
-                <div className="mt-3 font-display text-[2.2rem] uppercase leading-[0.92] tracking-[-0.04em] text-[#fff8ef]">
+                <div className="mt-3 text-2xl font-bold leading-[0.92] tracking-[-0.03em] text-white">
                   {recoveryMode ? t('Recover access', 'Recuperar acesso') : t('Producer login', 'Login do produtor')}
                 </div>
               </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#c79b44]/20 bg-[#5c1eb2]/14 text-[#e7d7ff]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#4285F4]/20 bg-[#0057E7]/14 text-[#4285F4]">
                 <ShieldCheck className="h-5 w-5" />
               </div>
             </div>
@@ -166,7 +166,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                     setGoogleLoading(false)
                   }}
                   disabled={googleLoading}
-                  className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/12 bg-white/[0.04] text-sm font-medium text-[#ebe7e0] transition-all hover:border-white/20 hover:bg-white/[0.07] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/12 bg-white/[0.04] text-sm font-medium text-white transition-all hover:border-white/20 hover:bg-white/[0.07] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
                   {t('Continue with Google', 'Continuar com Google')}
@@ -189,7 +189,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="input border-white/10 bg-white/[0.03] pl-10 text-[#ebe7e0] placeholder:text-white/30 focus:border-[#5c1eb2]"
+                    className="input border-white/10 bg-white/[0.03] pl-10 text-white placeholder:text-white/30 focus:border-[#0057E7]"
                     placeholder={t('you@email.com', 'voce@email.com')}
                     required
                     autoFocus
@@ -206,14 +206,14 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                         type={show ? 'text' : 'password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="input border-white/10 bg-white/[0.03] pr-10 text-[#ebe7e0] placeholder:text-white/30 focus:border-[#5c1eb2]"
+                        className="input border-white/10 bg-white/[0.03] pr-10 text-white placeholder:text-white/30 focus:border-[#0057E7]"
                         placeholder="••••••••"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShow(!show)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/35 transition-colors hover:text-[#d8c39a]"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/35 transition-colors hover:text-[#4285F4]"
                       >
                         {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -226,7 +226,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="h-4 w-4 rounded border-white/12 bg-white/[0.03] text-[#5c1eb2] focus:ring-[#5c1eb2]"
+                        className="h-4 w-4 rounded border-white/12 bg-white/[0.03] text-[#0057E7] focus:ring-[#0057E7]"
                       />
                       <span className="text-xs text-white/48">{t('Keep me signed in', 'Continuar conectado')}</span>
                     </label>
@@ -237,7 +237,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                         setError('')
                         setRecoveryMode(true)
                       }}
-                      className="text-xs text-[#d8c39a] transition-colors hover:text-[#f3dfb8]"
+                      className="text-xs text-[#4285F4] transition-colors hover:text-[#0057E7]"
                     >
                       {t('Recover access', 'Recuperar acesso')}
                     </button>
@@ -246,13 +246,13 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
               ) : null}
 
               {error ? (
-                <div className="rounded-[1rem] border border-status-error/20 bg-status-error/8 px-4 py-3 text-xs text-status-error">
+                <div className="rounded-xl border border-status-error/20 bg-status-error/8 px-4 py-3 text-xs text-status-error">
                   {error}
                 </div>
               ) : null}
 
               {recoveryMessage ? (
-                <div className="rounded-[1rem] border border-status-success/20 bg-status-success/8 px-4 py-3 text-xs text-status-success">
+                <div className="rounded-xl border border-status-success/20 bg-status-success/8 px-4 py-3 text-xs text-status-success">
                   {recoveryMessage}
                 </div>
               ) : null}
@@ -261,7 +261,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] text-[#f5f0e8] transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#0057E7] text-white transition-all hover:-translate-y-0.5 hover:bg-[#4285F4] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>
                     <span>{t('Sign in', 'Entrar')}</span>
@@ -273,7 +273,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                   type="button"
                   onClick={handleRecovery}
                   disabled={recoveryLoading}
-                  className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#5c1eb2_0%,#7d49e6_100%)] text-[#f5f0e8] transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#0057E7] text-white transition-all hover:-translate-y-0.5 hover:bg-[#4285F4] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {recoveryLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>
                     <span>{t('Send recovery link', 'Enviar link de recuperacao')}</span>
@@ -287,7 +287,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
               {!recoveryMode ? (
                 <>
                   {t("Don't have an account?", 'Nao tem uma conta?')}{' '}
-                  <button onClick={onSignup} className="text-[#d8c39a] transition-colors hover:text-[#f3dfb8]">
+                  <button onClick={onSignup} className="text-[#4285F4] transition-colors hover:text-[#0057E7]">
                     {t('Create one', 'Criar conta')}
                   </button>
                 </>
@@ -299,7 +299,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                     setError('')
                     setRecoveryMessage('')
                   }}
-                  className="text-[#d8c39a] transition-colors hover:text-[#f3dfb8]"
+                  className="text-[#4285F4] transition-colors hover:text-[#0057E7]"
                 >
                   {t('Back to login', 'Voltar ao login')}
                 </button>

@@ -62,7 +62,7 @@ export function EventsPublicHeader({
         }}
         className={cn(
           'w-full rounded-xl px-3 py-2 text-left text-sm transition-colors',
-          selected ? 'bg-white/10 text-[#fff8ef]' : 'text-white/58 hover:bg-white/[0.06] hover:text-white',
+          selected ? 'bg-[rgba(0,87,231,0.08)] text-[#0057E7]' : 'text-[#44475A] hover:bg-[#F7F8FA] hover:text-[#0A0A0A]',
         )}
       >
         {label}
@@ -76,26 +76,32 @@ export function EventsPublicHeader({
         className={cn(
           'sticky top-0 z-50 border-b transition-all duration-500',
           isScrolled
-            ? 'border-white/8 bg-[rgba(7,8,12,0.86)] backdrop-blur-2xl'
-            : 'border-transparent bg-[rgba(7,8,12,0.58)] backdrop-blur-xl',
+            ? 'border-[#E5E7EB] bg-white/90 backdrop-blur-2xl shadow-soft'
+            : 'border-transparent bg-[rgba(5,5,5,0.58)] backdrop-blur-xl',
           className,
         )}
       >
         <div className="mx-auto flex max-w-[1540px] items-center justify-between gap-5 px-5 py-4 md:px-8 lg:px-10">
-          <a href="/" className="group inline-flex items-center gap-4" aria-label="Animalz Events">
+          <a href="/" className="group inline-flex items-center gap-4" aria-label="Pulse">
             <img
               src="/logo.png"
-              alt="Animalz Events"
+              alt="Pulse"
               className={cn(
                 'w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]',
                 compact ? 'h-8 md:h-9' : 'h-10 md:h-11',
               )}
             />
             <div className="hidden sm:block">
-              <div className="text-[10px] uppercase tracking-[0.34em] text-[#d8c39a]">
-                {isPortuguese ? 'Animalz Events' : 'Animalz Events'}
+              <div className={cn(
+                'text-[10px] uppercase tracking-[0.34em]',
+                isScrolled ? 'text-[#0057E7]' : 'text-[#4285F4]',
+              )}>
+                Pulse
               </div>
-              <div className="mt-1 text-sm text-white/62">
+              <div className={cn(
+                'mt-1 text-sm',
+                isScrolled ? 'text-[#44475A]' : 'text-white/62',
+              )}>
                 {isPortuguese ? 'Operacao premium de eventos' : 'Premium event operations'}
               </div>
             </div>
@@ -108,9 +114,13 @@ export function EventsPublicHeader({
                 href={link.href}
                 className={cn(
                   'rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-300',
-                  isActive(link.href)
-                    ? 'bg-white/[0.08] text-[#fff8ef]'
-                    : 'text-white/58 hover:bg-white/[0.05] hover:text-white',
+                  isScrolled
+                    ? isActive(link.href)
+                      ? 'bg-[rgba(0,87,231,0.08)] text-[#0057E7]'
+                      : 'text-[#44475A] hover:bg-[#F7F8FA] hover:text-[#0A0A0A]'
+                    : isActive(link.href)
+                      ? 'bg-white/[0.08] text-white'
+                      : 'text-white/58 hover:bg-white/[0.05] hover:text-white',
                 )}
               >
                 {link.label}
@@ -125,14 +135,19 @@ export function EventsPublicHeader({
               <button
                 type="button"
                 onClick={() => setLanguageOpen((current) => !current)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium uppercase tracking-[0.16em] text-white/64 transition-all hover:border-[#c79b44]/22 hover:text-white"
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium uppercase tracking-[0.16em] transition-all',
+                  isScrolled
+                    ? 'border-[#E5E7EB] bg-white text-[#44475A] hover:border-[#D1D5DB] hover:text-[#0A0A0A]'
+                    : 'border-white/10 bg-white/[0.03] text-white/64 hover:border-white/20 hover:text-white',
+                )}
               >
                 <Globe className="h-3.5 w-3.5" />
                 {locale === 'en-US' ? 'EN' : 'BR'}
                 <ChevronDown className="h-3 w-3" />
               </button>
               {languageOpen ? (
-                <div className="absolute right-0 top-[calc(100%+0.65rem)] w-36 rounded-2xl border border-white/10 bg-[#10131a] p-2 shadow-[0_24px_80px_rgba(0,0,0,0.4)]">
+                <div className="absolute right-0 top-[calc(100%+0.65rem)] w-36 rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-strong">
                   {languageOption('en-US', 'English')}
                   {languageOption('pt-BR', 'Portugues')}
                 </div>
@@ -142,7 +157,12 @@ export function EventsPublicHeader({
             {user ? (
               <a
                 href="/me"
-                className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-white/68 transition-all hover:border-[#c79b44]/22 hover:text-white sm:inline-flex"
+                className={cn(
+                  'hidden items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] transition-all sm:inline-flex',
+                  isScrolled
+                    ? 'border-[#E5E7EB] bg-white text-[#44475A] hover:border-[#D1D5DB] hover:text-[#0A0A0A]'
+                    : 'border-white/10 bg-white/[0.03] text-white/68 hover:border-white/20 hover:text-white',
+                )}
               >
                 <UserRound className="h-3.5 w-3.5" />
                 {isPortuguese ? 'Conta' : 'Account'}
@@ -151,7 +171,7 @@ export function EventsPublicHeader({
               <button
                 type="button"
                 onClick={onLogin}
-                className="hidden rounded-full bg-[#f5f0e8] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-[#0b0c10] transition-all hover:-translate-y-0.5 hover:bg-[#c79b44] sm:inline-flex"
+                className="hidden rounded-full bg-[#0057E7] px-5 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all hover:-translate-y-0.5 hover:bg-[#4285F4] sm:inline-flex"
               >
                 {isPortuguese ? 'Entrar' : 'Sign in'}
               </button>
@@ -160,7 +180,12 @@ export function EventsPublicHeader({
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/72 transition-all hover:border-[#c79b44]/22 hover:text-white"
+              className={cn(
+                'inline-flex h-10 w-10 items-center justify-center rounded-full border transition-all',
+                isScrolled
+                  ? 'border-[#E5E7EB] bg-white text-[#44475A] hover:border-[#D1D5DB] hover:text-[#0A0A0A]'
+                  : 'border-white/10 bg-white/[0.03] text-white/72 hover:border-white/20 hover:text-white',
+              )}
             >
               <Menu className="h-4 w-4" />
             </button>
@@ -169,14 +194,14 @@ export function EventsPublicHeader({
       </header>
 
       {menuOpen ? (
-        <div className="fixed inset-0 z-[90] overflow-y-auto bg-[rgba(6,7,10,0.98)]">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(92,30,178,0.18),transparent_24%),radial-gradient(circle_at_82%_14%,rgba(199,155,68,0.14),transparent_18%)]" />
+        <div className="fixed inset-0 z-[90] overflow-y-auto bg-[rgba(5,5,5,0.98)]">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,87,231,0.18),transparent_24%),radial-gradient(circle_at_82%_14%,rgba(10,26,255,0.10),transparent_18%)]" />
           <div className="relative z-10 min-h-screen px-5 py-5 md:px-8 lg:px-10">
             <div className="mx-auto max-w-[1540px]">
               <div className="flex items-center justify-between gap-6">
                 <a href="/" className="inline-flex items-center gap-3">
-                  <img src="/logo.png" alt="Animalz Events" className="h-10 w-auto" />
-                  <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[#fff8ef]">Animalz.Events</span>
+                  <img src="/logo.png" alt="Pulse" className="h-10 w-auto" />
+                  <span className="text-sm font-bold uppercase tracking-[0.18em] text-white">Pulse</span>
                 </a>
                 <button
                   type="button"
@@ -189,7 +214,7 @@ export function EventsPublicHeader({
 
               <div className="mt-12 grid gap-14 lg:grid-cols-[1.05fr_0.95fr]">
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.38em] text-[#d8c39a]">
+                  <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
                     {isPortuguese ? 'Navegacao' : 'Navigation'}
                   </div>
                   <nav className="mt-8 grid gap-2">
@@ -198,11 +223,11 @@ export function EventsPublicHeader({
                         key={link.href}
                         href={link.href}
                         onClick={() => setMenuOpen(false)}
-                        className="group flex items-center justify-between gap-6 rounded-[1.8rem] px-4 py-5 transition-all duration-300 hover:bg-white/[0.05]"
+                        className="group flex items-center justify-between gap-6 rounded-2xl px-4 py-5 transition-all duration-300 hover:bg-white/[0.05]"
                       >
                         <div className="flex items-baseline gap-4">
                           <span className="font-mono text-xs text-white/30">0{index + 1}</span>
-                          <span className="font-display text-[clamp(2.2rem,4vw,4rem)] uppercase leading-none tracking-[-0.04em] text-[#fff8ef]">
+                          <span className="text-[clamp(2.2rem,4vw,4rem)] font-bold uppercase leading-none tracking-[-0.04em] text-white">
                             {link.label}
                           </span>
                         </div>
@@ -213,7 +238,7 @@ export function EventsPublicHeader({
                 </div>
 
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.38em] text-[#d8c39a]">
+                  <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
                     {isPortuguese ? 'Eventos ativos' : 'Active events'}
                   </div>
                   <div className="mt-6 grid gap-3">
@@ -222,13 +247,13 @@ export function EventsPublicHeader({
                         key={event.id}
                         href={`/e/${event.slug}`}
                         onClick={() => setMenuOpen(false)}
-                        className="group flex items-center gap-4 rounded-[1.6rem] border border-white/8 bg-white/[0.04] p-4 transition-all duration-300 hover:border-white/14 hover:bg-white/[0.06]"
+                        className="group flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.04] p-4 transition-all duration-300 hover:border-white/14 hover:bg-white/[0.06]"
                       >
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] border border-white/10 bg-black/22 font-mono text-sm text-[#d8c39a]">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-black/22 font-mono text-sm text-[#4285F4]">
                           0{index + 1}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-sm font-semibold text-[#fff8ef]">{event.name}</div>
+                          <div className="truncate text-sm font-semibold text-white">{event.name}</div>
                           <div className="mt-1 text-xs text-white/42">
                             {[event.venue_name, event.city].filter(Boolean).join(' / ')}
                           </div>

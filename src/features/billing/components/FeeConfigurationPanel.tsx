@@ -135,7 +135,7 @@ export function FeeConfigurationPanel({
             {formatLocaleCurrency(preview.platformFeeAmount, locale)}
           </div>
           <div className="mt-2 text-sm text-text-muted">
-            {t('Revenue generated for Animalz on this order.', 'Valor gerado para a Animalz neste pedido.')}
+            {t('Revenue generated for Pulse on this order.', 'Valor gerado para a Pulse neste pedido.')}
           </div>
         </div>
         <div>

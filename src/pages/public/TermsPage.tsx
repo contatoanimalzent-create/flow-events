@@ -12,7 +12,7 @@ export function TermsPage() {
         {
           title: '1. Aceitacao dos termos',
           content: [
-            'Ao acessar e usar a plataforma Animalz Events, voce concorda com estes termos. Se nao concordar com alguma parte, nao utilize o servico.',
+            'Ao acessar e usar a plataforma Pulse, voce concorda com estes termos. Se nao concordar com alguma parte, nao utilize o servico.',
           ],
         },
         {
@@ -32,14 +32,14 @@ export function TermsPage() {
         {
           title: '4. Transacoes e pagamentos',
           content: [
-            'A Animalz Events viabiliza compras de ingressos entre compradores e produtores, com processamento seguro de pagamentos.',
+            'A Pulse viabiliza compras de ingressos entre compradores e produtores, com processamento seguro de pagamentos.',
             'Taxas e condicoes aplicaveis devem ser apresentadas com clareza antes da confirmacao da compra.',
           ],
         },
         {
           title: '5. Propriedade intelectual',
           content: [
-            'Textos, imagens, marcas, layouts e demais elementos da plataforma pertencem a Animalz Events ou aos respectivos licenciadores.',
+            'Textos, imagens, marcas, layouts e demais elementos da plataforma pertencem a Pulse ou aos respectivos licenciadores.',
             'Nao e permitido reproduzir ou distribuir esse conteudo sem autorizacao previa.',
           ],
         },
@@ -52,7 +52,7 @@ export function TermsPage() {
         {
           title: '7. Limitacao de responsabilidade',
           content: [
-            'Na extensao permitida por lei, a Animalz Events nao responde por danos indiretos, incidentais ou consequentes decorrentes do uso da plataforma.',
+            'Na extensao permitida por lei, a Pulse nao responde por danos indiretos, incidentais ou consequentes decorrentes do uso da plataforma.',
           ],
         },
         {
@@ -90,7 +90,7 @@ export function TermsPage() {
         {
           title: '1. Acceptance of terms',
           content: [
-            'By accessing and using the Animalz Events platform, you agree to these terms. If you do not agree with any part, do not use the service.',
+            'By accessing and using the Pulse platform, you agree to these terms. If you do not agree with any part, do not use the service.',
           ],
         },
         {
@@ -110,14 +110,14 @@ export function TermsPage() {
         {
           title: '4. Transactions and payments',
           content: [
-            'Animalz Events enables ticket purchases between buyers and organizers, with secure payment processing.',
+            'Pulse enables ticket purchases between buyers and organizers, with secure payment processing.',
             'Applicable fees and conditions must be clearly presented before purchase confirmation.',
           ],
         },
         {
           title: '5. Intellectual property',
           content: [
-            'Texts, images, brands, layouts and other platform elements belong to Animalz Events or the respective licensors.',
+            'Texts, images, brands, layouts and other platform elements belong to Pulse or the respective licensors.',
             'You may not reproduce or distribute this content without prior authorization.',
           ],
         },
@@ -130,7 +130,7 @@ export function TermsPage() {
         {
           title: '7. Limitation of liability',
           content: [
-            'To the extent permitted by law, Animalz Events is not liable for indirect, incidental or consequential damages arising from use of the platform.',
+            'To the extent permitted by law, Pulse is not liable for indirect, incidental or consequential damages arising from use of the platform.',
           ],
         },
         {
@@ -166,10 +166,10 @@ export function TermsPage() {
       ]
 
   useSeoMeta({
-    title: isPortuguese ? 'Termos de uso | Animalz Events' : 'Terms of use | Animalz Events',
+    title: isPortuguese ? 'Termos de uso | Pulse' : 'Terms of use | Pulse',
     description: isPortuguese
-      ? 'Conheca os termos e condicoes de uso da plataforma Animalz Events.'
-      : 'Read the terms and conditions for using the Animalz Events platform.',
+      ? 'Conheca os termos e condicoes de uso da plataforma Pulse.'
+      : 'Read the terms and conditions for using the Pulse platform.',
     url: typeof window !== 'undefined' ? window.location.href : '/terms',
   })
 
@@ -192,8 +192,8 @@ export function TermsPage() {
 
             <p className="mt-6 text-base leading-8 text-text-secondary md:text-lg">
               {isPortuguese
-                ? 'Ao usar a plataforma Animalz Events, voce concorda com os seguintes termos. Leia com atencao.'
-                : 'By using the Animalz Events platform, you agree to the following terms. Please read them carefully.'}
+                ? 'Ao usar a plataforma Pulse, voce concorda com os seguintes termos. Leia com atencao.'
+                : 'By using the Pulse platform, you agree to the following terms. Please read them carefully.'}
             </p>
           </PublicReveal>
 

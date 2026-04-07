@@ -13,10 +13,10 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
   const cities = new Set(events.map((event) => event.city).filter(Boolean)).size
 
   useSeoMeta({
-    title: isPortuguese ? 'Sobre | Animalz Events' : 'About | Animalz Events',
+    title: isPortuguese ? 'Sobre | Pulse' : 'About | Pulse',
     description: isPortuguese
-      ? 'Animalz Events conecta compradores a eventos de cultura, gastronomia, musica e lifestyle, com compra simples e acesso garantido.'
-      : 'Animalz Events connects buyers to culture, food, music and lifestyle events with simple purchase and guaranteed access.',
+      ? 'Pulse conecta compradores a eventos de cultura, gastronomia, musica e lifestyle, com compra simples e acesso garantido.'
+      : 'Pulse connects buyers to culture, food, music and lifestyle events with simple purchase and guaranteed access.',
     image: events[0]?.mediaPresentation.coverAsset?.secure_url ?? events[0]?.cover_url ?? null,
     url: typeof window !== 'undefined' ? window.location.href : '/about',
   })
@@ -29,7 +29,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.06)] px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-[#6a6058]">
                 <Sparkles className="h-4 w-4" />
-                {isPortuguese ? 'Sobre a Animalz Events' : 'About Animalz Events'}
+                {isPortuguese ? 'Sobre a Pulse' : 'About Pulse'}
               </div>
               <h1 className="mt-6 font-display text-[clamp(4rem,7vw,7.2rem)] font-semibold leading-[0.86] tracking-[-0.05em] text-[#f0ebe2]">
                 {isPortuguese
@@ -38,8 +38,8 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#9a9088] md:text-lg">
                 {isPortuguese
-                  ? 'Animalz Events conecta compradores aos melhores eventos de cultura, gastronomia, musica e lifestyle. Compre ingressos com facilidade, receba seu QR code e aproveite cada momento.'
-                  : 'Animalz Events connects buyers to the best culture, food, music and lifestyle events. Buy tickets easily, receive your QR code and enjoy every moment.'}
+                  ? 'Pulse conecta compradores aos melhores eventos de cultura, gastronomia, musica e lifestyle. Compre ingressos com facilidade, receba seu QR code e aproveite cada momento.'
+                  : 'Pulse connects buyers to the best culture, food, music and lifestyle events. Buy tickets easily, receive your QR code and enjoy every moment.'}
               </p>
             </div>
           </PublicReveal>

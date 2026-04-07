@@ -12,7 +12,7 @@ export function PrivacyPage() {
         {
           title: '1. Sobre esta politica',
           content: [
-            'Esta Politica de Privacidade descreve como a Animalz Events coleta, usa, armazena e protege suas informacoes pessoais quando voce utiliza nossa plataforma.',
+            'Esta Politica de Privacidade descreve como a Pulse coleta, usa, armazena e protege suas informacoes pessoais quando voce utiliza nossa plataforma.',
           ],
         },
         {
@@ -100,7 +100,7 @@ export function PrivacyPage() {
         {
           title: '1. About this policy',
           content: [
-            'This Privacy Policy describes how Animalz Events collects, uses, stores and protects your personal information when you use our platform.',
+            'This Privacy Policy describes how Pulse collects, uses, stores and protects your personal information when you use our platform.',
           ],
         },
         {
@@ -186,10 +186,10 @@ export function PrivacyPage() {
       ]
 
   useSeoMeta({
-    title: isPortuguese ? 'Politica de privacidade | Animalz Events' : 'Privacy policy | Animalz Events',
+    title: isPortuguese ? 'Politica de privacidade | Pulse' : 'Privacy policy | Pulse',
     description: isPortuguese
-      ? 'Saiba como a Animalz Events coleta, usa e protege seus dados pessoais.'
-      : 'Learn how Animalz Events collects, uses and protects your personal data.',
+      ? 'Saiba como a Pulse coleta, usa e protege seus dados pessoais.'
+      : 'Learn how Pulse collects, uses and protects your personal data.',
     url: typeof window !== 'undefined' ? window.location.href : '/privacy',
   })
 
@@ -212,8 +212,8 @@ export function PrivacyPage() {
 
             <p className="mt-6 text-base leading-8 text-[#5f5549] md:text-lg">
               {isPortuguese
-                ? 'Na Animalz Events, protegemos seus dados com seriedade. Esta politica explica como coletamos, usamos e mantemos seguras suas informacoes.'
-                : 'At Animalz Events, we take your data seriously. This policy explains how we collect, use and protect your information.'}
+                ? 'Na Pulse, protegemos seus dados com seriedade. Esta politica explica como coletamos, usamos e mantemos seguras suas informacoes.'
+                : 'At Pulse, we take your data seriously. This policy explains how we collect, use and protect your information.'}
             </p>
           </PublicReveal>
 

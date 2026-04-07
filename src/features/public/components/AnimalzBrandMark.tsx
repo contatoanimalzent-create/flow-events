@@ -12,14 +12,14 @@ export function AnimalzBrandMark({ inverse = false, compact = false, className }
       href="/"
       className={cn(
         'group inline-flex items-center gap-3 no-underline',
-        inverse ? 'text-white' : 'text-[#0b1016]',
+        inverse ? 'text-white' : 'text-[#0A0A0A]',
         className,
       )}
-      aria-label="Animalz Events"
+      aria-label="Pulse"
     >
       <img
         src="/logo.png"
-        alt="Animalz Events"
+        alt="Pulse"
         className={cn(
           'w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]',
           compact ? 'h-10 md:h-12' : 'h-12 md:h-14',
@@ -30,18 +30,18 @@ export function AnimalzBrandMark({ inverse = false, compact = false, className }
         <div
           className={cn(
             'text-[10px] font-semibold uppercase tracking-[0.42em]',
-            inverse ? 'text-white/62' : 'text-[#6d727a]',
+            inverse ? 'text-white/62' : 'text-[#0057E7]',
           )}
         >
-          Animalz Events
+          Pulse
         </div>
         <div
           className={cn(
-            'mt-1 font-display text-[1.1rem] font-semibold uppercase tracking-[0.14em] md:text-[1.28rem]',
-            inverse ? 'text-white' : 'text-[#0b1016]',
+            'mt-1 text-base font-bold uppercase tracking-[0.04em] md:text-lg',
+            inverse ? 'text-white' : 'text-[#0A0A0A]',
           )}
         >
-          Experiences
+          Events
         </div>
       </div>
     </a>

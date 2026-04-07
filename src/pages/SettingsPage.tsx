@@ -392,7 +392,7 @@ export function SettingsPage() {
                   <div>
                     <h3 className="text-sm font-semibold text-text-primary">Marca branca completa</h3>
                     <p className="text-xs text-text-secondary mt-1">
-                      Com o plano Business ou Enterprise, seu comprador nunca vê a marca Animalz Events — vê apenas a sua.
+                      Com o plano Business ou Enterprise, seu comprador nunca vê a marca Pulse — vê apenas a sua.
                       Domínio próprio, e-mail próprio, cores e logo personalizados.
                     </p>
                     {(planKey === 'starter' || planKey === 'pro') && (
@@ -559,7 +559,7 @@ export function SettingsPage() {
                 <div className="flex items-start gap-3">
                   <Percent className="w-5 h-5 text-brand-acid shrink-0 mt-0.5" />
                   <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-text-primary">Modelo de taxas Animalz Events</h3>
+                    <h3 className="text-sm font-semibold text-text-primary">Modelo de taxas Pulse</h3>
                     <p className="text-xs text-text-secondary leading-relaxed">
                       Usamos <strong className="text-text-primary">dois tipos de taxa</strong> por transação — igual ao padrão do mercado (Sympla, Ingresse):
                     </p>

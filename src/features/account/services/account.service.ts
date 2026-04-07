@@ -359,7 +359,7 @@ export const accountService = {
         const usedTickets = events.reduce((sum, event) => sum + event.usedTicketCount, 0)
         const totalSpent = events.reduce((sum, event) => sum + event.totalSpent, 0)
         const fallbackName =
-          input.email.split('@')[0]?.replace(/[._-]+/g, ' ') ?? 'Cliente Animalz'
+          input.email.split('@')[0]?.replace(/[._-]+/g, ' ') ?? 'Cliente Pulse'
         const normalizedName = (input.name || fallbackName)
           .split(' ')
           .filter(Boolean)

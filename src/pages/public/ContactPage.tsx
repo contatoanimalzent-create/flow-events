@@ -11,10 +11,10 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
   const [submitted, setSubmitted] = useState(false)
 
   useSeoMeta({
-    title: isPortuguese ? 'Contato | Animalz Events' : 'Contact | Animalz Events',
+    title: isPortuguese ? 'Contato | Pulse' : 'Contact | Pulse',
     description: isPortuguese
-      ? 'Entre em contato com a equipe Animalz Events. Tire duvidas, fale sobre parcerias ou solicite suporte.'
-      : 'Contact the Animalz Events team. Ask questions, discuss partnerships or request support.',
+      ? 'Entre em contato com a equipe Pulse. Tire duvidas, fale sobre parcerias ou solicite suporte.'
+      : 'Contact the Pulse team. Ask questions, discuss partnerships or request support.',
     url: typeof window !== 'undefined' ? window.location.href : '/contact',
   })
 

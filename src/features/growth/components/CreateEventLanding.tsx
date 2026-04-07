@@ -16,7 +16,7 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
   const totalCapacity = events.reduce((sum, event) => sum + (event.total_capacity ?? 0), 0)
 
   useSeoMeta({
-    title: isPortuguese ? 'Criar evento | Animalz Events' : 'Create event | Animalz Events',
+    title: isPortuguese ? 'Criar evento | Pulse' : 'Create event | Pulse',
     description: isPortuguese
       ? 'Publique seu evento, venda ingressos e gerencie tudo em um lugar so. Pagamento, credenciamento, financeiro e dados do seu publico.'
       : 'Publish your event, sell tickets and manage everything in one place. Checkout, check-in, finance and audience data together.',

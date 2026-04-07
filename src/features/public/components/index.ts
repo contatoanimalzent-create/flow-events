@@ -43,6 +43,7 @@ export { PublicHero } from './PublicHero'
 export { PublicLayout } from './PublicLayout'
 export { PublicReveal } from './PublicReveal'
 export { SocialProofSection } from './SocialProofSection'
+export * from './landing'
 
 // New event components
 export { ExploreMoreSection } from './ExploreMoreSection'

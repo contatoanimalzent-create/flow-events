@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 export const appLayoutTokens = {
   sidebar: {
     expandedWidth: '16.25rem',
-    collapsedWidth: '5rem',
+    collapsedWidth: '16.25rem',
     mobileWidth: '16.25rem',
   },
   header: {
@@ -12,10 +12,10 @@ export const appLayoutTokens = {
   content: {
     maxWidth: '80rem',
     maxWidthWide: '80rem',
-    paddingXMobile: '1rem',
-    paddingXDesktop: '1.5rem',
+    paddingXMobile: '1.5rem',
+    paddingXDesktop: '2rem',
     paddingY: '1.5rem',
-    sectionGap: '1.5rem',
+    sectionGap: '2rem',
   },
   grid: {
     columns: 12,

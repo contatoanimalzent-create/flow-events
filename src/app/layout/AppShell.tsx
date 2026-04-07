@@ -89,18 +89,14 @@ function renderSection(activeSection: NavSection) {
 export function AppShell() {
   const [activeSection, setActiveSection] = useState<NavSection>(defaultNavSection)
   const sidebarOpen = useUIStore((state) => state.sidebarOpen)
-  const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed)
   const setSidebarOpen = useUIStore((state) => state.setSidebarOpen)
-  const toggleSidebarCollapsed = useUIStore((state) => state.toggleSidebarCollapsed)
 
   const shellVariables = useMemo(
     () => ({
       ...getAppLayoutVariables(),
-      '--pulse-app-sidebar-width': sidebarCollapsed
-        ? 'var(--pulse-app-sidebar-collapsed-width)'
-        : 'var(--pulse-app-sidebar-expanded-width)',
+      '--pulse-app-sidebar-width': 'var(--pulse-app-sidebar-expanded-width)',
     }),
-    [sidebarCollapsed],
+    [],
   )
 
   function handleNavigate(section: NavSection) {
@@ -118,8 +114,8 @@ export function AppShell() {
         onNavigate={handleNavigate}
         isMobileOpen={sidebarOpen}
         onCloseMobile={() => setSidebarOpen(false)}
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={toggleSidebarCollapsed}
+        isCollapsed={false}
+        onToggleCollapse={() => undefined}
       />
 
       <div className="min-h-screen lg:pl-[var(--pulse-app-sidebar-width)]">
@@ -137,4 +133,5 @@ export function AppShell() {
   )
 }
 
+export const AppLayout = AppShell
 export const AppShellV2 = AppShell

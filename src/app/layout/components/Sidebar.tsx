@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, LogOut, X } from 'lucide-react'
+import { LogOut, X } from 'lucide-react'
 import { useEffect } from 'react'
 import type { ElementType } from 'react'
 import { createAppNavigation, type NavSection } from '@/app/layout/navigation'
@@ -30,22 +30,20 @@ function SidebarItem({
   label,
   icon: Icon,
   active,
-  collapsed,
   onClick,
 }: {
   label: string
   icon: ElementType
   active: boolean
-  collapsed: boolean
   onClick: () => void
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      title={collapsed ? label : undefined}
+      title={label}
       className={cn(
-        'relative flex h-11 w-full items-center gap-3 rounded-xl px-4 text-left transition-colors duration-[var(--pulse-app-motion-duration)]',
+        'relative flex h-11 w-full items-center gap-3 rounded-[var(--pulse-radius-md)] px-4 text-left transition-colors duration-[var(--pulse-app-motion-duration)]',
         active
           ? 'bg-[var(--pulse-app-active-surface)] text-[var(--pulse-color-primary)]'
           : 'text-[var(--pulse-color-text-secondary)] hover:bg-[var(--pulse-app-hover-surface)] hover:text-[var(--pulse-color-text-primary)]',
@@ -53,15 +51,13 @@ function SidebarItem({
     >
       <span
         className={cn(
-          'absolute bottom-2 left-0 top-2 w-0.5 rounded-full',
+          'absolute bottom-2 left-0 top-2 w-[2px] rounded-full',
           active ? 'bg-[var(--pulse-color-primary)]' : 'bg-transparent',
         )}
         aria-hidden="true"
       />
       <Icon className={cn('h-4 w-4 shrink-0', active && 'text-[var(--pulse-color-primary)]')} />
-      <span className={cn('min-w-0 flex-1 truncate text-sm font-medium', collapsed && 'hidden')}>
-        {label}
-      </span>
+      <span className="min-w-0 flex-1 truncate text-sm font-medium">{label}</span>
     </button>
   )
 }
@@ -69,8 +65,6 @@ function SidebarItem({
 function SidebarSurface({
   activeSection,
   onNavigate,
-  isCollapsed,
-  onToggleCollapse,
   onCloseMobile,
   mobile = false,
 }: Omit<SidebarProps, 'isMobileOpen'> & { mobile?: boolean }) {
@@ -104,27 +98,16 @@ function SidebarSurface({
           >
             <X className="h-4 w-4" />
           </button>
-        ) : (
-          <button
-            type="button"
-            onClick={onToggleCollapse}
-            className="hidden h-9 w-9 items-center justify-center rounded-lg text-[var(--pulse-color-text-secondary)] transition hover:bg-[var(--pulse-app-hover-surface)] hover:text-[var(--pulse-color-text-primary)] lg:inline-flex"
-            title={isCollapsed ? t('Expand sidebar', 'Expandir sidebar') : t('Collapse sidebar', 'Recolher sidebar')}
-          >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
-        )}
+        ) : null}
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-4">
         <div className="space-y-6">
           {navigation.map((group) => (
             <section key={group.key}>
-              {!isCollapsed ? (
-                <div className="mb-2 px-4 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--pulse-color-text-secondary)]">
-                  {group.label}
-                </div>
-              ) : null}
+              <div className="mb-2 px-4 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--pulse-color-text-secondary)]">
+                {group.label}
+              </div>
 
               <div className="space-y-1">
                 {group.items.map((item) => (
@@ -133,7 +116,6 @@ function SidebarSurface({
                     label={item.label}
                     icon={item.icon}
                     active={item.id === activeSection}
-                    collapsed={isCollapsed && !mobile}
                     onClick={() => {
                       onNavigate(item.id)
                       if (mobile) {
@@ -154,7 +136,7 @@ function SidebarSurface({
             {initials || 'P'}
           </div>
 
-          <div className={cn('min-w-0 flex-1', isCollapsed && !mobile && 'hidden')}>
+          <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-medium text-[var(--pulse-color-text-primary)]">
               {fullName || 'Pulse User'}
             </div>
@@ -163,16 +145,14 @@ function SidebarSurface({
             </div>
           </div>
 
-          {!isCollapsed || mobile ? (
-            <button
-              type="button"
-              onClick={() => signOut()}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[var(--pulse-color-text-secondary)] transition hover:bg-[var(--pulse-app-hover-surface)] hover:text-[var(--pulse-color-text-primary)]"
-              title={t('Sign out', 'Sair')}
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onClick={() => signOut()}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[var(--pulse-color-text-secondary)] transition hover:bg-[var(--pulse-app-hover-surface)] hover:text-[var(--pulse-color-text-primary)]"
+            title={t('Sign out', 'Sair')}
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>
@@ -209,7 +189,7 @@ export function Sidebar({
         <SidebarSurface
           activeSection={activeSection}
           onNavigate={onNavigate}
-          isCollapsed={isCollapsed}
+          isCollapsed={false}
           onToggleCollapse={onToggleCollapse}
           onCloseMobile={onCloseMobile}
         />

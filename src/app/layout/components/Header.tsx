@@ -60,17 +60,9 @@ export function Header({ activeSection, onOpenMobileMenu }: HeaderProps) {
             <Bell className="h-4 w-4" />
           </button>
 
-          <div className="flex items-center gap-3 rounded-xl px-2 py-1.5">
+          <div className="flex items-center rounded-xl p-1">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--pulse-color-surface)] text-sm font-semibold text-[var(--pulse-color-text-primary)]">
               {initials || 'P'}
-            </div>
-            <div className="hidden min-w-0 sm:block">
-              <div className="truncate text-sm font-medium text-[var(--pulse-color-text-primary)]">
-                {fullName || 'Pulse User'}
-              </div>
-              <div className="truncate text-xs text-[var(--pulse-color-text-secondary)]">
-                {organization?.name || t('Internal workspace', 'Workspace interno')}
-              </div>
             </div>
           </div>
         </div>

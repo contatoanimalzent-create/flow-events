@@ -76,9 +76,9 @@ function createItem(
 
 export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
   const labels = {
-    operation: isPortuguese ? 'Operacao' : 'Operations',
-    people: isPortuguese ? 'Pessoas e acesso' : 'People and access',
-    business: isPortuguese ? 'Receita e relacionamento' : 'Revenue and relationship',
+    operation: isPortuguese ? 'Operacoes' : 'Operations',
+    people: isPortuguese ? 'Pessoas & Acesso' : 'People & Access',
+    business: isPortuguese ? 'Receita' : 'Revenue',
     system: isPortuguese ? 'Sistema' : 'System',
   }
 
@@ -90,7 +90,7 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
         createItem(
           'dashboard',
           isPortuguese ? 'Dashboard' : 'Dashboard',
-          isPortuguese ? 'Dash' : 'Dash',
+          isPortuguese ? 'Dashboard' : 'Dashboard',
           isPortuguese ? 'Visao executiva do sistema.' : 'Executive view of the system.',
           labels.operation,
           LayoutDashboard,
@@ -114,7 +114,7 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
         createItem(
           'financial',
           isPortuguese ? 'Financeiro' : 'Financial',
-          isPortuguese ? 'Financeiro' : 'Finance',
+          isPortuguese ? 'Financeiro' : 'Financial',
           isPortuguese ? 'Receita, repasses e leitura financeira.' : 'Revenue, payouts and financial readouts.',
           labels.operation,
           Wallet,
@@ -128,7 +128,7 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
         createItem(
           'registrations',
           isPortuguese ? 'Credenciamento' : 'Credentialing',
-          isPortuguese ? 'Credenciamento' : 'Credentials',
+          isPortuguese ? 'Credenciamento' : 'Credentialing',
           isPortuguese ? 'Listas, emissoes e fluxos de habilitacao.' : 'Lists, badge issuing and enablement flows.',
           labels.people,
           BadgeCheck,
@@ -166,7 +166,7 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
         createItem(
           'communication',
           isPortuguese ? 'Comunicacao' : 'Communication',
-          isPortuguese ? 'Comunicacao' : 'Comms',
+          isPortuguese ? 'Comunicacao' : 'Communication',
           isPortuguese ? 'Mensagens, campanhas e operacao de comunicacao.' : 'Messages, campaigns and communication operations.',
           labels.business,
           MessageSquare,

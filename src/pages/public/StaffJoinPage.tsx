@@ -334,7 +334,7 @@ export function StaffJoinPage() {
         <div className="relative mx-auto max-w-2xl px-5">
           {/* Logo / brand */}
           <div className="mb-8 flex items-center gap-3">
-            <img src="/logo.png" alt="Flow Events" className="h-8 w-auto" />
+            <img src="/logo.png" alt="Pulse" className="h-8 w-auto brightness-0 invert" />
             {info.organization_name && (
               <span className="text-xs uppercase tracking-[0.22em] text-white/40">
                 {info.organization_name}

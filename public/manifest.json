@@ -1,13 +1,13 @@
 {
-  "name": "Animalz Events",
-  "short_name": "Animalz",
+  "name": "Pulse",
+  "short_name": "Pulse",
   "description": "Ingressos para os melhores eventos de cultura, gastronomia, musica e lifestyle.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0a0908",
-  "theme_color": "#0a0908",
+  "background_color": "#0057E7",
+  "theme_color": "#0057E7",
   "lang": "pt-BR",
   "categories": ["entertainment", "lifestyle"],
   "icons": [

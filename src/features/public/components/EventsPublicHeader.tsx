@@ -82,29 +82,17 @@ export function EventsPublicHeader({
         )}
       >
         <div className="mx-auto flex max-w-[1540px] items-center justify-between gap-5 px-5 py-4 md:px-8 lg:px-10">
-          <a href="/" className="group inline-flex items-center gap-4" aria-label="Pulse">
+          <a href="/" className="group inline-flex items-center" aria-label="Pulse">
             <img
               src="/logo.png"
               alt="Pulse"
               className={cn(
-                'w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]',
+                'w-auto object-contain transition-all duration-300 group-hover:scale-[1.02]',
                 compact ? 'h-8 md:h-9' : 'h-10 md:h-11',
+                /* logo preta no fundo claro (scrolled), branca no fundo escuro (topo) */
+                isScrolled ? '' : 'brightness-0 invert',
               )}
             />
-            <div className="hidden sm:block">
-              <div className={cn(
-                'text-[10px] uppercase tracking-[0.34em]',
-                isScrolled ? 'text-[#0057E7]' : 'text-[#4285F4]',
-              )}>
-                Pulse
-              </div>
-              <div className={cn(
-                'mt-1 text-sm',
-                isScrolled ? 'text-[#44475A]' : 'text-white/62',
-              )}>
-                {isPortuguese ? 'Operacao premium de eventos' : 'Premium event operations'}
-              </div>
-            </div>
           </a>
 
           <nav className="hidden items-center gap-1 xl:flex">
@@ -199,9 +187,9 @@ export function EventsPublicHeader({
           <div className="relative z-10 min-h-screen px-5 py-5 md:px-8 lg:px-10">
             <div className="mx-auto max-w-[1540px]">
               <div className="flex items-center justify-between gap-6">
-                <a href="/" className="inline-flex items-center gap-3">
-                  <img src="/logo.png" alt="Pulse" className="h-10 w-auto" />
-                  <span className="text-sm font-bold uppercase tracking-[0.18em] text-white">Pulse</span>
+                <a href="/" className="inline-flex items-center">
+                  {/* mobile menu sempre escuro → logo branca */}
+                  <img src="/logo.png" alt="Pulse" className="h-9 w-auto brightness-0 invert" />
                 </a>
                 <button
                   type="button"

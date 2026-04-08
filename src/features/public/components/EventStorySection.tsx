@@ -23,7 +23,7 @@ export function EventExperienceBlock({ highlights }: { highlights: Array<{ label
         return (
           <div key={item.label} className="rounded-[1.5rem] border border-white/10 bg-white/6 p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ae936f]/12 text-[#ae936f]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4285F4]/12 text-[#4285F4]">
                 <Icon className="h-4 w-4" />
               </div>
               <div>
@@ -79,7 +79,7 @@ export function EventStorySection({
 
         <PublicReveal delayMs={120}>
           <div className="rounded-[2.1rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-7 shadow-[0_18px_55px_rgba(0,0,0,0.3)] md:p-8">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">{eyebrow}</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#4285F4]">{eyebrow}</div>
             <h3 className="mt-5 font-display text-[clamp(2.5rem,4vw,4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f0ebe2]">
               {title}
             </h3>

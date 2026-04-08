@@ -125,7 +125,7 @@ export function GrowthPage() {
         </div>
 
         <div className="novare-stage-panel-dark">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[11px] uppercase tracking-[0.3em] text-[#ae936f]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[11px] uppercase tracking-[0.3em] text-[#4285F4]">
             <Sparkles className="h-4 w-4" />
             {t('Live status', 'Status ao vivo')}
           </div>

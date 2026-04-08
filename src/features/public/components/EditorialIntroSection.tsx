@@ -23,8 +23,8 @@ export function EditorialIntroSection() {
   return (
     <section className="section-dark relative overflow-hidden px-5 py-20 md:px-10 lg:px-16 lg:py-28">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-6rem] top-[-6rem] h-[30rem] w-[30rem] rounded-full bg-[#7d6d52]/10 blur-[80px]" />
-        <div className="absolute bottom-[-8rem] right-[-4rem] h-[28rem] w-[28rem] rounded-full bg-[#6a86ad]/8 blur-[80px]" />
+        <div className="absolute left-[-6rem] top-[-6rem] h-[30rem] w-[30rem] rounded-full bg-[#0057E7]/10 blur-[80px]" />
+        <div className="absolute bottom-[-8rem] right-[-4rem] h-[28rem] w-[28rem] rounded-full bg-[#4285F4]/8 blur-[80px]" />
         <div
           className="absolute inset-0 opacity-[0.18]"
           style={{
@@ -40,7 +40,7 @@ export function EditorialIntroSection() {
         <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <PublicReveal>
             <div className="max-w-xl">
-              <div className="text-[11px] uppercase tracking-[0.34em] text-[#ae936f]">Experience platform</div>
+              <div className="text-[11px] uppercase tracking-[0.34em] text-[#4285F4]">Experience platform</div>
               <h2 className="mt-5 font-display text-[clamp(3rem,5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-white">
                 Discover. Purchase. Arrive.
               </h2>
@@ -59,8 +59,8 @@ export function EditorialIntroSection() {
           <div className="grid gap-4 md:grid-cols-3 lg:pt-10">
             {principles.map((principle, index) => (
               <PublicReveal key={principle.number} delayMs={index * 90}>
-                <div className="card-dark-hover group h-full p-6">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[#ae936f]/30 bg-[#ae936f]/10 font-display text-2xl font-semibold text-[#ae936f] transition-all duration-500 group-hover:border-[#ae936f]/60 group-hover:bg-[#ae936f]/20">
+                <div className="group h-full rounded-xl border border-white/10 bg-white/[0.04] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.07]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[#4285F4]/30 bg-[#4285F4]/10 font-display text-2xl font-semibold text-[#4285F4] transition-all duration-500 group-hover:border-[#4285F4]/60 group-hover:bg-[#4285F4]/20">
                     {principle.number}
                   </div>
                   <div className="mt-6 font-display text-[2rem] font-semibold leading-[0.94] tracking-[-0.03em] text-white">

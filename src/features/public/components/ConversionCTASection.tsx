@@ -10,8 +10,8 @@ export function ConversionCTASection({ onLogin }: ConversionCTASectionProps) {
     <section className="section-ink relative overflow-hidden px-5 pb-24 pt-16 md:px-10 lg:px-16 lg:pb-32 lg:pt-24">
       {/* Deep atmospheric glow */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-[24rem] w-[56rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#7d6d52]/12 blur-[100px]" />
-        <div className="absolute bottom-[-6rem] left-[-4rem] h-[24rem] w-[24rem] rounded-full bg-[#6a86ad]/8 blur-[80px]" />
+        <div className="absolute left-1/2 top-0 h-[24rem] w-[56rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0057E7]/12 blur-[100px]" />
+        <div className="absolute bottom-[-6rem] left-[-4rem] h-[24rem] w-[24rem] rounded-full bg-[#4285F4]/8 blur-[80px]" />
         <div className="absolute bottom-[-4rem] right-[-6rem] h-[20rem] w-[20rem] rounded-full bg-[#8b7aa3]/8 blur-[80px]" />
         <div
           className="absolute inset-0 opacity-[0.14]"

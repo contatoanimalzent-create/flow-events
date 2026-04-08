@@ -149,10 +149,10 @@ export function ExitLeadCaptureDialog({
             }}
           >
             {/* Glow decorativo */}
-            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#ae936f]/08 blur-3xl" />
+            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#4285F4]/08 blur-3xl" />
 
             <div className="relative">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-[#ae936f]">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-[#4285F4]">
                 <Mail className="h-3.5 w-3.5" />
                 {isPortuguese ? 'Acesso antecipado' : 'Early access'}
               </div>
@@ -170,13 +170,13 @@ export function ExitLeadCaptureDialog({
           <div className="px-5 py-8 sm:px-8 sm:py-10 md:px-9">
             {/* Eyebrow visivel so em mobile (no desktop esta no painel esquerdo) */}
             <div className="mb-4 flex items-center gap-2 md:hidden">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-[10px] uppercase tracking-[0.3em] text-[#ae936f]">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-[10px] uppercase tracking-[0.3em] text-[#4285F4]">
                 <Mail className="h-3 w-3" />
                 {isPortuguese ? 'Acesso antecipado' : 'Early access'}
               </div>
             </div>
 
-            <div className="text-[10px] uppercase tracking-[0.3em] text-[#ae936f]">{isPortuguese ? 'Acesso gratuito' : 'Free access'}</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-[#4285F4]">{isPortuguese ? 'Acesso gratuito' : 'Free access'}</div>
             <div className="mt-2 font-display text-[1.6rem] font-semibold leading-[0.94] tracking-[-0.04em] text-[#f0ebe2] sm:text-[1.9rem]">
               {isPortuguese ? 'Entre uma vez e mantenha a relacao viva.' : 'Sign up once and keep the relationship alive.'}
             </div>
@@ -204,7 +204,7 @@ export function ExitLeadCaptureDialog({
                   WebkitAppearance: 'none',
                   fontSize: '16px', // evita zoom no iOS
                 }}
-                onFocus={(e) => { e.currentTarget.style.border = '1px solid rgba(174,147,111,0.4)' }}
+                onFocus={(e) => { e.currentTarget.style.border = '1px solid rgba(0,87,231,0.4)' }}
                 onBlur={(e) => {
                   e.currentTarget.style.border = status === 'error'
                     ? '1px solid rgba(196,92,106,0.5)'
@@ -228,8 +228,8 @@ export function ExitLeadCaptureDialog({
                 disabled={captureLead.isPending || status === 'success'}
                 className="flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-sm font-semibold text-[#0a0908] transition-all hover:-translate-y-0.5 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                 style={{
-                  background: '#d62a0b',
-                  boxShadow: '0 4px 20px rgba(214,42,11,0.28)',
+                  background: '#0057E7',
+                  boxShadow: '0 4px 20px rgba(0,87,231,0.28)',
                 }}
               >
                 {captureLead.isPending

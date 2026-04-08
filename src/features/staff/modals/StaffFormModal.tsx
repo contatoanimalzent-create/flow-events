@@ -76,7 +76,7 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
         <>
           <ModalBody>
             <div className="mb-6 rounded-[24px] border border-bg-border bg-bg-secondary/55 p-4">
-              <div className="text-[11px] uppercase tracking-[0.28em] text-[#ae936f]">Ordem recomendada</div>
+              <div className="text-[11px] uppercase tracking-[0.28em] text-[#4285F4]">Ordem recomendada</div>
               <div className="mt-3 grid gap-3 md:grid-cols-3">
                 <div className="text-sm leading-6 text-text-secondary">1. Preencha dados basicos para identificar a pessoa.</div>
                 <div className="text-sm leading-6 text-text-secondary">2. Defina funcao, area, turno e portaria de trabalho.</div>

@@ -150,7 +150,7 @@ function buildFallbackReply(query: string, section: NavSection) {
 }
 
 function getConversationStorageKey(organizationId?: string | null) {
-  return `animalz-operational-ai-thread:${organizationId ?? 'global'}`
+  return `pulse-operational-ai-thread:${organizationId ?? 'global'}`
 }
 
 function createConversationId() {
@@ -296,8 +296,8 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
         className={cn(
           'fixed bottom-5 right-5 z-40 inline-flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-medium shadow-[0_26px_80px_rgba(0,0,0,0.45)] transition-all duration-300',
           open
-            ? 'border-[#ae936f]/30 bg-[#181412] text-[#ebe7e0]'
-            : 'border-[#d62a0b]/25 bg-[#d62a0b] text-[#090807] hover:-translate-y-0.5',
+            ? 'border-[#4285F4]/30 bg-[#181412] text-[#ebe7e0]'
+            : 'border-[#0057E7]/25 bg-[#0057E7] text-[#090807] hover:-translate-y-0.5',
         )}
       >
         {open ? <X className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -309,7 +309,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
           <div className="border-b border-white/6 px-5 py-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.34em] text-[#ae936f]">
+                <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.34em] text-[#4285F4]">
                   <Sparkles className="h-3.5 w-3.5" />
                   Assistente operacional
                 </div>
@@ -338,7 +338,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                   type="button"
                   onClick={() => void askAssistant(prompt)}
                   disabled={isLoading}
-                  className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-xs font-medium text-[#b8b0a8] transition-all hover:border-[#ae936f]/25 hover:text-[#ebe7e0] disabled:opacity-45"
+                  className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-xs font-medium text-[#b8b0a8] transition-all hover:border-[#4285F4]/25 hover:text-[#ebe7e0] disabled:opacity-45"
                 >
                   {prompt}
                 </button>
@@ -352,10 +352,10 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                   'rounded-[1.5rem] border px-4 py-4 text-sm leading-6',
                   message.role === 'assistant'
                     ? 'border-white/8 bg-white/[0.03] text-[#ebe7e0]'
-                    : 'ml-8 border-[#d62a0b]/18 bg-[#d62a0b]/10 text-[#f3dfd8]',
+                    : 'ml-8 border-[#0057E7]/18 bg-[#0057E7]/10 text-[#f3dfd8]',
                 )}
               >
-                <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] text-[#ae936f]">
+                <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] text-[#4285F4]">
                   {message.role === 'assistant' ? <Bot className="h-3.5 w-3.5" /> : <MessageSquare className="h-3.5 w-3.5" />}
                   {message.role === 'assistant' ? 'AI' : 'Voce'}
                 </div>
@@ -370,7 +370,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                         key={`${message.id}-${action.section}`}
                         type="button"
                         onClick={() => onNavigate(action.section)}
-                        className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-xs font-medium text-[#ebe7e0] transition-all hover:border-[#ae936f]/25"
+                        className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-xs font-medium text-[#ebe7e0] transition-all hover:border-[#4285F4]/25"
                       >
                         {action.label}
                         <ArrowRight className="h-3.5 w-3.5" />
@@ -384,7 +384,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
             {isLoading ? (
               <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] px-4 py-4 text-sm text-[#ebe7e0]">
                 <div className="flex items-center gap-3">
-                  <Loader2 className="h-4 w-4 animate-spin text-[#ae936f]" />
+                  <Loader2 className="h-4 w-4 animate-spin text-[#4285F4]" />
                   Pensando com base no contexto do app e nas memorias anteriores...
                 </div>
               </div>
@@ -408,7 +408,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                 type="button"
                 onClick={() => void handleSubmit()}
                 disabled={isLoading}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#d62a0b] text-[#090807] transition-all hover:-translate-y-0.5 disabled:opacity-45"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#0057E7] text-[#090807] transition-all hover:-translate-y-0.5 disabled:opacity-45"
               >
                 <Send className="h-4 w-4" />
               </button>

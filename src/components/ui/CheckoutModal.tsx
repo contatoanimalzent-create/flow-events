@@ -176,52 +176,51 @@ export function CheckoutModal({ eventId, eventName, ticketType, onClose }: Check
     setStep('payment')
   }
 
-  // Stripe Elements appearance — matches app dark theme
+  // Stripe Elements appearance — matches Pulse light theme
   const appearance: Parameters<typeof Elements>[0]['options'] = {
     appearance: {
-      theme: 'night',
+      theme: 'stripe',
       variables: {
-        colorPrimary:          '#d62a0b',
-        colorBackground:       '#1a1a1a',
-
-        colorText:             '#f5f5f0',
-        colorTextSecondary:    '#6b6b6b',
-        colorTextPlaceholder:  '#4a4a4a',
-        colorDanger:           '#FF5A6B',
-        borderRadius:          '2px',
-        fontFamily:            'DM Sans, system-ui, sans-serif',
+        colorPrimary:          '#0057E7',
+        colorBackground:       '#FFFFFF',
+        colorText:             '#0A0A0A',
+        colorTextSecondary:    '#44475A',
+        colorTextPlaceholder:  '#9CA3AF',
+        colorDanger:           '#EF4444',
+        borderRadius:          '8px',
+        fontFamily:            'Inter, system-ui, sans-serif',
         fontSizeBase:          '14px',
         spacingUnit:           '4px',
-        colorIconTab:          '#6b6b6b',
-        colorIconTabSelected:  '#d62a0b',
+        colorIconTab:          '#9CA3AF',
+        colorIconTabSelected:  '#0057E7',
       },
       rules: {
         '.Input': {
-          border:          '1px solid #242424',
-          backgroundColor: '#1a1a1a',
+          border:          '1px solid #E5E7EB',
+          backgroundColor: '#FFFFFF',
           boxShadow:       'none',
           padding:         '10px 14px',
         },
         '.Input:focus': {
-          border:    '1px solid rgba(214,42,11,0.4)',
-          boxShadow: '0 0 0 1px rgba(214,42,11,0.15)',
+          border:    '1px solid rgba(0,87,231,0.5)',
+          boxShadow: '0 0 0 3px rgba(0,87,231,0.12)',
         },
         '.Label': {
           fontSize:      '10px',
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
-          color:         '#6b6b6b',
+          color:         '#9CA3AF',
           marginBottom:  '6px',
         },
         '.Tab': {
-          border:          '1px solid #242424',
-          backgroundColor: '#141414',
+          border:          '1px solid #E5E7EB',
+          backgroundColor: '#F7F8FA',
         },
         '.Tab--selected': {
-          border:          '1px solid rgba(214,42,11,0.4)',
-          backgroundColor: 'rgba(214,42,11,0.05)',
+          border:          '1px solid rgba(0,87,231,0.4)',
+          backgroundColor: 'rgba(0,87,231,0.05)',
         },
-        '.Tab:hover': { border: '1px solid rgba(214,42,11,0.2)' },
+        '.Tab:hover': { border: '1px solid rgba(0,87,231,0.2)' },
       },
     },
   }

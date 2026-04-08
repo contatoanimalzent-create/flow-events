@@ -20,23 +20,23 @@ export function DashboardRevenueChart({ data }: DashboardRevenueChartProps) {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="grossRevenueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#d62a0b" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#d62a0b" stopOpacity={0} />
+                <stop offset="5%" stopColor="#0057E7" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#0057E7" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="netRevenueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ae936f" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#ae936f" stopOpacity={0} />
+                <stop offset="5%" stopColor="#4285F4" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#4285F4" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#202020" />
-            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#727272' }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: '#727272' }} axisLine={false} tickLine={false} tickFormatter={(value) => `R$${Math.round(Number(value) / 1000)}k`} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={(value) => `R$${Math.round(Number(value) / 1000)}k`} />
             <Tooltip
               formatter={(value: number, name: string) => [formatCurrency(value), name === 'grossRevenue' ? 'Receita bruta' : 'Receita liquida']}
-              contentStyle={{ backgroundColor: '#111111', border: '1px solid #262626', borderRadius: '8px' }}
+              contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '8px', color: '#0A0A0A' }}
             />
-            <Area type="monotone" dataKey="grossRevenue" stroke="#d62a0b" fill="url(#grossRevenueGradient)" strokeWidth={2} />
-            <Area type="monotone" dataKey="netRevenue" stroke="#ae936f" fill="url(#netRevenueGradient)" strokeWidth={2} />
+            <Area type="monotone" dataKey="grossRevenue" stroke="#0057E7" fill="url(#grossRevenueGradient)" strokeWidth={2} />
+            <Area type="monotone" dataKey="netRevenue" stroke="#4285F4" fill="url(#netRevenueGradient)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       )}

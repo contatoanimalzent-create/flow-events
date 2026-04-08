@@ -33,7 +33,7 @@ export function PremiumEventCard({
       <a
         href={`/e/${event.slug}`}
         aria-label={event.name}
-        className="group relative block h-full min-h-[26rem] overflow-hidden rounded-2xl border border-white/8 bg-[#12100f] transition-all duration-500 hover:border-[#ae936f]/20"
+        className="group relative block h-full min-h-[26rem] overflow-hidden rounded-2xl border border-white/8 bg-[#12100f] transition-all duration-500 hover:border-[#4285F4]/20"
       >
         <img
           src={coverImage}
@@ -45,7 +45,7 @@ export function PremiumEventCard({
 
         <div className="absolute left-4 top-4 z-10">
           {event.category ? (
-            <span className="inline-flex items-center rounded-full bg-[#ae936f]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#ae936f] backdrop-blur-sm">
+            <span className="inline-flex items-center rounded-full bg-[#4285F4]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#4285F4] backdrop-blur-sm">
               {event.category}
             </span>
           ) : null}
@@ -78,7 +78,7 @@ export function PremiumEventCard({
                   ? isPortuguese ? 'Acesso livre' : 'Free access'
                   : `${isPortuguese ? 'A partir de' : 'From'} ${formatPublicCurrency(event.minPrice, locale)}`}
             </span>
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all group-hover:border-[#ae936f]/30 group-hover:text-[#ae936f]">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all group-hover:border-[#4285F4]/30 group-hover:text-[#4285F4]">
               <ArrowUpRight className="h-4 w-4" />
             </span>
           </div>

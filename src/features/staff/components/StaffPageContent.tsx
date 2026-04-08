@@ -103,14 +103,14 @@ export function StaffPageContent() {
           },
         ].map((item) => (
           <div key={item.title} className="card p-5">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">{item.title}</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#4285F4]">{item.title}</div>
             <p className="mt-4 text-sm leading-7 text-text-secondary">{item.description}</p>
           </div>
         ))}
       </div>
 
       <div className="card p-5">
-        <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">Quando usar este modulo</div>
+        <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Quando usar este modulo</div>
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
           <div>
             <div className="font-medium text-text-primary">Staff</div>

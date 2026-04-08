@@ -143,20 +143,20 @@ export function InventoryPage() {
 
         <div className="grid gap-3 md:grid-cols-2">
           <div className="card p-5">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">Papel do modulo</div>
-            <div className="mt-4 font-display text-[2rem] leading-none text-[#ebe7e0]">Disponibilidade real.</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Papel do modulo</div>
+            <div className="mt-4 font-display text-[2rem] leading-none text-text-primary">Disponibilidade real.</div>
             <p className="mt-4 text-sm leading-7 text-text-muted">
               Leia o que precisa de reposicao, o que ja travou a operacao e quanto capital esta parado no estoque.
             </p>
           </div>
           <div className="card p-5">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">Nao confundir</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Nao confundir</div>
             <div className="mt-4 flex items-center gap-3 text-sm text-text-secondary">
-              <Warehouse className="h-4 w-4 text-[#ae936f]" />
+              <Warehouse className="h-4 w-4 text-[#0057E7]" />
               Estoque controla.
             </div>
             <div className="mt-3 flex items-center gap-3 text-sm text-text-secondary">
-              <ArrowRight className="h-4 w-4 text-[#d62a0b]" />
+              <ArrowRight className="h-4 w-4 text-[#0057E7]" />
               PDV vende.
             </div>
           </div>
@@ -174,8 +174,8 @@ export function InventoryPage() {
               className={cn(
                 'rounded-full px-4 py-2 text-xs font-medium transition-all',
                 selectedEventId === event.id
-                  ? 'bg-brand-acid text-[#090807]'
-                  : 'border border-white/8 text-text-secondary hover:text-text-primary',
+                  ? 'bg-brand-primary text-white'
+                  : 'border border-bg-border text-text-secondary hover:text-text-primary',
               )}
             >
               {event.name}
@@ -230,8 +230,8 @@ export function InventoryPage() {
               className={cn(
                 'rounded-full px-4 py-2 text-xs font-medium transition-all',
                 statusFilter === item.key
-                  ? 'bg-brand-acid text-[#090807]'
-                  : 'border border-white/8 text-text-secondary hover:text-text-primary',
+                  ? 'bg-brand-primary text-white'
+                  : 'border border-bg-border text-text-secondary hover:text-text-primary',
               )}
             >
               {item.label}

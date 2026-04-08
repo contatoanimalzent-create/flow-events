@@ -67,7 +67,7 @@ export function HelpPage() {
       </div>
 
       <div className="mb-6 card p-6">
-        <div className="text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">{t('Operational AI', 'AI operacional')}</div>
+        <div className="text-[11px] uppercase tracking-[0.32em] text-[#4285F4]">{t('Operational AI', 'AI operacional')}</div>
         <h2 className="mt-3 font-display text-3xl leading-none text-text-primary">
           {t('Help inside every module.', 'Ajuda dentro de cada modulo.')}
         </h2>
@@ -161,7 +161,7 @@ export function HelpPage() {
             {t('Contact support', 'Falar com suporte')}
           </a>
           <a
-            href="https://docs.animalz.events"
+            href="https://docs.pulse.events"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-full border border-bg-border px-6 py-3 text-sm font-medium text-text-primary transition-all hover:bg-bg-border"

@@ -25,7 +25,7 @@ export function PremiumSection({
         {eyebrow || title || description ? (
           <PublicReveal className={cn('mb-10 max-w-3xl', align === 'center' && 'mx-auto text-center')}>
             {eyebrow ? (
-              <div className="mb-4 text-[11px] uppercase tracking-[0.32em] text-[#ae936f]">
+              <div className="mb-4 text-[11px] uppercase tracking-[0.32em] text-[#4285F4]">
                 {eyebrow}
               </div>
             ) : null}

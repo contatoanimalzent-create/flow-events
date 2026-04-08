@@ -11,7 +11,7 @@ export function EventManifestSection({ event }: EventManifestSectionProps) {
       <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <PublicReveal>
           <div className="max-w-xl">
-            <div className="text-[11px] uppercase tracking-[0.34em] text-[#ae936f]">Manifesto</div>
+            <div className="text-[11px] uppercase tracking-[0.34em] text-[#4285F4]">Manifesto</div>
             <h2 className="mt-5 font-display text-[clamp(2.8rem,4.5vw,4.5rem)] font-semibold leading-[0.9] tracking-[-0.04em] text-[#f0ebe2]">
               Uma experiencia pensada para ser sentida antes mesmo da chegada.
             </h2>

@@ -160,12 +160,7 @@ export function EventsPublicHeader({
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className={cn(
-                'inline-flex h-10 w-10 items-center justify-center rounded-full border transition-all',
-                isScrolled
-                  ? 'border-[#E5E7EB] bg-white text-[#44475A] hover:border-[#D1D5DB] hover:text-[#0A0A0A]'
-                  : 'border-white/10 bg-white/[0.03] text-white/72 hover:border-white/20 hover:text-white',
-              )}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/72 transition-all hover:border-white/20 hover:text-white"
             >
               <Menu className="h-4 w-4" />
             </button>

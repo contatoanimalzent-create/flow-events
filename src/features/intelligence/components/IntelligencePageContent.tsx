@@ -85,7 +85,7 @@ export function IntelligencePageContent() {
             onClick={() => dashboard.setSelectedEventId('all')}
             className={cn(
               'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-              dashboard.selectedEventId === 'all' ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+              dashboard.selectedEventId === 'all' ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
             )}
           >
             Todos
@@ -96,7 +96,7 @@ export function IntelligencePageContent() {
               onClick={() => dashboard.setSelectedEventId(event.id)}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                dashboard.selectedEventId === event.id ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                dashboard.selectedEventId === event.id ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               {event.name}
@@ -112,7 +112,7 @@ export function IntelligencePageContent() {
               onClick={() => dashboard.setStatusFilter('all')}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                dashboard.statusFilter === 'all' ? 'bg-brand-blue text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                dashboard.statusFilter === 'all' ? 'bg-brand-blue text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               Todos status
@@ -123,7 +123,7 @@ export function IntelligencePageContent() {
                 onClick={() => dashboard.setStatusFilter(key as keyof typeof INTELLIGENCE_ALERT_STATUS_LABELS)}
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                  dashboard.statusFilter === key ? 'bg-brand-blue text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                  dashboard.statusFilter === key ? 'bg-brand-blue text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
                 )}
               >
                 {label}
@@ -136,7 +136,7 @@ export function IntelligencePageContent() {
               onClick={() => dashboard.setSeverityFilter('all')}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                dashboard.severityFilter === 'all' ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                dashboard.severityFilter === 'all' ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               Todas severidades
@@ -147,7 +147,7 @@ export function IntelligencePageContent() {
                 onClick={() => dashboard.setSeverityFilter(key as keyof typeof INTELLIGENCE_ALERT_SEVERITY_LABELS)}
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                  dashboard.severityFilter === key ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                  dashboard.severityFilter === key ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
                 )}
               >
                 {label}
@@ -160,7 +160,7 @@ export function IntelligencePageContent() {
               onClick={() => dashboard.setTypeFilter('all')}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                dashboard.typeFilter === 'all' ? 'bg-brand-purple text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                dashboard.typeFilter === 'all' ? 'bg-brand-purple text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               Todos tipos
@@ -171,7 +171,7 @@ export function IntelligencePageContent() {
                 onClick={() => dashboard.setTypeFilter(key as keyof typeof INTELLIGENCE_ALERT_TYPE_LABELS)}
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                  dashboard.typeFilter === key ? 'bg-brand-purple text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                  dashboard.typeFilter === key ? 'bg-brand-purple text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
                 )}
               >
                 {label}

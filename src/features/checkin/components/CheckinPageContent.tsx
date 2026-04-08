@@ -96,7 +96,7 @@ export function CheckinPageContent() {
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                   selectedEventId === item.id
-                    ? 'bg-brand-acid text-bg-primary'
+                    ? 'bg-brand-acid text-white'
                     : 'border border-bg-border text-text-muted hover:text-text-primary',
                 )}
               >
@@ -116,7 +116,7 @@ export function CheckinPageContent() {
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                 selectedGateId === 'all'
-                  ? 'bg-brand-acid text-bg-primary'
+                  ? 'bg-brand-acid text-white'
                   : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
@@ -129,7 +129,7 @@ export function CheckinPageContent() {
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                   selectedGateId === gate.id
-                    ? 'bg-brand-acid text-bg-primary'
+                    ? 'bg-brand-acid text-white'
                     : 'border border-bg-border text-text-muted hover:text-text-primary',
                 )}
               >

@@ -136,7 +136,7 @@ export function StaffPageContent() {
               onClick={() => setSelectedEventId(event.id)}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                selectedEventId === event.id ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                selectedEventId === event.id ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               {event.name}
@@ -164,7 +164,7 @@ export function StaffPageContent() {
               onClick={() => setStatusFilter(status)}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                statusFilter === status ? 'bg-brand-acid text-bg-primary' : 'border border-transparent text-text-muted hover:border-bg-border hover:text-text-primary',
+                statusFilter === status ? 'bg-brand-acid text-white' : 'border border-transparent text-text-muted hover:border-bg-border hover:text-text-primary',
               )}
             >
               {status === 'all' ? 'Todos' : STAFF_STATUS_CONFIG[status].label}

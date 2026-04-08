@@ -203,7 +203,7 @@ export function MediaStockBrowser({ defaultType = 'image', onSelect }: MediaStoc
                   {isSelected && (
                     <div className="absolute inset-0 flex items-center justify-center bg-brand-acid/20">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-acid">
-                        <Check className="h-4 w-4 text-bg-primary" />
+                        <Check className="h-4 w-4 text-white" />
                       </div>
                     </div>
                   )}

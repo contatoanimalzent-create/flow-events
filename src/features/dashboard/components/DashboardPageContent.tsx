@@ -61,7 +61,7 @@ export function DashboardPageContent() {
               onClick={() => dashboard.setPeriod(value)}
               className={cn(
               'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-                dashboard.period === value ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                dashboard.period === value ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               {label}

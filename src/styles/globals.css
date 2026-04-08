@@ -43,11 +43,11 @@
 
     --color-primary: #0057E7;
     --color-primary-light: #4285F4;
-    --color-background: #FFFFFF;
-    --color-surface: #F7F8FA;
-    --color-text-primary: #0A0A0A;
-    --color-text-secondary: #44475A;
-    --color-border: #E5E7EB;
+    --color-background: #0A0A0A;
+    --color-surface: #111111;
+    --color-text-primary: rgba(255,255,255,0.92);
+    --color-text-secondary: rgba(255,255,255,0.60);
+    --color-border: rgba(255,255,255,0.10);
     --color-highlight: #0A1AFF;
     --radius-sm: 4px;
     --radius-md: 8px;
@@ -73,18 +73,18 @@
     --pulse-color-border: rgba(255,255,255,0.07);
     --pulse-color-primary-base: var(--pulse-color-primary);
     --pulse-color-primary-accent: var(--pulse-color-primary-soft);
-    --pulse-surface-base: #FFFFFF;
+    --pulse-surface-base: #111111;
     --pulse-surface-muted: var(--pulse-color-surface);
     --pulse-surface-accent: rgba(66, 133, 244, 0.08);
-    --pulse-surface-elevated: #FFFFFF;
+    --pulse-surface-elevated: #1A1A1A;
     --pulse-overlay-soft: rgba(66, 133, 244, 0.14);
     --pulse-overlay-backdrop: rgba(0, 87, 231, 0.72);
     --pulse-color-text-inverse: #FFFFFF;
-    --pulse-color-text-muted: #44475A;
+    --pulse-color-text-muted: rgba(255,255,255,0.38);
     --pulse-color-text-on-accent: #FFFFFF;
-    --pulse-input-background: #FFFFFF;
+    --pulse-input-background: rgba(255,255,255,0.04);
     --pulse-input-muted: var(--pulse-color-surface);
-    --pulse-input-placeholder: #44475A;
+    --pulse-input-placeholder: rgba(255,255,255,0.30);
     --pulse-focus-ring: rgba(66, 133, 244, 0.18);
     --pulse-button-primary-bg: var(--pulse-color-primary);
     --pulse-button-primary-hover: var(--pulse-color-primary-soft);
@@ -288,7 +288,7 @@
 
   .admin-header {
     @apply reveal grid gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start;
-    border-color: #E5E7EB;
+    border-color: rgba(255,255,255,0.08);
   }
 
   .admin-title {
@@ -312,20 +312,20 @@
   .admin-filterbar,
   .admin-action-bar {
     @apply flex flex-wrap items-center justify-between gap-3 px-4 py-3;
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
   }
 
   .admin-filter-chip {
     @apply rounded-full border border-transparent px-3.5 py-1.5 text-xs font-medium transition-all;
-    color: #44475A;
+    color: rgba(255,255,255,0.50);
   }
   .admin-filter-chip:hover {
-    background: #F7F8FA;
-    border-color: #E5E7EB;
-    color: #0A0A0A;
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.10);
+    color: rgba(255,255,255,0.85);
   }
   .admin-filter-chip-active {
     background: rgba(0,87,231,0.08);
@@ -333,8 +333,8 @@
     border-color: rgba(0,87,231,0.22) !important;
   }
 
-  .admin-tab        { @apply rounded-full px-4 py-2 text-sm font-medium transition-all; color: #44475A; }
-  .admin-tab:hover  { color: #0A0A0A; background: #F7F8FA; }
+  .admin-tab        { @apply rounded-full px-4 py-2 text-sm font-medium transition-all; color: rgba(255,255,255,0.50); }
+  .admin-tab:hover  { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
   .admin-tab-active {
     background: #0057E7;
     color: #FFFFFF !important;
@@ -353,16 +353,16 @@
   }
 
   .card-hover {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    box-shadow: none;
     transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
   }
   .card-hover:hover {
-    border-color: #D1D5DB;
+    border-color: rgba(255,255,255,0.12);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   }
 
   /* Dark card — for admin pages */
@@ -376,16 +376,16 @@
     border-color: rgba(255,255,255,0.10);
   }
   .card-dark-hover {
-    background: #F7F8FA;
-    border: 1px solid #E5E7EB;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: none;
     transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
   }
   .card-dark-hover:hover {
-    border-color: #D1D5DB;
+    border-color: rgba(255,255,255,0.14);
     transform: translateY(-3px);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
   }
 
   /* Metric / KPI card */
@@ -404,19 +404,19 @@
 
   .stat-card   { @apply card p-5 flex flex-col gap-2; }
   .stat-value  { @apply text-3xl font-semibold; color: #FFFFFF; }
-  .stat-label  { @apply text-[11px] uppercase tracking-[0.26em]; color: #44475A; }
+  .stat-label  { @apply text-[11px] uppercase tracking-[0.26em]; color: rgba(255,255,255,0.38); }
   .stat-change-up   { @apply text-xs font-medium; color: #22C55E; }
   .stat-change-down { @apply text-xs font-medium; color: #EF4444; }
 
-  .metric-label { @apply text-[10px] uppercase tracking-[0.34em]; color: #44475A; }
-  .metric-value { @apply mt-5 font-display text-[2.6rem] font-semibold leading-none tracking-[-0.03em]; color: #0A0A0A; }
+  .metric-label { @apply text-[10px] uppercase tracking-[0.34em]; color: rgba(255,255,255,0.38); }
+  .metric-value { @apply mt-5 font-display text-[2.6rem] font-semibold leading-none tracking-[-0.03em]; color: #FFFFFF; }
   .metric-icon  {
     @apply flex h-10 w-10 items-center justify-center rounded-full;
     background: rgba(0,87,231,0.08);
     border: 1px solid rgba(0,87,231,0.18);
     color: #0057E7;
   }
-  .metric-helper { color: #44475A; }
+  .metric-helper { color: rgba(255,255,255,0.38); }
   .metric-trend  { color: #0057E7; }
 
   /* Surface panels */
@@ -570,13 +570,13 @@
   .nav-item {
     @apply flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all;
     border-radius: 8px;
-    color: #44475A;
+    color: rgba(255,255,255,0.50);
     border: 1px solid transparent;
   }
   .nav-item:hover {
-    background: #F7F8FA;
-    border-color: #E5E7EB;
-    color: #0A0A0A;
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.85);
   }
   .nav-item-active {
     @apply nav-item;
@@ -900,7 +900,7 @@
   }
 
   .skeleton {
-    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.6s linear infinite;
     border-radius: 8px;

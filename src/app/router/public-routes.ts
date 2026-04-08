@@ -23,6 +23,7 @@ export function getInitialPublicRoute(): PublicRoute {
   if (path === '/events') return 'events'
   if (path === '/create-event') return 'create-event'
   if (path === '/me' || path === '/account') return 'account'
+  if (path === '/login') return 'login'
   if (path === '/signup' || path === '/register') return 'signup'
 
   const eventMatch = path.match(/^\/e\/([^/]+)/)

@@ -58,7 +58,7 @@ export function CrmPageContent() {
             onClick={() => dashboard.setSelectedEventId('all')}
             className={cn(
               'rounded-sm px-3 py-2 text-xs font-medium transition-all',
-              dashboard.selectedEventId === 'all' ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+              dashboard.selectedEventId === 'all' ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
             )}
           >
             Todos eventos
@@ -69,7 +69,7 @@ export function CrmPageContent() {
               onClick={() => dashboard.setSelectedEventId(event.id)}
               className={cn(
                 'rounded-sm px-3 py-2 text-xs font-medium transition-all',
-                dashboard.selectedEventId === event.id ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                dashboard.selectedEventId === event.id ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               {event.name}
@@ -84,7 +84,7 @@ export function CrmPageContent() {
             onClick={() => dashboard.setStatusFilter('all')}
             className={cn(
               'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-              dashboard.statusFilter === 'all' ? 'bg-brand-blue text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+              dashboard.statusFilter === 'all' ? 'bg-brand-blue text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
             )}
           >
             Todos status
@@ -95,7 +95,7 @@ export function CrmPageContent() {
               onClick={() => dashboard.setStatusFilter(key as keyof typeof CRM_CUSTOMER_STATUS_LABELS)}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                dashboard.statusFilter === key ? 'bg-brand-blue text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                dashboard.statusFilter === key ? 'bg-brand-blue text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               {label}
@@ -110,7 +110,7 @@ export function CrmPageContent() {
               onClick={() => dashboard.setPeriodFilter(key as keyof typeof CRM_PERIOD_FILTER_LABELS)}
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
-                dashboard.periodFilter === key ? 'bg-brand-purple text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                dashboard.periodFilter === key ? 'bg-brand-purple text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
               )}
             >
               {label}

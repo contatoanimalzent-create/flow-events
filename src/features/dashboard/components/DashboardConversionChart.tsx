@@ -17,10 +17,10 @@ export function DashboardConversionChart({ data }: DashboardConversionChartProps
       ) : (
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} interval={0} angle={-15} textAnchor="end" height={60} />
-            <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-            <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, 'Conversao']} contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '8px', color: '#0A0A0A' }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.4)' }} axisLine={false} tickLine={false} interval={0} angle={-15} textAnchor="end" height={60} />
+            <YAxis tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.4)' }} axisLine={false} tickLine={false} />
+            <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, 'Conversao']} contentStyle={{ backgroundColor: '#1A1A1A', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', color: '#FFFFFF' }} />
             <Bar dataKey="conversionRate" fill="#0057E7" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>

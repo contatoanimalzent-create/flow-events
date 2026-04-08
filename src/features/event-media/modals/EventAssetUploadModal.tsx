@@ -120,7 +120,7 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
               className={cn(
                 'flex flex-1 items-center justify-center gap-2 rounded-[16px] px-4 py-2.5 text-xs font-medium transition-all',
                 source === key
-                  ? 'bg-text-primary text-bg-primary shadow-sm'
+                  ? 'bg-text-primary text-white shadow-sm'
                   : 'text-text-muted hover:text-text-primary',
               )}
             >

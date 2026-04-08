@@ -2,7 +2,7 @@ import { Zap } from 'lucide-react'
 
 export function LoadingScreen() {
   return (
-    <div className="h-screen bg-white flex flex-col items-center justify-center gap-4">
+    <div className="h-screen bg-[#050505] flex flex-col items-center justify-center gap-4">
       <div className="w-12 h-12 rounded-2xl bg-[#0057E7] flex items-center justify-center">
         <Zap className="w-6 h-6 text-white" />
       </div>

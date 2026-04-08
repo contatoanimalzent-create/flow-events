@@ -194,7 +194,7 @@ export function SponsorsPage() {
               className={cn(
                 'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                 statusFilter === status
-                  ? 'bg-brand-acid text-bg-primary'
+                  ? 'bg-brand-acid text-white'
                   : 'border border-transparent text-text-muted hover:border-bg-border hover:text-text-primary',
               )}
             >

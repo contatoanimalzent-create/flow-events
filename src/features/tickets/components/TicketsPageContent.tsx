@@ -75,7 +75,7 @@ export function TicketsPageContent() {
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                   selectedEventId === event.id
-                    ? 'bg-brand-acid text-bg-primary'
+                    ? 'bg-brand-acid text-white'
                     : 'border border-bg-border text-text-muted hover:border-brand-acid/30 hover:text-text-primary',
                 )}
               >

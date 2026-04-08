@@ -175,13 +175,13 @@ export function SuppliersPage() {
         <span className="text-xs text-text-muted font-mono">EVENTO:</span>
         <button onClick={() => setSelectedEventId('all')}
           className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all',
-            selectedEventId === 'all' ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary')}>
+            selectedEventId === 'all' ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary')}>
           Todos
         </button>
         {events.map(e => (
           <button key={e.id} onClick={() => setSelectedEventId(e.id)}
             className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all',
-              selectedEventId === e.id ? 'bg-brand-acid text-bg-primary' : 'border border-bg-border text-text-muted hover:text-text-primary')}>
+              selectedEventId === e.id ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary')}>
             {e.name}
           </button>
         ))}
@@ -234,7 +234,7 @@ export function SuppliersPage() {
           {(['all', 'prospect', 'negotiating', 'contracted', 'confirmed', 'active', 'finished', 'cancelled'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               className={cn('px-3 py-1.5 rounded-sm text-xs font-medium transition-all',
-                statusFilter === s ? 'bg-brand-acid text-bg-primary' :
+                statusFilter === s ? 'bg-brand-acid text-white' :
                   'text-text-muted hover:text-text-primary border border-transparent hover:border-bg-border')}>
               {s === 'all' ? 'Todos' : STATUS_CONFIG[s as SupplierStatus].label}
             </button>

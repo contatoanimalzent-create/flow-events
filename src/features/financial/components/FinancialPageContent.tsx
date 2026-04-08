@@ -178,7 +178,7 @@ export function FinancialPageContent() {
                 className={cn(
                   'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                   dashboard.selectedEventId === 'all'
-                    ? 'bg-brand-acid text-bg-primary'
+                    ? 'bg-brand-acid text-white'
                     : 'border border-bg-border text-text-muted hover:text-text-primary',
                 )}
               >
@@ -191,7 +191,7 @@ export function FinancialPageContent() {
                   className={cn(
                     'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                     dashboard.selectedEventId === event.id
-                      ? 'bg-brand-acid text-bg-primary'
+                      ? 'bg-brand-acid text-white'
                       : 'border border-bg-border text-text-muted hover:text-text-primary',
                   )}
                 >
@@ -341,7 +341,7 @@ export function FinancialPageContent() {
                     className={cn(
                       'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                       dashboard.categoryFilter === 'all'
-                        ? 'bg-brand-acid text-bg-primary'
+                        ? 'bg-brand-acid text-white'
                         : 'border border-bg-border text-text-muted hover:text-text-primary',
                     )}
                   >
@@ -354,7 +354,7 @@ export function FinancialPageContent() {
                       className={cn(
                         'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                         dashboard.categoryFilter === key
-                          ? 'bg-brand-acid text-bg-primary'
+                          ? 'bg-brand-acid text-white'
                           : 'border border-bg-border text-text-muted hover:text-text-primary',
                       )}
                     >
@@ -369,7 +369,7 @@ export function FinancialPageContent() {
                     className={cn(
                       'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                       dashboard.statusFilter === 'all'
-                        ? 'bg-brand-blue text-bg-primary'
+                        ? 'bg-brand-blue text-white'
                         : 'border border-bg-border text-text-muted hover:text-text-primary',
                     )}
                   >
@@ -382,7 +382,7 @@ export function FinancialPageContent() {
                       className={cn(
                         'rounded-sm px-3 py-1.5 text-xs font-medium transition-all',
                         dashboard.statusFilter === key
-                          ? 'bg-brand-blue text-bg-primary'
+                          ? 'bg-brand-blue text-white'
                           : 'border border-bg-border text-text-muted hover:text-text-primary',
                       )}
                     >

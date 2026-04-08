@@ -68,12 +68,12 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
       <section className="px-5 pb-8 pt-6 md:px-8 lg:px-10 lg:pb-10 lg:pt-8">
         <div className="mx-auto max-w-[1540px]">
           <PublicReveal>
-            <div className="grid gap-6 rounded-[2.6rem] border border-white/8 bg-[linear-gradient(135deg,rgba(92,30,178,0.16)_0%,rgba(11,13,18,0.98)_36%,rgba(199,155,68,0.1)_100%)] px-8 py-10 shadow-[0_28px_90px_rgba(0,0,0,0.3)] lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-end">
+            <div className="grid gap-6 rounded-[2.6rem] border border-white/8 bg-[linear-gradient(135deg,rgba(0,87,231,0.16)_0%,rgba(11,13,18,0.98)_36%,rgba(66,133,244,0.08)_100%)] px-8 py-10 shadow-[0_28px_90px_rgba(0,0,0,0.3)] lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-end">
               <div className="max-w-4xl">
-                <div className="text-[11px] uppercase tracking-[0.34em] text-[#d8c39a]">
+                <div className="text-[11px] uppercase tracking-[0.34em] text-[#4285F4]">
                   {isPortuguese ? 'Catalogo operacional de eventos' : 'Operational event catalog'}
                 </div>
-                <h1 className="mt-5 font-display text-[clamp(3.6rem,8vw,6.8rem)] uppercase leading-[0.84] tracking-[-0.04em] text-[#fff8ef]">
+                <h1 className="mt-5 font-display text-[clamp(3.6rem,8vw,6.8rem)] uppercase leading-[0.84] tracking-[-0.04em] text-[#FFFFFF]">
                   {isPortuguese ? 'Descubra e compre sem cair em um marketplace comum.' : 'Discover and buy without falling into a generic marketplace.'}
                 </h1>
                 <p className="mt-5 max-w-3xl text-base leading-8 text-white/62 md:text-lg">
@@ -91,7 +91,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                 ].map((item) => (
                   <div key={item.label} className="rounded-[1.6rem] border border-white/8 bg-black/20 p-5">
                     <div className="text-[10px] uppercase tracking-[0.28em] text-white/40">{item.label}</div>
-                    <div className="mt-3 font-display text-[2rem] uppercase tracking-[-0.04em] text-[#fff8ef]">
+                    <div className="mt-3 font-display text-[2rem] uppercase tracking-[-0.04em] text-[#FFFFFF]">
                       {item.value}
                     </div>
                   </div>
@@ -164,10 +164,10 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                     <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,7,10,0.96)_0%,rgba(6,7,10,0.84)_42%,rgba(6,7,10,0.28)_78%,rgba(6,7,10,0.12)_100%)]" />
                     <div className="relative z-10 grid gap-8 p-8 md:p-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:p-12">
                       <div className="max-w-3xl">
-                        <div className="inline-flex rounded-full border border-[#c79b44]/22 bg-[#c79b44]/8 px-4 py-2 text-[10px] uppercase tracking-[0.28em] text-[#d8c39a]">
+                        <div className="inline-flex rounded-full border border-[#4285F4]/22 bg-[#4285F4]/8 px-4 py-2 text-[10px] uppercase tracking-[0.28em] text-[#4285F4]">
                           {isPortuguese ? 'Evento em destaque' : 'Featured event'}
                         </div>
-                        <h2 className="mt-6 font-display text-[clamp(3rem,6vw,5.2rem)] uppercase leading-[0.86] tracking-[-0.05em] text-[#fff8ef]">
+                        <h2 className="mt-6 font-display text-[clamp(3rem,6vw,5.2rem)] uppercase leading-[0.86] tracking-[-0.05em] text-[#FFFFFF]">
                           {featuredEvent.name}
                         </h2>
                         <p className="mt-5 max-w-2xl text-base leading-8 text-white/64">
@@ -175,7 +175,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                         </p>
                         <div className="mt-8 flex flex-wrap items-center gap-5 text-sm text-white/72">
                           <span className="inline-flex items-center gap-2">
-                            <CalendarDays className="h-4 w-4 text-[#c79b44]" />
+                            <CalendarDays className="h-4 w-4 text-[#4285F4]" />
                             {formatPublicDate(featuredEvent.starts_at, locale, {
                               day: '2-digit',
                               month: 'long',
@@ -183,7 +183,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                             })}
                           </span>
                           <span className="inline-flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-[#c79b44]" />
+                            <MapPin className="h-4 w-4 text-[#4285F4]" />
                             {[featuredEvent.venue_name, featuredEvent.city].filter(Boolean).join(' / ')}
                           </span>
                         </div>
@@ -194,7 +194,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                           <div className="text-[10px] uppercase tracking-[0.24em] text-white/42">
                             {isPortuguese ? 'Ticketing' : 'Ticketing'}
                           </div>
-                          <div className="mt-3 font-display text-[2rem] uppercase leading-none tracking-[-0.04em] text-[#fff8ef]">
+                          <div className="mt-3 font-display text-[2rem] uppercase leading-none tracking-[-0.04em] text-[#FFFFFF]">
                             {featuredEvent.minPrice && featuredEvent.minPrice > 0
                               ? formatPublicCurrency(featuredEvent.minPrice, locale)
                               : isPortuguese
@@ -205,7 +205,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                             {formatPublicNumber(featuredEvent.sold_tickets, locale)} {isPortuguese ? 'acessos vendidos' : 'accesses sold'}
                           </div>
                         </div>
-                        <div className="inline-flex items-center gap-2 rounded-full bg-[#f5f0e8] px-5 py-3 text-xs font-bold uppercase tracking-[0.22em] text-[#0a0b0f]">
+                        <div className="inline-flex items-center gap-2 rounded-full bg-[#0057E7] px-5 py-3 text-xs font-bold uppercase tracking-[0.22em] text-white">
                           {isPortuguese ? 'Ver evento' : 'View event'}
                           <ArrowRight className="h-4 w-4" />
                         </div>
@@ -221,17 +221,17 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
             <div className="mx-auto max-w-[1540px]">
               <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.32em] text-[#d8c39a]">
+                  <div className="text-[10px] uppercase tracking-[0.32em] text-[#4285F4]">
                     {isPortuguese ? 'Lista ativa' : 'Active list'}
                   </div>
-                  <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.4rem)] uppercase leading-[0.9] tracking-[-0.04em] text-[#fff8ef]">
+                  <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.4rem)] uppercase leading-[0.9] tracking-[-0.04em] text-[#FFFFFF]">
                     {isPortuguese ? 'Eventos prontos para venda, inscricao e acesso.' : 'Events ready for sales, registration and access.'}
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={onLogin}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-xs font-bold uppercase tracking-[0.22em] text-white/74 transition-all hover:border-[#c79b44]/25 hover:text-white"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-xs font-bold uppercase tracking-[0.22em] text-white/74 transition-all hover:border-[#4285F4]/25 hover:text-white"
                 >
                   {isPortuguese ? 'Acesso do produtor' : 'Producer access'}
                 </button>
@@ -259,10 +259,10 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                             />
                             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,7,10,0.1)_0%,rgba(5,7,10,0.78)_100%)]" />
                             <div className="absolute inset-x-5 bottom-5">
-                              <div className="text-[10px] uppercase tracking-[0.26em] text-[#d8c39a]">
+                              <div className="text-[10px] uppercase tracking-[0.26em] text-[#4285F4]">
                                 {event.category || (isPortuguese ? 'Evento' : 'Event')}
                               </div>
-                              <div className="mt-2 font-display text-[3rem] uppercase leading-none tracking-[-0.05em] text-[#fff8ef]">
+                              <div className="mt-2 font-display text-[3rem] uppercase leading-none tracking-[-0.05em] text-[#FFFFFF]">
                                 {formatPublicDate(event.starts_at, locale, { day: '2-digit' })}
                               </div>
                             </div>
@@ -271,7 +271,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                           <div className="flex min-w-0 flex-col justify-between p-6 md:p-7">
                             <div>
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="rounded-full border border-[#5c1eb2]/22 bg-[#5c1eb2]/12 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#e6d8ff]">
+                                <span className="rounded-full border border-[#0057E7]/22 bg-[#0057E7]/12 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#93B4F4]">
                                   {index < 2 ? (isPortuguese ? 'Alta demanda' : 'High demand') : isPortuguese ? 'Venda aberta' : 'Open sales'}
                                 </span>
                                 <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white/46">
@@ -279,7 +279,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                                 </span>
                               </div>
 
-                              <h3 className="mt-5 font-display text-[clamp(2.2rem,3vw,3.2rem)] uppercase leading-[0.9] tracking-[-0.04em] text-[#fff8ef]">
+                              <h3 className="mt-5 font-display text-[clamp(2.2rem,3vw,3.2rem)] uppercase leading-[0.9] tracking-[-0.04em] text-[#FFFFFF]">
                                 {event.name}
                               </h3>
                               <p className="mt-4 text-sm leading-7 text-white/60">
@@ -290,7 +290,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                             <div className="mt-6 space-y-4">
                               <div className="grid gap-3 sm:grid-cols-2">
                                 <div className="flex items-center gap-2 text-sm text-white/64">
-                                  <CalendarDays className="h-4 w-4 text-[#c79b44]" />
+                                  <CalendarDays className="h-4 w-4 text-[#4285F4]" />
                                   {formatPublicDate(event.starts_at, locale, {
                                     day: '2-digit',
                                     month: 'long',
@@ -298,7 +298,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                                   })}
                                 </div>
                                 <div className="flex items-center gap-2 text-sm text-white/64">
-                                  <MapPin className="h-4 w-4 text-[#c79b44]" />
+                                  <MapPin className="h-4 w-4 text-[#4285F4]" />
                                   {[event.venue_name, event.city].filter(Boolean).join(' / ')}
                                 </div>
                               </div>
@@ -308,7 +308,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                                   <div className="text-[10px] uppercase tracking-[0.24em] text-white/40">
                                     {isPortuguese ? 'Ticketing' : 'Ticketing'}
                                   </div>
-                                  <div className="mt-2 font-display text-[2rem] uppercase leading-none tracking-[-0.04em] text-[#fff8ef]">
+                                  <div className="mt-2 font-display text-[2rem] uppercase leading-none tracking-[-0.04em] text-[#FFFFFF]">
                                     {event.minPrice && event.minPrice > 0
                                       ? formatPublicCurrency(event.minPrice, locale)
                                       : isPortuguese
@@ -316,7 +316,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                                         : 'Registration'}
                                   </div>
                                   <div className="mt-2 inline-flex items-center gap-2 text-sm text-white/46">
-                                    <Ticket className="h-4 w-4 text-[#c79b44]" />
+                                    <Ticket className="h-4 w-4 text-[#4285F4]" />
                                     {formatPublicNumber(event.sold_tickets, locale)} {isPortuguese ? 'confirmados' : 'confirmed'}
                                   </div>
                                 </div>

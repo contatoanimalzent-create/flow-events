@@ -415,7 +415,7 @@ export function SettingsPage() {
                   </div>
                   <div>
                     <label className="input-label">Preview do botão</label>
-                    <div className="h-10 rounded-sm flex items-center px-4 text-xs font-bold text-bg-primary"
+                    <div className="h-10 rounded-sm flex items-center px-4 text-xs font-bold text-white"
                       style={{ background: form.primary_color }}>
                       COMPRAR INGRESSO
                     </div>

@@ -96,7 +96,7 @@ function EventAssetCardBase({
             <Film className="h-4 w-4 text-white/80" />
           )}
           {!asset.is_active && (
-            <span className="rounded-sm bg-status-warning/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-bg-primary">
+            <span className="rounded-sm bg-status-warning/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
               Inativo
             </span>
           )}

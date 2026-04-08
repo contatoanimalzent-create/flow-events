@@ -156,7 +156,7 @@ export function HelpPage() {
         <div className="flex flex-wrap gap-3">
           <a
             href="/contact"
-            className="inline-flex items-center justify-center rounded-full bg-brand-acid px-6 py-3 text-sm font-medium text-bg-primary transition-all hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center rounded-full bg-brand-acid px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5"
           >
             {t('Contact support', 'Falar com suporte')}
           </a>

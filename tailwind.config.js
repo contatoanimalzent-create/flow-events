@@ -4,19 +4,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* ── Pulse light theme ── */
+        /* ── Pulse dark theme ── */
         bg: {
-          primary:   '#FFFFFF',
-          secondary: '#F7F8FA',
-          card:      '#FFFFFF',
-          surface:   '#F7F8FA',
-          border:    '#E5E7EB',
-          elevated:  '#FFFFFF',
+          primary:   '#0A0A0A',
+          secondary: '#111111',
+          card:      '#111111',
+          surface:   '#161616',
+          border:    'rgba(255,255,255,0.10)',
+          elevated:  '#1A1A1A',
         },
         text: {
-          primary:   '#0A0A0A',
-          secondary: '#44475A',
-          muted:     '#9CA3AF',
+          primary:   'rgba(255,255,255,0.92)',
+          secondary: 'rgba(255,255,255,0.60)',
+          muted:     'rgba(255,255,255,0.38)',
         },
         /* ── Brand ── */
         brand: {
@@ -77,9 +77,9 @@ export default {
         'glow-yellow':    '0 8px 28px rgba(0, 87, 231, 0.18)',
         'glow-sky':       '0 8px 28px rgba(66, 133, 244, 0.22)',
         'glow-teal':      '0 8px 28px rgba(66, 133, 244, 0.18)',
-        'panel-navy':     '1px 0 0 #E5E7EB',
+        'panel-navy':     '1px 0 0 rgba(255,255,255,0.08)',
         'float-dark':     '0 32px 80px rgba(0, 0, 0, 0.18)',
-        raised:           '0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(255,255,255,0.9) inset',
+        raised:           '0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255,255,255,0.04) inset',
         inset:            '0 2px 4px rgba(0, 0, 0, 0.06) inset',
         pressed:          '0 1px 3px rgba(0, 0, 0, 0.08) inset',
       },
@@ -110,8 +110,8 @@ export default {
         'gradient-navy':  'linear-gradient(135deg, #0057E7 0%, #4285F4 100%)',
         'gradient-acid':  'linear-gradient(135deg, #0057E7 0%, #0A1AFF 100%)',
         'gradient-sky':   'linear-gradient(135deg, #0057E7 0%, #4285F4 100%)',
-        'gradient-light': 'linear-gradient(180deg, #ffffff 0%, #F7F8FA 100%)',
-        'gradient-card':  'linear-gradient(180deg, #ffffff 0%, #FAFBFC 100%)',
+        'gradient-light': 'linear-gradient(180deg, #0A0A0A 0%, #111111 100%)',
+        'gradient-card':  'linear-gradient(180deg, #111111 0%, #161616 100%)',
       },
     },
   },

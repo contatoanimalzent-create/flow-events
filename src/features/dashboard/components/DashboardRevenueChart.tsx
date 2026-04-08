@@ -28,12 +28,12 @@ export function DashboardRevenueChart({ data }: DashboardRevenueChartProps) {
                 <stop offset="95%" stopColor="#4285F4" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={(value) => `R$${Math.round(Number(value) / 1000)}k`} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.4)' }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.4)' }} axisLine={false} tickLine={false} tickFormatter={(value) => `R$${Math.round(Number(value) / 1000)}k`} />
             <Tooltip
               formatter={(value: number, name: string) => [formatCurrency(value), name === 'grossRevenue' ? 'Receita bruta' : 'Receita liquida']}
-              contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '8px', color: '#0A0A0A' }}
+              contentStyle={{ backgroundColor: '#1A1A1A', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', color: '#FFFFFF' }}
             />
             <Area type="monotone" dataKey="grossRevenue" stroke="#0057E7" fill="url(#grossRevenueGradient)" strokeWidth={2} />
             <Area type="monotone" dataKey="netRevenue" stroke="#4285F4" fill="url(#netRevenueGradient)" strokeWidth={2} />

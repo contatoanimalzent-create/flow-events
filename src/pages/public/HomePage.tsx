@@ -217,11 +217,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
               }}
             />
 
-            {/* Top-left logo */}
-            <div style={{ position: 'relative', zIndex: 10, padding: '2rem 2.5rem' }}>
-              <img src="/logo.png" alt="Pulse" style={{ height: '2.5rem', width: 'auto', filter: 'brightness(0) invert(1)' }} />
-            </div>
-
             {/* Hero center content */}
             <div
               style={{

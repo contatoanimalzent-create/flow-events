@@ -62,7 +62,7 @@ export function EventsPublicHeader({
         }}
         className={cn(
           'w-full rounded-xl px-3 py-2 text-left text-sm transition-colors',
-          selected ? 'bg-[rgba(0,87,231,0.08)] text-[#0057E7]' : 'text-[#44475A] hover:bg-[#F7F8FA] hover:text-[#0A0A0A]',
+          selected ? 'bg-[rgba(0,87,231,0.14)] text-[#4285F4]' : 'text-white/60 hover:bg-white/[0.06] hover:text-white',
         )}
       >
         {label}
@@ -76,7 +76,7 @@ export function EventsPublicHeader({
         className={cn(
           'sticky top-0 z-50 border-b transition-all duration-500',
           isScrolled
-            ? 'border-[#E5E7EB] bg-white/90 backdrop-blur-2xl shadow-soft'
+            ? 'border-white/8 bg-[rgba(8,8,8,0.94)] backdrop-blur-2xl shadow-[0_1px_0_rgba(255,255,255,0.06)]'
             : 'border-transparent bg-[rgba(5,5,5,0.58)] backdrop-blur-xl',
           className,
         )}
@@ -89,8 +89,8 @@ export function EventsPublicHeader({
               className={cn(
                 'w-auto object-contain transition-all duration-300 group-hover:scale-[1.02]',
                 compact ? 'h-8 md:h-9' : 'h-10 md:h-11',
-                /* logo preta no fundo claro (scrolled), branca no fundo escuro (topo) */
-                isScrolled ? '' : 'brightness-0 invert',
+                /* sempre branca — header agora é sempre dark */
+                'brightness-0 invert',
               )}
             />
           </a>
@@ -102,13 +102,9 @@ export function EventsPublicHeader({
                 href={link.href}
                 className={cn(
                   'rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-300',
-                  isScrolled
-                    ? isActive(link.href)
-                      ? 'bg-[rgba(0,87,231,0.08)] text-[#0057E7]'
-                      : 'text-[#44475A] hover:bg-[#F7F8FA] hover:text-[#0A0A0A]'
-                    : isActive(link.href)
-                      ? 'bg-white/[0.08] text-white'
-                      : 'text-white/58 hover:bg-white/[0.05] hover:text-white',
+                  isActive(link.href)
+                    ? 'bg-white/[0.08] text-white'
+                    : 'text-white/58 hover:bg-white/[0.05] hover:text-white',
                 )}
               >
                 {link.label}
@@ -125,9 +121,7 @@ export function EventsPublicHeader({
                 onClick={() => setLanguageOpen((current) => !current)}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium uppercase tracking-[0.16em] transition-all',
-                  isScrolled
-                    ? 'border-[#E5E7EB] bg-white text-[#44475A] hover:border-[#D1D5DB] hover:text-[#0A0A0A]'
-                    : 'border-white/10 bg-white/[0.03] text-white/64 hover:border-white/20 hover:text-white',
+                  'border-white/10 bg-white/[0.04] text-white/64 hover:border-white/20 hover:text-white',
                 )}
               >
                 <Globe className="h-3.5 w-3.5" />
@@ -135,7 +129,7 @@ export function EventsPublicHeader({
                 <ChevronDown className="h-3 w-3" />
               </button>
               {languageOpen ? (
-                <div className="absolute right-0 top-[calc(100%+0.65rem)] w-36 rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-strong">
+                <div className="absolute right-0 top-[calc(100%+0.65rem)] w-36 rounded-2xl border border-white/10 bg-[#111111] p-2 shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
                   {languageOption('en-US', 'English')}
                   {languageOption('pt-BR', 'Portugues')}
                 </div>
@@ -147,9 +141,7 @@ export function EventsPublicHeader({
                 href="/me"
                 className={cn(
                   'hidden items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] transition-all sm:inline-flex',
-                  isScrolled
-                    ? 'border-[#E5E7EB] bg-white text-[#44475A] hover:border-[#D1D5DB] hover:text-[#0A0A0A]'
-                    : 'border-white/10 bg-white/[0.03] text-white/68 hover:border-white/20 hover:text-white',
+                  'border-white/10 bg-white/[0.04] text-white/68 hover:border-white/20 hover:text-white',
                 )}
               >
                 <UserRound className="h-3.5 w-3.5" />

@@ -9,6 +9,7 @@ export type PublicRoute =
   | 'terms'
   | 'privacy'
   | 'contact'
+  | 'producer'
   | { type: 'event'; slug: string }
   | { type: 'staff-join'; token: string }
   | { type: 'timeclock'; eventId: string; credentialToken: string }
@@ -23,6 +24,7 @@ export function getInitialPublicRoute(): PublicRoute {
   if (path === '/events') return 'events'
   if (path === '/create-event') return 'create-event'
   if (path === '/me' || path === '/account') return 'account'
+  if (path === '/producer') return 'producer'
   if (path === '/login') return 'login'
   if (path === '/signup' || path === '/register') return 'signup'
 
@@ -56,6 +58,7 @@ export function isImmediatePublicRoute(route: PublicRoute) {
     route === 'terms' ||
     route === 'privacy' ||
     route === 'contact' ||
+    route === 'producer' ||
     route === 'signup'
   )
 }

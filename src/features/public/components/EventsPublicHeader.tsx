@@ -38,8 +38,7 @@ export function EventsPublicHeader({
     () => [
       { label: isPortuguese ? 'Inicio' : 'Home', href: '/' },
       { label: isPortuguese ? 'Eventos' : 'Events', href: '/events' },
-      { label: isPortuguese ? 'Participante' : 'Participant', href: '/me' },
-      { label: isPortuguese ? 'Produtor' : 'Producer', href: '/login' },
+      { label: isPortuguese ? 'Produtor' : 'Producer', href: '/producer' },
     ],
     [isPortuguese],
   )

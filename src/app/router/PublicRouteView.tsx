@@ -7,6 +7,7 @@ const AboutPage = lazy(() => import('@/pages/public/AboutPage').then((m) => ({ d
 const StaffJoinPage = lazy(() => import('@/pages/public/StaffJoinPage').then((m) => ({ default: m.StaffJoinPage })))
 const StaffTimeclockPage = lazy(() => import('@/pages/public/StaffTimeclockPage').then((m) => ({ default: m.StaffTimeclockPage })))
 const ContactPage = lazy(() => import('@/pages/public/ContactPage').then((m) => ({ default: m.ContactPage })))
+const ProducerPage = lazy(() => import('@/pages/public/ProducerPage').then((m) => ({ default: m.ProducerPage })))
 const AccountPage = lazy(() => import('@/pages/public/AccountPage').then((m) => ({ default: m.AccountPage })))
 const CreateEventPage = lazy(() => import('@/pages/public/CreateEventPage').then((m) => ({ default: m.CreateEventPage })))
 const EventPage = lazy(() => import('@/pages/public/EventPage').then((m) => ({ default: m.EventPage })))
@@ -43,6 +44,8 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
         <TermsPage />
       ) : route === 'privacy' ? (
         <PrivacyPage />
+      ) : route === 'producer' ? (
+        <ProducerPage onLogin={onLogin} />
       ) : route === 'contact' ? (
         <ContactPage onLogin={onLogin} />
       ) : route === 'about' ? (

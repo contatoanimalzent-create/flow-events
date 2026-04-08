@@ -117,6 +117,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               {
                 title: isPortuguese ? 'Produtor' : 'Producer',
                 links: [
+                  { label: isPortuguese ? 'Beneficios' : 'Benefits', href: '/producer' },
                   { label: isPortuguese ? 'Login' : 'Login', href: '/login' },
                   { label: isPortuguese ? 'Criar evento' : 'Create event', href: '/create-event' },
                 ],

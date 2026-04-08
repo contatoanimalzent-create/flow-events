@@ -96,7 +96,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
             <img
               src="/logo.png"
               alt="Pulse"
-              className="h-20 w-auto object-contain brightness-0 invert"
+              className="h-28 w-auto object-contain brightness-0 invert"
               style={{ filter: 'brightness(0) invert(1) drop-shadow(0 0 18px rgba(0,87,231,0.22))' }}
             />
 

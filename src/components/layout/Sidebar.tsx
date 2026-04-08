@@ -238,7 +238,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
     <div className="relative shrink-0 border-b border-[#E5E7EB] px-4 py-4">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg overflow-hidden bg-[#0057E7]">
-          <img src="/logo.png" alt="Pulse" className="h-7 w-auto object-contain" />
+          <img src="/logo.png" alt="Pulse" className="h-9 w-auto object-contain" />
         </div>
         <div className="min-w-0">
           <div className="text-[9px] font-semibold uppercase tracking-[0.38em] text-[#9CA3AF]">
@@ -313,7 +313,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
             <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden bg-[#0057E7]">
-                  <img src="/logo.png" alt="Pulse" className="h-6 w-auto object-contain" />
+                  <img src="/logo.png" alt="Pulse" className="h-8 w-auto object-contain" />
                 </div>
                 <div className="text-lg font-bold leading-none tracking-[-0.02em] text-[#0A0A0A]">
                   {isPortuguese ? 'Navegacao' : 'Navigation'}

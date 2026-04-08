@@ -141,9 +141,9 @@ export function SignupPage({ onBack, onLogin }: { onBack?: () => void; onLogin?:
             {/* Logo */}
             <img
               src="/logo.png"
-              alt="Flow Events"
-              className="mb-10 h-16 w-auto object-contain"
-              style={{ filter: 'drop-shadow(0 0 16px rgba(212,255,0,0.18))' }}
+              alt="Pulse"
+              className="mb-10 h-24 w-auto object-contain brightness-0 invert"
+              style={{ filter: 'brightness(0) invert(1) drop-shadow(0 0 16px rgba(0,87,231,0.22))' }}
             />
 
             {/* Step indicator */}

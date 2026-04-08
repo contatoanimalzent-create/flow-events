@@ -85,7 +85,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             <div>
               <a href="/" className="inline-flex items-center">
                 {/* footer é sempre escuro → inverte a logo preta para branca */}
-                <img src="/logo.png" alt="Pulse" className="h-10 w-auto brightness-0 invert" />
+                <img src="/logo.png" alt="Pulse" className="h-12 w-auto brightness-0 invert" />
               </a>
               <p className="mt-4 max-w-sm text-sm leading-7 text-white/56">
                 {isPortuguese

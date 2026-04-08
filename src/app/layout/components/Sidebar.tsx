@@ -86,7 +86,7 @@ function SidebarSurface({
     <div className="flex h-full flex-col bg-[var(--pulse-app-sidebar-bg)]">
       <div className="flex h-[var(--pulse-app-header-height)] items-center justify-between border-b border-[var(--pulse-app-sidebar-border)] px-5">
         <div className="flex flex-col">
-          <img src="/logo.png" alt="Pulse" className="h-8 w-auto brightness-0 invert" />
+          <img src="/logo.png" alt="Pulse" className="h-10 w-auto brightness-0 invert" />
           <span className="text-[10px] uppercase tracking-widest text-white/30 mt-1">Platform</span>
         </div>
 

@@ -88,7 +88,7 @@ export function EventsPublicHeader({
               alt="Pulse"
               className={cn(
                 'w-auto object-contain transition-all duration-300 group-hover:scale-[1.02]',
-                compact ? 'h-8 md:h-9' : 'h-10 md:h-11',
+                compact ? 'h-10 md:h-11' : 'h-12 md:h-14',
                 /* sempre branca — header agora é sempre dark */
                 'brightness-0 invert',
               )}
@@ -176,7 +176,7 @@ export function EventsPublicHeader({
               <div className="flex items-center justify-between gap-6">
                 <a href="/" className="inline-flex items-center">
                   {/* mobile menu sempre escuro → logo branca */}
-                  <img src="/logo.png" alt="Pulse" className="h-9 w-auto brightness-0 invert" />
+                  <img src="/logo.png" alt="Pulse" className="h-11 w-auto brightness-0 invert" />
                 </a>
                 <button
                   type="button"

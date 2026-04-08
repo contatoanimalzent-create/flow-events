@@ -68,7 +68,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
             <img
               src="/logo.png"
               alt="Pulse"
-              className="h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+              className="h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
             <div className="hidden min-w-0 xl:block">
               <div className="text-[10px] uppercase tracking-[0.42em] text-[#0057E7]">{access.role}</div>

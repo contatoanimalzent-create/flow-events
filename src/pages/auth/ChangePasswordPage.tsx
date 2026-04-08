@@ -35,8 +35,8 @@ export function ChangePasswordPage() {
           <img
             src="/logo.png"
             alt="Pulse"
-            className="h-20 w-auto object-contain"
-            style={{ filter: 'drop-shadow(0 0 6px rgba(174,147,111,0.18))' }}
+            className="h-24 w-auto object-contain brightness-0 invert"
+            style={{ filter: 'brightness(0) invert(1) drop-shadow(0 0 16px rgba(0,87,231,0.22))' }}
           />
         </div>
 

@@ -23,7 +23,7 @@ export function AnimalzBrandMark({ inverse = false, compact = false, className }
         alt="Pulse"
         className={cn(
           'w-auto object-contain transition-all duration-300 group-hover:scale-[1.02]',
-          compact ? 'h-8 md:h-10' : 'h-10 md:h-12',
+          compact ? 'h-10 md:h-12' : 'h-12 md:h-14',
           inverse && 'brightness-0 invert',
         )}
       />

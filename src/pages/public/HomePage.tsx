@@ -2,7 +2,6 @@ import { ArrowRight, BarChart3, LayoutDashboard, QrCode } from 'lucide-react'
 import { useMemo, useRef } from 'react'
 import { PublicLayout, PublicReveal, useEventsQuery, type PublicEventSummary } from '@/features/public'
 import { formatPublicDate, usePublicLocale } from '@/features/public/lib/public-locale'
-import { FeaturedEvents, PulseHero } from '@/shared/components'
 import { useSeoMeta } from '@/shared/lib'
 
 interface HomeEventCardModel {
@@ -35,26 +34,6 @@ function navigateTo(url: string) {
   if (typeof window !== 'undefined') {
     window.location.assign(url)
   }
-}
-
-function BenefitCard({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: typeof LayoutDashboard
-  title: string
-  description: string
-}) {
-  return (
-    <div className="pulse-home__benefit-card">
-      <div className="pulse-home__benefit-icon">
-        <Icon size={22} aria-hidden="true" />
-      </div>
-      <h3 className="pulse-home__benefit-title">{title}</h3>
-      <p className="pulse-home__benefit-copy">{description}</p>
-    </div>
-  )
 }
 
 export function HomePage({ onLogin }: { onLogin: () => void }) {
@@ -165,367 +144,759 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
   return (
     <>
       <style>{`
-        .pulse-home {
-          color: var(--pulse-color-text-primary, #000000);
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
         }
-
-        .pulse-home__hero-bleed {
-          width: 100vw;
-          margin-left: calc(50% - 50vw);
-          margin-right: calc(50% - 50vw);
+        @keyframes pulseDot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.8); }
         }
-
-        .pulse-home__shell {
-          width: min(calc(100% - (2 * var(--pulse-grid-gutter-mobile, 1.25rem))), var(--pulse-grid-max-width, 78rem));
-          margin: 0 auto;
-        }
-
-        .pulse-home__hero-meta {
-          margin-top: calc(var(--pulse-spacing-xl, 2rem) * -1);
-          position: relative;
-          z-index: 2;
-        }
-
-        .pulse-home__hero-panel {
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          border-radius: 1.75rem;
-          background: rgba(255, 255, 255, 0.92);
-          box-shadow: 0 24px 60px rgba(0, 26, 84, 0.14);
-          backdrop-filter: blur(18px);
-          padding: 1rem;
-        }
-
-        .pulse-home__hero-strip {
-          display: grid;
-          grid-template-columns: repeat(var(--pulse-grid-columns-mobile, 4), minmax(0, 1fr));
-          gap: var(--pulse-grid-gap-sm, 1rem);
-        }
-
-        .pulse-home__hero-stat {
-          grid-column: span 4;
-          border-radius: 1.25rem;
-          background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(243,247,255,0.95));
-          padding: 1rem 1.1rem;
-        }
-
-        .pulse-home__hero-stat-label {
-          color: var(--pulse-color-primary-base, #0033A0);
-          font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 0.78rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .pulse-home__hero-stat-value {
-          margin-top: 0.45rem;
-          color: var(--pulse-color-text-primary, #000000);
-          font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 1rem;
-          line-height: 1.5;
-        }
-
-        .pulse-home__section {
-          padding: var(--pulse-spacing-xxl, 3rem) 0 0;
-        }
-
-        .pulse-home__surface {
-          border: 1px solid rgba(229, 229, 229, 0.9);
-          border-radius: 2rem;
-          background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,250,255,0.98));
-          box-shadow: 0 24px 64px rgba(0, 26, 84, 0.09);
-          padding: 1.35rem;
-        }
-
-        .pulse-home__surface--why {
-          background:
-            radial-gradient(circle at top right, rgba(0, 123, 255, 0.12), transparent 28%),
-            linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,248,255,0.98));
-        }
-
-        .pulse-home__section-head {
+        .home-marquee-track {
+          animation: marquee 22s linear infinite;
           display: flex;
-          flex-direction: column;
-          gap: 0.9rem;
+          width: max-content;
         }
-
-        .pulse-home__eyebrow {
-          color: var(--pulse-color-primary-accent, #007BFF);
-          font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 0.78rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
+        .home-hero-eyebrow-dot {
+          animation: pulseDot 1.8s ease-in-out infinite;
         }
-
-        .pulse-home__heading-row {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
+        .home-event-card-img {
+          transition: transform 700ms cubic-bezier(0.16,1,0.3,1);
         }
-
-        .pulse-home__title {
-          margin: 0;
-          color: var(--pulse-color-primary-base, #0033A0);
-          font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: var(--pulse-font-size-h2, 2.5rem);
-          font-weight: 800;
-          line-height: 1.1;
-        }
-
-        .pulse-home__copy {
-          margin: 0;
-          max-width: 44rem;
-          color: var(--pulse-color-text-primary, #000000);
-          font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 1rem;
-          line-height: 1.7;
-        }
-
-        .pulse-home__link {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0;
-          border: 0;
-          background: transparent;
-          cursor: pointer;
-          color: var(--pulse-color-primary-base, #0033A0);
-          font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 0.9rem;
-          font-weight: 700;
-          text-decoration: none;
-          transition: transform 180ms ease, color 180ms ease;
-        }
-
-        .pulse-home__link:hover {
-          color: var(--pulse-color-primary-accent, #007BFF);
-          transform: translateX(2px);
-        }
-
-        .pulse-home__benefits-grid {
-          display: grid;
-          grid-template-columns: repeat(var(--pulse-grid-columns-mobile, 4), minmax(0, 1fr));
-          gap: var(--pulse-grid-gap-md, 1.5rem);
-          margin-top: var(--pulse-spacing-xl, 2rem);
-        }
-
-        .pulse-home__benefit-item {
-          grid-column: span 4;
-        }
-
-        .pulse-home__benefit-card {
-          height: 100%;
-          border: 1px solid rgba(229, 229, 229, 0.9);
-          border-radius: 1.6rem;
-          background: rgba(255, 255, 255, 0.94);
-          padding: 1.4rem;
-          box-shadow: 0 16px 40px rgba(0, 26, 84, 0.08);
-        }
-
-        .pulse-home__benefit-icon {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 3rem;
-          height: 3rem;
-          border-radius: 999px;
-          background: rgba(0, 123, 255, 0.12);
-          color: var(--pulse-color-primary-accent, #007BFF);
-        }
-
-        .pulse-home__benefit-title {
-          margin: 1rem 0 0;
-          color: var(--pulse-color-primary-base, #0033A0);
-          font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 1.2rem;
-          font-weight: 800;
-          line-height: 1.3;
-        }
-
-        .pulse-home__benefit-copy {
-          margin: 0.85rem 0 0;
-          color: var(--pulse-color-text-primary, #000000);
-          font-family: var(--pulse-font-family, Inter, sans-serif);
-          font-size: 0.98rem;
-          line-height: 1.7;
-        }
-
-        @media (min-width: 768px) {
-          .pulse-home__shell {
-            width: min(calc(100% - (2 * var(--pulse-grid-gutter-tablet, 2rem))), var(--pulse-grid-max-width, 78rem));
-          }
-
-          .pulse-home__hero-panel,
-          .pulse-home__surface {
-            padding: 1.75rem;
-          }
-
-          .pulse-home__hero-strip,
-          .pulse-home__benefits-grid {
-            grid-template-columns: repeat(var(--pulse-grid-columns-tablet, 8), minmax(0, 1fr));
-          }
-
-          .pulse-home__hero-stat {
-            grid-column: span 4;
-          }
-
-          .pulse-home__benefit-item {
-            grid-column: span 4;
-          }
-
-          .pulse-home__heading-row {
-            align-items: end;
-            justify-content: space-between;
-            flex-direction: row;
-          }
-        }
-
-        @media (min-width: 1100px) {
-          .pulse-home__shell {
-            width: min(calc(100% - (2 * var(--pulse-grid-gutter-desktop, 3rem))), var(--pulse-grid-max-width, 78rem));
-          }
-
-          .pulse-home__hero-strip,
-          .pulse-home__benefits-grid {
-            grid-template-columns: repeat(var(--pulse-grid-columns-desktop, 12), minmax(0, 1fr));
-            gap: var(--pulse-grid-gap-lg, 2rem);
-          }
-
-          .pulse-home__hero-stat,
-          .pulse-home__benefit-item {
-            grid-column: span 4;
-          }
+        .home-event-card:hover .home-event-card-img {
+          transform: scale(1.04);
         }
       `}</style>
 
       <PublicLayout onLogin={onLogin}>
-        <div className="pulse-home">
-          <div className="pulse-home__hero-bleed">
-            <PulseHero
-              title={
-                isPortuguese
-                  ? 'Pulse organiza o evento antes, durante e depois.'
-                  : 'Pulse runs the event before, during and after showtime.'
-              }
-              subtitle={
-                isPortuguese
-                  ? 'Uma home feita para descoberta, com credenciamento, inteligencia operacional e relatorios conectados na mesma experiencia.'
-                  : 'A home built for discovery, with accreditation, operational intelligence and reporting connected in the same experience.'
-              }
-              callToActionLabel={isPortuguese ? 'Ver proximos eventos' : 'See upcoming events'}
-              onCallToAction={scrollToUpcomingEvents}
-              backgroundVideoUrl="/videos/video.mp4"
-            />
-          </div>
+        <div style={{ background: '#050505', color: '#FFFFFF' }}>
 
-          <div className="pulse-home__hero-meta">
-            <div className="pulse-home__shell">
-              <div className="pulse-home__hero-panel">
-                <div className="pulse-home__hero-strip">
-                  {[
-                    {
-                      label: isPortuguese ? 'Operacao conectada' : 'Connected operation',
-                      value: isPortuguese
-                        ? 'Vendas, check-in e relatorios em uma unica base.'
-                        : 'Sales, check-in and reporting in one shared foundation.',
-                    },
-                    {
-                      label: isPortuguese ? 'Catalogo vivo' : 'Live catalog',
-                      value:
-                        liveEvents.length > 0
-                          ? isPortuguese
-                            ? `${liveEvents.length} eventos ja publicados agora.`
-                            : `${liveEvents.length} events already published now.`
-                          : isPortuguese
-                            ? 'Exemplos prontos para apresentar a experiencia Pulse.'
-                            : 'Ready-made examples to showcase the Pulse experience.',
-                    },
-                    {
-                      label: isPortuguese ? 'Acao imediata' : 'Immediate action',
-                      value: isPortuguese
-                        ? 'Entre no cockpit ou avance para os proximos eventos.'
-                        : 'Enter the cockpit or move straight into upcoming events.',
-                    },
-                  ].map((item) => (
-                    <div key={item.label} className="pulse-home__hero-stat">
-                      <div className="pulse-home__hero-stat-label">{item.label}</div>
-                      <div className="pulse-home__hero-stat-value">{item.value}</div>
-                    </div>
-                  ))}
-                </div>
+          {/* ── HERO ── */}
+          <section
+            style={{
+              position: 'relative',
+              minHeight: '100vh',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Video background */}
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                zIndex: 0,
+              }}
+            >
+              <source src="/videos/video.mp4" type="video/mp4" />
+            </video>
+            {/* Dark overlay */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(5,5,5,0.72)',
+                zIndex: 1,
+              }}
+            />
+            {/* Blue glow top */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'radial-gradient(ellipse at 50% -10%, rgba(0,87,231,0.28) 0%, transparent 55%)',
+                zIndex: 2,
+              }}
+            />
+
+            {/* Top-left logo */}
+            <div style={{ position: 'relative', zIndex: 10, padding: '2rem 2.5rem' }}>
+              <img src="/logo.png" alt="Pulse" style={{ height: '2.5rem', width: 'auto', filter: 'brightness(0) invert(1)' }} />
+            </div>
+
+            {/* Hero center content */}
+            <div
+              style={{
+                position: 'relative',
+                zIndex: 10,
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                padding: '0 1.5rem',
+              }}
+            >
+              {/* Eyebrow badge */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.35rem 1rem',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(0,87,231,0.4)',
+                  background: 'rgba(0,87,231,0.12)',
+                  marginBottom: '2rem',
+                }}
+              >
+                <span
+                  className="home-hero-eyebrow-dot"
+                  style={{ width: 6, height: 6, borderRadius: '50%', background: '#4285F4', display: 'inline-block' }}
+                />
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.28em',
+                    textTransform: 'uppercase',
+                    color: '#4285F4',
+                  }}
+                >
+                  {isPortuguese ? 'PLATAFORMA DE EVENTOS' : 'EVENT PLATFORM'}
+                </span>
+              </div>
+
+              {/* H1 */}
+              <h1
+                style={{
+                  margin: 0,
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 'clamp(4.5rem, 9vw, 9rem)',
+                  fontWeight: 900,
+                  lineHeight: 0.86,
+                  letterSpacing: '-0.05em',
+                  color: '#FFFFFF',
+                  maxWidth: '14ch',
+                }}
+              >
+                {isPortuguese
+                  ? 'Onde os grandes eventos são construídos.'
+                  : 'Where great events are built.'}
+              </h1>
+
+              {/* Subtitle */}
+              <p
+                style={{
+                  marginTop: '1.75rem',
+                  maxWidth: '36rem',
+                  color: 'rgba(255,255,255,0.62)',
+                  fontSize: '1.125rem',
+                  lineHeight: 2,
+                }}
+              >
+                {isPortuguese
+                  ? 'Credenciamento, vendas, relatorios e equipes — tudo em uma operacao conectada.'
+                  : 'Accreditation, sales, reporting and teams — all in one connected operation.'}
+              </p>
+
+              {/* CTA buttons */}
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  onClick={scrollToUpcomingEvents}
+                  style={{
+                    background: '#0057E7',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    padding: '1rem 2rem',
+                    borderRadius: '999px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease',
+                    boxShadow: '0 16px 40px rgba(0,87,231,0.35)',
+                  }}
+                  onMouseEnter={(e) => {
+                    ;(e.currentTarget as HTMLButtonElement).style.background = '#4285F4'
+                    ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    ;(e.currentTarget as HTMLButtonElement).style.background = '#0057E7'
+                    ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
+                  }}
+                >
+                  {isPortuguese ? 'Ver eventos' : 'See events'}
+                </button>
+                <button
+                  type="button"
+                  onClick={onLogin}
+                  style={{
+                    background: 'transparent',
+                    color: 'rgba(255,255,255,0.80)',
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    padding: '1rem 2rem',
+                    borderRadius: '999px',
+                    border: '1px solid rgba(255,255,255,0.20)',
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.4)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = '#FFFFFF'
+                  }}
+                  onMouseLeave={(e) => {
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.20)'
+                    ;(e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.80)'
+                  }}
+                >
+                  {isPortuguese ? 'Entrar na plataforma' : 'Enter platform'}
+                </button>
               </div>
             </div>
-          </div>
 
-          <div ref={upcomingEventsRef}>
-            <FeaturedEvents
-              title={isPortuguese ? 'Eventos em destaque' : 'Featured events'}
-              description={
-                isPortuguese
-                  ? 'Uma selecao premium com eventos prontos para conversao, descoberta rapida e navegacao fluida.'
-                  : 'A premium selection of events ready for conversion, fast discovery and smooth navigation.'
-              }
-              columns={upcomingEvents.length >= 4 ? 4 : 3}
-              events={upcomingEvents.map((event) => ({
-                id: event.id,
-                imageUrl: event.imageUrl,
-                eventName: event.eventName,
-                date: event.date,
-                location: event.location,
-                badge: event.badge,
-                badgeTone: event.badgeTone,
-                onClick: () => navigateTo(event.href),
-              }))}
-            />
-          </div>
-
-          <section className="pulse-home__section">
-            <div className="pulse-home__shell">
-              <PublicReveal delayMs={60}>
-                <div className="pulse-home__surface pulse-home__surface--why">
-                  <div className="pulse-home__section-head">
-                    <div className="pulse-home__eyebrow">
-                      {isPortuguese ? 'Por que Pulse?' : 'Why Pulse?'}
+            {/* Stats bar */}
+            <div style={{ position: 'relative', zIndex: 10, padding: '0 1.5rem 3rem' }}>
+              <div
+                style={{
+                  maxWidth: '56rem',
+                  margin: '0 auto',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  borderRadius: '1.5rem',
+                  backdropFilter: 'blur(20px)',
+                  padding: '1.5rem 2.5rem',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '1rem',
+                }}
+              >
+                {[
+                  { value: '12+', label: isPortuguese ? 'Eventos ativos' : 'Active events' },
+                  { value: '50k+', label: isPortuguese ? 'Ingressos vendidos' : 'Tickets sold' },
+                  { value: '200+', label: isPortuguese ? 'Produtores' : 'Producers' },
+                ].map((stat, i) => (
+                  <div
+                    key={stat.label}
+                    style={{
+                      textAlign: 'center',
+                      borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '2rem',
+                        fontWeight: 900,
+                        letterSpacing: '-0.04em',
+                        color: '#FFFFFF',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {stat.value}
                     </div>
-                    <div className="pulse-home__heading-row">
-                      <div>
-                        <h2 className="pulse-home__title">
-                          {isPortuguese
-                            ? 'Uma pilha unica para governar toda a experiencia.'
-                            : 'One stack to govern the whole experience.'}
-                        </h2>
-                        <p className="pulse-home__copy">
-                          {isPortuguese
-                            ? 'A hierarquia visual destaca o que importa: titulos fortes em azul profundo, narrativa objetiva e icones em azul vibrante para guiar o olhar.'
-                            : 'The visual hierarchy highlights what matters: strong deep-blue titles, clear copy and vibrant-blue icons guiding the eye.'}
-                        </p>
-                      </div>
-
-                      <button type="button" className="pulse-home__link" onClick={onLogin}>
-                        {isPortuguese ? 'Entrar no Pulse' : 'Enter Pulse'}
-                        <ArrowRight size={16} aria-hidden="true" />
-                      </button>
+                    <div
+                      style={{
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.18em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(255,255,255,0.40)',
+                        marginTop: '0.4rem',
+                      }}
+                    >
+                      {stat.label}
                     </div>
                   </div>
-
-                  <div className="pulse-home__benefits-grid">
-                    {benefits.map((benefit, index) => (
-                      <PublicReveal key={benefit.title} delayMs={index * 90}>
-                        <div className="pulse-home__benefit-item">
-                          <BenefitCard
-                            icon={benefit.icon}
-                            title={benefit.title}
-                            description={benefit.description}
-                          />
-                        </div>
-                      </PublicReveal>
-                    ))}
-                  </div>
-                </div>
-              </PublicReveal>
+                ))}
+              </div>
             </div>
           </section>
+
+          {/* ── MARQUEE STRIP ── */}
+          <section style={{ background: '#050505', overflow: 'hidden', padding: '1.25rem 0', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="home-marquee-track">
+              {['EVENTOS • ', 'CREDENCIAMENTO • ', 'RELATORIOS • ', 'FINANCEIRO • ', 'EQUIPES • ', 'QR CODE • ', 'EVENTOS • ', 'CREDENCIAMENTO • ', 'RELATORIOS • ', 'FINANCEIRO • ', 'EQUIPES • ', 'QR CODE • '].map(
+                (item, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      color: 'rgba(255,255,255,0.20)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.4em',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      whiteSpace: 'nowrap',
+                      paddingRight: '0.5rem',
+                    }}
+                  >
+                    {item}
+                  </span>
+                ),
+              )}
+            </div>
+          </section>
+
+          {/* ── FEATURED EVENTS ── */}
+          <section ref={upcomingEventsRef} style={{ background: '#050505', padding: '6rem 1.5rem' }}>
+            <div style={{ maxWidth: '78rem', margin: '0 auto' }}>
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '3rem', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <div
+                    style={{
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.28em',
+                      textTransform: 'uppercase',
+                      color: '#0057E7',
+                      marginBottom: '0.75rem',
+                    }}
+                  >
+                    {isPortuguese ? 'EM DESTAQUE' : 'FEATURED'}
+                  </div>
+                  <h2
+                    style={{
+                      margin: 0,
+                      fontSize: 'clamp(2.5rem, 4vw, 4rem)',
+                      fontWeight: 700,
+                      letterSpacing: '-0.04em',
+                      color: '#FFFFFF',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {isPortuguese ? 'Eventos em destaque' : 'Featured events'}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={scrollToUpcomingEvents}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    color: 'rgba(255,255,255,0.50)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    transition: 'color 180ms ease',
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#4285F4' }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.50)' }}
+                >
+                  {isPortuguese ? 'Ver todos' : 'View all'}
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+
+              {/* Magazine grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: upcomingEvents.length >= 2 ? '2fr 1fr' : '1fr',
+                  gap: '1.25rem',
+                }}
+              >
+                {/* First event — large */}
+                {upcomingEvents[0] ? (
+                  <div
+                    className="home-event-card"
+                    onClick={() => navigateTo(upcomingEvents[0].href)}
+                    style={{
+                      position: 'relative',
+                      minHeight: '36rem',
+                      borderRadius: '1.5rem',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <img
+                      src={upcomingEvents[0].imageUrl}
+                      alt={upcomingEvents[0].eventName}
+                      className="home-event-card-img"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to top, #050607 0%, rgba(5,6,7,0.20) 50%, transparent 100%)',
+                      }}
+                    />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '2rem' }}>
+                      {upcomingEvents[0].badge ? (
+                        <div
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '999px',
+                            background: upcomingEvents[0].badgeTone === 'live' ? 'rgba(34,197,94,0.18)' : 'rgba(0,87,231,0.22)',
+                            border: `1px solid ${upcomingEvents[0].badgeTone === 'live' ? 'rgba(34,197,94,0.4)' : 'rgba(0,87,231,0.4)'}`,
+                            color: upcomingEvents[0].badgeTone === 'live' ? '#22C55E' : '#4285F4',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.16em',
+                            textTransform: 'uppercase',
+                            marginBottom: '0.75rem',
+                          }}
+                        >
+                          {upcomingEvents[0].badge}
+                        </div>
+                      ) : null}
+                      <h3 style={{ margin: 0, fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+                        {upcomingEvents[0].eventName}
+                      </h3>
+                      <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.50)' }}>
+                        {upcomingEvents[0].date} &nbsp;·&nbsp; {upcomingEvents[0].location}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* Right column — stacked small cards */}
+                {upcomingEvents.length >= 2 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    {upcomingEvents.slice(1, 3).map((event) => (
+                      <div
+                        key={event.id}
+                        className="home-event-card"
+                        onClick={() => navigateTo(event.href)}
+                        style={{
+                          position: 'relative',
+                          flex: 1,
+                          minHeight: '17rem',
+                          borderRadius: '1.5rem',
+                          overflow: 'hidden',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <img
+                          src={event.imageUrl}
+                          alt={event.eventName}
+                          className="home-event-card-img"
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'linear-gradient(to top, #050607 0%, rgba(5,6,7,0.20) 55%, transparent 100%)',
+                          }}
+                        />
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.5rem' }}>
+                          {event.badge ? (
+                            <div
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                padding: '0.2rem 0.6rem',
+                                borderRadius: '999px',
+                                background: event.badgeTone === 'live' ? 'rgba(34,197,94,0.18)' : event.badgeTone === 'warning' ? 'rgba(217,119,6,0.18)' : 'rgba(0,87,231,0.22)',
+                                border: `1px solid ${event.badgeTone === 'live' ? 'rgba(34,197,94,0.4)' : event.badgeTone === 'warning' ? 'rgba(217,119,6,0.4)' : 'rgba(0,87,231,0.4)'}`,
+                                color: event.badgeTone === 'live' ? '#22C55E' : event.badgeTone === 'warning' ? '#F59E0B' : '#4285F4',
+                                fontSize: '0.6rem',
+                                fontWeight: 700,
+                                letterSpacing: '0.14em',
+                                textTransform: 'uppercase',
+                                marginBottom: '0.5rem',
+                              }}
+                            >
+                              {event.badge}
+                            </div>
+                          ) : null}
+                          <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                            {event.eventName}
+                          </h3>
+                          <p style={{ margin: '0.35rem 0 0', fontSize: '0.78rem', color: 'rgba(255,255,255,0.50)' }}>
+                            {event.date} &nbsp;·&nbsp; {event.location}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </section>
+
+          {/* ── STATS SECTION ── */}
+          <section
+            style={{
+              background: 'linear-gradient(135deg, #050505 0%, #080D1A 100%)',
+              position: 'relative',
+              overflow: 'hidden',
+              padding: '6rem 1.5rem',
+            }}
+          >
+            {/* Blue glow top */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'radial-gradient(circle at 50% 0%, rgba(0,87,231,0.20), transparent 50%)',
+                pointerEvents: 'none',
+              }}
+            />
+            <div style={{ maxWidth: '56rem', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+                {[
+                  { value: '98%', label: isPortuguese ? 'Taxa de check-in' : 'Check-in rate' },
+                  { value: '< 2s', label: isPortuguese ? 'Tempo de leitura' : 'Scan speed' },
+                  { value: '24/7', label: isPortuguese ? 'Operacao continua' : 'Non-stop operation' },
+                ].map((stat, i) => (
+                  <div
+                    key={stat.label}
+                    style={{
+                      textAlign: 'center',
+                      borderRight: i < 2 ? '1px solid rgba(255,255,255,0.07)' : 'none',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 'clamp(4rem, 8vw, 7rem)',
+                        fontWeight: 900,
+                        letterSpacing: '-0.05em',
+                        color: '#FFFFFF',
+                        lineHeight: 1,
+                      }}
+                    >
+                      {stat.value}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.28em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(255,255,255,0.48)',
+                        marginTop: '1rem',
+                      }}
+                    >
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ── FEATURES SECTION ── */}
+          <section style={{ background: '#0A0A0A', padding: '6rem 1.5rem' }}>
+            <div style={{ maxWidth: '78rem', margin: '0 auto' }}>
+              {/* Header */}
+              <div style={{ marginBottom: '3.5rem' }}>
+                <div
+                  style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.28em',
+                    textTransform: 'uppercase',
+                    color: '#0057E7',
+                    marginBottom: '0.75rem',
+                  }}
+                >
+                  {isPortuguese ? 'POR QUE PULSE?' : 'WHY PULSE?'}
+                </div>
+                <h2
+                  style={{
+                    margin: 0,
+                    fontSize: 'clamp(2rem, 3.5vw, 3.5rem)',
+                    fontWeight: 700,
+                    letterSpacing: '-0.04em',
+                    color: '#FFFFFF',
+                    lineHeight: 1.1,
+                    maxWidth: '22ch',
+                  }}
+                >
+                  {isPortuguese
+                    ? 'Uma pilha unica para governar toda a experiencia.'
+                    : 'One stack to govern the whole experience.'}
+                </h2>
+              </div>
+
+              {/* Feature cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(18rem, 1fr))', gap: '1.5rem' }}>
+                {benefits.map((benefit, index) => (
+                  <PublicReveal key={benefit.title} delayMs={index * 90}>
+                    <div
+                      style={{
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '1.5rem',
+                        padding: '2rem',
+                        height: '100%',
+                        transition: 'background 200ms ease, border-color 200ms ease, transform 200ms ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        const el = e.currentTarget as HTMLDivElement
+                        el.style.background = 'rgba(255,255,255,0.06)'
+                        el.style.borderColor = 'rgba(255,255,255,0.12)'
+                        el.style.transform = 'translateY(-3px)'
+                      }}
+                      onMouseLeave={(e) => {
+                        const el = e.currentTarget as HTMLDivElement
+                        el.style.background = 'rgba(255,255,255,0.04)'
+                        el.style.borderColor = 'rgba(255,255,255,0.08)'
+                        el.style.transform = 'translateY(0)'
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '3.5rem',
+                          height: '3.5rem',
+                          borderRadius: '0.875rem',
+                          background: 'rgba(0,87,231,0.12)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#4285F4',
+                        }}
+                      >
+                        <benefit.icon size={22} />
+                      </div>
+                      <h3
+                        style={{
+                          margin: '1.5rem 0 0',
+                          fontSize: '1.2rem',
+                          fontWeight: 700,
+                          color: '#FFFFFF',
+                          letterSpacing: '-0.02em',
+                        }}
+                      >
+                        {benefit.title}
+                      </h3>
+                      <p
+                        style={{
+                          margin: '0.75rem 0 0',
+                          fontSize: '0.875rem',
+                          lineHeight: 1.75,
+                          color: 'rgba(255,255,255,0.56)',
+                        }}
+                      >
+                        {benefit.description}
+                      </p>
+                    </div>
+                  </PublicReveal>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ── CTA SECTION ── */}
+          <section
+            style={{
+              background: '#050505',
+              borderTop: '1px solid rgba(255,255,255,0.05)',
+              position: 'relative',
+              overflow: 'hidden',
+              padding: '8rem 1.5rem',
+              textAlign: 'center',
+            }}
+          >
+            {/* Blue gradient top */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '1px',
+                background: 'linear-gradient(90deg, transparent, rgba(0,87,231,0.6), transparent)',
+                pointerEvents: 'none',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '60%',
+                height: '40%',
+                background: 'radial-gradient(ellipse at top, rgba(0,87,231,0.15), transparent 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: 'clamp(3rem, 6vw, 6rem)',
+                  fontWeight: 900,
+                  letterSpacing: '-0.05em',
+                  color: '#FFFFFF',
+                  lineHeight: 0.92,
+                }}
+              >
+                {isPortuguese ? 'Comece agora.' : 'Start now.'}
+              </h2>
+              <p
+                style={{
+                  marginTop: '1.5rem',
+                  fontSize: '1.1rem',
+                  color: 'rgba(255,255,255,0.56)',
+                  maxWidth: '36rem',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  lineHeight: 1.8,
+                }}
+              >
+                {isPortuguese
+                  ? 'Entre no cockpit e gerencie seu proximo evento com total controle operacional.'
+                  : 'Enter the cockpit and manage your next event with full operational control.'}
+              </p>
+              <button
+                type="button"
+                onClick={onLogin}
+                style={{
+                  marginTop: '2.5rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  background: '#0057E7',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  fontSize: '1.1rem',
+                  padding: '1.25rem 2.5rem',
+                  borderRadius: '999px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 20px 60px rgba(0,87,231,0.35)',
+                  transition: 'all 200ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  const btn = e.currentTarget as HTMLButtonElement
+                  btn.style.background = '#4285F4'
+                  btn.style.transform = 'translateY(-3px)'
+                  btn.style.boxShadow = '0 28px 80px rgba(0,87,231,0.45)'
+                }}
+                onMouseLeave={(e) => {
+                  const btn = e.currentTarget as HTMLButtonElement
+                  btn.style.background = '#0057E7'
+                  btn.style.transform = 'translateY(0)'
+                  btn.style.boxShadow = '0 20px 60px rgba(0,87,231,0.35)'
+                }}
+              >
+                {isPortuguese ? 'Entrar na plataforma' : 'Enter platform'}
+                <ArrowRight size={18} />
+              </button>
+            </div>
+          </section>
+
         </div>
       </PublicLayout>
     </>

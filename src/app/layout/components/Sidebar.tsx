@@ -45,8 +45,8 @@ function SidebarItem({
       className={cn(
         'relative flex h-11 w-full items-center gap-3 rounded-[var(--pulse-radius-md)] px-4 text-left transition-colors duration-[var(--pulse-app-motion-duration)]',
         active
-          ? 'bg-[var(--pulse-app-active-surface)] text-[var(--pulse-color-primary)]'
-          : 'text-[var(--pulse-color-text-secondary)] hover:bg-[var(--pulse-app-hover-surface)] hover:text-[var(--pulse-color-text-primary)]',
+          ? 'bg-[#0057E7]/12 text-[#4285F4]'
+          : 'text-white/44 hover:bg-white/[0.04] hover:text-white/80',
       )}
     >
       <span
@@ -85,15 +85,16 @@ function SidebarSurface({
   return (
     <div className="flex h-full flex-col bg-[var(--pulse-app-sidebar-bg)]">
       <div className="flex h-[var(--pulse-app-header-height)] items-center justify-between border-b border-[var(--pulse-app-sidebar-border)] px-5">
-        <span className="text-lg font-semibold tracking-[-0.03em] text-[var(--pulse-color-text-primary)]">
-          Pulse
-        </span>
+        <div className="flex flex-col">
+          <img src="/logo.png" alt="Pulse" className="h-8 w-auto brightness-0 invert" />
+          <span className="text-[10px] uppercase tracking-widest text-white/30 mt-1">Platform</span>
+        </div>
 
         {mobile ? (
           <button
             type="button"
             onClick={onCloseMobile}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[var(--pulse-color-text-secondary)] transition hover:bg-[var(--pulse-app-hover-surface)] hover:text-[var(--pulse-color-text-primary)]"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-white/44 transition hover:bg-white/[0.04] hover:text-white/80"
             title={t('Close navigation', 'Fechar navegacao')}
           >
             <X className="h-4 w-4" />
@@ -105,7 +106,7 @@ function SidebarSurface({
         <div className="space-y-6">
           {navigation.map((group) => (
             <section key={group.key}>
-              <div className="mb-2 px-4 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--pulse-color-text-secondary)]">
+              <div className="mb-2 px-4 text-[11px] font-medium uppercase tracking-[0.14em] text-white/24">
                 {group.label}
               </div>
 
@@ -131,16 +132,16 @@ function SidebarSurface({
       </div>
 
       <div className="border-t border-[var(--pulse-app-sidebar-border)] px-4 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--pulse-color-surface)] text-sm font-semibold text-[var(--pulse-color-text-primary)]">
+        <div className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] p-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/12 bg-[#0057E7]/20 text-sm font-semibold text-[#4285F4]">
             {initials || 'P'}
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-medium text-[var(--pulse-color-text-primary)]">
+            <div className="truncate text-sm font-medium text-white/90">
               {fullName || 'Pulse User'}
             </div>
-            <div className="truncate text-xs text-[var(--pulse-color-text-secondary)]">
+            <div className="truncate text-xs text-white/40">
               {organization?.name || t('Internal workspace', 'Workspace interno')}
             </div>
           </div>
@@ -148,7 +149,7 @@ function SidebarSurface({
           <button
             type="button"
             onClick={() => signOut()}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[var(--pulse-color-text-secondary)] transition hover:bg-[var(--pulse-app-hover-surface)] hover:text-[var(--pulse-color-text-primary)]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/40 transition hover:bg-white/[0.06] hover:text-white/80"
             title={t('Sign out', 'Sair')}
           >
             <LogOut className="h-4 w-4" />

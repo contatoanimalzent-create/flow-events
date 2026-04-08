@@ -66,11 +66,11 @@
     --pulse-color-primary: #0057E7;
     --pulse-color-primary-soft: #4285F4;
     --pulse-color-primary-light: #4285F4;
-    --pulse-color-background: #FFFFFF;
-    --pulse-color-surface: #F7F8FA;
-    --pulse-color-text-primary: #0A0A0A;
-    --pulse-color-text-secondary: #44475A;
-    --pulse-color-border: #E5E7EB;
+    --pulse-color-background: #0A0A0A;
+    --pulse-color-surface: rgba(255,255,255,0.04);
+    --pulse-color-text-primary: rgba(255,255,255,0.9);
+    --pulse-color-text-secondary: rgba(255,255,255,0.50);
+    --pulse-color-border: rgba(255,255,255,0.07);
     --pulse-color-primary-base: var(--pulse-color-primary);
     --pulse-color-primary-accent: var(--pulse-color-primary-soft);
     --pulse-surface-base: #FFFFFF;
@@ -144,21 +144,21 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Admin body — light */
+  /* Admin body — dark */
   body {
-    background-color: var(--pulse-color-background);
-    color: var(--pulse-color-text-primary);
+    background-color: #0A0A0A;
+    color: rgba(255,255,255,0.9);
     margin: 0;
     padding: 0;
   }
 
-  /* Scrollbar — subtle on light bg */
+  /* Scrollbar — subtle on dark bg */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: #F7F8FA; }
-  ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+  ::-webkit-scrollbar-track { background: #0A0A0A; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
-  ::selection { background: rgba(0,87,231,0.18); color: #0A0A0A; }
+  ::selection { background: rgba(0,87,231,0.35); color: #FFFFFF; }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -275,12 +275,12 @@
 
   .admin-shell-foundation {
     @apply relative flex min-h-screen overflow-hidden;
-    background: #FFFFFF;
+    background: #0A0A0A;
   }
 
-  /* Main content area — light */
+  /* Main content area — dark */
   .main-grid-bg {
-    background-color: #F7F8FA;
+    background-color: #0A0A0A !important;
   }
 
   .admin-page-layout { @apply mx-auto max-w-[1720px] space-y-10 px-5 py-8 md:px-8 lg:px-10 lg:py-10; }
@@ -293,12 +293,12 @@
 
   .admin-title {
     @apply font-display text-[clamp(2.5rem,5vw,3.5rem)] font-bold tracking-[-0.03em] leading-[0.92];
-    color: #0A0A0A;
+    color: #FFFFFF !important;
   }
   .admin-title-accent { color: #0057E7; }
   .admin-subtitle {
     @apply mt-5 max-w-2xl text-base leading-8;
-    color: #44475A;
+    color: rgba(255,255,255,0.5) !important;
   }
   .admin-eyebrow {
     @apply text-[11px] uppercase tracking-[0.46em];
@@ -346,10 +346,10 @@
 ═══════════════════════════════════════════════════ */
 
   .card {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 16px;
+    box-shadow: none !important;
   }
 
   .card-hover {
@@ -365,12 +365,15 @@
     box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
   }
 
-  /* Dark card — for sidebar panels */
+  /* Dark card — for admin pages */
   .card-dark {
-    background: #F7F8FA;
-    border: 1px solid #E5E7EB;
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+  }
+  .card-dark:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.10);
   }
   .card-dark-hover {
     background: #F7F8FA;
@@ -387,21 +390,20 @@
 
   /* Metric / KPI card */
   .metric-card {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
     transition: all 0.22s var(--ds-ease-productive);
   }
   .metric-card:hover {
-    border-color: #D1D5DB;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+    border-color: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
     transform: translateY(-2px);
   }
 
   .stat-card   { @apply card p-5 flex flex-col gap-2; }
-  .stat-value  { @apply text-3xl font-semibold; color: #0A0A0A; }
+  .stat-value  { @apply text-3xl font-semibold; color: #FFFFFF; }
   .stat-label  { @apply text-[11px] uppercase tracking-[0.26em]; color: #44475A; }
   .stat-change-up   { @apply text-xs font-medium; color: #22C55E; }
   .stat-change-down { @apply text-xs font-medium; color: #EF4444; }
@@ -526,20 +528,18 @@
 
   .input {
     @apply w-full text-sm transition-all;
-    background: var(--pulse-input-muted);
-    border: 1px solid var(--pulse-color-border);
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid rgba(255,255,255,0.10) !important;
     border-radius: var(--pulse-radius-sm);
-    color: var(--pulse-color-text-primary);
+    color: rgba(255,255,255,0.9) !important;
     padding: 0.625rem 1rem;
-    box-shadow: var(--pulse-shadow-inset);
     font-family: var(--pulse-font-family);
   }
-  .input::placeholder { color: var(--pulse-input-placeholder); }
+  .input::placeholder { color: rgba(255,255,255,0.25) !important; }
   .input:focus {
     outline: none;
-    border-color: var(--pulse-color-primary-accent);
-    background: var(--pulse-input-background);
-    box-shadow: 0 0 0 3px var(--pulse-focus-ring);
+    border-color: #0057E7 !important;
+    box-shadow: 0 0 0 3px rgba(0,87,231,0.18);
   }
   .input-label { @apply block text-[11px] font-semibold mb-2 uppercase tracking-[0.2em]; color: var(--pulse-color-text-secondary); }
 
@@ -592,13 +592,13 @@
 
   .table-header {
     @apply text-[11px] font-semibold uppercase tracking-[0.22em] px-5 py-3.5 text-left;
-    color: var(--pulse-color-text-secondary);
-    background: var(--pulse-surface-muted);
-    border-bottom: 1px solid var(--pulse-color-border);
+    color: rgba(255,255,255,0.4) !important;
+    background: rgba(255,255,255,0.03) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
   }
   .table-cell  { @apply px-5 py-4 text-sm align-top; color: var(--pulse-color-text-primary); }
-  .table-row   { border-top: 1px solid var(--pulse-color-border); transition: background 0.12s; }
-  .table-row:hover { background: var(--pulse-surface-muted); }
+  .table-row   { border-top: 1px solid rgba(255,255,255,0.05); transition: background 0.12s; }
+  .table-row:hover { background: rgba(255,255,255,0.03) !important; }
 
   .premium-table-shell {
     @apply overflow-hidden;
@@ -974,4 +974,15 @@
   .page-header-actions,
   .section-header-actions { @apply flex flex-wrap items-center gap-2; }
   .premium-card  { @apply rounded-[1.5rem] p-6; }
+
+/* ═══════════════════════════════════════════════════
+   DARK ADMIN UTILITIES
+═══════════════════════════════════════════════════ */
+
+  /* Admin text utilities */
+  .admin-title { color: #FFFFFF !important; }
+  .admin-subtitle { color: rgba(255,255,255,0.5) !important; }
+  .text-text-primary { color: rgba(255,255,255,0.9) !important; }
+  .text-text-secondary { color: rgba(255,255,255,0.52) !important; }
+  .text-text-muted { color: rgba(255,255,255,0.30) !important; }
 }

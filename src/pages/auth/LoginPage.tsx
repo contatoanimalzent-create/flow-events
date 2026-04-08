@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2, Mail, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Loader2, Mail, ShieldCheck } from 'lucide-react'
 import { authService } from '@/features/auth/services/auth.service'
 import { useAuthStore } from '@/lib/store/auth'
 import { useAppLocale } from '@/shared/i18n/app-locale'
@@ -120,6 +120,22 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                       'Uma unica entrada para vendas, controle de acesso, financeiro, equipe e governanca.',
                     )}
               </p>
+              {!recoveryMode ? (
+                <ul className="mt-8 space-y-3">
+                  {[
+                    t('Vendas e ingressos em tempo real', 'Real-time sales and tickets'),
+                    t('Check-in com QR Code', 'QR Code check-in'),
+                    t('Relatorios e financeiro', 'Reports and finance'),
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sm text-white/60">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0057E7]/20 text-[#4285F4]">
+                        <Check className="h-3 w-3" />
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </div>
 
@@ -139,16 +155,20 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
           </div>
         </div>
 
-        <div className="relative flex items-center justify-center px-8 py-10 lg:px-10 lg:py-12">
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0)_100%)]" />
-          <div className="relative z-10 w-full max-w-[32rem] rounded-2xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-7 shadow-[0_32px_120px_rgba(0,0,0,0.34)] backdrop-blur-xl md:p-8">
+        <div className="relative flex items-center justify-center bg-[#0A0A0A] px-8 py-10 lg:px-10 lg:py-12">
+          <div className="relative z-10 w-full max-w-[28rem] mx-auto">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.34em] text-[#4285F4]">
                   {recoveryMode ? t('Recovery flow', 'Fluxo de recuperacao') : t('Secure sign in', 'Entrada segura')}
                 </div>
-                <div className="mt-3 text-2xl font-bold leading-[0.92] tracking-[-0.03em] text-white">
-                  {recoveryMode ? t('Recover access', 'Recuperar acesso') : t('Producer login', 'Login do produtor')}
+                <div className="mt-3 text-3xl font-black leading-[0.92] tracking-[-0.03em] text-white">
+                  {recoveryMode ? t('Recover access', 'Recuperar acesso') : t('Sign in', 'Entrar')}
+                </div>
+                <div className="mt-2 text-sm text-white/42">
+                  {recoveryMode
+                    ? t('Enter your email to receive a recovery link.', 'Digite seu email para receber um link de recuperacao.')
+                    : t('Welcome back. Enter your credentials.', 'Bem-vindo de volta. Digite suas credenciais.')}
                 </div>
               </div>
               <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#4285F4]/20 bg-[#0057E7]/14 text-[#4285F4]">
@@ -166,7 +186,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                     setGoogleLoading(false)
                   }}
                   disabled={googleLoading}
-                  className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/12 bg-white/[0.04] text-sm font-medium text-white transition-all hover:border-white/20 hover:bg-white/[0.07] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-full bg-white text-[#0A0A0A] text-sm font-semibold transition-all hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
                   {t('Continue with Google', 'Continuar com Google')}
@@ -261,7 +281,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#0057E7] text-white transition-all hover:-translate-y-0.5 hover:bg-[#4285F4] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#0057E7] text-base font-bold text-white shadow-[0_16px_40px_rgba(0,87,231,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#4285F4] hover:shadow-[0_20px_50px_rgba(0,87,231,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>
                     <span>{t('Sign in', 'Entrar')}</span>
@@ -273,7 +293,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                   type="button"
                   onClick={handleRecovery}
                   disabled={recoveryLoading}
-                  className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#0057E7] text-white transition-all hover:-translate-y-0.5 hover:bg-[#4285F4] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#0057E7] text-base font-bold text-white shadow-[0_16px_40px_rgba(0,87,231,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#4285F4] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {recoveryLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>
                     <span>{t('Send recovery link', 'Enviar link de recuperacao')}</span>

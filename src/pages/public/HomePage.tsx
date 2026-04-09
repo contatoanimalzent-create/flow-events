@@ -294,60 +294,6 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                   : 'Accreditation, sales, reporting and teams — all in one connected operation.'}
               </p>
 
-              {/* CTA buttons */}
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <button
-                  type="button"
-                  onClick={scrollToUpcomingEvents}
-                  style={{
-                    background: '#0057E7',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    fontSize: '1rem',
-                    padding: '1rem 2rem',
-                    borderRadius: '999px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 200ms ease',
-                    boxShadow: '0 16px 40px rgba(0,87,231,0.35)',
-                  }}
-                  onMouseEnter={(e) => {
-                    ;(e.currentTarget as HTMLButtonElement).style.background = '#4285F4'
-                    ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)'
-                  }}
-                  onMouseLeave={(e) => {
-                    ;(e.currentTarget as HTMLButtonElement).style.background = '#0057E7'
-                    ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
-                  }}
-                >
-                  {isPortuguese ? 'Ver eventos' : 'See events'}
-                </button>
-                <button
-                  type="button"
-                  onClick={onLogin}
-                  style={{
-                    background: 'transparent',
-                    color: 'rgba(255,255,255,0.80)',
-                    fontWeight: 600,
-                    fontSize: '1rem',
-                    padding: '1rem 2rem',
-                    borderRadius: '999px',
-                    border: '1px solid rgba(255,255,255,0.20)',
-                    cursor: 'pointer',
-                    transition: 'all 200ms ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.4)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = '#FFFFFF'
-                  }}
-                  onMouseLeave={(e) => {
-                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.20)'
-                    ;(e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.80)'
-                  }}
-                >
-                  {isPortuguese ? 'Entrar na plataforma' : 'Enter platform'}
-                </button>
-              </div>
             </div>
 
             {/* Stats bar */}

@@ -7,6 +7,7 @@
 
 import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { corsHeaders } from '../_shared/cors.ts'
 
 const ADMIN_FEE_RATE  = 0.05    // 5% do comprador → Animalz Events
 const PROCESSING_RATE = 0.018   // 1.8% do produtor → Animalz Events
@@ -19,19 +20,34 @@ const CARD_RATES: Record<number, number> = {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, content-type',
-      },
-    })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
+    // ── Auth check ────────────────────────────────────────────
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders })
+    }
+
+    const supabaseUser = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } },
+    )
+
+    const { data: { user }, error: authError } = await supabaseUser.auth.getUser(
+      authHeader.replace('Bearer ', ''),
+    )
+    if (authError || !user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders })
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
       apiVersion: '2024-06-20',
     })
 
+    // Service-role client for admin lookups (events, orgs, ticket types)
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
@@ -39,6 +55,14 @@ Deno.serve(async (req) => {
 
     const body = await req.json()
     const { eventId, ticketTypeId, quantity = 1, installments = 0, buyerEmail, successUrl, cancelUrl } = body
+
+    // ── Quantity validation ───────────────────────────────────
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
+      return Response.json(
+        { error: 'Quantidade inválida. Máximo 10 ingressos por tipo.' },
+        { status: 400, headers: corsHeaders },
+      )
+    }
 
     // ── Fetch event + ticket type ──────────────────────────────
     const { data: event, error: evErr } = await supabase
@@ -134,30 +158,53 @@ Deno.serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create(sessionParams)
 
-    // ── Create pending order in DB ─────────────────────────────
-    await supabase.from('orders').insert({
-      event_id: eventId,
-      organization_id: event.organization_id,
-      buyer_email: buyerEmail ?? '',
-      buyer_name: '',
-      subtotal: faceValue * quantity,
-      discount_amount: 0,
-      fee_amount: flowFee * quantity,
-      total_amount: totalAmount,
-      status: 'pending',
-      payment_method: installments === 0 ? 'pix' : `card_${installments}x`,
-      stripe_session_id: session.id,
-    })
+    // ── Reserve inventory via RPC (uses authenticated user's client) ────
+    const { data: orderId, error: rpcError } = await supabaseUser.rpc(
+      'create_order_draft_with_reservations',
+      {
+        p_payload: {
+          organization_id: event.organization_id,
+          event_id: eventId,
+          buyer_name: '',
+          buyer_email: buyerEmail ?? '',
+          buyer_phone: '',
+          buyer_cpf: '',
+          subtotal: faceValue * quantity,
+          discount_amount: 0,
+          fee_amount: flowFee * quantity,
+          total_amount: totalAmount,
+          status: 'pending',
+          payment_method: installments === 0 ? 'pix' : `card_${installments}x`,
+          source_channel: 'online',
+          notes: `Stripe session: ${session.id}`,
+          items: [
+            {
+              ticket_type_id: ticketTypeId,
+              quantity,
+              unit_price: faceValue,
+            },
+          ],
+        },
+      },
+    )
+
+    if (rpcError) {
+      console.error('[stripe-checkout] RPC error:', rpcError)
+      return Response.json(
+        { error: rpcError.message ?? 'Falha ao reservar ingressos' },
+        { status: 500, headers: corsHeaders },
+      )
+    }
 
     return Response.json(
-      { sessionId: session.id, url: session.url },
-      { headers: { 'Access-Control-Allow-Origin': '*' } },
+      { sessionId: session.id, url: session.url, orderId },
+      { headers: corsHeaders },
     )
   } catch (err: any) {
     console.error('[stripe-checkout]', err)
     return Response.json(
       { error: err.message ?? 'Erro interno' },
-      { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } },
+      { status: 500, headers: corsHeaders },
     )
   }
 })

@@ -231,6 +231,25 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   const credentialId: string = credential.id
 
+  // ── Persist the QR token so validate-checkin can find it ───────────────
+  const { error: qrTokenError } = await admin
+    .from('qr_tokens')
+    .insert({
+      token:     qrToken,
+      ref_type:  'credential',
+      ref_id:    credentialId,
+      event_id:  eventId,
+      is_active: true,
+      max_uses:  null,  // unlimited for staff credentials
+    })
+
+  if (qrTokenError) {
+    // Roll back credential to avoid orphaned record
+    await admin.from('credentials').delete().eq('id', credentialId)
+    console.error('QR token insert error:', qrTokenError)
+    return errorResponse('Failed to persist QR token.', 500, 'QR_TOKEN_INSERT_ERROR')
+  }
+
   // ── Create access rules ────────────────────────────────────────────────────
   let accessZones: string[] | 'all' = 'all'
 

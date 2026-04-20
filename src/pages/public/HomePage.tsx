@@ -266,12 +266,14 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                 style={{
                   margin: 0,
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: 'clamp(4.5rem, 9vw, 9rem)',
+                  fontSize: 'clamp(2.25rem, 11vw, 9rem)',
                   fontWeight: 900,
-                  lineHeight: 0.86,
-                  letterSpacing: '-0.05em',
+                  lineHeight: 0.92,
+                  letterSpacing: '-0.04em',
                   color: '#FFFFFF',
                   maxWidth: '14ch',
+                  overflowWrap: 'anywhere',
+                  wordBreak: 'break-word',
                 }}
               >
                 {isPortuguese
@@ -398,11 +400,12 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                   <h2
                     style={{
                       margin: 0,
-                      fontSize: 'clamp(2.5rem, 4vw, 4rem)',
+                      fontSize: 'clamp(1.75rem, 6vw, 4rem)',
                       fontWeight: 700,
                       letterSpacing: '-0.04em',
                       color: '#FFFFFF',
-                      lineHeight: 1,
+                      lineHeight: 1.05,
+                      overflowWrap: 'anywhere',
                     }}
                   >
                     {isPortuguese ? 'Eventos em destaque' : 'Featured events'}
@@ -593,7 +596,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
               }}
             />
             <div style={{ maxWidth: '56rem', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'clamp(0.5rem, 2vw, 2rem)' }}>
                 {[
                   { value: '98%', label: isPortuguese ? 'Taxa de check-in' : 'Check-in rate' },
                   { value: '< 2s', label: isPortuguese ? 'Tempo de leitura' : 'Scan speed' },
@@ -608,7 +611,7 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
                   >
                     <div
                       style={{
-                        fontSize: 'clamp(4rem, 8vw, 7rem)',
+                        fontSize: 'clamp(2rem, 10vw, 7rem)',
                         fontWeight: 900,
                         letterSpacing: '-0.05em',
                         color: '#FFFFFF',
@@ -776,11 +779,12 @@ export function HomePage({ onLogin }: { onLogin: () => void }) {
               <h2
                 style={{
                   margin: 0,
-                  fontSize: 'clamp(3rem, 6vw, 6rem)',
+                  fontSize: 'clamp(2rem, 9vw, 6rem)',
                   fontWeight: 900,
                   letterSpacing: '-0.05em',
                   color: '#FFFFFF',
-                  lineHeight: 0.92,
+                  lineHeight: 0.95,
+                  overflowWrap: 'anywhere',
                 }}
               >
                 {isPortuguese ? 'Comece agora.' : 'Start now.'}

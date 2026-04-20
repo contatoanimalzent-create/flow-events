@@ -12,9 +12,9 @@ export const appLayoutTokens = {
   content: {
     maxWidth: '80rem',
     maxWidthWide: '80rem',
-    paddingXMobile: '1.5rem',
+    paddingXMobile: '1rem',
     paddingXDesktop: '2rem',
-    paddingY: '1.5rem',
+    paddingY: '1rem',
     sectionGap: '2rem',
   },
   grid: {

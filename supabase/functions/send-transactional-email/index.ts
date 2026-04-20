@@ -12,7 +12,7 @@ type TransactionalTemplateKey =
   | 'order-confirmation-with-qr'
   | 'tickets-issued'
 
-function buildTemplatePayload(
+async function buildTemplatePayload(
   templateKey: TransactionalTemplateKey,
   data: {
     orderId: string
@@ -24,6 +24,8 @@ function buildTemplatePayload(
     eventDate?: string
     eventLocation?: string
     exerciseType?: string
+    coverUrl?: string
+    emailTheme?: { accent_color?: string; bg_color?: string; text_color?: string }
     tickets: Array<{
       ticketNumber: string
       holderName: string | null
@@ -35,7 +37,7 @@ function buildTemplatePayload(
 ) {
   switch (templateKey) {
     case 'order-confirmation-with-qr':
-      return buildOrderConfirmationWithQREmail({
+      return await buildOrderConfirmationWithQREmail({
         orderId: data.orderId,
         eventName: data.eventName,
         buyerName: data.buyerName,
@@ -45,6 +47,8 @@ function buildTemplatePayload(
         eventDate: data.eventDate,
         eventLocation: data.eventLocation,
         exerciseType: data.exerciseType,
+        coverUrl: data.coverUrl,
+        emailTheme: data.emailTheme,
         tickets: data.tickets,
       })
     case 'tickets-issued':
@@ -82,7 +86,7 @@ Deno.serve(async (req) => {
     const [{ data: event }, { data: digitalTickets }] = await Promise.all([
       supabase
         .from('events')
-        .select('id,name,starts_at,venue_address,venue_name,settings')
+        .select('id,name,starts_at,venue_address,venue_name,cover_url,settings')
         .eq('id', order.event_id)
         .single(),
       supabase
@@ -110,19 +114,24 @@ Deno.serve(async (req) => {
         })
       : undefined
 
-    // Extract location from venue info
+    // Extract location from venue info (venue_address is a JSON {street, city, state})
+    const venueAddr = event?.venue_address as Record<string, string> | null | undefined
+    const addressParts = venueAddr
+      ? [venueAddr.street, venueAddr.city, venueAddr.state].filter(Boolean).join(', ')
+      : ''
     const eventLocation = event?.venue_name
-      ? `${event.venue_name}${event.venue_address ? ' - ' + event.venue_address : ''}`
+      ? `${event.venue_name}${addressParts ? ' — ' + addressParts : ''}`
       : undefined
 
-    // Extract exercise type from settings if available
-    const exerciseType = event?.settings
-      ? ((event.settings as Record<string, unknown>)?.exercise_type as string | undefined)
-      : undefined
+    // Extract exercise type and email theme from settings if available
+    const settings = event?.settings as Record<string, unknown> | null | undefined
+    const exerciseType = settings?.exercise_type as string | undefined
+    const emailTheme = settings?.email_theme as { accent_color?: string; bg_color?: string; text_color?: string } | undefined
+    const coverUrl = event?.cover_url ? String(event.cover_url) : undefined
 
-    const content = buildTemplatePayload(templateKey, {
+    const content = await buildTemplatePayload(templateKey, {
       orderId: order.id,
-      eventName: event?.name ?? 'Animalz Event',
+      eventName: event?.name ?? 'Pulse Event',
       buyerName: order.buyer_name ?? '',
       buyerEmail: order.buyer_email ?? '',
       totalAmount: Number(order.total_amount ?? 0),
@@ -130,6 +139,8 @@ Deno.serve(async (req) => {
       eventDate,
       eventLocation,
       exerciseType,
+      coverUrl,
+      emailTheme,
       tickets: ((digitalTickets as Array<Record<string, unknown>> | null) ?? []).map((ticket) => ({
         ticketNumber: String(ticket.ticket_number ?? ''),
         holderName: (ticket.holder_name as string | null | undefined) ?? null,

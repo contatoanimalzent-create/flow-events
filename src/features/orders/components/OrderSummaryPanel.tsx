@@ -1,4 +1,4 @@
-import { Check, Lock, Ticket } from 'lucide-react'
+import { Check, Lock, Tag, Ticket } from 'lucide-react'
 import type { CheckoutCartItem, CheckoutSummary } from '@/features/orders/types'
 import { formatPublicCurrency, usePublicLocale } from '@/features/public/lib/public-locale'
 
@@ -10,6 +10,8 @@ interface OrderSummaryPanelProps {
   onAdd: (ticketTypeId: string, batchId: string) => void
   onRemove: (batchId: string) => void
   reserveCountdown?: string | null
+  couponCode?: string | null
+  couponDiscount?: number
 }
 
 export function OrderSummaryPanel({
@@ -20,6 +22,8 @@ export function OrderSummaryPanel({
   onAdd,
   onRemove,
   reserveCountdown,
+  couponCode,
+  couponDiscount = 0,
 }: OrderSummaryPanelProps) {
   const { locale, isPortuguese } = usePublicLocale()
   return (
@@ -90,6 +94,15 @@ export function OrderSummaryPanel({
             <span>Subtotal</span>
             <span>{summary.subtotal === 0 ? (isPortuguese ? 'Gratuito' : 'Free') : formatPublicCurrency(summary.subtotal, locale)}</span>
           </div>
+          {couponCode && couponDiscount > 0 && (
+            <div className="mt-3 flex items-center justify-between text-sm text-[#22c55e]">
+              <span className="flex items-center gap-1.5">
+                <Tag className="h-3.5 w-3.5" />
+                {couponCode}
+              </span>
+              <span>-{formatPublicCurrency(couponDiscount, locale)}</span>
+            </div>
+          )}
           <div className="mt-3 flex items-center justify-between text-sm text-white/50">
             <span>{summary.absorb_fee ? (isPortuguese ? 'Taxa absorvida' : 'Absorbed fee') : (isPortuguese ? 'Taxa aplicada' : 'Applied fee')}</span>
             <span>

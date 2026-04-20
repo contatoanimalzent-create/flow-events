@@ -17,8 +17,8 @@ interface AgendaSectionProps {
 
 export function AgendaSection({ items }: AgendaSectionProps) {
   const { isPortuguese } = usePublicLocale()
-  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420 })
-  const cardAnimation = useAnimationPreset('slideUp', { durationMs: 460, distance: 18 })
+  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420, amount: 0.05 })
+  const cardAnimation = useAnimationPreset('slideUp', { durationMs: 460, distance: 18, amount: 0.1 })
 
   return (
     <motion.section
@@ -43,7 +43,7 @@ export function AgendaSection({ items }: AgendaSectionProps) {
           {items.map((item, index) => (
             <motion.article
               key={item.id}
-              className="flex h-full flex-col rounded-[calc(var(--pulse-radius-lg)+0.25rem)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-background)] p-6 shadow-[var(--pulse-shadow-soft)]"
+              className="flex h-full flex-col rounded-[calc(var(--pulse-radius-lg)+0.25rem)] border border-[rgba(255,255,255,0.10)] bg-[var(--pulse-surface-elevated)] p-6 shadow-[var(--pulse-shadow-soft)]"
               initial={cardAnimation.initial}
               whileInView={cardAnimation.whileInView}
               viewport={cardAnimation.viewport}
@@ -51,7 +51,7 @@ export function AgendaSection({ items }: AgendaSectionProps) {
               transition={{ delay: index * 0.04 }}
             >
               <div className="flex items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pulse-color-primary)_9%,white)] px-3 py-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[var(--pulse-color-primary)]">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pulse-color-primary)_12%,transparent)] px-3 py-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[var(--pulse-color-primary)]">
                   <Clock3 className="h-3.5 w-3.5" />
                   {item.time}
                 </span>

@@ -2,6 +2,7 @@ import Stripe from 'npm:stripe@14'
 import { createSupabaseAdminClient } from '../../_shared/supabase-admin.ts'
 import {
   buildOrderConfirmationEmail,
+  buildOrderConfirmationWithQREmail,
   buildTicketsEmail,
   sendResendEmail,
 } from '../../_shared/transactional-email.ts'
@@ -301,18 +302,57 @@ async function sendTransactionalEmails(
     return
   }
 
-  const eventResult = await supabase.from('events').select('name').eq('id', order.event_id).single()
+  // Fetch event details including date, location, cover image, and email theme
+  const eventResult = await supabase
+    .from('events')
+    .select('name,starts_at,venue_name,venue_address,cover_url,settings')
+    .eq('id', order.event_id)
+    .single()
 
   if (eventResult.error) {
     throw eventResult.error
   }
 
+  const event = eventResult.data as Record<string, unknown> | null
+
+  // Format event date
+  const eventDate = event?.starts_at
+    ? new Date(String(event.starts_at)).toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : undefined
+
+  // Build location string (venue_address is a JSON object {street, city, state})
+  const venueAddr = event?.venue_address as Record<string, string> | null | undefined
+  const addressParts = venueAddr
+    ? [venueAddr.street, venueAddr.city, venueAddr.state].filter(Boolean).join(', ')
+    : ''
+  const eventLocation = event?.venue_name
+    ? `${event.venue_name}${addressParts ? ' — ' + addressParts : ''}`
+    : undefined
+
+  const settings = event?.settings as Record<string, unknown> | null | undefined
+  const exerciseType = settings?.exercise_type as string | undefined
+  const emailTheme = settings?.email_theme as { accent_color?: string; bg_color?: string; text_color?: string } | undefined
+  const coverUrl = event?.cover_url ? String(event.cover_url) : undefined
+
   const payload = {
     orderId: String(order.id),
-    eventName: String((eventResult.data as Record<string, unknown> | null)?.name ?? 'Animalz Event'),
+    eventName: String(event?.name ?? 'Pulse Event'),
     buyerName: String(order.buyer_name ?? ''),
     buyerEmail: String(order.buyer_email ?? ''),
     totalAmount: Number(order.total_amount ?? 0),
+    recipientName: String(order.buyer_name ?? ''),
+    eventDate,
+    eventLocation,
+    exerciseType,
+    coverUrl,
+    emailTheme,
     tickets: ((digitalTicketsResult.data as Array<Record<string, unknown>> | null) ?? []).map((ticket) => ({
       ticketNumber: String(ticket.ticket_number ?? ''),
       holderName: (ticket.holder_name as string | null | undefined) ?? null,
@@ -322,39 +362,32 @@ async function sendTransactionalEmails(
     })),
   }
 
-  const templates = [
-    { key: 'order-confirmation', content: buildOrderConfirmationEmail(payload) },
-    { key: 'tickets-issued', content: buildTicketsEmail(payload) },
-  ] as const
+  // Send the main confirmation email with embedded QR codes
+  const qrEmail = await buildOrderConfirmationWithQREmail(payload)
 
-  for (const template of templates) {
-    const result = await sendResendEmail({
-      to: payload.buyerEmail,
-      subject: template.content.subject,
-      html: template.content.html,
-      text: template.content.text,
-    })
+  const qrResult = await sendResendEmail({
+    to: payload.buyerEmail,
+    subject: qrEmail.subject,
+    html: qrEmail.html,
+    text: qrEmail.text,
+  })
 
-    const insertResult = await supabase.from('transactional_messages').insert({
-      order_id: payload.orderId,
-      event_id: String(order.event_id),
-      channel: 'email',
-      template_key: template.key,
-      provider: 'resend',
-      provider_message_id: result.providerMessageId,
-      recipient: payload.buyerEmail,
-      status: result.status,
-      metadata: {
-        automatic: true,
-        ticket_count: payload.tickets.length,
-      },
-      sent_at: result.status === 'sent' ? nowIso() : null,
-    })
-
-    if (insertResult.error) {
-      throw insertResult.error
-    }
-  }
+  await supabase.from('transactional_messages').insert({
+    order_id: payload.orderId,
+    event_id: String(order.event_id),
+    channel: 'email',
+    template_key: 'order-confirmation-with-qr',
+    provider: 'resend',
+    provider_message_id: qrResult.providerMessageId,
+    recipient: payload.buyerEmail,
+    status: qrResult.status,
+    metadata: {
+      automatic: true,
+      ticket_count: payload.tickets.length,
+      has_qr_codes: true,
+    },
+    sent_at: qrResult.status === 'sent' ? nowIso() : null,
+  })
 }
 
 async function processPaymentIntentSucceeded(

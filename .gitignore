@@ -42,3 +42,6 @@ xquads-squads
 # Local scratch / conversion artifacts
 .tmp/
 supabase/.temp/
+
+# Capacitor CLI cache
+.capacitor/

@@ -36,6 +36,13 @@ function mapEditorRecordToForm(data: EventEditorRecord): EventFormData {
     fee_type: data.fee_type ?? 'percentage',
     fee_value: String(data.fee_value ?? 10),
     absorb_fee: data.absorb_fee ?? false,
+    email_accent_color: data.settings?.email_theme?.accent_color ?? '#0057E7',
+    email_bg_color: data.settings?.email_theme?.bg_color ?? '#0A0A0A',
+    email_text_color: data.settings?.email_theme?.text_color ?? '#FFFFFF',
+    is_private: data.is_private ?? false,
+    access_password: data.access_password ?? '',
+    waitlist_enabled: data.waitlist_enabled ?? false,
+    max_tickets_per_order: data.max_tickets_per_order?.toString() ?? '',
   }
 }
 

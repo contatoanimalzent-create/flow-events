@@ -14,6 +14,7 @@ export function DashboardCustomerRankingTable({ rows }: DashboardCustomerRanking
       {rows.length === 0 ? (
         <div className="p-12 text-center text-sm text-text-muted">Nenhum cliente com receita suficiente para rankear no periodo.</div>
       ) : (
+        <div className="table-scroll">
         <table className="w-full">
           <thead className="border-b border-bg-border">
             <tr>
@@ -39,6 +40,7 @@ export function DashboardCustomerRankingTable({ rows }: DashboardCustomerRanking
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   )

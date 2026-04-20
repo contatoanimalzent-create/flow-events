@@ -27,6 +27,10 @@ export interface PublicEventRecord {
   fee_value: number
   absorb_fee: boolean
   status: string
+  is_private?: boolean | null
+  access_password?: string | null
+  waitlist_enabled?: boolean | null
+  max_tickets_per_order?: number | null
 }
 
 export interface PublicTicketType extends TicketType {

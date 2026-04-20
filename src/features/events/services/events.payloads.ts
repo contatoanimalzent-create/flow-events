@@ -2,7 +2,7 @@ import { slugify } from '@/shared/lib'
 import type { EventFormData, EventRow } from '@/features/events/types'
 
 export const EVENT_LIST_SELECT =
-  'id,name,slug,subtitle,category,status,starts_at,ends_at,venue_name,venue_address,total_capacity,sold_tickets,cover_url,fee_type,fee_value,absorb_fee,created_at'
+  'id,name,slug,subtitle,category,status,starts_at,ends_at,venue_name,venue_address,total_capacity,sold_tickets,cover_url,fee_type,fee_value,absorb_fee,created_at,event_code'
 
 function toOptionalString(value: string) {
   return value.trim() || null
@@ -41,7 +41,18 @@ export function buildEventPayload(form: EventFormData) {
     fee_type: form.fee_type,
     fee_value: Number(form.fee_value || 0),
     absorb_fee: form.absorb_fee,
-    settings: form.video_url ? { video_url: form.video_url.trim() } : {},
+    is_private: form.is_private,
+    access_password: form.is_private ? toOptionalString(form.access_password) : null,
+    waitlist_enabled: form.waitlist_enabled,
+    max_tickets_per_order: form.max_tickets_per_order ? parseInt(form.max_tickets_per_order, 10) : null,
+    settings: {
+      ...(form.video_url ? { video_url: form.video_url.trim() } : {}),
+      email_theme: {
+        accent_color: form.email_accent_color || '#0057E7',
+        bg_color: form.email_bg_color || '#0A0A0A',
+        text_color: form.email_text_color || '#FFFFFF',
+      },
+    },
   }
 }
 

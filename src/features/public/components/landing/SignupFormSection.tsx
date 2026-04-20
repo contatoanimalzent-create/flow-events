@@ -29,7 +29,7 @@ interface SignupFormSectionProps {
 }
 
 const inputClassName =
-  'mt-2 w-full rounded-[var(--pulse-radius-md)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-background)] px-4 py-3 text-[var(--pulse-color-text-primary)] outline-none transition-all placeholder:text-[color-mix(in_srgb,var(--pulse-color-text-secondary)_82%,white)] focus:border-[var(--pulse-color-primary)] focus:ring-4 focus:ring-[var(--pulse-focus-ring)]'
+  'mt-2 w-full rounded-[var(--pulse-radius-md)] border border-[rgba(255,255,255,0.10)] bg-[var(--pulse-surface-elevated)] px-4 py-3 text-[var(--pulse-color-text-primary)] outline-none transition-all placeholder:text-[var(--pulse-color-text-muted)] focus:border-[var(--pulse-color-primary)] focus:ring-4 focus:ring-[var(--pulse-focus-ring)]'
 
 function formatCpfInput(value: string) {
   const digits = value.replace(/\D/g, '').slice(0, 11)
@@ -43,8 +43,8 @@ function formatCpfInput(value: string) {
 
 export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubmit }: SignupFormSectionProps) {
   const { isPortuguese } = usePublicLocale()
-  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420 })
-  const formAnimation = useAnimationPreset('slideUp', { durationMs: 460, distance: 18 })
+  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420, amount: 0.05 })
+  const formAnimation = useAnimationPreset('slideUp', { durationMs: 460, distance: 18, amount: 0.1 })
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
 

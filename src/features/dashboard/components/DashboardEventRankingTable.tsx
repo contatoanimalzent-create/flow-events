@@ -14,6 +14,7 @@ export function DashboardEventRankingTable({ rows }: DashboardEventRankingTableP
       {rows.length === 0 ? (
         <div className="p-12 text-center text-sm text-text-muted">Nenhum evento encontrado para o filtro selecionado.</div>
       ) : (
+        <div className="table-scroll">
         <table className="w-full">
           <thead className="border-b border-bg-border">
             <tr>
@@ -39,6 +40,7 @@ export function DashboardEventRankingTable({ rows }: DashboardEventRankingTableP
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   )

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CalendarDays, Copy, Edit2, Plus, Search, Trash2 } from 'lucide-react'
+import { CalendarDays, Copy, Edit2, Plus, ScanLine, Search, Trash2 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useAccessControl } from '@/features/access-control'
 import { useEventActions, useEventsList } from '@/features/events/hooks'
@@ -218,7 +218,23 @@ export function EventsPageContent() {
                   <tr key={event.id} className="table-row">
                     <td className="table-cell">
                       <div className="font-display text-sm tracking-wide">{event.name}</div>
-                      <div className="text-[11px] text-text-muted">{event.category}</div>
+                      <div className="mt-0.5 flex items-center gap-2 text-[11px] text-text-muted">
+                        {event.category && <span>{event.category}</span>}
+                        {event.event_code && (
+                          <button
+                            type="button"
+                            title="Clique para copiar o código do scanner"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              void navigator.clipboard.writeText(event.event_code!)
+                            }}
+                            className="flex items-center gap-1 rounded border border-brand-acid/25 bg-brand-acid/8 px-1.5 py-0.5 font-mono font-bold tracking-widest text-brand-acid hover:bg-brand-acid/15 transition-colors"
+                          >
+                            <ScanLine className="h-2.5 w-2.5" />
+                            {event.event_code}
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="table-cell">
                       <span className={cn('flex items-center gap-1.5 text-xs', statusConfig.text)}>

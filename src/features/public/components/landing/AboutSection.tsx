@@ -38,8 +38,8 @@ export function AboutSection({
   images = [],
 }: AboutSectionProps) {
   const { locale, isPortuguese } = usePublicLocale()
-  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420 })
-  const blockAnimation = useAnimationPreset('slideUp', { durationMs: 460, distance: 22 })
+  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420, amount: 0.05 })
+  const blockAnimation = useAnimationPreset('slideUp', { durationMs: 460, distance: 22, amount: 0.1 })
   const addressLabel = getAddressLabel(venueAddress)
 
   const infoItems = [
@@ -104,7 +104,7 @@ export function AboutSection({
               return (
                 <div
                   key={item.label}
-                  className="rounded-[var(--pulse-radius-lg)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-surface)] p-5 shadow-[var(--pulse-shadow-soft)]"
+                  className="rounded-[var(--pulse-radius-lg)] border border-[rgba(255,255,255,0.10)] bg-[var(--pulse-surface-elevated)] p-5 shadow-[var(--pulse-shadow-soft)]"
                 >
                   <div className="flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[var(--pulse-color-primary)]">
                     <Icon className="h-4 w-4" />
@@ -135,15 +135,15 @@ export function AboutSection({
             ))
           ) : (
             <>
-              <div className="rounded-[calc(var(--pulse-radius-lg)+0.25rem)] border border-[var(--pulse-color-border)] bg-[linear-gradient(180deg,var(--pulse-color-background)_0%,var(--pulse-color-surface)_100%)] p-7 shadow-[var(--pulse-shadow-medium)]">
+              <div className="rounded-[calc(var(--pulse-radius-lg)+0.25rem)] border border-[rgba(255,255,255,0.10)] bg-[linear-gradient(180deg,var(--pulse-surface-elevated)_0%,rgba(255,255,255,0.06)_100%)] p-7 shadow-[var(--pulse-shadow-medium)]">
                 <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[var(--pulse-color-primary)]">
                   {isPortuguese ? 'Mapa conceitual' : 'Concept map'}
                 </div>
                 <div className="mt-5 grid gap-3">
-                  <div className="rounded-[var(--pulse-radius-md)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-background)] p-4 text-sm text-[var(--pulse-color-text-secondary)]">
+                  <div className="rounded-[var(--pulse-radius-md)] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-4 text-sm text-[var(--pulse-color-text-secondary)]">
                     {isPortuguese ? 'Recepcao, credenciamento e fluxo principal em um unico eixo claro.' : 'Reception, credentialing and the main flow aligned into one clear axis.'}
                   </div>
-                  <div className="rounded-[var(--pulse-radius-md)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-background)] p-4 text-sm text-[var(--pulse-color-text-secondary)]">
+                  <div className="rounded-[var(--pulse-radius-md)] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-4 text-sm text-[var(--pulse-color-text-secondary)]">
                     {isPortuguese ? 'Palco, lounges e ativacoes distribuidos para gerar circulacao natural.' : 'Stage, lounges and activations distributed to create natural movement.'}
                   </div>
                 </div>

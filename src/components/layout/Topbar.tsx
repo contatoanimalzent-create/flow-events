@@ -176,7 +176,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
       ) : null}
 
       {showNotifications ? (
-        <div className="absolute right-6 top-[80px] z-40 w-[420px] overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-strong">
+        <div className="absolute right-2 top-[80px] z-40 w-[min(420px,calc(100vw-1rem))] overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-strong sm:right-6">
           <div className="flex items-center justify-between border-b border-[#E5E7EB] px-5 py-5">
             <div>
               <div className="text-[10px] uppercase tracking-[0.34em] text-[#0057E7]">{access.role}</div>

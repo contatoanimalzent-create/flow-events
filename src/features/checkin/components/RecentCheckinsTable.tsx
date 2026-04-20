@@ -49,6 +49,7 @@ export function RecentCheckinsTable({
         </div>
       ) : (
         <div className="surface-panel overflow-hidden">
+          <div className="table-scroll">
           <table className="w-full">
             <thead className="border-b border-bg-border">
               <tr>
@@ -107,6 +108,7 @@ export function RecentCheckinsTable({
               })}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

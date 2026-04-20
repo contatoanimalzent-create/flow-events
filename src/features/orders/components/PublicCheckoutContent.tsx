@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, Tag, X } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 import { growthService, readStoredReferralCode } from '@/features/growth'
 import { usePaymentStatus } from '@/features/payments'
 import { usePublicLocale } from '@/features/public/lib/public-locale'
 import { useCheckoutFlow, useCheckoutStore } from '@/features/orders/hooks'
+import { sendPaymentConfirmationEmail } from '@/features/orders/services/email.service'
 import type { CheckoutCartItem, OrderPaymentMethod } from '@/features/orders/types'
 import { PublicLayout, PremiumBadge, PublicReveal } from '@/features/public'
 import type { PublicTicketType } from '@/features/public/types/public.types'
@@ -12,6 +14,141 @@ import { CheckoutStepper } from './CheckoutStepper'
 import { OrderSummaryPanel } from './OrderSummaryPanel'
 import { PaymentSection } from './PaymentSection'
 import { TicketSelector } from './TicketSelector'
+
+// ─── Coupon Input ─────────────────────────────────────────────────────────────
+
+interface CouponState {
+  code: string
+  type: 'percentage' | 'fixed'
+  value: number
+  discount: number // pre-computed discount in R$
+}
+
+function CouponInput({
+  subtotal,
+  eventId,
+  onApply,
+  onRemove,
+  appliedCoupon,
+  isPortuguese,
+}: {
+  subtotal: number
+  eventId: string
+  onApply: (coupon: CouponState) => void
+  onRemove: () => void
+  appliedCoupon: CouponState | null
+  isPortuguese: boolean
+}) {
+  const [code, setCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  async function handleApply() {
+    const trimmed = code.trim().toUpperCase()
+    if (!trimmed) return
+    setLoading(true); setError('')
+
+    const { data, error: dbErr } = await supabase
+      .from('discount_coupons')
+      .select('id, code, type, value, max_uses, uses_count, valid_until, min_order_amount, is_active')
+      .eq('code', trimmed)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    setLoading(false)
+
+    if (dbErr || !data) {
+      setError(isPortuguese ? 'Cupom inválido ou inexistente.' : 'Invalid or non-existent coupon.')
+      return
+    }
+    if (data.valid_until && new Date(data.valid_until) < new Date()) {
+      setError(isPortuguese ? 'Este cupom expirou.' : 'This coupon has expired.')
+      return
+    }
+    if (data.max_uses != null && data.uses_count >= data.max_uses) {
+      setError(isPortuguese ? 'Este cupom atingiu o limite de usos.' : 'This coupon has reached its usage limit.')
+      return
+    }
+    if (data.min_order_amount != null && subtotal < data.min_order_amount) {
+      setError(
+        isPortuguese
+          ? `Pedido mínimo de R$ ${data.min_order_amount.toFixed(2)} para este cupom.`
+          : `Minimum order of R$ ${data.min_order_amount.toFixed(2)} required for this coupon.`,
+      )
+      return
+    }
+
+    // Also check event scope (if coupon is for a specific event, validate)
+    const { data: couponFull } = await supabase
+      .from('discount_coupons')
+      .select('event_id')
+      .eq('id', data.id)
+      .single()
+
+    if (couponFull?.event_id && couponFull.event_id !== eventId) {
+      setError(isPortuguese ? 'Este cupom não é válido para este evento.' : 'This coupon is not valid for this event.')
+      return
+    }
+
+    const discount = data.type === 'percentage'
+      ? Math.min(subtotal, subtotal * (data.value / 100))
+      : Math.min(subtotal, data.value)
+
+    onApply({ code: data.code, type: data.type, value: data.value, discount })
+    setCode('')
+  }
+
+  if (appliedCoupon) {
+    return (
+      <div className="flex items-center justify-between rounded-[1.4rem] border border-[#22c55e]/30 bg-[#22c55e]/10 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Check className="h-4 w-4 text-[#22c55e]" />
+          <div>
+            <span className="font-mono text-sm font-bold text-[#22c55e]">{appliedCoupon.code}</span>
+            <span className="ml-2 text-xs text-white/60">
+              {appliedCoupon.type === 'percentage'
+                ? `${appliedCoupon.value}% OFF`
+                : `R$ ${appliedCoupon.value.toFixed(2)} OFF`}
+              {' · '}
+              {isPortuguese ? 'Desconto:' : 'Discount:'}{' '}
+              -R$ {appliedCoupon.discount.toFixed(2)}
+            </span>
+          </div>
+        </div>
+        <button onClick={onRemove} className="p-1 text-white/50 hover:text-white transition-colors">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Tag className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+          <input
+            type="text"
+            value={code}
+            onChange={e => setCode(e.target.value.toUpperCase())}
+            onKeyDown={e => e.key === 'Enter' && void handleApply()}
+            placeholder={isPortuguese ? 'Código de desconto' : 'Discount code'}
+            className="w-full rounded-full border border-white/10 bg-white/[0.05] py-3 pl-10 pr-4 font-mono text-sm uppercase tracking-widest text-white placeholder-white/30 focus:border-white/30 focus:outline-none transition-colors"
+            maxLength={20}
+          />
+        </div>
+        <button
+          onClick={() => void handleApply()}
+          disabled={loading || !code.trim()}
+          className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-white/20 disabled:opacity-40"
+        >
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isPortuguese ? 'Aplicar' : 'Apply'}
+        </button>
+      </div>
+      {error && <p className="pl-1 text-xs text-[#ff6a5c]">{error}</p>}
+    </div>
+  )
+}
 
 interface PublicCheckoutContentProps {
   event: {
@@ -66,6 +203,7 @@ export function PublicCheckoutContent({
   const [phase, setPhase] = useState<'form' | 'review' | 'payment' | 'processing'>('form')
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
   const [error, setError] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponState | null>(null)
   const processedConversionOrderRef = useRef<string | null>(null)
   const referralCode = useMemo(() => readStoredReferralCode(event.id), [event.id])
 
@@ -272,6 +410,11 @@ export function PublicCheckoutContent({
           })
         }
 
+        // Send confirmation email with QR code for free orders
+        if (draftOrderId) {
+          void sendPaymentConfirmationEmail(draftOrderId)
+        }
+
         setCurrentStep(4)
         resetCheckout()
         onSuccess()
@@ -472,6 +615,18 @@ export function PublicCheckoutContent({
                 <>
                   <CheckoutForm buyer={buyer} setBuyerField={setBuyerField} />
 
+                  {/* Coupon input */}
+                  {cartSummary.subtotal > 0 && (
+                    <CouponInput
+                      subtotal={cartSummary.subtotal}
+                      eventId={event.id}
+                      appliedCoupon={appliedCoupon}
+                      onApply={setAppliedCoupon}
+                      onRemove={() => setAppliedCoupon(null)}
+                      isPortuguese={isPortuguese}
+                    />
+                  )}
+
                   {error ? (
                     <div className="rounded-[1.5rem] border border-[#ff2d2d]/24 bg-[#ff2d2d]/10 px-5 py-4 text-sm text-white">
                       {error}
@@ -541,11 +696,16 @@ export function PublicCheckoutContent({
             <OrderSummaryPanel
               eventName={event.name}
               cart={cart}
-              summary={cartSummary}
+              summary={{
+                ...cartSummary,
+                total_amount: Math.max(0, cartSummary.total_amount - (appliedCoupon?.discount ?? 0)),
+              }}
               editable={phase === 'form'}
               onAdd={onAdd}
               onRemove={onRemove}
               reserveCountdown={phase !== 'form' ? countdown : null}
+              couponCode={appliedCoupon?.code}
+              couponDiscount={appliedCoupon?.discount}
             />
           </div>
         </div>

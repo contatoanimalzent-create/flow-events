@@ -195,6 +195,42 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                       onChange={(event) => setField('dress_code', event.target.value)}
                     />
                   </FormField>
+
+                  <FormField label="Limite de ingressos por pedido">
+                    <input
+                      type="number"
+                      min={1}
+                      className="input"
+                      placeholder="ex: 4 (deixe em branco para sem limite)"
+                      value={form.max_tickets_per_order}
+                      onChange={(event) => setField('max_tickets_per_order', event.target.value)}
+                    />
+                  </FormField>
+
+                  <FormToggleCard
+                    title="Lista de espera"
+                    description="Quando esgotado, compradores podem entrar na fila de espera e ser notificados se vagas abrirem."
+                    checked={form.waitlist_enabled}
+                    onToggle={() => setField('waitlist_enabled', !form.waitlist_enabled)}
+                  />
+
+                  <FormToggleCard
+                    title="Evento privado"
+                    description="Exige senha de acesso na pagina publica. Ideal para eventos corporativos ou exclusivos."
+                    checked={form.is_private}
+                    onToggle={() => setField('is_private', !form.is_private)}
+                  />
+
+                  {form.is_private && (
+                    <FormField label="Senha de acesso">
+                      <input
+                        className="input"
+                        placeholder="ex: PULSE2025"
+                        value={form.access_password}
+                        onChange={(event) => setField('access_password', event.target.value)}
+                      />
+                    </FormField>
+                  )}
                 </FormSection>
 
                 <FormSection title="Monetizacao do evento" description="Defina como a plataforma monetiza este evento e como a taxa aparece para o comprador.">
@@ -335,6 +371,96 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                     />
                     <FormHint>O video toca em loop no hero da pagina publica do evento.</FormHint>
                   </FormField>
+                </FormSection>
+
+                <FormSection title="Tema do email de ingresso" description="Personalize as cores do email de confirmacao que o comprador recebe com o QR code.">
+                  <div className="grid grid-cols-3 gap-4">
+                    <FormField label="Cor de destaque">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={form.email_accent_color}
+                          onChange={(event) => setField('email_accent_color', event.target.value)}
+                          className="h-10 w-12 cursor-pointer rounded-lg border border-bg-border bg-transparent p-0.5"
+                        />
+                        <input
+                          className="input flex-1 font-mono text-xs uppercase"
+                          value={form.email_accent_color}
+                          onChange={(event) => setField('email_accent_color', event.target.value)}
+                          maxLength={7}
+                        />
+                      </div>
+                    </FormField>
+                    <FormField label="Fundo do email">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={form.email_bg_color}
+                          onChange={(event) => setField('email_bg_color', event.target.value)}
+                          className="h-10 w-12 cursor-pointer rounded-lg border border-bg-border bg-transparent p-0.5"
+                        />
+                        <input
+                          className="input flex-1 font-mono text-xs uppercase"
+                          value={form.email_bg_color}
+                          onChange={(event) => setField('email_bg_color', event.target.value)}
+                          maxLength={7}
+                        />
+                      </div>
+                    </FormField>
+                    <FormField label="Cor do texto">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={form.email_text_color}
+                          onChange={(event) => setField('email_text_color', event.target.value)}
+                          className="h-10 w-12 cursor-pointer rounded-lg border border-bg-border bg-transparent p-0.5"
+                        />
+                        <input
+                          className="input flex-1 font-mono text-xs uppercase"
+                          value={form.email_text_color}
+                          onChange={(event) => setField('email_text_color', event.target.value)}
+                          maxLength={7}
+                        />
+                      </div>
+                    </FormField>
+                  </div>
+
+                  {/* Preview mini */}
+                  <div
+                    className="mt-2 overflow-hidden rounded-2xl border border-bg-border"
+                    style={{ backgroundColor: form.email_bg_color }}
+                  >
+                    {form.cover_url ? (
+                      <div className="relative h-32 w-full overflow-hidden">
+                        <img src={form.cover_url} alt="" className="h-full w-full object-cover" />
+                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${form.email_bg_color} 5%, transparent 60%)` }} />
+                      </div>
+                    ) : (
+                      <div className="flex h-20 items-center justify-center" style={{ backgroundColor: form.email_accent_color + '22' }}>
+                        <ImageIcon className="h-5 w-5" style={{ color: form.email_accent_color }} />
+                      </div>
+                    )}
+                    <div className="px-4 pb-4 pt-2">
+                      <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: form.email_accent_color }}>
+                        {form.starts_at ? new Date(form.starts_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase() : 'DATA DO EVENTO'}
+                      </div>
+                      <div className="mt-1 text-lg font-black uppercase tracking-tight" style={{ color: form.email_text_color }}>
+                        {form.name || 'NOME DO EVENTO'}
+                      </div>
+                      <div className="mt-1 text-[10px]" style={{ color: form.email_text_color + '88' }}>
+                        {form.venue_name || 'Local do evento'} {form.venue_city ? `· ${form.venue_city}` : ''}
+                      </div>
+                      <div className="mt-3 flex items-end justify-between">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg border" style={{ borderColor: form.email_accent_color + '44' }}>
+                          <span className="text-[8px] font-bold" style={{ color: form.email_accent_color }}>QR</span>
+                        </div>
+                        <div className="text-[9px] font-medium uppercase tracking-widest" style={{ color: form.email_accent_color }}>
+                          Pulse Events
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <FormHint>Preview de como o email de ingresso vai aparecer para o comprador.</FormHint>
                 </FormSection>
 
                 <FormSection title="Media Library" description="Use assets dedicados para hero video, capa e galeria.">

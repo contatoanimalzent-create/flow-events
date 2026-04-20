@@ -36,6 +36,13 @@ export const EMPTY_EVENT_FORM: EventFormData = {
   fee_type: 'percentage',
   fee_value: '10',
   absorb_fee: false,
+  email_accent_color: '#0057E7',
+  email_bg_color: '#0A0A0A',
+  email_text_color: '#FFFFFF',
+  is_private: false,
+  access_password: '',
+  waitlist_enabled: false,
+  max_tickets_per_order: '',
 }
 
 export const EVENT_CATEGORIES = ['M\u00fasica', 'Tech', 'Arte', 'Esportes', 'Business', 'Gastronomia', 'Moda', 'Educa\u00e7\u00e3o', 'Outro']

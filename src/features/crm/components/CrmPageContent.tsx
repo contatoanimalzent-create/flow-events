@@ -1,14 +1,33 @@
 import { useState } from 'react'
-import { AlertTriangle, Loader2, RefreshCw, Search, UsersRound } from 'lucide-react'
+import { AlertTriangle, Download, Loader2, RefreshCw, Search, UsersRound } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useCrmDashboard, useCrmMutations } from '@/features/crm/hooks'
 import { CustomerDetailModal } from '@/features/crm/modals'
 import { CRM_CUSTOMER_STATUS_LABELS, CRM_PERIOD_FILTER_LABELS } from '@/features/crm/types'
 import type { CustomerListRow } from '@/features/crm/types'
 import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
-import { cn } from '@/shared/lib'
+import { cn, formatCurrency, formatDate } from '@/shared/lib'
 import { CustomerMetricsGrid } from './CustomerMetricsGrid'
 import { CustomersTable } from './CustomersTable'
+
+function exportCustomersCsv(customers: CustomerListRow[]) {
+  const rows = [
+    ['Nome', 'E-mail', 'Telefone', 'Status', 'Pedidos', 'Receita Total', 'Ticket Médio', 'Eventos', 'Última compra', 'Tags'],
+    ...customers.map(c => [
+      c.full_name, c.email, c.phone ?? '', c.status,
+      c.total_orders, formatCurrency(c.total_revenue), formatCurrency(c.average_ticket),
+      c.attended_events_count,
+      c.last_purchase_at ? formatDate(c.last_purchase_at, 'dd/MM/yyyy') : '',
+      (c.tags ?? []).join(';'),
+    ]),
+  ]
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = `participantes-${new Date().toISOString().slice(0, 10)}.csv`; a.click()
+  URL.revokeObjectURL(url)
+}
 
 export function CrmPageContent() {
   const organization = useAuthStore((state) => state.organization)
@@ -35,9 +54,19 @@ export function CrmPageContent() {
             Customers, relacionamento, historico de compras e presenca por evento
           </p>
         </div>
-        <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
-          <RefreshCw className="h-3.5 w-3.5" /> Atualizar
-        </button>
+        <div className="flex items-center gap-2">
+          {dashboard.allCustomers.length > 0 && (
+            <button
+              onClick={() => exportCustomersCsv(dashboard.allCustomers)}
+              className="btn-secondary flex items-center gap-2 text-xs"
+            >
+              <Download className="h-3.5 w-3.5" /> Exportar CSV
+            </button>
+          )}
+          <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
+            <RefreshCw className="h-3.5 w-3.5" /> Atualizar
+          </button>
+        </div>
       </div>
 
       <CustomerMetricsGrid summary={dashboard.summary} />

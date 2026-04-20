@@ -25,6 +25,13 @@ export interface EventRow {
   fee_value: number
   absorb_fee: boolean
   created_at: string
+  event_code?: string
+}
+
+export interface EventEmailTheme {
+  accent_color?: string
+  bg_color?: string
+  text_color?: string
 }
 
 export interface EventEditorRecord extends EventRow {
@@ -36,7 +43,12 @@ export interface EventEditorRecord extends EventRow {
   online_url?: string
   settings?: {
     video_url?: string
+    email_theme?: EventEmailTheme
   }
+  is_private?: boolean
+  access_password?: string | null
+  waitlist_enabled?: boolean
+  max_tickets_per_order?: number | null
 }
 
 export interface EventFormData {
@@ -61,6 +73,13 @@ export interface EventFormData {
   fee_type: 'fixed' | 'percentage'
   fee_value: string
   absorb_fee: boolean
+  email_accent_color: string
+  email_bg_color: string
+  email_text_color: string
+  is_private: boolean
+  access_password: string
+  waitlist_enabled: boolean
+  max_tickets_per_order: string
 }
 
 export type EventListFilter = 'all' | EventStatus

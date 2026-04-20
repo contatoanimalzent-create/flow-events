@@ -25,6 +25,13 @@ const HelpPage = lazy(() => import('@/pages/HelpPage').then((module) => ({ defau
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then((module) => ({ default: module.SettingsPage })))
 const RegistrationsPage = lazy(() => import('@/pages/RegistrationsPage').then((module) => ({ default: module.RegistrationsPage })))
 const SponsorsPage = lazy(() => import('@/pages/SponsorsPage').then((module) => ({ default: module.SponsorsPage })))
+const CouponsPage = lazy(() => import('@/pages/CouponsPage').then((module) => ({ default: module.CouponsPage })))
+const WaitlistPage = lazy(() => import('@/pages/WaitlistPage').then((module) => ({ default: module.WaitlistPage })))
+const OrganizationsPage = lazy(() => import('@/pages/OrganizationsPage').then((module) => ({ default: module.OrganizationsPage })))
+const MapPage = lazy(() => import('@/pages/MapPage').then((module) => ({ default: module.MapPage })))
+const CommunityPage = lazy(() => import('@/pages/CommunityPage').then((module) => ({ default: module.CommunityPage })))
+const MonetizationPage = lazy(() => import('@/pages/MonetizationPage').then((module) => ({ default: module.MonetizationPage })))
+const AuditPage = lazy(() => import('@/pages/AuditPage').then((module) => ({ default: module.AuditPage })))
 
 function PageFallback() {
   const { t } = useAppLocale()
@@ -81,6 +88,20 @@ function renderSection(activeSection: NavSection) {
       return <RegistrationsPage />
     case 'sponsors':
       return <SponsorsPage />
+    case 'coupons':
+      return <CouponsPage />
+    case 'waitlist':
+      return <WaitlistPage />
+    case 'organizations':
+      return <OrganizationsPage />
+    case 'map':
+      return <MapPage />
+    case 'community':
+      return <CommunityPage />
+    case 'monetization':
+      return <MonetizationPage />
+    case 'audit':
+      return <AuditPage />
     default:
       return <DashboardPage />
   }
@@ -118,11 +139,11 @@ export function AppShell() {
         onToggleCollapse={() => undefined}
       />
 
-      <div className="min-h-screen lg:pl-[var(--pulse-app-sidebar-width)]">
+      <div className="min-w-0 min-h-screen lg:pl-[var(--pulse-app-sidebar-width)]">
         <Header activeSection={activeSection} onOpenMobileMenu={() => setSidebarOpen(true)} />
 
-        <main className="min-h-[calc(100vh-var(--pulse-app-header-height))] bg-[var(--pulse-app-shell-bg)]">
-          <PageContainer as="div" className="space-y-6">
+        <main className="min-w-0 min-h-[calc(100vh-var(--pulse-app-header-height))] bg-[var(--pulse-app-shell-bg)]">
+          <PageContainer as="div" className="space-y-4 sm:space-y-6">
             <div className="min-h-[calc(100vh-var(--pulse-app-header-height)-3rem)]">
               <Suspense fallback={<PageFallback />}>{renderSection(activeSection)}</Suspense>
             </div>

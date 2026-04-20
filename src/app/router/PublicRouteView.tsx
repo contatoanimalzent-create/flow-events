@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react'
 import type { PublicRoute } from './public-routes'
 import { AuthLoadingGate, useAuthStore } from '@/features/auth'
 import { LoadingState } from '@/shared/components'
+import { OperatorPage } from '@/features/checkin/pages/OperatorPage'
 
 const AboutPage = lazy(() => import('@/pages/public/AboutPage').then((m) => ({ default: m.AboutPage })))
 const StaffJoinPage = lazy(() => import('@/pages/public/StaffJoinPage').then((m) => ({ default: m.StaffJoinPage })))
@@ -62,6 +63,8 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
         <LoginPage onBack={onBackToHome} onSignup={onSignup} />
       ) : route === 'signup' ? (
         <SignupPage onBack={onBackToHome} onLogin={onLogin} />
+      ) : route === 'operator' ? (
+        <OperatorPage />
       ) : (
         <HomePage onLogin={onLogin} />
       )}

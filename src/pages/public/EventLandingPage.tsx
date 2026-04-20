@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { ArrowLeft } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
+import { ArrowLeft, Eye, EyeOff, Lock } from 'lucide-react'
 import type { EventAsset } from '@/lib/supabase'
 import { PublicLayout, usePublicEvent } from '@/features/public'
 import { formatPublicCurrency, formatPublicDate, formatPublicTime, usePublicLocale, type PublicLocale } from '@/features/public/lib/public-locale'
@@ -242,10 +242,126 @@ function NotFoundState({ isPortuguese }: { isPortuguese: boolean }) {
   )
 }
 
+interface PrivateEventGateProps {
+  eventName: string
+  onUnlock: (password: string) => boolean
+  isPortuguese: boolean
+}
+
+function PrivateEventGate({ eventName, onUnlock, isPortuguese }: PrivateEventGateProps) {
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState(false)
+  const [shaking, setShaking] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const ok = onUnlock(password)
+    if (!ok) {
+      setError(true)
+      setShaking(true)
+      setPassword('')
+      setTimeout(() => setShaking(false), 500)
+      setTimeout(() => inputRef.current?.focus(), 10)
+    }
+  }
+
+  return (
+    <PublicLayout showFooter={false}>
+      <div className="flex min-h-screen items-center justify-center bg-[#090c12] px-6 py-16">
+        <div
+          className={`w-full max-w-md rounded-[2rem] border border-white/8 bg-[linear-gradient(180deg,#0d1117_0%,#121823_100%)] p-8 shadow-[0_24px_64px_rgba(0,0,0,0.45)] md:p-10 ${shaking ? 'animate-[shake_0.4s_ease-in-out]' : ''}`}
+          style={
+            shaking
+              ? {
+                  animation: 'shake 0.4s ease-in-out',
+                }
+              : undefined
+          }
+        >
+          <div className="mb-7 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06]">
+            <Lock className="h-6 w-6 text-[#ff6a5c]" />
+          </div>
+
+          <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.04em] text-white md:text-4xl">
+            {isPortuguese ? 'Evento privado' : 'Private event'}
+          </h1>
+          <p className="mt-3 text-sm leading-7 text-white/60">
+            <span className="font-medium text-white">{eventName}</span>{' '}
+            {isPortuguese
+              ? 'requer uma senha de acesso. Insira a senha fornecida pelo organizador para continuar.'
+              : 'requires an access password. Enter the password provided by the organizer to continue.'}
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            <div className="relative">
+              <input
+                ref={inputRef}
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setError(false)
+                }}
+                placeholder={isPortuguese ? 'Senha de acesso' : 'Access password'}
+                autoFocus
+                className={`w-full rounded-[1.2rem] border px-5 py-4 pr-12 text-sm text-white placeholder-white/30 outline-none transition-all duration-200 bg-white/[0.04] ${
+                  error
+                    ? 'border-[#ff2d2d]/60 bg-[#ff2d2d]/5 focus:border-[#ff2d2d]'
+                    : 'border-white/10 focus:border-white/30 focus:bg-white/[0.07]'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 transition-colors hover:text-white/70"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+
+            {error && (
+              <p className="text-xs text-[#ff6a5c]">
+                {isPortuguese ? 'Senha incorreta. Tente novamente.' : 'Incorrect password. Please try again.'}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={!password.trim()}
+              className="w-full rounded-[1.2rem] bg-[#ff2d2d] py-4 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#ff4133] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {isPortuguese ? 'Acessar evento' : 'Access event'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-xs text-white/30">
+            {isPortuguese
+              ? 'Nao tem a senha? Fale com o organizador do evento.'
+              : "Don't have the password? Contact the event organizer."}
+          </p>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-8px); }
+          40% { transform: translateX(8px); }
+          60% { transform: translateX(-5px); }
+          80% { transform: translateX(5px); }
+        }
+      `}</style>
+    </PublicLayout>
+  )
+}
+
 export function EventLandingPage({ slug }: EventLandingPageProps) {
   const { locale, isPortuguese } = usePublicLocale()
   const publicEventQuery = usePublicEvent(slug)
   const [selectedTicketId, setSelectedTicketId] = useState<string>()
+  const [unlockedPrivate, setUnlockedPrivate] = useState(false)
   const detail = publicEventQuery.data
   const event = detail?.event ?? null
   const mediaPresentation = detail?.mediaPresentation ?? null
@@ -293,6 +409,22 @@ export function EventLandingPage({ slug }: EventLandingPageProps) {
 
   if (!event || !detail) {
     return <NotFoundState isPortuguese={isPortuguese} />
+  }
+
+  if (event.is_private && !unlockedPrivate) {
+    return (
+      <PrivateEventGate
+        eventName={event.name}
+        isPortuguese={isPortuguese}
+        onUnlock={(password) => {
+          if (password === event.access_password) {
+            setUnlockedPrivate(true)
+            return true
+          }
+          return false
+        }}
+      />
+    )
   }
 
   const eventRecord = event

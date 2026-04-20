@@ -25,8 +25,11 @@ export function Header({ activeSection, onOpenMobileMenu }: HeaderProps) {
   const initials = getInitials(fullName || organization?.name || 'Pulse')
 
   return (
-    <header className="sticky top-0 z-20 h-[var(--pulse-app-header-height)] border-b border-[var(--pulse-app-header-border)] bg-[var(--pulse-app-header-bg)] backdrop-blur-xl">
-      <div className="flex h-full items-center gap-4 px-4 lg:px-6">
+    <header
+      className="app-safe-top sticky top-0 z-20 border-b border-[var(--pulse-app-header-border)] bg-[var(--pulse-app-header-bg)] backdrop-blur-xl"
+      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+    >
+      <div className="flex h-[var(--pulse-app-header-height)] items-center gap-3 px-3 sm:gap-4 sm:px-4 lg:px-6">
         <button
           type="button"
           onClick={onOpenMobileMenu}
@@ -51,7 +54,7 @@ export function Header({ activeSection, onOpenMobileMenu }: HeaderProps) {
 
         <div className="flex-1" />
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.03] text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/80"

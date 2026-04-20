@@ -27,7 +27,7 @@ export function PageContainer<T extends ElementType = 'section'>({
   return (
     <Component
       className={cn(
-        'mx-auto w-full px-[var(--pulse-app-content-padding-x-mobile)] py-[var(--pulse-app-content-padding-y)] lg:px-[var(--pulse-app-content-padding-x-desktop)]',
+        'mx-auto w-full min-w-0 max-w-full px-[var(--pulse-app-content-padding-x-mobile)] py-[var(--pulse-app-content-padding-y)] sm:py-6 lg:px-[var(--pulse-app-content-padding-x-desktop)] lg:py-8',
         sizeClassNames[size],
         className,
       )}

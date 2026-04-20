@@ -1,18 +1,27 @@
 import type { LucideIcon } from 'lucide-react'
 import {
   BadgeCheck,
+  BrainCircuit,
   BriefcaseBusiness,
+  Building2,
   CalendarDays,
   CircleHelp,
+  Clock,
+  ClipboardList,
+  Globe,
   LayoutDashboard,
+  Map,
   MessageSquare,
   ScanLine,
   Settings2,
   Shield,
+  Sparkles,
+  Tag,
   Ticket,
   TrendingUp,
   UsersRound,
   Wallet,
+  Zap,
 } from 'lucide-react'
 
 export type NavSection =
@@ -35,6 +44,13 @@ export type NavSection =
   | 'settings'
   | 'registrations'
   | 'sponsors'
+  | 'coupons'
+  | 'waitlist'
+  | 'organizations'
+  | 'map'
+  | 'community'
+  | 'monetization'
+  | 'audit'
 
 export interface AppNavItem {
   id: NavSection
@@ -82,109 +98,75 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
     system: isPortuguese ? 'Sistema' : 'System',
   }
 
+  const labels2 = {
+    intelligence: isPortuguese ? 'Inteligencia & Dados' : 'Intelligence & Data',
+  }
+
   return [
     {
       key: 'operation',
       label: labels.operation,
       items: [
-        createItem(
-          'dashboard',
-          isPortuguese ? 'Dashboard' : 'Dashboard',
-          isPortuguese ? 'Dashboard' : 'Dashboard',
-          isPortuguese ? 'Visao executiva do sistema.' : 'Executive view of the system.',
-          labels.operation,
-          LayoutDashboard,
-        ),
-        createItem(
-          'events',
-          isPortuguese ? 'Eventos' : 'Events',
-          isPortuguese ? 'Eventos' : 'Events',
-          isPortuguese ? 'Gestao central do portfolio de eventos.' : 'Central management for the event portfolio.',
-          labels.operation,
-          CalendarDays,
-        ),
-        createItem(
-          'tickets',
-          isPortuguese ? 'Ingressos' : 'Tickets',
-          isPortuguese ? 'Ingressos' : 'Tickets',
-          isPortuguese ? 'Lotes, regras e disponibilidade comercial.' : 'Releases, rules and commercial availability.',
-          labels.operation,
-          Ticket,
-        ),
-        createItem(
-          'financial',
-          isPortuguese ? 'Financeiro' : 'Financial',
-          isPortuguese ? 'Financeiro' : 'Financial',
-          isPortuguese ? 'Receita, repasses e leitura financeira.' : 'Revenue, payouts and financial readouts.',
-          labels.operation,
-          Wallet,
-        ),
+        createItem('dashboard', isPortuguese ? 'Dashboard' : 'Dashboard', 'Dashboard',
+          isPortuguese ? 'Visao executiva do sistema.' : 'Executive view of the system.', labels.operation, LayoutDashboard),
+        createItem('events', isPortuguese ? 'Eventos' : 'Events', isPortuguese ? 'Eventos' : 'Events',
+          isPortuguese ? 'Gestao central do portfolio de eventos.' : 'Central management for the event portfolio.', labels.operation, CalendarDays),
+        createItem('tickets', isPortuguese ? 'Ingressos' : 'Tickets', isPortuguese ? 'Ingressos' : 'Tickets',
+          isPortuguese ? 'Lotes, regras e disponibilidade comercial.' : 'Releases, rules and commercial availability.', labels.operation, Ticket),
+        createItem('financial', isPortuguese ? 'Financeiro' : 'Financial', isPortuguese ? 'Financeiro' : 'Financial',
+          isPortuguese ? 'Receita, repasses e leitura financeira.' : 'Revenue, payouts and financial readouts.', labels.operation, Wallet),
+        createItem('map', isPortuguese ? 'Mapa Operacional' : 'Operational Map', isPortuguese ? 'Mapa' : 'Map',
+          isPortuguese ? 'Visualizacao em tempo real de zonas, staff e densidade.' : 'Real-time zones, staff and density visualization.', labels.operation, Map),
       ],
     },
     {
       key: 'people',
       label: labels.people,
       items: [
-        createItem(
-          'registrations',
-          isPortuguese ? 'Credenciamento' : 'Credentialing',
-          isPortuguese ? 'Credenciamento' : 'Credentialing',
-          isPortuguese ? 'Listas, emissoes e fluxos de habilitacao.' : 'Lists, badge issuing and enablement flows.',
-          labels.people,
-          BadgeCheck,
-        ),
-        createItem(
-          'staff',
-          isPortuguese ? 'Equipe' : 'Team',
-          isPortuguese ? 'Equipe' : 'Team',
-          isPortuguese ? 'Pessoas, cargos e operacao de campo.' : 'People, roles and field operations.',
-          labels.people,
-          BriefcaseBusiness,
-        ),
-        createItem(
-          'checkin',
-          isPortuguese ? 'Check-in' : 'Check-in',
-          isPortuguese ? 'Check-in' : 'Check-in',
-          isPortuguese ? 'Leitura, filas e validacao em campo.' : 'Scanning, queues and field validation.',
-          labels.people,
-          ScanLine,
-        ),
+        createItem('registrations', isPortuguese ? 'Credenciamento' : 'Credentialing', isPortuguese ? 'Credenciamento' : 'Credentialing',
+          isPortuguese ? 'Listas, emissoes e fluxos de habilitacao.' : 'Lists, badge issuing and enablement flows.', labels.people, BadgeCheck),
+        createItem('staff', isPortuguese ? 'Equipe' : 'Team', isPortuguese ? 'Equipe' : 'Team',
+          isPortuguese ? 'Pessoas, cargos e operacao de campo.' : 'People, roles and field operations.', labels.people, BriefcaseBusiness),
+        createItem('checkin', isPortuguese ? 'Check-in' : 'Check-in', 'Check-in',
+          isPortuguese ? 'Leitura, filas e validacao em campo.' : 'Scanning, queues and field validation.', labels.people, ScanLine),
       ],
     },
     {
       key: 'business',
       label: labels.business,
       items: [
-        createItem(
-          'crm',
-          isPortuguese ? 'CRM' : 'CRM',
-          isPortuguese ? 'CRM' : 'CRM',
-          isPortuguese ? 'Relacionamento com publico e recorrencia.' : 'Audience relationship and retention.',
-          labels.business,
-          UsersRound,
-        ),
-        createItem(
-          'communication',
-          isPortuguese ? 'Comunicacao' : 'Communication',
-          isPortuguese ? 'Comunicacao' : 'Communication',
-          isPortuguese ? 'Mensagens, campanhas e operacao de comunicacao.' : 'Messages, campaigns and communication operations.',
-          labels.business,
-          MessageSquare,
-        ),
+        createItem('crm', 'CRM', 'CRM',
+          isPortuguese ? 'Relacionamento com publico e recorrencia.' : 'Audience relationship and retention.', labels.business, UsersRound),
+        createItem('community', isPortuguese ? 'Comunidade' : 'Community', isPortuguese ? 'Comunidade' : 'Community',
+          isPortuguese ? 'Feed, posts, reacoes e networking pos-evento.' : 'Feed, posts, reactions and post-event networking.', labels.business, Globe),
+        createItem('monetization', isPortuguese ? 'Monetizacao' : 'Monetization', isPortuguese ? 'Monetizacao' : 'Monetization',
+          isPortuguese ? 'Upgrades, experiencias premium e ativacoes internas.' : 'Upgrades, premium experiences and internal activations.', labels.business, Sparkles),
+        createItem('communication', isPortuguese ? 'Comunicacao' : 'Communication', isPortuguese ? 'Comunicacao' : 'Communication',
+          isPortuguese ? 'Mensagens, campanhas e operacao de comunicacao.' : 'Messages, campaigns and communication operations.', labels.business, MessageSquare),
+        createItem('coupons', isPortuguese ? 'Cupons' : 'Coupons', isPortuguese ? 'Cupons' : 'Coupons',
+          isPortuguese ? 'Codigos promocionais e descontos estrategicos.' : 'Promo codes and strategic discounts.', labels.business, Tag),
+        createItem('waitlist', isPortuguese ? 'Lista de Espera' : 'Waitlist', isPortuguese ? 'Lista de Espera' : 'Waitlist',
+          isPortuguese ? 'Demanda reprimida e conversao de fila.' : 'Suppressed demand and queue conversion.', labels.business, Clock),
+      ],
+    },
+    {
+      key: 'intelligence',
+      label: labels2.intelligence,
+      items: [
+        createItem('intelligence', isPortuguese ? 'IA Operacional' : 'AI Operational', isPortuguese ? 'IA' : 'AI',
+          isPortuguese ? 'Alertas, recomendacoes e previsoes em tempo real.' : 'Real-time alerts, recommendations and forecasts.', labels2.intelligence, BrainCircuit),
+        createItem('audit', isPortuguese ? 'Auditoria' : 'Audit', isPortuguese ? 'Auditoria' : 'Audit',
+          isPortuguese ? 'Logs, seguranca, webhooks e historico de acoes.' : 'Logs, security, webhooks and action history.', labels2.intelligence, ClipboardList),
       ],
     },
     {
       key: 'system',
       label: labels.system,
       items: [
-        createItem(
-          'settings',
-          isPortuguese ? 'Configuracoes' : 'Settings',
-          isPortuguese ? 'Configuracoes' : 'Settings',
-          isPortuguese ? 'Preferencias, governanca e ajustes da conta.' : 'Preferences, governance and account settings.',
-          labels.system,
-          Settings2,
-        ),
+        createItem('organizations', isPortuguese ? 'Organizacao' : 'Organization', isPortuguese ? 'Org' : 'Org',
+          isPortuguese ? 'Dados, membros, permissoes e integracoes da org.' : 'Org data, members, permissions and integrations.', labels.system, Building2),
+        createItem('settings', isPortuguese ? 'Configuracoes' : 'Settings', isPortuguese ? 'Configuracoes' : 'Settings',
+          isPortuguese ? 'Preferencias, governanca e ajustes da conta.' : 'Preferences, governance and account settings.', labels.system, Settings2),
       ],
     },
   ]
@@ -291,6 +273,27 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       CircleHelp,
       false,
     ),
+    coupons: createItem(
+      'coupons',
+      isPortuguese ? 'Cupons' : 'Coupons',
+      isPortuguese ? 'Cupons' : 'Coupons',
+      isPortuguese ? 'Codigos promocionais e descontos estrategicos.' : 'Promo codes and strategic discounts.',
+      advancedGroupLabel,
+      Tag,
+      false,
+    ),
+    waitlist: createItem('waitlist', isPortuguese ? 'Lista de Espera' : 'Waitlist', isPortuguese ? 'Lista de Espera' : 'Waitlist',
+      isPortuguese ? 'Demanda reprimida e conversao de fila.' : 'Suppressed demand and queue conversion.', advancedGroupLabel, Clock, false),
+    organizations: createItem('organizations', isPortuguese ? 'Organizacao' : 'Organization', isPortuguese ? 'Org' : 'Org',
+      isPortuguese ? 'Dados, membros, permissoes e integracoes da org.' : 'Org data, members, permissions and integrations.', advancedGroupLabel, Building2, false),
+    map: createItem('map', isPortuguese ? 'Mapa Operacional' : 'Operational Map', isPortuguese ? 'Mapa' : 'Map',
+      isPortuguese ? 'Visualizacao em tempo real de zonas, staff e densidade.' : 'Real-time zones, staff and density.', advancedGroupLabel, Map, false),
+    community: createItem('community', isPortuguese ? 'Comunidade' : 'Community', isPortuguese ? 'Comunidade' : 'Community',
+      isPortuguese ? 'Feed, posts, reacoes e networking pos-evento.' : 'Feed, posts, reactions and post-event networking.', advancedGroupLabel, Globe, false),
+    monetization: createItem('monetization', isPortuguese ? 'Monetizacao' : 'Monetization', isPortuguese ? 'Monetizacao' : 'Monetization',
+      isPortuguese ? 'Upgrades, experiencias premium e ativacoes internas.' : 'Upgrades, premium experiences and activations.', advancedGroupLabel, Sparkles, false),
+    audit: createItem('audit', isPortuguese ? 'Auditoria' : 'Audit', isPortuguese ? 'Auditoria' : 'Audit',
+      isPortuguese ? 'Logs, seguranca, webhooks e historico de acoes.' : 'Logs, security, webhooks and action history.', advancedGroupLabel, ClipboardList, false),
   }
 
   return hiddenItems[section]

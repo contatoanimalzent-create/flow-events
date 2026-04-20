@@ -29,15 +29,27 @@ export function useAuthBootstrap() {
 
     async function initializeSession() {
       try {
-        const { data } = await withTimeout(authService.getSession(), 5000)
+        // getSession lê do localStorage — rápido e síncrono
+        const { data } = await authService.getSession()
 
         if (!active) return
 
-        await withTimeout(bootstrapSession(data.session?.user ?? null), 5000)
+        if (!data.session?.user) {
+          clearSession()
+          setInitialized(true)
+          return
+        }
+
+        // Marca inicializado ANTES do fetchProfile para não bloquear a UI
+        // O profile é carregado em background
+        setInitialized(true)
+
+        bootstrapSession(data.session.user).catch((error) => {
+          console.error('Auth bootstrap profile error:', error)
+        })
       } catch (error) {
         console.error('Auth bootstrap error:', error)
         if (active) clearSession()
-      } finally {
         if (active) setInitialized(true)
       }
     }
@@ -55,10 +67,10 @@ export function useAuthBootstrap() {
           return
         }
 
-        await withTimeout(bootstrapSession(session?.user ?? null), 5000)
-      } catch (error) {
-        console.error('Auth state change error:', error)
-        clearSession()
+        // Atualiza profile em background sem bloquear
+        bootstrapSession(session?.user ?? null).catch((error) => {
+          console.error('Auth state change error:', error)
+        })
       } finally {
         setInitialized(true)
       }

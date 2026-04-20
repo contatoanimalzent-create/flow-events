@@ -22,8 +22,8 @@ interface TicketsSectionProps {
 
 export function TicketsSection({ tickets, selectedTicketId, onSelect }: TicketsSectionProps) {
   const { locale, isPortuguese } = usePublicLocale()
-  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420 })
-  const cardAnimation = useAnimationPreset('scaleIn', { durationMs: 420 })
+  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420, amount: 0.05 })
+  const cardAnimation = useAnimationPreset('scaleIn', { durationMs: 420, amount: 0.1 })
 
   return (
     <motion.section
@@ -52,10 +52,10 @@ export function TicketsSection({ tickets, selectedTicketId, onSelect }: TicketsS
               <motion.article
                 key={ticketItem.id}
                 className={cn(
-                  'flex h-full flex-col rounded-[calc(var(--pulse-radius-lg)+0.25rem)] border bg-[var(--pulse-color-background)] p-6 transition-all duration-200',
+                  'flex h-full flex-col rounded-[calc(var(--pulse-radius-lg)+0.25rem)] border bg-[var(--pulse-surface-elevated)] p-6 transition-all duration-200',
                   isSelected
-                    ? 'border-[var(--pulse-color-primary)] shadow-[var(--pulse-shadow-medium)]'
-                    : 'border-[var(--pulse-color-border)] shadow-[var(--pulse-shadow-soft)] hover:-translate-y-0.5 hover:shadow-[var(--pulse-shadow-medium)]',
+                    ? 'border-[var(--pulse-color-primary)] shadow-[0_0_20px_rgba(0,87,231,0.15)]'
+                    : 'border-[rgba(255,255,255,0.10)] shadow-[var(--pulse-shadow-soft)] hover:-translate-y-0.5 hover:border-[rgba(255,255,255,0.18)] hover:shadow-[var(--pulse-shadow-medium)]',
                 )}
                 initial={cardAnimation.initial}
                 whileInView={cardAnimation.whileInView}
@@ -64,7 +64,7 @@ export function TicketsSection({ tickets, selectedTicketId, onSelect }: TicketsS
                 transition={{ delay: index * 0.05 }}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[var(--pulse-radius-md)] bg-[color-mix(in_srgb,var(--pulse-color-primary)_8%,white)] text-[var(--pulse-color-primary)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-[var(--pulse-radius-md)] bg-[color-mix(in_srgb,var(--pulse-color-primary)_12%,transparent)] text-[var(--pulse-color-primary)]">
                     <Ticket className="h-5 w-5" />
                   </div>
                   <span

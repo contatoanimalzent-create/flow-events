@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react'
-import { CalendarDays, Copy, Edit2, ExternalLink, Globe, MapPin, MoreHorizontal, Trash2, Users } from 'lucide-react'
+import { CalendarDays, Copy, Edit2, ExternalLink, Globe, MapPin, MoreHorizontal, ScanLine, Trash2, Users } from 'lucide-react'
 import { EVENT_STATUS_CONFIG } from '@/features/events/types'
 import { cn, formatDate, formatNumber } from '@/shared/lib'
 import type { EventRow } from '@/features/events/types'
@@ -109,6 +109,28 @@ export function EventCard({
             Ocupacao atual e disponibilidade projetada para este evento.
           </div>
         </div>
+
+        {/* Event code badge */}
+        {event.event_code && (
+          <button
+            type="button"
+            title="Código do scanner — clique para copiar"
+            onClick={(e) => {
+              e.stopPropagation()
+              void navigator.clipboard.writeText(event.event_code!)
+            }}
+            className="flex w-full items-center justify-between rounded-sm border border-brand-acid/20 bg-brand-acid/5 px-3 py-2 transition-colors hover:bg-brand-acid/10 group"
+          >
+            <span className="flex items-center gap-2 font-mono text-[11px] text-text-muted">
+              <ScanLine className="h-3.5 w-3.5 text-brand-acid" />
+              Código do scanner
+            </span>
+            <span className="flex items-center gap-2 font-mono text-sm font-bold tracking-[0.2em] text-brand-acid">
+              {event.event_code}
+              <Copy className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity" />
+            </span>
+          </button>
+        )}
 
         <div className="relative flex items-center justify-between border-t border-bg-border pt-3">
           <button

@@ -4,7 +4,7 @@ import { useCheckinBoard, useCheckinScanner } from '@/features/checkin/hooks'
 import { CheckinHistoryModal } from '@/features/checkin/modals'
 import { PaginationControls } from '@/shared/components'
 import { cn, formatNumber } from '@/shared/lib'
-import { CheckinScannerPanel } from './CheckinScannerPanel'
+import { CheckinCameraModal } from './CheckinCameraModal'
 import { CheckinStatsGrid } from './CheckinStatsGrid'
 import { CommandCenterOverview } from './CommandCenterOverview'
 import { RecentCheckinsTable } from './RecentCheckinsTable'
@@ -143,12 +143,13 @@ export function CheckinPageContent() {
       <CommandCenterOverview snapshot={commandCenter} />
 
       {scanMode && (
-        <CheckinScannerPanel
-          scanInput={scanInput}
-          setScanInput={setScanInput}
+        <CheckinCameraModal
+          eventId={selectedEventId ?? ''}
+          gateId={selectedGateId !== 'all' ? selectedGateId : null}
+          onScan={handleScan}
+          onClose={() => setScanMode(false)}
           scanResult={scanResult}
           processing={processing}
-          onScan={handleScan}
           onClearResult={clearScanResult}
         />
       )}

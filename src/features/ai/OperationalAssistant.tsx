@@ -38,6 +38,13 @@ const SECTION_TITLES: Record<NavSection, string> = {
   settings: 'Configuracoes',
   registrations: 'Credenciamento',
   sponsors: 'Patrocinios',
+  coupons: 'Cupons',
+  waitlist: 'Lista de Espera',
+  map: 'Mapa Operacional',
+  organizations: 'Organizacoes',
+  community: 'Comunidade',
+  monetization: 'Monetizacao',
+  audit: 'Auditoria',
 }
 
 const SECTION_PROMPTS: Record<NavSection, string[]> = {
@@ -60,6 +67,13 @@ const SECTION_PROMPTS: Record<NavSection, string[]> = {
   settings: ['Onde ajustar marca?', 'Como trocar dominio?', 'Como rever permissoes?'],
   registrations: ['Como emitir credenciais?', 'Onde filtro listas e perfis?', 'Como exportar a base habilitada?'],
   sponsors: ['Como organizar cotas?', 'Onde acompanho patrocinadores ativos?', 'Como registrar entregas de marca?'],
+  coupons: ['Como criar um cupom?', 'Onde vejo usos por cupom?', 'Como limitar desconto por pedido?'],
+  waitlist: ['Como notificar a lista de espera?', 'Onde vejo posicoes?', 'Como converter espera em venda?'],
+  map: ['Como ver a ocupacao ao vivo?', 'Onde monitoro o staff?', 'Como identificar zonas criticas?'],
+  organizations: ['Como configurar a organizacao?', 'Onde gerencio membros?', 'Como rever permissoes?'],
+  community: ['Como moderar o feed?', 'Onde gerencio anuncios?', 'Como ativar networking?'],
+  monetization: ['Como criar uma oferta?', 'Onde vejo receita interna?', 'Como ativar ativacoes de marca?'],
+  audit: ['Como exportar logs?', 'Onde vejo eventos de seguranca?', 'Como filtrar por severidade?'],
 }
 
 function buildSuggestedActions(query: string, section: NavSection) {

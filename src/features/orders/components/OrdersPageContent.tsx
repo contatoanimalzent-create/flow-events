@@ -2,9 +2,30 @@ import { CreditCard, Download, Eye, Loader2, RefreshCw, Search, Smartphone, Tick
 import { useAuthStore } from '@/features/auth'
 import { useOrderActions, useOrderDetails, useOrdersList } from '@/features/orders/hooks'
 import { ORDER_PAYMENT_METHOD_CONFIG, ORDER_STATUS_CONFIG } from '@/features/orders/types'
+import type { OrderRow } from '@/features/orders/types'
 import { OrderDetailModal } from '@/features/orders/modals'
 import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
 import { cn, formatCurrency, formatDate } from '@/shared/lib'
+
+function exportOrdersCsv(orders: OrderRow[]) {
+  const rows = [
+    ['ID', 'Nome', 'E-mail', 'Telefone', 'CPF', 'Status', 'Pagamento', 'Subtotal', 'Desconto', 'Total', 'Método', 'Data', 'Pago em'],
+    ...orders.map(o => [
+      o.id.slice(0, 8), o.buyer_name, o.buyer_email, o.buyer_phone ?? '', o.buyer_cpf ?? '',
+      o.status, o.payment_status,
+      formatCurrency(o.subtotal), formatCurrency(o.discount_amount), formatCurrency(o.total_amount),
+      o.payment_method ?? '',
+      formatDate(o.created_at, 'dd/MM/yyyy HH:mm'),
+      o.paid_at ? formatDate(o.paid_at, 'dd/MM/yyyy HH:mm') : '',
+    ]),
+  ]
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = `pedidos-${new Date().toISOString().slice(0, 10)}.csv`; a.click()
+  URL.revokeObjectURL(url)
+}
 
 function PaymentMethodIcon({ method }: { method?: string | null }) {
   const config = method ? ORDER_PAYMENT_METHOD_CONFIG[method as keyof typeof ORDER_PAYMENT_METHOD_CONFIG] : undefined
@@ -59,9 +80,19 @@ export function OrdersPageContent() {
           </h1>
           <p className="admin-subtitle">Pedidos, pagamentos e emissao digital.</p>
         </div>
-        <button onClick={() => void refreshOrders()} className="btn-secondary flex items-center gap-2">
-          <RefreshCw className="h-3.5 w-3.5" /> Atualizar
-        </button>
+        <div className="flex items-center gap-2">
+          {filteredOrders.length > 0 && (
+            <button
+              onClick={() => exportOrdersCsv(filteredOrders)}
+              className="btn-secondary flex items-center gap-2 text-sm"
+            >
+              <Download className="h-3.5 w-3.5" /> Exportar CSV
+            </button>
+          )}
+          <button onClick={() => void refreshOrders()} className="btn-secondary flex items-center gap-2">
+            <RefreshCw className="h-3.5 w-3.5" /> Atualizar
+          </button>
+        </div>
       </div>
 
       {events.length > 1 && (

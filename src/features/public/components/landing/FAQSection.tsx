@@ -19,8 +19,8 @@ interface FAQSectionProps {
 export function FAQSection({ items, supportEmail, supportWhatsapp }: FAQSectionProps) {
   const { isPortuguese } = usePublicLocale()
   const [openIndex, setOpenIndex] = useState(0)
-  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420 })
-  const blockAnimation = useAnimationPreset('slideUp', { durationMs: 460, distance: 18 })
+  const sectionAnimation = useAnimationPreset('fadeIn', { durationMs: 420, amount: 0.05 })
+  const blockAnimation = useAnimationPreset('slideUp', { durationMs: 460, distance: 18, amount: 0.1 })
 
   return (
     <motion.section
@@ -50,7 +50,7 @@ export function FAQSection({ items, supportEmail, supportWhatsapp }: FAQSectionP
               href={`mailto:${supportEmail}`}
               className="flex items-center gap-3 rounded-[var(--pulse-radius-lg)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-surface)] p-5 text-[var(--pulse-color-text-primary)] shadow-[var(--pulse-shadow-soft)]"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-[var(--pulse-radius-md)] bg-[color-mix(in_srgb,var(--pulse-color-primary)_8%,white)] text-[var(--pulse-color-primary)]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[var(--pulse-radius-md)] bg-[color-mix(in_srgb,var(--pulse-color-primary)_12%,transparent)] text-[var(--pulse-color-primary)]">
                 <Mail className="h-5 w-5" />
               </div>
               <div>
@@ -63,7 +63,7 @@ export function FAQSection({ items, supportEmail, supportWhatsapp }: FAQSectionP
               href={`https://wa.me/${supportWhatsapp.replace(/\D/g, '')}`}
               className="flex items-center gap-3 rounded-[var(--pulse-radius-lg)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-surface)] p-5 text-[var(--pulse-color-text-primary)] shadow-[var(--pulse-shadow-soft)]"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-[var(--pulse-radius-md)] bg-[color-mix(in_srgb,var(--pulse-color-primary)_8%,white)] text-[var(--pulse-color-primary)]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[var(--pulse-radius-md)] bg-[color-mix(in_srgb,var(--pulse-color-primary)_12%,transparent)] text-[var(--pulse-color-primary)]">
                 <MessageCircleMore className="h-5 w-5" />
               </div>
               <div>
@@ -87,7 +87,7 @@ export function FAQSection({ items, supportEmail, supportWhatsapp }: FAQSectionP
             return (
               <div
                 key={item.question}
-                className="overflow-hidden rounded-[var(--pulse-radius-lg)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-background)] shadow-[var(--pulse-shadow-soft)]"
+                className="overflow-hidden rounded-[var(--pulse-radius-lg)] border border-[rgba(255,255,255,0.10)] bg-[var(--pulse-surface-elevated)] shadow-[var(--pulse-shadow-soft)]"
               >
                 <button
                   type="button"

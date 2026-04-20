@@ -21,6 +21,13 @@ export const SECTION_PERMISSIONS: SectionPermissionMap = {
   settings: { module: 'settings', action: 'view' },
   registrations: { module: 'crm', action: 'view' },
   sponsors: { module: 'financial', action: 'view' },
+  coupons: { module: 'campaigns', action: 'view' },
+  waitlist: { module: 'events', action: 'view' },
+  map: { module: 'checkin', action: 'view' },
+  organizations: { module: 'settings', action: 'view' },
+  community: { module: 'campaigns', action: 'view' },
+  monetization: { module: 'financial', action: 'view' },
+  audit: { module: 'intelligence', action: 'view' },
 }
 
 const ROLE_MATRIX: Record<EnterpriseRole, Record<AccessModule, AccessAction[]>> = {

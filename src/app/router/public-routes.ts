@@ -11,6 +11,10 @@ export type PublicRoute =
   | 'contact'
   | 'producer'
   | 'operator'
+  | 'staff-app'
+  | 'supervisor-app'
+  | 'participant-app'
+  | 'promoter-app'
   | { type: 'event'; slug: string }
   | { type: 'staff-join'; token: string }
   | { type: 'timeclock'; eventId: string; credentialToken: string }
@@ -29,6 +33,10 @@ export function getInitialPublicRoute(): PublicRoute {
   if (path === '/login') return 'login'
   if (path === '/signup' || path === '/register') return 'signup'
   if (path === '/op') return 'operator'
+  if (path === '/staff' || path === '/staff-app') return 'staff-app'
+  if (path === '/supervisor') return 'supervisor-app'
+  if (path === '/app' || path === '/participant') return 'participant-app'
+  if (path === '/promoter') return 'promoter-app'
 
   const eventMatch = path.match(/^\/e\/([^/]+)/)
   if (eventMatch) {
@@ -62,7 +70,11 @@ export function isImmediatePublicRoute(route: PublicRoute) {
     route === 'contact' ||
     route === 'producer' ||
     route === 'signup' ||
-    route === 'operator'
+    route === 'operator' ||
+    route === 'staff-app' ||
+    route === 'supervisor-app' ||
+    route === 'participant-app' ||
+    route === 'promoter-app'
   )
 }
 

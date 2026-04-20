@@ -19,8 +19,22 @@ const SignupPage = lazy(() => import('@/pages/auth/SignupPage').then((m) => ({ d
 const PrivacyPage = lazy(() => import('@/pages/public/PrivacyPage').then((m) => ({ default: m.PrivacyPage })))
 const TermsPage = lazy(() => import('@/pages/public/TermsPage').then((m) => ({ default: m.TermsPage })))
 
+const StaffApp = lazy(() => import('@/features/mobile/staff/StaffApp').then((m) => ({ default: m.StaffApp })))
+const SupervisorApp = lazy(() => import('@/features/mobile/supervisor/SupervisorApp').then((m) => ({ default: m.SupervisorApp })))
+const ParticipantApp = lazy(() => import('@/features/mobile/participant/ParticipantApp').then((m) => ({ default: m.ParticipantApp })))
+const PromoterApp = lazy(() => import('@/features/mobile/promoter/PromoterApp').then((m) => ({ default: m.PromoterApp })))
+const OperatorApp = lazy(() => import('@/features/mobile/operator/OperatorApp').then((m) => ({ default: m.OperatorApp })))
+
 function PublicFallback() {
   return <LoadingState title="Loading" description="" className="min-h-screen" />
+}
+
+function MobileLoader() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-black">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-white/60" />
+    </div>
+  )
 }
 
 interface PublicRouteViewProps {
@@ -32,6 +46,13 @@ interface PublicRouteViewProps {
 
 export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: PublicRouteViewProps) {
   const user = useAuthStore((state) => state.user)
+
+  // Mobile apps get their own full-screen suspense with dark loader
+  if (route === 'staff-app') return <Suspense fallback={<MobileLoader />}><StaffApp /></Suspense>
+  if (route === 'supervisor-app') return <Suspense fallback={<MobileLoader />}><SupervisorApp /></Suspense>
+  if (route === 'participant-app') return <Suspense fallback={<MobileLoader />}><ParticipantApp /></Suspense>
+  if (route === 'promoter-app') return <Suspense fallback={<MobileLoader />}><PromoterApp /></Suspense>
+  if (route === 'operator') return <Suspense fallback={<MobileLoader />}><OperatorApp /></Suspense>
 
   return (
     <Suspense fallback={<PublicFallback />}>
@@ -63,8 +84,6 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
         <LoginPage onBack={onBackToHome} onSignup={onSignup} />
       ) : route === 'signup' ? (
         <SignupPage onBack={onBackToHome} onLogin={onLogin} />
-      ) : route === 'operator' ? (
-        <OperatorPage />
       ) : (
         <HomePage onLogin={onLogin} />
       )}

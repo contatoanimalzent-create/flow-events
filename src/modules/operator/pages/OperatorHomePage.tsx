@@ -3,10 +3,11 @@ import {
   ScanLine, History, BarChart2, Search, BellRing,
   CheckCircle, XCircle, Clock, TrendingUp,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
-const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   ScanLine, History, BarChart2, Search, BellRing,
   CheckCircle, XCircle, Clock, TrendingUp,
 }

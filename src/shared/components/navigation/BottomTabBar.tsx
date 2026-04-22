@@ -19,9 +19,10 @@ import {
   Target,
   User,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import type { TabItem } from '@/shared/utils/menu'
 
-const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   Ticket,
   Calendar,
   Map,

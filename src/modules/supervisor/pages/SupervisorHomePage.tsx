@@ -1,10 +1,11 @@
 import React from 'react'
 import { Users, Map, CheckSquare, AlertTriangle, Clock, ShieldAlert } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
 interface QuickCard {
-  title: string; subtitle: string; icon: React.ComponentType<{size?:number; className?:string}>
+  title: string; subtitle: string; icon: LucideIcon
   color: string; path: string; large?: boolean; badge?: number
 }
 

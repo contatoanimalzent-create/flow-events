@@ -1,9 +1,10 @@
 import React from 'react'
 import { X, ScanLine, Clock, Users, Ticket, Tag, Check } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import type { AppMode } from '@/core/context/app-context.types'
 import { buildModeLabel, buildModeAccent } from '@/shared/utils/menu'
 
-const MODE_ICONS: Record<AppMode, React.ComponentType<{ size?: number }>> = {
+const MODE_ICONS: Record<AppMode, LucideIcon> = {
   operator: ScanLine,
   staff: Clock,
   supervisor: Users,

@@ -3,6 +3,7 @@ import {
   ChevronLeft, ChevronRight, User, Bell, Shield, HelpCircle,
   LogOut, Building2, Calendar, ToggleLeft,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import { usePermissions } from '@/core/permissions/permissions.store'
 import { buildModeLabel, buildModeAccent, buildModeIcon } from '@/shared/utils/menu'
@@ -10,7 +11,7 @@ import { supabase } from '@/lib/supabase'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
 interface MenuItem {
-  icon: React.ComponentType<{size?:number; className?:string}>
+  icon: LucideIcon
   label: string
   subtitle?: string
   action: () => void

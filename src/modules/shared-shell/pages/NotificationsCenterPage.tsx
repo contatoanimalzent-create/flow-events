@@ -1,10 +1,11 @@
 import React from 'react'
 import { ChevronLeft, Bell, BellOff, Info, AlertTriangle, CheckCircle, AlertCircle, Trash2 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useNotifications } from '@/core/notifications/notifications.store'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 import type { NotificationType } from '@/core/notifications/notifications.store'
 
-const TYPE_CONFIG: Record<NotificationType, { icon: React.ComponentType<{size?:number}>, color: string }> = {
+const TYPE_CONFIG: Record<NotificationType, { icon: LucideIcon, color: string }> = {
   info: { icon: Info, color: '#4285F4' },
   warning: { icon: AlertTriangle, color: '#d97706' },
   critical: { icon: AlertCircle, color: '#EF4444' },

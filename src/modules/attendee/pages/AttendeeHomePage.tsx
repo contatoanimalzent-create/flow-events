@@ -1,9 +1,10 @@
 import React from 'react'
 import { Ticket, Calendar, Map, Rss, Users, Sparkles } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
-interface Card { title: string; subtitle: string; icon: React.ComponentType<{size?:number;className?:string}>; color: string; path: string; large?: boolean }
+interface Card { title: string; subtitle: string; icon: LucideIcon; color: string; path: string; large?: boolean }
 
 const CARDS: Card[] = [
   { title: 'Meu Ingresso', subtitle: 'Ver QR Code', icon: Ticket, color: '#4285F4', path: '/pulse/attendee/tickets', large: true },

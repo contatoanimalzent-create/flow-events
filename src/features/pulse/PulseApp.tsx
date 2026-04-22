@@ -154,7 +154,7 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
   // Attendee
   if (is('/pulse/attendee')) return <AttendeeHomePage onNavigate={navigate} />
   if (is('/pulse/attendee/tickets')) return <MyTicketsPage onNavigate={navigate} />
-  if (starts('/pulse/attendee/ticket/')) return <TicketQrPage ticketId={path.split('/').at(-1)!} onNavigate={navigate} />
+  if (starts('/pulse/attendee/ticket/')) return <TicketQrPage ticketId={path.split('/').pop()!} onNavigate={navigate} />
   if (is('/pulse/attendee/agenda')) return <AgendaPage onNavigate={navigate} />
   if (is('/pulse/attendee/feed')) return <AttendeeFeedPage onNavigate={navigate} />
   if (is('/pulse/attendee/map')) return <AttendeeMapPage onNavigate={navigate} />

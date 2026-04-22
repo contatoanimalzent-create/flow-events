@@ -1,5 +1,6 @@
 import React from 'react'
 import { ChevronLeft, ScanLine, Clock, Users, Ticket, Tag } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { usePermissions } from '@/core/permissions/permissions.store'
 import { useEvents } from '@/core/events/events.store'
 import { useOrganizations } from '@/core/organizations/organizations.store'
@@ -8,7 +9,7 @@ import { buildModeAccent, buildHomeRoute, buildModeLabel } from '@/shared/utils/
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 import type { AppMode } from '@/core/context/app-context.types'
 
-const MODE_ICONS: Record<AppMode, React.ComponentType<{ size?: number }>> = {
+const MODE_ICONS: Record<AppMode, LucideIcon> = {
   operator: ScanLine,
   staff: Clock,
   supervisor: Users,

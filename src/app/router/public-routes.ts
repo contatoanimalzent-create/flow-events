@@ -15,6 +15,7 @@ export type PublicRoute =
   | 'supervisor-app'
   | 'participant-app'
   | 'promoter-app'
+  | 'pulse-app'                                       // ← unified Pulse mobile app
   | { type: 'event'; slug: string }
   | { type: 'staff-join'; token: string }
   | { type: 'timeclock'; eventId: string; credentialToken: string }
@@ -32,6 +33,9 @@ export function getInitialPublicRoute(): PublicRoute {
   if (path === '/producer') return 'producer'
   if (path === '/login') return 'login'
   if (path === '/signup' || path === '/register') return 'signup'
+  // Unified Pulse app (all /pulse/* paths)
+  if (path.startsWith('/pulse')) return 'pulse-app'
+
   if (path === '/op') return 'operator'
   if (path === '/staff' || path === '/staff-app') return 'staff-app'
   if (path === '/supervisor') return 'supervisor-app'
@@ -74,7 +78,8 @@ export function isImmediatePublicRoute(route: PublicRoute) {
     route === 'staff-app' ||
     route === 'supervisor-app' ||
     route === 'participant-app' ||
-    route === 'promoter-app'
+    route === 'promoter-app' ||
+    route === 'pulse-app'
   )
 }
 

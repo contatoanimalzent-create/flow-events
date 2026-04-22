@@ -25,7 +25,7 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
     clearContext()
     clearPerms()
     await supabase.auth.signOut()
-    onNavigate('/pulse/login')
+    window.location.replace('/login') // login único do app
   }
 
   const mode = context?.mode ?? null

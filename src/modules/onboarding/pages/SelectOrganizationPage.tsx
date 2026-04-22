@@ -15,12 +15,13 @@ export default function SelectOrganizationPage({ onNavigate }: PulsePageProps) {
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
-        onNavigate('/pulse/login')
+        // Sem sessão → login principal do app (único login)
+        window.location.replace('/login')
         return
       }
       load(user.id)
     })
-  }, [load, onNavigate])
+  }, [load])
 
   // Auto-select if only one org
   useEffect(() => {

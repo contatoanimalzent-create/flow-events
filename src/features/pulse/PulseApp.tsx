@@ -8,6 +8,7 @@
  */
 
 import React, { lazy, Suspense, useState, useCallback, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 import { useAppContext } from '@/core/context/app-context.store'
 import { usePermissions } from '@/core/permissions/permissions.store'
 import { useOrganizations } from '@/core/organizations/organizations.store'
@@ -23,9 +24,6 @@ import { buildModeFromPath } from './pulse.utils'
 import type { AppMode } from '@/core/context/app-context.types'
 
 // ─── lazy-loaded screen groups ───────────────────────────────────────────────
-
-// Auth
-const PulseLoginPage = lazy(() => import('@/modules/auth/pages/PulseLoginPage'))
 
 // Onboarding
 const SelectOrganizationPage = lazy(() => import('@/modules/onboarding/pages/SelectOrganizationPage'))
@@ -120,9 +118,6 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
   const is = (p: string) => path === p
   const starts = (p: string) => path.startsWith(p)
 
-  // Auth
-  if (is('/pulse/login')) return <PulseLoginPage onNavigate={navigate} />
-
   // Onboarding
   if (is('/pulse/select-organization')) return <SelectOrganizationPage onNavigate={navigate} />
   if (is('/pulse/select-event')) return <SelectEventPage onNavigate={navigate} />
@@ -182,6 +177,7 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
 export function PulseApp() {
   const { path, navigate, replace } = usePulseRouter()
   const [showModeSwitcher, setShowModeSwitcher] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
 
   const { context, availableModes, isContextReady, setMode } = useAppContext()
   const unreadCount = useNotifications((s) => s.unreadCount)
@@ -190,30 +186,32 @@ export function PulseApp() {
   // Register offline detection at app root
   useOfflineDetection()
 
-  // ── routing logic ──
+  // ── session guard — usa a sessão Supabase existente, sem login próprio ──
   useEffect(() => {
-    const authStore = (window as any).__pulseAuthUser // set by auth store
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthChecked(true)
 
-    // Not on a pulse route at all
-    if (!path.startsWith('/pulse')) return
+      if (!session) {
+        // Sem sessão → redireciona para o login principal do app
+        window.location.replace('/login')
+        return
+      }
 
-    const isAuthRoute = path === '/pulse/login' || path.startsWith('/pulse/auth')
-    const isOnboardingRoute = path.startsWith('/pulse/select-')
+      const isOnboardingRoute = path.startsWith('/pulse/select-')
 
-    if (!authStore && !isAuthRoute) {
-      replace('/pulse/login')
-      return
-    }
+      // Sessão existe mas sem contexto → onboarding
+      if (!isContextReady && !isOnboardingRoute) {
+        replace('/pulse/select-organization')
+        return
+      }
 
-    if (authStore && !isContextReady && !isOnboardingRoute && !isAuthRoute) {
-      replace('/pulse/select-organization')
-      return
-    }
-
-    if (path === '/pulse' && isContextReady && context?.mode) {
-      replace(buildHomeRoute(context.mode))
-    }
-  }, [path, isContextReady, context, replace])
+      // Contexto pronto, na raiz → vai para home do modo ativo
+      if (path === '/pulse' && isContextReady && context?.mode) {
+        replace(buildHomeRoute(context.mode))
+      }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path, isContextReady, context])
 
   // ── mode from path ──
   const modeFromPath = buildModeFromPath(path)
@@ -227,16 +225,25 @@ export function PulseApp() {
 
   // ── determine if chrome should show ──
   const noChromePaths = [
-    '/pulse/login',
     '/pulse/select-organization',
     '/pulse/select-event',
     '/pulse/select-mode',
     '/pulse/operator/scanner', // full-screen scanner
   ]
   const showChrome =
+    authChecked &&
     isContextReady &&
     context?.mode != null &&
     !noChromePaths.includes(path)
+
+  // Aguardando verificação de sessão
+  if (!authChecked) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#060d1f]">
+        <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
+      </div>
+    )
+  }
 
   const activeMode = context?.mode ?? modeFromPath ?? 'attendee'
   const accent = buildModeAccent(activeMode)

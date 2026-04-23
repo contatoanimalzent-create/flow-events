@@ -1121,3 +1121,47 @@
   .text-text-secondary { color: rgba(255,255,255,0.52) !important; }
   .text-text-muted { color: rgba(255,255,255,0.30) !important; }
 }
+
+/* ═══════════════════════════════════════════════════
+   PULSE LIGHT THEME OVERRIDES
+   Applied when html[data-pulse-theme="light"]
+═══════════════════════════════════════════════════ */
+html[data-pulse-theme="light"] {
+  /* Core backgrounds */
+  --pulse-bg-base: #f1f5f9;
+  --pulse-bg-card: rgba(0, 0, 0, 0.04);
+  --pulse-bg-elevated: #ffffff;
+  /* Text */
+  --pulse-text-primary: #0f172a;
+  --pulse-text-secondary: #475569;
+  --pulse-text-muted: #94a3b8;
+  /* Borders */
+  --pulse-border: rgba(0, 0, 0, 0.08);
+}
+
+/* Override specific Tailwind dark-hardcoded classes inside the pulse app */
+html[data-pulse-theme="light"] .bg-\[#060d1f\] { background-color: #f1f5f9 !important; }
+html[data-pulse-theme="light"] .bg-\[#0f172a\] { background-color: #e2e8f0 !important; }
+html[data-pulse-theme="light"] .bg-\[#0a0f1e\] { background-color: #e2e8f0 !important; }
+
+/* Cards & surfaces */
+html[data-pulse-theme="light"] .bg-white\/4 { background-color: rgba(0,0,0,0.04) !important; }
+html[data-pulse-theme="light"] .bg-white\/5 { background-color: rgba(0,0,0,0.05) !important; }
+html[data-pulse-theme="light"] .bg-white\/8 { background-color: rgba(0,0,0,0.07) !important; }
+html[data-pulse-theme="light"] .bg-white\/10 { background-color: rgba(0,0,0,0.08) !important; }
+
+/* Text */
+html[data-pulse-theme="light"] .text-white { color: #0f172a !important; }
+html[data-pulse-theme="light"] .text-slate-300 { color: #475569 !important; }
+html[data-pulse-theme="light"] .text-slate-400 { color: #64748b !important; }
+html[data-pulse-theme="light"] .text-slate-500 { color: #94a3b8 !important; }
+html[data-pulse-theme="light"] .text-slate-600 { color: #94a3b8 !important; }
+
+/* Borders */
+html[data-pulse-theme="light"] .border-white\/6 { border-color: rgba(0,0,0,0.08) !important; }
+html[data-pulse-theme="light"] .border-white\/8 { border-color: rgba(0,0,0,0.10) !important; }
+html[data-pulse-theme="light"] .border-white\/10 { border-color: rgba(0,0,0,0.12) !important; }
+html[data-pulse-theme="light"] .border-white\/15 { border-color: rgba(0,0,0,0.15) !important; }
+
+/* Bottom tab bar & top bar */
+html[data-pulse-theme="light"] .border-t { border-top-color: rgba(0,0,0,0.10) !important; }

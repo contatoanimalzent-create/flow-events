@@ -25,6 +25,7 @@ import type { AppMode } from '@/core/context/app-context.types'
 import { PulseErrorBoundary } from '@/shared/components/ui/ErrorBoundary'
 import { checkRouteAccess } from '@/core/permissions/route-guard'
 import { initPush, handleServiceWorkerMessages } from '@/core/push/push.service'
+import { useTheme, applyTheme } from '@/core/theme/theme.store'
 
 const AccessDeniedPage = lazy(() => import('@/modules/shared-shell/pages/AccessDeniedPage'))
 
@@ -63,6 +64,7 @@ const TeamMapPage = lazy(() => import('@/modules/supervisor/pages/TeamMapPage'))
 const OccurrencesPage = lazy(() => import('@/modules/supervisor/pages/OccurrencesPage'))
 const ApprovalsPage = lazy(() => import('@/modules/supervisor/pages/ApprovalsPage'))
 const SupervisorAlertsPage = lazy(() => import('@/modules/supervisor/pages/SupervisorAlertsPage'))
+const EventSummaryPage = lazy(() => import('@/modules/supervisor/pages/EventSummaryPage'))
 
 // Attendee
 const AttendeeHomePage = lazy(() => import('@/modules/attendee/pages/AttendeeHomePage'))
@@ -157,6 +159,7 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
   if (is('/pulse/supervisor/occurrences')) return <OccurrencesPage onNavigate={navigate} />
   if (is('/pulse/supervisor/approvals')) return <ApprovalsPage onNavigate={navigate} />
   if (is('/pulse/supervisor/alerts')) return <SupervisorAlertsPage onNavigate={navigate} />
+  if (is('/pulse/supervisor/summary')) return <EventSummaryPage onNavigate={navigate} />
 
   // Attendee
   if (is('/pulse/attendee')) return <AttendeeHomePage onNavigate={navigate} />
@@ -185,6 +188,9 @@ export function PulseApp() {
   const { path, navigate, replace } = usePulseRouter()
   const [showModeSwitcher, setShowModeSwitcher] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)
+
+  const theme = useTheme((s) => s.theme)
+  useEffect(() => { applyTheme(theme) }, [theme])
 
   const { context, availableModes: contextModes, isContextReady, setMode } = useAppContext()
   const { availableModes } = usePermissions()

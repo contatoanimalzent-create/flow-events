@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
   ChevronLeft, ChevronRight, User, Bell, Shield, HelpCircle,
-  LogOut, Building2, Calendar, ToggleLeft, Loader2, Globe,
+  LogOut, Building2, Calendar, ToggleLeft, Loader2, Globe, Moon, Sun,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
@@ -10,6 +10,7 @@ import { buildModeLabel, buildModeAccent } from '@/shared/utils/menu'
 import { supabase } from '@/lib/supabase'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 import { useLocale } from '@/core/i18n'
+import { useTheme } from '@/core/theme/theme.store'
 
 interface MenuItem {
   icon: LucideIcon
@@ -29,6 +30,7 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
   const { context, clearContext } = useAppContext()
   const { availableModes, clear: clearPerms } = usePermissions()
   const { locale, setLocale } = useLocale()
+  const { theme, toggle } = useTheme()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loadingProfile, setLoadingProfile] = useState(true)
 
@@ -75,6 +77,12 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
       label: locale === 'pt-BR' ? 'Idioma: Português' : 'Language: English',
       subtitle: 'Trocar idioma / Change language',
       action: () => setLocale(locale === 'pt-BR' ? 'en-US' : 'pt-BR'),
+    },
+    {
+      icon: theme === 'dark' ? Sun : Moon,
+      label: theme === 'dark' ? 'Tema escuro' : 'Tema claro',
+      subtitle: 'Toque para alternar',
+      action: () => toggle(),
     },
     { icon: Shield, label: 'Segurança', subtitle: 'Senha e sessões', action: () => {} },
     { icon: HelpCircle, label: 'Ajuda', subtitle: 'Central de suporte', action: () => {} },

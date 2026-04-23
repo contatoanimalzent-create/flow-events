@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Users, Map, CheckSquare, AlertTriangle, Clock, ShieldAlert, Loader2, RefreshCw } from 'lucide-react'
+import { Users, Map, CheckSquare, AlertTriangle, Clock, ShieldAlert, Loader2, RefreshCw, BarChart2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import { supervisorService } from '@/core/supervisor/supervisor.service'
 import { useRealtimeAlerts, useRealtimeApprovals } from '@/core/realtime/realtime.hooks'
+import { useHealthWatcher } from '@/core/supervisor/health-watcher.hook'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
 interface QuickCard {
@@ -42,6 +43,7 @@ export default function SupervisorHomePage({ onNavigate }: PulsePageProps) {
   // Realtime alerts & approvals
   useRealtimeAlerts(context?.eventId)
   useRealtimeApprovals(context?.eventId)
+  useHealthWatcher(context?.eventId)
 
   const cards: QuickCard[] = [
     { title: 'Equipe Ao Vivo', subtitle: teamData ? `${teamData.active} ativo${teamData.active !== 1 ? 's' : ''} · ${teamData.delayed} atrasado${teamData.delayed !== 1 ? 's' : ''}` : 'Carregando…', icon: Users, color: '#7C3AED', path: '/pulse/supervisor/team-live', large: true },
@@ -49,6 +51,7 @@ export default function SupervisorHomePage({ onNavigate }: PulsePageProps) {
     { title: 'Ocorrências', subtitle: openOccurrences > 0 ? `${openOccurrences} em aberto` : 'Sem ocorrências', icon: AlertTriangle, color: openOccurrences > 0 ? '#7f1d1d' : '#1e293b', path: '/pulse/supervisor/occurrences', badge: openOccurrences > 0 ? openOccurrences : undefined },
     { title: 'Aprovações', subtitle: pendingApprovals > 0 ? `${pendingApprovals} pendente${pendingApprovals !== 1 ? 's' : ''}` : 'Sem pendências', icon: CheckSquare, color: pendingApprovals > 0 ? '#78350f' : '#1e293b', path: '/pulse/supervisor/approvals', badge: pendingApprovals > 0 ? pendingApprovals : undefined },
     { title: 'Alertas', subtitle: 'Notificações críticas', icon: ShieldAlert, color: '#1e293b', path: '/pulse/supervisor/alerts' },
+    { title: 'Resumo', subtitle: 'Relatório automático', icon: BarChart2, color: '#0f2027', path: '/pulse/supervisor/summary' },
   ]
 
   return (

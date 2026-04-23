@@ -1,21 +1,38 @@
-import React from 'react'
-import { ChevronLeft, Trophy, Medal } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { ChevronLeft, Trophy, Medal, Loader2 } from 'lucide-react'
+import { useAppContext } from '@/core/context/app-context.store'
+import { promoterService } from '@/core/promoter/promoter.service'
+import { supabase } from '@/lib/supabase'
+import type { RankingEntry } from '@/core/promoter/promoter.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
-const RANKING = [
-  { rank: 1, name: 'Fernanda Rocha', code: 'FERO10', sales: 89, commission: 2670 },
-  { rank: 2, name: 'Lucas Batista', code: 'LUBA15', sales: 71, commission: 2130 },
-  { rank: 3, name: 'Carlos Mendes', code: 'CARLOS20', sales: 42, commission: 1260, isMe: true },
-  { rank: 4, name: 'Ana Paula Reis', code: 'ANA25', sales: 38, commission: 1140 },
-  { rank: 5, name: 'Tiago Melo', code: 'TIAGO10', sales: 29, commission: 870 },
-]
-
-const PODIUM_COLORS = ['#d97706', '#94a3b8', '#b45309']
-const PODIUM_HEIGHTS = ['h-28', 'h-36', 'h-20']
-
 export default function RankingPage({ onNavigate }: PulsePageProps) {
-  const top3 = RANKING.slice(0, 3)
-  const podiumOrder = [top3[1], top3[0], top3[2]] // 2nd, 1st, 3rd
+  const context = useAppContext((s) => s.context)
+  const [ranking, setRanking] = useState<RankingEntry[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || !context?.eventId) { setLoading(false); return }
+      try {
+        const data = await promoterService.getRanking(context.eventId, user.id)
+        setRanking(data)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [context?.eventId])
+
+  const fmt = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 })
+
+  const podium = ranking.slice(0, 3)
+  const rest = ranking.slice(3)
+  const myEntry = ranking.find((r) => r.isMe)
+
+  const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32']
+  const podiumHeights = ['h-24', 'h-16', 'h-12']
 
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
@@ -26,68 +43,85 @@ export default function RankingPage({ onNavigate }: PulsePageProps) {
         <h1 className="text-lg font-bold text-white">Ranking</h1>
       </div>
 
-      {/* Podium */}
-      <div className="px-4 mb-6">
-        <div className="flex items-end justify-center gap-2 h-44">
-          {podiumOrder.map((p, i) => {
-            const actualRank = i === 0 ? 1 : i === 1 ? 0 : 2
-            const colors = PODIUM_COLORS
-            const heights = PODIUM_HEIGHTS
-            return (
-              <div key={p.rank} className="flex-1 flex flex-col items-center">
-                {/* Avatar */}
-                <div
-                  className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-bold text-white mb-1 shrink-0"
-                  style={{ borderColor: colors[actualRank], backgroundColor: colors[actualRank] + '33' }}
-                >
-                  {p.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
-                </div>
-                {p.isMe && <span className="text-[9px] text-orange-400 font-bold mb-0.5">VOCÊ</span>}
-                {/* Pedestal */}
-                <div
-                  className={`w-full ${heights[actualRank]} rounded-t-xl flex flex-col items-center justify-start pt-2`}
-                  style={{ backgroundColor: colors[actualRank] + '33', border: `1px solid ${colors[actualRank]}44` }}
-                >
-                  <p className="text-white font-black text-2xl" style={{ color: colors[actualRank] }}>{p.rank}</p>
-                  <p className="text-white text-[10px] font-semibold text-center px-1 mt-0.5 leading-tight">
-                    {p.name.split(' ')[0]}
-                  </p>
-                  <p className="text-[9px] mt-0.5" style={{ color: colors[actualRank] }}>{p.sales} vendas</p>
-                </div>
-              </div>
-            )
-          })}
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 size={24} className="text-orange-400 animate-spin" />
         </div>
-      </div>
-
-      {/* Full list */}
-      <div className="px-4 space-y-2">
-        {RANKING.map((person) => (
-          <div
-            key={person.rank}
-            className={`flex items-center gap-4 rounded-2xl border px-4 py-3 ${
-              person.isMe ? 'border-orange-500/30 bg-orange-500/8' : 'border-white/8 bg-white/4'
-            }`}
-          >
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-              {person.rank <= 3
-                ? <Trophy size={14} style={{ color: PODIUM_COLORS[person.rank - 1] }} />
-                : <span className="text-slate-400 text-xs font-bold">{person.rank}</span>
-              }
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className={`text-sm font-semibold ${person.isMe ? 'text-orange-300' : 'text-white'}`}>{person.name}</p>
-                {person.isMe && <span className="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded-full font-bold">Você</span>}
+      ) : ranking.length === 0 ? (
+        <div className="flex flex-col items-center py-16 text-center">
+          <Trophy size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Ranking ainda não disponível</p>
+        </div>
+      ) : (
+        <div className="px-4">
+          {/* My position highlight */}
+          {myEntry && myEntry.position > 3 && (
+            <div className="mb-4 bg-orange-500/10 border border-orange-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
+              <span className="text-orange-400 font-bold text-lg">#{myEntry.position}</span>
+              <div className="flex-1">
+                <p className="text-white text-sm font-semibold">Sua posição atual</p>
+                <p className="text-slate-400 text-xs">{myEntry.sales} vendas · {fmt(myEntry.revenue)}</p>
               </div>
-              <p className="text-slate-500 text-xs">{person.code} · {person.sales} vendas</p>
             </div>
-            <p className="text-green-400 font-bold text-sm shrink-0">
-              R$ {person.commission.toLocaleString('pt-BR')}
-            </p>
+          )}
+
+          {/* Podium */}
+          {podium.length >= 2 && (
+            <div className="flex items-end justify-center gap-3 mb-6 px-4 pt-4">
+              {[podium[1], podium[0], podium[2]].filter(Boolean).map((entry, idx) => {
+                const realIdx = idx === 0 ? 1 : idx === 1 ? 0 : 2
+                const height = podiumHeights[realIdx]
+                const color = medalColors[realIdx]
+                return (
+                  <div key={entry.position} className="flex flex-col items-center flex-1">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white mb-2"
+                      style={{ backgroundColor: color + '33', border: `2px solid ${color}`, outline: entry.isMe ? `2px solid #F97316` : 'none', outlineOffset: 2 }}
+                    >
+                      {entry.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+                    </div>
+                    <p className="text-white text-xs font-semibold text-center truncate w-full px-1">{entry.name.split(' ')[0]}</p>
+                    <p className="text-slate-500 text-[10px]">{entry.sales}v</p>
+                    <div
+                      className={`w-full ${height} rounded-t-xl mt-2 flex items-center justify-center`}
+                      style={{ backgroundColor: color + '22', border: `1px solid ${color}44` }}
+                    >
+                      <span className="font-bold text-lg" style={{ color }}>#{entry.position}</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Rest of ranking */}
+          <div className="space-y-2">
+            {rest.map((entry) => (
+              <div
+                key={entry.position}
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 ${entry.isMe ? 'bg-orange-500/10 border border-orange-500/30' : 'bg-white/4 border border-white/6'}`}
+              >
+                <span className="text-slate-500 font-bold text-sm w-6 text-center">#{entry.position}</span>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                  style={{ backgroundColor: entry.isMe ? '#F9731633' : '#1e293b' }}
+                >
+                  {entry.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium truncate ${entry.isMe ? 'text-orange-300' : 'text-white'}`}>
+                    {entry.name}{entry.isMe ? ' (você)' : ''}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-white text-sm font-semibold">{entry.sales}</p>
+                  <p className="text-slate-500 text-xs">vendas</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

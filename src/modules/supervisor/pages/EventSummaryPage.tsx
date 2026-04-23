@@ -311,7 +311,7 @@ export default function EventSummaryPage({ onNavigate }: PulsePageProps) {
                 <CheckCircle size={17} className="text-green-400" />
                 <span className="text-green-400 font-semibold text-sm">Copiado!</span>
               </>
-            ) : navigator.share ? (
+            ) : typeof navigator.share === 'function' ? (
               <>
                 <Share2 size={17} className="text-[#d4ff00]" />
                 <span className="text-[#d4ff00] font-semibold text-sm">Compartilhar resumo</span>

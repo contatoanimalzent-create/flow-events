@@ -45,3 +45,5 @@ supabase/.temp/
 
 # Capacitor CLI cache
 .capacitor/
+
+.vercel

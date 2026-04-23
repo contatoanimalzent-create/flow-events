@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ChevronLeft, ChevronRight, User, Bell, Shield, HelpCircle,
-  LogOut, Building2, Calendar, ToggleLeft,
+  LogOut, Building2, Calendar, ToggleLeft, Loader2,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import { usePermissions } from '@/core/permissions/permissions.store'
-import { buildModeLabel, buildModeAccent, buildModeIcon } from '@/shared/utils/menu'
+import { buildModeLabel, buildModeAccent } from '@/shared/utils/menu'
 import { supabase } from '@/lib/supabase'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
@@ -18,15 +18,45 @@ interface MenuItem {
   danger?: boolean
 }
 
+interface UserProfile {
+  fullName: string
+  email: string
+  avatarUrl: string | null
+}
+
 export default function ProfilePage({ onNavigate }: PulsePageProps) {
   const { context, clearContext } = useAppContext()
   const { availableModes, clear: clearPerms } = usePermissions()
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loadingProfile, setLoadingProfile] = useState(true)
+
+  // Load real user data
+  useEffect(() => {
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoadingProfile(false); return }
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      setProfile({
+        fullName: (data as any)?.full_name ?? user.user_metadata?.full_name ?? 'Usuário',
+        email: user.email ?? '—',
+        avatarUrl: (data as any)?.avatar_url ?? null,
+      })
+      setLoadingProfile(false)
+    }
+    load()
+  }, [])
 
   const handleLogout = async () => {
     clearContext()
     clearPerms()
     await supabase.auth.signOut()
-    window.location.replace('/login') // login único do app
+    window.location.replace('/login')
   }
 
   const mode = context?.mode ?? null
@@ -35,7 +65,7 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
   const menuItems: MenuItem[] = [
     { icon: User, label: 'Meu perfil', subtitle: 'Nome, foto, preferências', action: () => {} },
     { icon: Bell, label: 'Notificações', subtitle: 'Configurar alertas', action: () => onNavigate('/pulse/notifications') },
-    { icon: ToggleLeft, label: 'Trocar modo', subtitle: mode ? `Modo atual: ${buildModeLabel(mode)}` : '—', action: () => {} },
+    { icon: ToggleLeft, label: 'Trocar modo', subtitle: mode ? `Modo atual: ${buildModeLabel(mode)}` : '—', action: () => onNavigate('/pulse/select-mode') },
     { icon: Building2, label: 'Trocar organização', subtitle: context?.organizationName ?? '—', action: () => onNavigate('/pulse/select-organization') },
     { icon: Calendar, label: 'Trocar evento', subtitle: context?.eventName ?? '—', action: () => onNavigate('/pulse/select-event') },
     { icon: Shield, label: 'Segurança', subtitle: 'Senha e sessões', action: () => {} },
@@ -55,14 +85,29 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
 
       {/* Avatar */}
       <div className="flex flex-col items-center py-6">
-        <div
-          className="w-20 h-20 rounded-full border-2 flex items-center justify-center mb-3"
-          style={{ borderColor: accent, backgroundColor: accent + '22' }}
-        >
-          <User size={36} style={{ color: accent }} />
-        </div>
-        <p className="text-white font-bold text-lg">Usuário</p>
-        <p className="text-slate-400 text-sm">usuário@exemplo.com</p>
+        {loadingProfile ? (
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: accent + '22' }}>
+            <Loader2 size={24} className="animate-spin" style={{ color: accent }} />
+          </div>
+        ) : profile?.avatarUrl ? (
+          <img
+            src={profile.avatarUrl}
+            alt={profile.fullName}
+            className="w-20 h-20 rounded-full border-2 mb-3 object-cover"
+            style={{ borderColor: accent }}
+          />
+        ) : (
+          <div
+            className="w-20 h-20 rounded-full border-2 flex items-center justify-center mb-3"
+            style={{ borderColor: accent, backgroundColor: accent + '22' }}
+          >
+            <span className="text-2xl font-bold" style={{ color: accent }}>
+              {(profile?.fullName ?? 'U').split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+            </span>
+          </div>
+        )}
+        <p className="text-white font-bold text-lg">{profile?.fullName ?? '—'}</p>
+        <p className="text-slate-400 text-sm">{profile?.email ?? '—'}</p>
 
         {/* Mode badges */}
         {availableModes.length > 0 && (

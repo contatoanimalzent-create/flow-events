@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^12.38.0",
+    "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.383.0",
     "next-cloudinary": "^6.17.5",
     "qrcode.react": "^4.2.0",

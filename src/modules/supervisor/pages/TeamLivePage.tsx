@@ -1,162 +1,211 @@
-import React, { useState } from 'react'
-import { ChevronLeft, Phone, MapPin, Clock, X, MessageSquare } from 'lucide-react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { ChevronLeft, Phone, MapPin, Clock, X, RefreshCw, Loader2, Wifi } from 'lucide-react'
+import { useAppContext } from '@/core/context/app-context.store'
+import { supervisorService } from '@/core/supervisor/supervisor.service'
+import type { TeamMember } from '@/core/supervisor/supervisor.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
-const TEAM = [
-  { id: 1, name: 'Ana Paula Santos', role: 'Portaria Principal', status: 'active', inZone: true, elapsed: '02:14', avatar: 'AP' },
-  { id: 2, name: 'Bruno Alves', role: 'Portaria Principal', status: 'active', inZone: true, elapsed: '02:05', avatar: 'BA' },
-  { id: 3, name: 'Carla Santos', role: 'Portaria Lateral', status: 'active', inZone: true, elapsed: '01:58', avatar: 'CS' },
-  { id: 4, name: 'Diego Mota', role: 'Portaria Lateral', status: 'late', inZone: false, elapsed: '—', avatar: 'DM' },
-  { id: 5, name: 'Fernanda Lima', role: 'Apoio VIP', status: 'active', inZone: false, elapsed: '01:22', avatar: 'FL' },
-  { id: 6, name: 'Ricardo Souza', role: 'Apoio VIP', status: 'active', inZone: true, elapsed: '01:45', avatar: 'RS' },
-]
+const STATUS_CONFIG = {
+  active: { label: 'Ativo', color: '#22C55E' },
+  delayed: { label: 'Atrasado', color: '#d97706' },
+  absent: { label: 'Ausente', color: '#EF4444' },
+  'out-of-area': { label: 'Fora da área', color: '#F97316' },
+  offline: { label: 'Offline', color: '#64748b' },
+}
 
-type FilterType = 'all' | 'active' | 'late' | 'outZone'
-
-const STATUS_COLORS = { active: '#22C55E', late: '#d97706', absent: '#EF4444' }
-
-interface MemberOverlayProps { member: typeof TEAM[0]; onClose: () => void }
-
-function MemberOverlay({ member, onClose }: MemberOverlayProps) {
-  return (
-    <>
-      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0f172a] border-t border-white/10 rounded-t-2xl">
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
-        </div>
-        <div className="flex items-center gap-4 px-5 py-4">
-          <div className="w-14 h-14 rounded-full bg-purple-600/30 border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold text-xl">
-            {member.avatar}
-          </div>
-          <div className="flex-1">
-            <p className="text-white font-bold text-lg">{member.name}</p>
-            <p className="text-slate-400 text-sm">{member.role}</p>
-            <div className="flex items-center gap-1.5 mt-1">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: STATUS_COLORS[member.status as keyof typeof STATUS_COLORS] }} />
-              <span className="text-xs" style={{ color: STATUS_COLORS[member.status as keyof typeof STATUS_COLORS] }}>
-                {member.status === 'active' ? 'Ativo' : member.status === 'late' ? 'Atrasado' : 'Ausente'}
-              </span>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-2 bg-white/10 rounded-full">
-            <X size={18} className="text-slate-300" />
-          </button>
-        </div>
-        <div className="grid grid-cols-3 gap-3 px-5 pb-3">
-          {[
-            { label: 'Tempo ativo', value: member.elapsed },
-            { label: 'Zona', value: member.inZone ? 'Dentro' : 'Fora' },
-            { label: 'Status', value: member.status === 'active' ? 'Ok' : 'Atenção' },
-          ].map(({ label, value }) => (
-            <div key={label} className="bg-white/5 rounded-xl p-3 text-center">
-              <p className="text-white font-bold text-sm">{value}</p>
-              <p className="text-slate-500 text-xs">{label}</p>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-3 px-5 pb-6">
-          <button className="flex-1 py-3 rounded-xl bg-green-600/20 border border-green-500/30 text-green-400 font-semibold text-sm flex items-center justify-center gap-2">
-            <Phone size={16} />
-            Ligar
-          </button>
-          <button className="flex-1 py-3 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 font-semibold text-sm flex items-center justify-center gap-2">
-            <MessageSquare size={16} />
-            Mensagem
-          </button>
-        </div>
-        <div style={{ height: 'env(safe-area-inset-bottom)' }} />
-      </div>
-    </>
-  )
+function formatSessionTime(startedAt: string | null): string {
+  if (!startedAt) return '—'
+  const diff = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)
+  const h = Math.floor(diff / 3600)
+  const m = Math.floor((diff % 3600) / 60)
+  return h > 0 ? `${h}h ${m}m` : `${m}m`
 }
 
 export default function TeamLivePage({ onNavigate }: PulsePageProps) {
-  const [filter, setFilter] = useState<FilterType>('all')
-  const [selectedMember, setSelectedMember] = useState<typeof TEAM[0] | null>(null)
+  const context = useAppContext((s) => s.context)
+  const [members, setMembers] = useState<TeamMember[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selected, setSelected] = useState<TeamMember | null>(null)
+  const [filter, setFilter] = useState<string>('all')
 
-  const filtered = TEAM.filter((m) => {
-    if (filter === 'active') return m.status === 'active'
-    if (filter === 'late') return m.status === 'late'
-    if (filter === 'outZone') return !m.inZone
-    return true
-  })
+  const load = useCallback(async () => {
+    if (!context?.eventId) return
+    setLoading(true)
+    try {
+      const data = await supervisorService.getTeamLive(context.eventId)
+      setMembers(data.members)
+    } finally {
+      setLoading(false)
+    }
+  }, [context?.eventId])
+
+  useEffect(() => { load() }, [load])
+
+  // Auto-refresh every 30s
+  useEffect(() => {
+    const interval = setInterval(load, 30_000)
+    return () => clearInterval(interval)
+  }, [load])
+
+  const filtered = filter === 'all' ? members : members.filter((m) => m.status === filter)
+
+  const filters = [
+    { key: 'all', label: 'Todos', count: members.length },
+    { key: 'active', label: 'Ativos', count: members.filter((m) => m.status === 'active').length },
+    { key: 'delayed', label: 'Atrasados', count: members.filter((m) => m.status === 'delayed').length },
+    { key: 'absent', label: 'Ausentes', count: members.filter((m) => m.status === 'absent').length },
+  ]
 
   return (
-    <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
+    <div className="flex flex-col min-h-full bg-[#060d1f] pb-6 relative">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
+      <div className="flex items-center gap-3 px-4 pt-5 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
         <button onClick={() => onNavigate('/pulse/supervisor')} className="p-2 -ml-2">
           <ChevronLeft size={22} className="text-slate-300" />
         </button>
-        <h1 className="text-lg font-bold text-white">Equipe Ao Vivo</h1>
-        <span className="ml-auto text-slate-400 text-sm">{TEAM.length} pessoas</span>
+        <h1 className="text-lg font-bold text-white flex-1">Equipe Ao Vivo</h1>
+        <button onClick={load} className="p-2">
+          <RefreshCw size={14} className={`text-slate-400 ${loading ? 'animate-spin' : ''}`} />
+        </button>
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-2 px-4 mb-4 overflow-x-auto pb-1">
-        {[
-          { id: 'all', label: 'Todos' },
-          { id: 'active', label: '✓ Ativos' },
-          { id: 'late', label: '⏰ Atrasos' },
-          { id: 'outZone', label: '⚠ Fora da zona' },
-        ].map(({ id, label }) => (
+      <div className="flex gap-2 px-4 mb-4 overflow-x-auto">
+        {filters.map((f) => (
           <button
-            key={id}
-            onClick={() => setFilter(id as FilterType)}
-            className={`shrink-0 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${filter === id ? 'bg-purple-600 text-white' : 'bg-white/5 text-slate-400'}`}
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-all ${
+              filter === f.key ? 'bg-purple-600 text-white' : 'bg-white/5 text-slate-400'
+            }`}
           >
-            {label}
+            {f.label}
+            {f.count > 0 && (
+              <span className={`rounded-full px-1.5 text-[10px] font-bold ${filter === f.key ? 'bg-white/20' : 'bg-white/10'}`}>
+                {f.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* Team list */}
-      <div className="flex-1 px-4 space-y-2">
-        {filtered.map((member) => (
-          <button
-            key={member.id}
-            onClick={() => setSelectedMember(member)}
-            className="w-full flex items-center gap-3 bg-white/5 border border-white/8 rounded-2xl px-4 py-3 active:bg-white/10 text-left"
-          >
-            {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white shrink-0">
-              {member.avatar}
+      {/* List */}
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 size={24} className="text-purple-400 animate-spin" />
+        </div>
+      ) : (
+        <div className="px-4 space-y-2">
+          {filtered.length === 0 && (
+            <p className="text-slate-600 text-sm text-center py-10">Nenhum membro nesta categoria</p>
+          )}
+          {filtered.map((m) => {
+            const sc = STATUS_CONFIG[m.status]
+            return (
+              <button
+                key={m.id}
+                onClick={() => setSelected(m)}
+                className="w-full flex items-center gap-3 bg-white/5 border border-white/8 rounded-2xl px-4 py-3.5 text-left active:bg-white/8 transition-all"
+              >
+                {/* Avatar */}
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-white border-2"
+                  style={{ borderColor: sc.color, backgroundColor: sc.color + '22' }}
+                >
+                  {m.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm font-semibold truncate">{m.name}</p>
+                  <p className="text-slate-400 text-xs">
+                    {m.zone ?? m.role.replace('_', ' ')}
+                    {m.sessionStart ? ` · ${formatSessionTime(m.sessionStart)}` : ''}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <span
+                    className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                    style={{ backgroundColor: sc.color + '22', color: sc.color }}
+                  >
+                    {sc.label}
+                  </span>
+                  {m.lastPingAt && (
+                    <span className="flex items-center gap-0.5 text-slate-600 text-[9px]">
+                      <Wifi size={8} />
+                      {formatSessionTime(m.lastPingAt)} atrás
+                    </span>
+                  )}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Member detail overlay */}
+      {selected && (
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-end z-40">
+          <div className="w-full bg-[#0f172a] border-t border-white/10 rounded-t-3xl p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold text-white border-2"
+                  style={{ borderColor: STATUS_CONFIG[selected.status].color, backgroundColor: STATUS_CONFIG[selected.status].color + '22' }}
+                >
+                  {selected.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-white font-bold text-lg">{selected.name}</p>
+                  <p className="text-slate-400 text-sm">{selected.role.replace('_', ' ')}</p>
+                </div>
+              </div>
+              <button onClick={() => setSelected(null)} className="p-2">
+                <X size={20} className="text-slate-400" />
+              </button>
             </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="text-white text-sm font-semibold truncate">{member.name}</p>
-                {member.status === 'late' && (
-                  <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 font-semibold">
-                    Atrasado
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3">
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ backgroundColor: STATUS_CONFIG[selected.status].color + '22', color: STATUS_CONFIG[selected.status].color }}>
+                  {STATUS_CONFIG[selected.status].label}
+                </span>
+                {selected.sessionStart && (
+                  <span className="text-slate-400 text-xs flex items-center gap-1">
+                    <Clock size={10} /> {formatSessionTime(selected.sessionStart)} em sessão
                   </span>
                 )}
               </div>
-              <p className="text-slate-500 text-xs">{member.role}</p>
-            </div>
 
-            {/* Status indicators */}
-            <div className="flex flex-col items-end gap-1 shrink-0">
-              <div className="flex items-center gap-1 text-xs" style={{ color: STATUS_COLORS[member.status as keyof typeof STATUS_COLORS] }}>
-                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: STATUS_COLORS[member.status as keyof typeof STATUS_COLORS] }} />
-                {member.elapsed}
-              </div>
-              {!member.inZone && (
-                <span className="flex items-center gap-1 text-[10px] text-orange-400">
-                  <MapPin size={10} />
-                  Fora zona
-                </span>
+              {selected.zone && (
+                <div className="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-3">
+                  <MapPin size={14} className="text-slate-400 shrink-0" />
+                  <p className="text-white text-sm">{selected.zone}</p>
+                </div>
+              )}
+
+              {selected.lastPingAt && (
+                <div className="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-3">
+                  <Wifi size={14} className="text-slate-400 shrink-0" />
+                  <p className="text-slate-400 text-sm">Último ping: {formatSessionTime(selected.lastPingAt)} atrás</p>
+                </div>
               )}
             </div>
-          </button>
-        ))}
-      </div>
 
-      {/* Member overlay */}
-      {selectedMember && (
-        <MemberOverlay member={selectedMember} onClose={() => setSelectedMember(null)} />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setSelected(null)}
+                className="flex-1 py-3 rounded-xl bg-white/8 border border-white/10 text-slate-300 font-semibold text-sm"
+              >
+                Fechar
+              </button>
+              <button
+                onClick={() => { setSelected(null); onNavigate('/pulse/supervisor/occurrences') }}
+                className="flex-1 py-3 rounded-xl bg-purple-600 text-white font-semibold text-sm"
+              >
+                Registrar alerta
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

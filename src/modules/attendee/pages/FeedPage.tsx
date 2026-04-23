@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, Heart, Megaphone, Loader2, Rss } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import { attendeeService } from '@/core/attendee/attendee.service'
@@ -12,6 +12,11 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
   const [posts, setPosts] = useState<FeedPost[]>([])
   const [loading, setLoading] = useState(true)
   const [liked, setLiked] = useState<Set<string>>(new Set())
+  const [composing, setComposing] = useState('')
+  const [posting, setPosting] = useState(false)
+  const [postError, setPostError] = useState<string | null>(null)
+  const [lastPostAt, setLastPostAt] = useState<number | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const loadFeed = async () => {
     if (!context?.eventId) { setLoading(false); return }
@@ -62,6 +67,75 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
     }
   }
 
+  const handleComposerInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setComposing(e.target.value)
+    setPostError(null)
+    // Auto-resize: reset height then set to scrollHeight, capped at 4 rows (~96px)
+    const el = e.target
+    el.style.height = 'auto'
+    el.style.height = Math.min(el.scrollHeight, 96) + 'px'
+  }
+
+  const handlePublish = async () => {
+    const body = composing.trim()
+    if (!body || posting) return
+
+    const now = Date.now()
+    if (lastPostAt !== null && now - lastPostAt < 30_000) {
+      const remaining = Math.ceil((30_000 - (now - lastPostAt)) / 1000)
+      setPostError(`Aguarde ${remaining} segundo${remaining !== 1 ? 's' : ''}`)
+      return
+    }
+
+    if (!context?.eventId) return
+
+    setPosting(true)
+    setPostError(null)
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setPosting(false); return }
+
+    const authorName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? 'Eu'
+
+    const optimisticPost: FeedPost = {
+      id: `optimistic-${Date.now()}`,
+      authorName,
+      authorAvatar: (user.user_metadata?.avatar_url as string | undefined) ?? null,
+      body,
+      imageUrl: null,
+      likesCount: 0,
+      createdAt: new Date().toISOString(),
+    }
+
+    setPosts((prev) => [optimisticPost, ...prev])
+    setComposing('')
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
+    setLastPostAt(now)
+
+    const { error } = await supabase.from('event_feed_posts').insert({
+      event_id: context.eventId,
+      author_id: user.id,
+      body,
+      likes_count: 0,
+      created_at: new Date().toISOString(),
+    })
+
+    if (error) {
+      setPostError('Erro ao publicar. Tente novamente.')
+      setPosts((prev) => prev.filter((p) => p.id !== optimisticPost.id))
+    }
+
+    setPosting(false)
+  }
+
+  const cooldownSeconds = (() => {
+    if (lastPostAt === null) return 0
+    const remaining = Math.ceil((30_000 - (Date.now() - lastPostAt)) / 1000)
+    return remaining > 0 ? remaining : 0
+  })()
+
   const fmtTime = (s: string) =>
     new Date(s).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
@@ -78,6 +152,39 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
           <ChevronLeft size={22} className="text-slate-300" />
         </button>
         <h1 className="text-lg font-bold text-white">Feed</h1>
+      </div>
+
+      {/* Composer */}
+      <div className="px-4 mb-4">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-3 space-y-2">
+          <textarea
+            ref={textareaRef}
+            rows={1}
+            value={composing}
+            onChange={handleComposerInput}
+            placeholder="Compartilhe algo com o evento..."
+            className="w-full bg-transparent text-white placeholder:text-slate-600 text-sm outline-none resize-none leading-relaxed"
+            style={{ minHeight: '24px', maxHeight: '96px' }}
+          />
+          {postError && (
+            <p className="text-red-400 text-xs">{postError}</p>
+          )}
+          <div className="flex justify-end">
+            <button
+              onClick={handlePublish}
+              disabled={!composing.trim() || posting || cooldownSeconds > 0}
+              className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-orange-500 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+            >
+              {posting ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : cooldownSeconds > 0 ? (
+                `Aguarde ${cooldownSeconds}s`
+              ) : (
+                'Publicar'
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
       {loading ? (

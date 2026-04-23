@@ -17,18 +17,21 @@ export default function SupervisorHomePage({ onNavigate }: PulsePageProps) {
   const [pendingApprovals, setPendingApprovals] = useState(0)
   const [openOccurrences, setOpenOccurrences] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [healthScore, setHealthScore] = useState<{ score: number; grade: string; factors: Array<{label: string; value: number; weight: number; ok: boolean}> } | null>(null)
 
   const load = async () => {
     if (!context?.eventId) return
     try {
-      const [team, approvals, occurrences] = await Promise.all([
+      const [team, approvals, occurrences, health] = await Promise.all([
         supervisorService.getTeamLive(context.eventId),
         supervisorService.getApprovals(context.eventId),
         supervisorService.getOccurrences(context.eventId),
+        supervisorService.getHealthScore(context.eventId),
       ])
       setTeamData({ total: team.total, active: team.active, delayed: team.delayed, absent: team.absent, outOfArea: team.outOfArea })
       setPendingApprovals(approvals.filter((a) => a.status === 'pending').length)
       setOpenOccurrences(occurrences.filter((o) => o.status === 'open').length)
+      setHealthScore(health)
     } finally {
       setLoading(false)
     }
@@ -89,6 +92,89 @@ export default function SupervisorHomePage({ onNavigate }: PulsePageProps) {
           )}
         </div>
       ) : null}
+
+      {/* Health Score */}
+      {healthScore && (
+        <div className="px-4 mb-5">
+          <div
+            className="rounded-2xl border p-4"
+            style={{
+              borderColor: healthScore.score >= 80 ? '#22C55E44' : healthScore.score >= 60 ? '#d9770644' : '#EF444444',
+              backgroundColor: healthScore.score >= 80 ? '#22C55E0a' : healthScore.score >= 60 ? '#d977060a' : '#EF44440a',
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-slate-400 text-xs uppercase tracking-wider font-medium">Health Score do Evento</p>
+                <p className="text-white font-bold text-2xl mt-0.5">
+                  {healthScore.score}
+                  <span className="text-sm font-normal text-slate-400 ml-1">/ 100</span>
+                </p>
+              </div>
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black"
+                style={{
+                  backgroundColor: healthScore.score >= 80 ? '#22C55E20' : healthScore.score >= 60 ? '#d9770620' : '#EF444420',
+                  color: healthScore.score >= 80 ? '#22C55E' : healthScore.score >= 60 ? '#d97706' : '#EF4444',
+                }}
+              >
+                {healthScore.grade}
+              </div>
+            </div>
+            <div className="space-y-2">
+              {healthScore.factors.map((f) => (
+                <div key={f.label} className="flex items-center gap-3">
+                  <p className="text-slate-400 text-xs w-28 shrink-0">{f.label}</p>
+                  <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${f.value}%`,
+                        backgroundColor: f.ok ? '#22C55E' : f.value >= 60 ? '#d97706' : '#EF4444',
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs font-medium w-8 text-right" style={{ color: f.ok ? '#22C55E' : '#d97706' }}>
+                    {f.value}%
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Operational Recommendations */}
+      {healthScore && healthScore.score < 90 && (() => {
+        const recs: Array<{ icon: string; text: string; urgent: boolean }> = []
+        const f = Object.fromEntries(healthScore.factors.map((x) => [x.label, x]))
+        if (f['Staff ativo'] && !f['Staff ativo'].ok) recs.push({ icon: '👥', text: 'Staff ativo abaixo de 80% — mobilize membros reserva imediatamente', urgent: true })
+        if (f['Pontualidade'] && !f['Pontualidade'].ok) recs.push({ icon: '⏰', text: `${teamData?.delayed ?? 0} membros atrasados — entre em contato pela equipe`, urgent: f['Pontualidade'].value < 70 })
+        if (f['Presença geral'] && !f['Presença geral'].ok) recs.push({ icon: '📍', text: 'Presença geral baixa — verifique absenteísmo e distribua tarefas', urgent: false })
+        if (f['Segurança'] && !f['Segurança'].ok) recs.push({ icon: '🔒', text: 'Alta taxa de tentativas inválidas — reforce o controle na portaria', urgent: true })
+        if (teamData && teamData.outOfArea > 0) recs.push({ icon: '🗺️', text: `${teamData.outOfArea} membro${teamData.outOfArea > 1 ? 's' : ''} fora da zona — verifique o mapa`, urgent: false })
+        if (recs.length === 0) return null
+        return (
+          <div className="px-4 mb-5">
+            <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-3">Recomendações operacionais</p>
+            <div className="space-y-2">
+              {recs.map((r, i) => (
+                <div
+                  key={i}
+                  className={`flex items-start gap-3 rounded-xl px-4 py-3 border ${
+                    r.urgent
+                      ? 'bg-red-500/8 border-red-500/20'
+                      : 'bg-amber-500/8 border-amber-500/20'
+                  }`}
+                >
+                  <span className="text-base shrink-0 mt-0.5">{r.icon}</span>
+                  <p className={`text-sm leading-relaxed ${r.urgent ? 'text-red-300' : 'text-amber-300'}`}>{r.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Quick access */}
       <div className="px-4 grid grid-cols-2 gap-3">

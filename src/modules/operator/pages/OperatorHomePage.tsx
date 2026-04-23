@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
-  ScanLine, History, BarChart2, Search, BellRing,
+  ScanLine, History, BarChart2, Search, BellRing, Monitor,
   CheckCircle, XCircle, Clock, TrendingUp, Wifi, WifiOff, RefreshCw,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -12,7 +12,7 @@ import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 import type { CheckinRecord, FlowMetrics } from '@/core/operator/operator.service'
 
 const ICON_MAP: Record<string, LucideIcon> = {
-  ScanLine, History, BarChart2, Search, BellRing,
+  ScanLine, History, BarChart2, Search, BellRing, Monitor,
 }
 
 interface QuickCard {
@@ -25,6 +25,7 @@ const CARDS: QuickCard[] = [
   { id: 'flow', title: 'Fluxo', subtitle: 'Métricas ao vivo', icon: 'BarChart2', color: '#1e293b', path: '/pulse/operator/flow' },
   { id: 'manual', title: 'Busca Manual', subtitle: 'Nome / CPF / e-mail', icon: 'Search', color: '#1e293b', path: '/pulse/operator/manual-check' },
   { id: 'alerts', title: 'Alertas', subtitle: 'Tentativas inválidas', icon: 'BellRing', color: '#7f1d1d', path: '/pulse/operator/alerts' },
+  { id: 'kiosk', title: 'Modo Kiosk', subtitle: 'Scanner fixo / totem', icon: 'Monitor', color: '#0f2027', path: '/pulse/kiosk' },
 ]
 
 export default function OperatorHomePage({ onNavigate }: PulsePageProps) {

@@ -22,6 +22,10 @@ import { TopContextBar } from '@/shared/components/navigation/TopContextBar'
 import { ModeSwitcher } from '@/shared/components/navigation/ModeSwitcher'
 import { buildModeFromPath } from './pulse.utils'
 import type { AppMode } from '@/core/context/app-context.types'
+import { PulseErrorBoundary } from '@/shared/components/ui/ErrorBoundary'
+import { checkRouteAccess } from '@/core/permissions/route-guard'
+
+const AccessDeniedPage = lazy(() => import('@/modules/shared-shell/pages/AccessDeniedPage'))
 
 // ─── lazy-loaded screen groups ───────────────────────────────────────────────
 
@@ -37,6 +41,7 @@ const ProfilePage = lazy(() => import('@/modules/profile-settings/pages/ProfileP
 // Operator
 const OperatorHomePage = lazy(() => import('@/modules/operator/pages/OperatorHomePage'))
 const ScannerPage = lazy(() => import('@/modules/operator/pages/ScannerPage'))
+const KioskPage = lazy(() => import('@/modules/operator/pages/KioskPage'))
 const ManualCheckPage = lazy(() => import('@/modules/operator/pages/ManualCheckPage'))
 const CheckinHistoryPage = lazy(() => import('@/modules/operator/pages/CheckinHistoryPage'))
 const FlowPage = lazy(() => import('@/modules/operator/pages/FlowPage'))
@@ -134,6 +139,7 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
   if (is('/pulse/operator/history')) return <CheckinHistoryPage onNavigate={navigate} />
   if (is('/pulse/operator/flow')) return <FlowPage onNavigate={navigate} />
   if (is('/pulse/operator/alerts')) return <OperatorAlertsPage onNavigate={navigate} />
+  if (is('/pulse/kiosk')) return <KioskPage onNavigate={navigate} />
 
   // Staff
   if (is('/pulse/staff')) return <StaffHomePage onNavigate={navigate} />
@@ -179,7 +185,8 @@ export function PulseApp() {
   const [showModeSwitcher, setShowModeSwitcher] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)
 
-  const { context, availableModes, isContextReady, setMode } = useAppContext()
+  const { context, availableModes: contextModes, isContextReady, setMode } = useAppContext()
+  const { availableModes } = usePermissions()
   const unreadCount = useNotifications((s) => s.unreadCount)
   const isOnline = useOffline((s) => s.isOnline)
 
@@ -229,6 +236,7 @@ export function PulseApp() {
     '/pulse/select-event',
     '/pulse/select-mode',
     '/pulse/operator/scanner', // full-screen scanner
+    '/pulse/kiosk',            // full-screen kiosk mode
   ]
   const showChrome =
     authChecked &&
@@ -243,6 +251,15 @@ export function PulseApp() {
         <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-white/60 animate-spin" />
       </div>
     )
+  }
+
+  // ── route permission guard ──
+  const guardResult = checkRouteAccess(path, context ?? null, availableModes, isContextReady)
+
+  if (authChecked && !guardResult.allowed && guardResult.redirectTo) {
+    if (path !== guardResult.redirectTo) {
+      replace(guardResult.redirectTo)
+    }
   }
 
   const activeMode = context?.mode ?? modeFromPath ?? 'attendee'
@@ -270,9 +287,14 @@ export function PulseApp() {
 
       {/* Screen content */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden">
-        <Suspense fallback={<ScreenLoader />}>
-          {resolveScreen(path, navigate)}
-        </Suspense>
+        <PulseErrorBoundary routeName={path}>
+          <Suspense fallback={<ScreenLoader />}>
+            {!guardResult.allowed && guardResult.reason === 'no-permission'
+              ? <AccessDeniedPage onNavigate={navigate} />
+              : resolveScreen(path, navigate)
+            }
+          </Suspense>
+        </PulseErrorBoundary>
       </main>
 
       {/* Bottom tab bar */}
@@ -288,7 +310,7 @@ export function PulseApp() {
       {/* Mode switcher sheet */}
       {showModeSwitcher && (
         <ModeSwitcher
-          availableModes={availableModes}
+          availableModes={contextModes}
           activeMode={activeMode}
           onSelect={handleModeSwitcherSelect}
           onClose={() => setShowModeSwitcher(false)}

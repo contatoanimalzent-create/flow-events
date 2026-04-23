@@ -186,4 +186,53 @@ export const supervisorService = {
     })
     if (error) throw new Error(error.message)
   },
+
+  async getHealthScore(eventId: string): Promise<{
+    score: number // 0-100
+    grade: 'A' | 'B' | 'C' | 'D' | 'F'
+    factors: Array<{ label: string; value: number; weight: number; ok: boolean }>
+  }> {
+    // Fetch all data in parallel
+    const [teamData, { count: totalCheckins }, { count: totalInvalid }] = await Promise.all([
+      supervisorService.getTeamLive(eventId),
+      supabase.from('checkins').select('id', { count: 'exact', head: true }).eq('event_id', eventId),
+      supabase.from('checkin_attempts').select('id', { count: 'exact', head: true }).eq('event_id', eventId).eq('valid', false),
+    ])
+
+    const checkins = totalCheckins ?? 0
+    const invalids = totalInvalid ?? 0
+
+    // Factor 1: Staff active rate (weight 40)
+    const activeRate = teamData.total > 0 ? (teamData.active / teamData.total) * 100 : 100
+    const activeOk = activeRate >= 80
+
+    // Factor 2: Delay rate (weight 25)
+    const delayRate = teamData.total > 0 ? ((teamData.total - teamData.delayed - teamData.absent) / teamData.total) * 100 : 100
+    const delayOk = delayRate >= 85
+
+    // Factor 3: Absence rate (weight 20)
+    const presentRate = teamData.total > 0 ? ((teamData.active + teamData.delayed) / teamData.total) * 100 : 100
+    const presentOk = presentRate >= 70
+
+    // Factor 4: Security (invalid attempts rate) (weight 15)
+    const total = checkins + invalids
+    const securityRate = total > 0 ? (checkins / total) * 100 : 100
+    const securityOk = securityRate >= 90
+
+    const factors = [
+      { label: 'Staff ativo', value: Math.round(activeRate), weight: 40, ok: activeOk },
+      { label: 'Pontualidade', value: Math.round(delayRate), weight: 25, ok: delayOk },
+      { label: 'Presença geral', value: Math.round(presentRate), weight: 20, ok: presentOk },
+      { label: 'Segurança', value: Math.round(securityRate), weight: 15, ok: securityOk },
+    ]
+
+    const score = Math.round(
+      factors.reduce((sum, f) => sum + (f.value * f.weight) / 100, 0)
+    )
+
+    const grade: 'A' | 'B' | 'C' | 'D' | 'F' =
+      score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F'
+
+    return { score, grade, factors }
+  },
 }

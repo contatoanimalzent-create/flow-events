@@ -4,6 +4,8 @@ import { useAppContext } from '@/core/context/app-context.store'
 import { attendeeService } from '@/core/attendee/attendee.service'
 import type { UpgradeOffer } from '@/core/attendee/attendee.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
+import { createCheckoutSession } from '@/lib/stripe'
+import { supabase } from '@/lib/supabase'
 
 const CARD_GRADIENTS = [
   'from-amber-900/60 to-slate-900',
@@ -16,6 +18,8 @@ export default function UpgradesPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [upgrades, setUpgrades] = useState<UpgradeOffer[]>([])
   const [loading, setLoading] = useState(true)
+  const [buying, setBuying] = useState<string | null>(null) // upgrade id being purchased
+  const [buyError, setBuyError] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -29,6 +33,46 @@ export default function UpgradesPage({ onNavigate }: PulsePageProps) {
     }
     load()
   }, [context?.eventId])
+
+  const handleBuy = async (upgrade: UpgradeOffer) => {
+    setBuying(upgrade.id)
+    setBuyError(null)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setBuyError('Você precisa estar logado'); return }
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+
+      const result = await createCheckoutSession(
+        {
+          eventId: context?.eventId ?? '',
+          ticketTypeId: upgrade.id,
+          quantity: 1,
+          installments: 1, // card, 1x
+          buyerEmail: user.email,
+          successUrl: `${window.location.origin}/pulse/attendee/tickets?upgrade=success`,
+          cancelUrl: `${window.location.origin}/pulse/attendee/upgrades`,
+        },
+        supabaseUrl,
+        anonKey
+      )
+
+      if (result.error) {
+        setBuyError(result.error)
+        return
+      }
+
+      // Redirect to Stripe Checkout
+      if (result.url) {
+        window.location.href = result.url
+      }
+    } catch (err: any) {
+      setBuyError(err.message ?? 'Erro ao processar pagamento')
+    } finally {
+      setBuying(null)
+    }
+  }
 
   const fmt = (n: number, cur = 'BRL') =>
     n.toLocaleString('pt-BR', { style: 'currency', currency: cur, minimumFractionDigits: 0 })
@@ -56,6 +100,11 @@ export default function UpgradesPage({ onNavigate }: PulsePageProps) {
         </div>
       ) : (
         <div className="px-4 space-y-4">
+          {buyError && (
+            <div className="px-4 mt-2">
+              <p className="text-red-400 text-sm text-center">{buyError}</p>
+            </div>
+          )}
           {upgrades.map((upgrade, idx) => (
             <div
               key={upgrade.id}
@@ -102,9 +151,16 @@ export default function UpgradesPage({ onNavigate }: PulsePageProps) {
                   <span className="text-2xl font-bold text-white">
                     {fmt(upgrade.price, upgrade.currency)}
                   </span>
-                  <button className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-900 rounded-xl text-sm font-bold active:opacity-80 transition-opacity">
-                    Comprar
-                    <ArrowRight size={16} />
+                  <button
+                    onClick={() => handleBuy(upgrade)}
+                    disabled={buying === upgrade.id}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-900 rounded-xl text-sm font-bold active:opacity-80 transition-opacity disabled:opacity-60"
+                  >
+                    {buying === upgrade.id
+                      ? <Loader2 size={14} className="animate-spin" />
+                      : <ArrowRight size={16} />
+                    }
+                    {buying === upgrade.id ? 'Aguarde...' : 'Comprar'}
                   </button>
                 </div>
               </div>

@@ -24,6 +24,7 @@ import { buildModeFromPath } from './pulse.utils'
 import type { AppMode } from '@/core/context/app-context.types'
 import { PulseErrorBoundary } from '@/shared/components/ui/ErrorBoundary'
 import { checkRouteAccess } from '@/core/permissions/route-guard'
+import { initPush, handleServiceWorkerMessages } from '@/core/push/push.service'
 
 const AccessDeniedPage = lazy(() => import('@/modules/shared-shell/pages/AccessDeniedPage'))
 
@@ -192,6 +193,22 @@ export function PulseApp() {
 
   // Register offline detection at app root
   useOfflineDetection()
+
+  // Register push notifications + service worker
+  useEffect(() => {
+    if (!isContextReady || !context) return
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user && context.eventId) {
+        initPush(user.id, context.eventId).catch(() => {})
+      }
+    })
+
+    // Handle service worker → navigate messages
+    handleServiceWorkerMessages((url) => {
+      navigate(url)
+    })
+  }, [isContextReady, context?.eventId])
 
   // ── session guard — usa a sessão Supabase existente, sem login próprio ──
   useEffect(() => {

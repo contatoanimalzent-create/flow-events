@@ -5,6 +5,20 @@ import { LoadingState } from '@/shared/components'
 import { OperatorPage } from '@/features/checkin/pages/OperatorPage'
 
 const AboutPage = lazy(() => import('@/pages/public/AboutPage').then((m) => ({ default: m.AboutPage })))
+const ComoFuncionaPage = lazy(() => import('@/pages/public/ComoFuncionaPage').then((m) => ({ default: m.ComoFuncionaPage })))
+const PrecosPage = lazy(() => import('@/pages/public/PrecosPage').then((m) => ({ default: m.PrecosPage })))
+const DemoPage = lazy(() => import('@/pages/public/DemoPage').then((m) => ({ default: m.DemoPage })))
+const ApiPage = lazy(() => import('@/pages/public/ApiPage').then((m) => ({ default: m.ApiPage })))
+const FuncionalidadesPage = lazy(() => import('@/pages/public/FuncionalidadesPage').then((m) => ({ default: m.FuncionalidadesPage })))
+const CarreirasPage = lazy(() => import('@/pages/public/CarreirasPage').then((m) => ({ default: m.CarreirasPage })))
+const BlogPage = lazy(() => import('@/pages/public/BlogPage').then((m) => ({ default: m.BlogPage })))
+const CasesPage = lazy(() => import('@/pages/public/CasesPage').then((m) => ({ default: m.CasesPage })))
+const ImprensaPage = lazy(() => import('@/pages/public/ImprensaPage').then((m) => ({ default: m.ImprensaPage })))
+const AjudaPage = lazy(() => import('@/pages/public/AjudaPage').then((m) => ({ default: m.AjudaPage })))
+const AjudaCompradoresPage = lazy(() => import('@/pages/public/AjudaCompradoresPage').then((m) => ({ default: m.AjudaCompradoresPage })))
+const AjudaProdutoresPage = lazy(() => import('@/pages/public/AjudaProdutoresPage').then((m) => ({ default: m.AjudaProdutoresPage })))
+const StatusPage = lazy(() => import('@/pages/public/StatusPage').then((m) => ({ default: m.StatusPage })))
+const EventosCategoriPage = lazy(() => import('@/pages/public/EventosCategoriaPage').then((m) => ({ default: m.EventosCategoriaPage })))
 const StaffJoinPage = lazy(() => import('@/pages/public/StaffJoinPage').then((m) => ({ default: m.StaffJoinPage })))
 const StaffTimeclockPage = lazy(() => import('@/pages/public/StaffTimeclockPage').then((m) => ({ default: m.StaffTimeclockPage })))
 const ContactPage = lazy(() => import('@/pages/public/ContactPage').then((m) => ({ default: m.ContactPage })))
@@ -90,6 +104,34 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
         <LoginPage onBack={onBackToHome} onSignup={onSignup} />
       ) : route === 'signup' ? (
         <SignupPage onBack={onBackToHome} onLogin={onLogin} />
+      ) : route === 'como-funciona' ? (
+        <ComoFuncionaPage onLogin={onLogin} />
+      ) : route === 'precos' ? (
+        <PrecosPage onLogin={onLogin} />
+      ) : route === 'demo' ? (
+        <DemoPage onLogin={onLogin} />
+      ) : route === 'api' ? (
+        <ApiPage onLogin={onLogin} />
+      ) : route === 'funcionalidades' ? (
+        <FuncionalidadesPage onLogin={onLogin} />
+      ) : route === 'carreiras' ? (
+        <CarreirasPage onLogin={onLogin} />
+      ) : route === 'blog' ? (
+        <BlogPage onLogin={onLogin} />
+      ) : route === 'cases' ? (
+        <CasesPage onLogin={onLogin} />
+      ) : route === 'imprensa' ? (
+        <ImprensaPage onLogin={onLogin} />
+      ) : route === 'ajuda' ? (
+        <AjudaPage onLogin={onLogin} />
+      ) : route === 'ajuda-compradores' ? (
+        <AjudaCompradoresPage onLogin={onLogin} />
+      ) : route === 'ajuda-produtores' ? (
+        <AjudaProdutoresPage onLogin={onLogin} />
+      ) : route === 'status' ? (
+        <StatusPage onLogin={onLogin} />
+      ) : route === 'eventos-categoria' ? (
+        <EventosCategoriPage onLogin={onLogin} />
       ) : (
         <HomePage onLogin={onLogin} />
       )}

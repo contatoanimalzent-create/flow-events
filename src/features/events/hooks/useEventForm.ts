@@ -132,7 +132,7 @@ export function useEventForm({ eventId, organizationId, onSaved }: UseEventFormP
 
         if (!gate.canCreateEvent) {
           const limitLabel = gate.usage.eventLimit == null ? 'do plano atual' : `de ${gate.usage.eventLimit} eventos`
-          setError(`Este plano ja atingiu o limite ${limitLabel}. Ative um plano superior em Billing para criar novos eventos.`)
+          setError(`Este plano já atingiu o limite ${limitLabel}. Ative um plano superior em Billing para criar novos eventos.`)
           return
         }
       }

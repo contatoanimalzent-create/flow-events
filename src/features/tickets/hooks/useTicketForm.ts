@@ -97,7 +97,7 @@ export function useTicketForm({ eventId, ticketId, position, onSaved }: UseTicke
             gate.usage.ticketsPerEventLimit == null
               ? 'do plano atual'
               : `de ${gate.usage.ticketsPerEventLimit} tipos por evento`
-          setError(`Este evento ja alcançou o limite ${limitLabel}. Ajuste o plano em Billing para liberar novos tipos de ingresso.`)
+          setError(`Este evento já alcançou o limite ${limitLabel}. Ajuste o plano em Billing para liberar novos tipos de ingresso.`)
           return
         }
       }

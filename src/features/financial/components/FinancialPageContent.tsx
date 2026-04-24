@@ -105,7 +105,7 @@ export function FinancialPageContent() {
             <RefreshCw className="h-3.5 w-3.5" /> {t('Refresh', 'Atualizar')}
           </button>
           <button className="btn-secondary flex items-center gap-2 text-xs">
-            <Download className="h-3.5 w-3.5" /> {t('Export executive view', 'Exportar visao executiva')}
+            <Download className="h-3.5 w-3.5" /> {t('Export executive view', 'Exportar visão executiva')}
           </button>
           {dashboard.tab === 'costs' && canManageFinancial ? (
             <button
@@ -138,7 +138,7 @@ export function FinancialPageContent() {
 
       <div className="surface-panel reveal flex items-center gap-1 p-2">
         {([
-          { key: 'overview', label: t('Overview', 'Visao geral') },
+          { key: 'overview', label: t('Overview', 'Visão geral') },
           { key: 'forecast', label: 'Forecast' },
           { key: 'payouts', label: t('Payouts', 'Repasses') },
           { key: 'closure', label: t('Closure', 'Fechamento') },
@@ -164,7 +164,7 @@ export function FinancialPageContent() {
       ) : dashboard.error ? (
         <PageErrorState title={t('Unable to load financials', 'Erro ao carregar financeiro')} description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : !dashboard.overview ? (
-        <PageEmptyState title={t('No financial data', 'Nenhum dado financeiro')} description={t('There is not enough data yet to consolidate the executive view.', 'Ainda nao ha dados suficientes para consolidar a visao executiva.')} icon={<Wallet className="mb-3 h-10 w-10 text-text-muted" />} />
+        <PageEmptyState title={t('No financial data', 'Nenhum dado financeiro')} description={t('There is not enough data yet to consolidate the executive view.', 'Ainda não há dados suficientes para consolidar a visão executiva.')} icon={<Wallet className="mb-3 h-10 w-10 text-text-muted" />} />
       ) : (
         <>
           {(dashboard.tab === 'overview' || dashboard.tab === 'dre') && <FinancialExecutiveCards overview={dashboard.overview} />}
@@ -211,7 +211,7 @@ export function FinancialPageContent() {
 
               <div className="space-y-4">
                 <div className="card p-5">
-                  <div className="mb-3 text-[10px] font-mono uppercase tracking-widest text-text-muted">Governanca</div>
+                  <div className="mb-3 text-[10px] font-mono uppercase tracking-widest text-text-muted">Governança</div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-text-secondary">Pagamentos aprovados</span>
@@ -395,7 +395,7 @@ export function FinancialPageContent() {
               {dashboard.filteredCostEntries.length === 0 ? (
                 <PageEmptyState
                   title="NENHUM LANCAMENTO"
-                  description="Crie custos manuais para fortalecer a governanca financeira por evento."
+                  description="Crie custos manuais para fortalecer a governança financeira por evento."
                   icon={<Wallet className="mb-3 h-10 w-10 text-text-muted" />}
                 />
               ) : (
@@ -403,7 +403,7 @@ export function FinancialPageContent() {
                   <table className="w-full">
                     <thead className="border-b border-bg-border">
                       <tr>
-                        {['Descricao', 'Categoria', 'Valor', 'Status', 'Vencimento', 'Acoes'].map((header) => (
+                        {['Descricao', 'Categoria', 'Valor', 'Status', 'Vencimento', 'Ações'].map((header) => (
                           <th key={header} className="table-header">
                             {header}
                           </th>

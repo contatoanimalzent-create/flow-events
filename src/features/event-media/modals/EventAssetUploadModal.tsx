@@ -82,7 +82,7 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
   async function handleSubmit() {
     if (source === 'file' && !file) { setError('Selecione um arquivo para continuar.'); return }
     if (source === 'url' && !externalUrl.trim()) { setError('Informe uma URL para continuar.'); return }
-    if (source === 'library' && !selectedStock) { setError('Selecione uma midia da biblioteca para continuar.'); return }
+    if (source === 'library' && !selectedStock) { setError('Selecione uma mídia da biblioteca para continuar.'); return }
     setError('')
     try {
       await onSubmit({
@@ -97,7 +97,7 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
       })
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Nao foi possivel publicar o asset.')
+      setError(err instanceof Error ? err.message : 'Não foi possível publicar o asset.')
     }
   }
 
@@ -156,7 +156,7 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
                 </FormGrid>
                 <FormToggleCard
                   title="Asset ativo na landing"
-                  description="Somente assets ativos aparecem no hero e na galeria publica."
+                  description="Somente assets ativos aparecem no hero e na galeria pública."
                   checked={isActive}
                   onToggle={() => setIsActive((v) => !v)}
                 />
@@ -234,7 +234,7 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
                   <input className="input" placeholder="Titulo curto do asset" value={caption} onChange={(e) => setCaption(e.target.value)} />
                 </FormField>
                 <FormField label="Alt text">
-                  <input className="input" placeholder="Descricao acessivel" value={altText} onChange={(e) => setAltText(e.target.value)} />
+                  <input className="input" placeholder="Descrição acessivel" value={altText} onChange={(e) => setAltText(e.target.value)} />
                 </FormField>
               </FormGrid>
               {assetType === 'video' && (
@@ -244,7 +244,7 @@ export function EventAssetUploadModal({ onClose, onSubmit, uploading = false }: 
               )}
               <FormToggleCard
                 title="Asset ativo na landing"
-                description="Somente assets ativos aparecem no hero e na galeria publica."
+                description="Somente assets ativos aparecem no hero e na galeria pública."
                 checked={isActive}
                 onToggle={() => setIsActive((v) => !v)}
               />

@@ -44,7 +44,7 @@ export function PayoutModal({ organizationId, events, initialReport, defaultEven
 
     for (const field of ['gross_sales', 'platform_fees', 'retained_amount', 'payable_amount'] as const) {
       if (Number.isNaN(Number(values[field]))) {
-        setError('Preencha os valores financeiros com numeros validos.')
+        setError('Preencha os valores financeiros com números validos.')
         return
       }
     }

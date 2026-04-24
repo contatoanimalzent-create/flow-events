@@ -29,7 +29,7 @@ export function SubscriptionCard({ plan, current = false, disabled = false, onSe
           <div className="mt-3 font-display text-4xl leading-none tracking-[-0.05em] text-text-primary">{planName}</div>
           <p className="mt-3 max-w-sm text-sm leading-6 text-text-muted">{planDescription}</p>
         </div>
-        {current ? <PremiumBadge tone="accent">{t('Active', 'Ativo')}</PremiumBadge> : <PremiumBadge tone="info">{t('Available', 'Disponivel')}</PremiumBadge>}
+        {current ? <PremiumBadge tone="accent">{t('Active', 'Ativo')}</PremiumBadge> : <PremiumBadge tone="info">{t('Available', 'Disponível')}</PremiumBadge>}
       </div>
 
       <div className="mt-6 flex items-end gap-2">

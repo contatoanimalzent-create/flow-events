@@ -6,7 +6,7 @@ import { formatDate } from '@/shared/lib'
 
 const ENTITY_LABELS: Record<AuditEntityType, string> = {
   event: 'Evento',
-  event_media_asset: 'Midia do evento',
+  event_media_asset: 'Mídia do evento',
   order: 'Pedido',
   payment: 'Pagamento',
   ticket: 'Ingresso',
@@ -30,7 +30,7 @@ export function AuditFeedPanel() {
           ))}
         </select>
         <select className="input h-9 text-xs" value={audit.userId} onChange={(event) => audit.setUserId(event.target.value)}>
-          <option value="all">Todos usuarios</option>
+          <option value="all">Todos usuários</option>
           {audit.users.map((user) => (
             <option key={user.id} value={user.id}>
               {user.name}

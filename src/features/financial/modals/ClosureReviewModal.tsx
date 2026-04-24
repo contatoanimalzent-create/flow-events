@@ -69,7 +69,7 @@ export function ClosureReviewModal({
             <span className="admin-title-accent">.</span>
           </>
         }
-        subtitle="Revise conciliacao, custos, repasse e validacao final com uma checklist clara."
+        subtitle="Revise conciliacao, custos, repasse e válidação final com uma checklist clara."
         onClose={onClose}
       />
 

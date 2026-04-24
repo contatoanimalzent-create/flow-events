@@ -38,7 +38,7 @@ export function FinancialPayoutsTable({ reports, onEditPayout }: FinancialPayout
       <table className="w-full">
         <thead className="border-b border-bg-border">
           <tr>
-            {['Evento', 'Payable', 'Retido', 'Liquido organizador', 'Status', 'Agenda', 'Acoes'].map((header) => (
+            {['Evento', 'Payable', 'Retido', 'Liquido organizador', 'Status', 'Agenda', 'Ações'].map((header) => (
               <th key={header} className="table-header">
                 {header}
               </th>

@@ -74,7 +74,7 @@ const PLANS = {
       'Marca branca completa',
       'Domínio personalizado',
       'Gestão de tráfego pago',
-      'Analises com marca branca',
+      'Análises com marca branca',
       'Ticket Social (Stories)',
       'Acesso completo a API',
     ],
@@ -90,7 +90,7 @@ const PLANS = {
       'Tudo do Business',
       'Taxa negociada por volume',
       'Totem facial (hardware)',
-      'Sincronizacao offline',
+      'Sincronização offline',
       'Reconhecimento facial',
       'SLA dedicado 24/7',
       'Onboarding personalizado',
@@ -244,7 +244,7 @@ export function SettingsPage() {
           GOVERNANÇA<span className="text-brand-acid">.</span>
         </h1>
         <p className="text-text-muted text-xs mt-1 font-mono tracking-wider">
-          Organizacao, marca, permissoes, integracoes e trilha operacional
+          Organização, marca, permissões, integrações e trilha operacional
         </p>
       </div>
 

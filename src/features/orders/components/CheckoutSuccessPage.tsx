@@ -35,13 +35,13 @@ export function CheckoutSuccessPage({
           </div>
           <h1 className="mt-4 font-display text-[clamp(3rem,5vw,5rem)] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white">
             {isFreeOrder
-              ? isPortuguese ? 'Sua inscricao foi confirmada.' : 'Your registration is confirmed.'
+              ? isPortuguese ? 'Sua inscrição foi confirmada.' : 'Your registration is confirmed.'
               : isPortuguese ? 'Sua compra foi concluida.' : 'Your purchase is complete.'}
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-white/66">
             {isFreeOrder
               ? isPortuguese
-                ? 'O QR code e a confirmacao chegam por e-mail em instantes. A experiencia ja esta reservada para voce.'
+                ? 'O QR code e a confirmação chegam por e-mail em instantes. A experiência já esta reservada para você.'
                 : 'Your QR code and confirmation will arrive by email shortly. The experience is already reserved for you.'
               : isPortuguese
                 ? 'Os ingressos digitais serao enviados assim que o pagamento for confirmado pelo gateway.'

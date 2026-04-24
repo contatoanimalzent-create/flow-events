@@ -42,7 +42,7 @@ export default function StaffInstructionsPage({ onNavigate }: PulsePageProps) {
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
+      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-área-inset-top) + 20px)' }}>
         <button onClick={() => onNavigate('/pulse/staff')} className="p-2 -ml-2">
           <ChevronLeft size={22} className="text-slate-300" />
         </button>
@@ -107,7 +107,7 @@ export default function StaffInstructionsPage({ onNavigate }: PulsePageProps) {
                 </button>
                 {isOpen && (
                   <div className="px-4 pb-4 border-t border-white/8">
-                    <p className="text-slate-300 text-sm leading-relaxed pt-3 whitespace-pre-wrap">{item.body}</p>
+                    <p className="text-slate-300 text-sm leading-relaxed pt-3 whitespace-pré-wrap">{item.body}</p>
                     <p className="text-slate-600 text-xs mt-3">
                       {new Date(item.createdAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                     </p>

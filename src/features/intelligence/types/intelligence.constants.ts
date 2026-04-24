@@ -9,7 +9,7 @@ export const INTELLIGENCE_ALERT_TYPE_LABELS: Record<IntelligenceAlertType, strin
 
 export const INTELLIGENCE_ALERT_SEVERITY_LABELS: Record<IntelligenceAlertSeverity, string> = {
   critical: 'Critico',
-  warning: 'Atencao',
+  warning: 'Atenção',
   info: 'Informativo',
 }
 

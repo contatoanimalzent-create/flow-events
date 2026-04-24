@@ -49,7 +49,7 @@ export function ConversionCTASection({ onLogin }: ConversionCTASectionProps) {
                   href="/events"
                   className="inline-flex items-center justify-center gap-3 rounded-full bg-[#f4ede0] px-7 py-3.5 text-sm font-semibold text-[#14110c] transition-all duration-500 hover:-translate-y-1 hover:bg-white hover:shadow-[0_20px_50px_rgba(244,237,224,0.18)]"
                 >
-                  Explorar experiencias
+                  Explorar experiências
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a

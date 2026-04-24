@@ -54,14 +54,14 @@ export function EventsPageContent() {
           </p>
         </div>
         <div className="novare-stage-panel-dark">
-          <div className="novare-stage-label">{t('Live catalog', 'Catalogo ao vivo')}</div>
+          <div className="novare-stage-label">{t('Live catalog', 'Catálogo ao vivo')}</div>
           <div className="novare-stage-title">
-            {t('The event portfolio now behaves like an editorial operating layer.', 'O portfolio de eventos agora se comporta como uma camada editorial de operacao.')}
+            {t('The event portfolio now behaves like an editorial operating layer.', 'O portfolio de eventos agora se comporta como uma camada editorial de operação.')}
           </div>
           <div className="novare-stage-copy">
             {t(
               'Every launch, draft and published event stays inside the same visual system used by the public layer and the back office.',
-              'Cada lancamento, rascunho e evento publicado permanece dentro do mesmo sistema visual usado na camada publica e no backoffice.',
+              'Cada lancamento, rascunho e evento publicado permanece dentro do mesmo sistema visual usado na camada pública e no backoffice.',
             )}
           </div>
           {canManageEvents ? (
@@ -81,7 +81,7 @@ export function EventsPageContent() {
             <div className="novare-stage-label">{stat.label}</div>
             <div className="novare-stage-metric-value">{stat.value}</div>
             <div className="novare-stage-metric-copy">
-              {t('Signal extracted from the current event catalog.', 'Sinal extraido do catalogo atual de eventos.')}
+              {t('Signal extracted from the current event catalog.', 'Sinal extraido do catálogo atual de eventos.')}
             </div>
           </article>
         ))}
@@ -134,7 +134,7 @@ export function EventsPageContent() {
       </div>
 
       {loading && (
-        <PageLoadingState title={t('Loading events', 'Carregando eventos')} description={t('Fetching the portfolio and organization indicators.', 'Buscando o portfolio e os indicadores da organizacao.')} />
+        <PageLoadingState title={t('Loading events', 'Carregando eventos')} description={t('Fetching the portfolio and organization indicators.', 'Buscando o portfolio e os indicadores da organização.')} />
       )}
 
       {!loading && error && (
@@ -200,7 +200,7 @@ export function EventsPageContent() {
           <table className="w-full">
             <thead className="border-b border-bg-border">
               <tr>
-                {[t('Event', 'Evento'), t('Status', 'Status'), t('Date', 'Data'), t('Venue', 'Local'), t('Occupancy', 'Ocupacao'), t('Actions', 'Acoes')].map((header) => (
+                {[t('Event', 'Evento'), t('Status', 'Status'), t('Date', 'Data'), t('Venue', 'Local'), t('Occupancy', 'Ocupacao'), t('Actions', 'Ações')].map((header) => (
                   <th key={header} className="table-header">
                     {header}
                   </th>
@@ -299,7 +299,7 @@ export function EventsPageContent() {
         open={Boolean(pendingDeleteEvent)}
         title={t('Remove event', 'Remover evento')}
         description={pendingDeleteEvent ? t(`The event "${pendingDeleteEvent.name}" will be removed from the admin portfolio.`, `O evento "${pendingDeleteEvent.name}" sera removido do portfolio administrativo.`) : undefined}
-        impact={t('This removal takes the event out of the administrative portfolio and can affect operations, future sales and historical visibility in the back office.', 'A exclusao remove a configuracao principal do evento e pode afetar operacao, vendas futuras e historico associado no painel administrativo.')}
+        impact={t('This removal takes the event out of the administrative portfolio and can affect operations, future sales and historical visibility in the back office.', 'A exclusao remove a configuração principal do evento e pode afetar operação, vendas futuras e histórico associado no painel administrativo.')}
         confirmLabel={t('Delete event', 'Excluir evento')}
         confirming={false}
         onCancel={() => setPendingDeleteEvent(null)}

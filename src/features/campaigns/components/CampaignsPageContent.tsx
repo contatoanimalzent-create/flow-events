@@ -298,10 +298,10 @@ export function CampaignsPageContent() {
         title="Remover segmento salvo"
         description={
           pendingDeleteSegment
-            ? `O segmento ${pendingDeleteSegment.name} sera removido da operacao de CRM e campanhas.`
+            ? `O segmento ${pendingDeleteSegment.name} sera removido da operação de CRM e campanhas.`
             : undefined
         }
-        impact="Drafts que dependem deste publico perdem a referencia principal e a equipe precisara revisar a estrategia antes do proximo disparo."
+        impact="Drafts que dependem deste público perdem a referência principal e a equipe precisara revisar a estratégia antes do próximo disparo."
         confirmLabel="Excluir segmento"
         confirming={mutations.deletingSegment}
         onCancel={() => setPendingDeleteSegment(null)}
@@ -318,8 +318,8 @@ export function CampaignsPageContent() {
       <ActionConfirmationDialog
         open={Boolean(pendingDeleteDraft)}
         title="Excluir draft de campanha"
-        description={pendingDeleteDraft ? `O draft ${pendingDeleteDraft.name} saira da fila editorial desta organizacao.` : undefined}
-        impact="O conteudo, o agendamento e o contexto comercial deste disparo deixam de ficar disponiveis para reaproveitamento imediato."
+        description={pendingDeleteDraft ? `O draft ${pendingDeleteDraft.name} saira da fila editorial desta organização.` : undefined}
+        impact="O conteúdo, o agendamento e o contexto comercial deste disparo deixam de ficar disponíveis para reaproveitamento imediato."
         confirmLabel="Excluir draft"
         confirming={mutations.deletingDraft}
         onCancel={() => setPendingDeleteDraft(null)}
@@ -337,8 +337,8 @@ export function CampaignsPageContent() {
         open={Boolean(pendingLaunchDraft)}
         tone="default"
         title="Lancar campanha"
-        description={pendingLaunchDraft ? `O draft ${pendingLaunchDraft.name} sera enviado para execucao agora.` : undefined}
-        impact="A plataforma vai criar a run operacional, resolver a audiencia e registrar os destinatarios desta campanha. Revise o conteudo antes de seguir."
+        description={pendingLaunchDraft ? `O draft ${pendingLaunchDraft.name} sera enviado para execução agora.` : undefined}
+        impact="A plataforma vai criar a run operacional, resolver a audiencia e registrar os destinatarios desta campanha. Revise o conteúdo antes de seguir."
         confirmLabel="Lancar agora"
         cancelLabel="Revisar draft"
         confirming={mutations.launchingCampaign}

@@ -278,7 +278,7 @@ export function buildCampaignRecipientPayload(params: {
 
   if (channel === 'whatsapp' || channel === 'sms' || channel === 'push') {
     status = 'skipped'
-    errorMessage = 'Canal ainda sem provider configurado para execucao'
+    errorMessage = 'Canal ainda sem provider configurado para execução'
   }
 
   return {

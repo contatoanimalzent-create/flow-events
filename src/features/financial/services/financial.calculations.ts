@@ -125,7 +125,7 @@ function buildReconciliationRow(
       payment_status: payment?.status ?? null,
       payment_provider: payment?.provider ?? null,
       reconciliation_status: 'pending',
-      issue_label: 'Aguardando confirmacao do pagamento',
+      issue_label: 'Aguardando confirmação do pagamento',
       created_at: order.created_at,
     }
   }
@@ -397,19 +397,19 @@ export function buildFinancialOverview(params: {
     const pendingItems: string[] = []
 
     if (!report.payments_reconciled) {
-      pendingItems.push('Pagamentos ainda nao conciliados')
+      pendingItems.push('Pagamentos ainda não conciliados')
     }
     if (!report.costs_recorded) {
-      pendingItems.push('Custos operacionais ainda nao consolidados')
+      pendingItems.push('Custos operacionais ainda não consolidados')
     }
     if (!report.payouts_reviewed) {
-      pendingItems.push('Repasse ainda nao revisado')
+      pendingItems.push('Repasse ainda não revisado')
     }
     if (!report.divergences_resolved) {
       pendingItems.push('Divergencias financeiras em aberto')
     }
     if (!report.result_validated) {
-      pendingItems.push('Resultado final ainda nao validado')
+      pendingItems.push('Resultado final ainda não validado')
     }
 
     report.closure_pending_items = pendingItems

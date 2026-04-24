@@ -60,7 +60,7 @@ function buildFallbackPlan(slug = 'starter'): BillingSubscriptionPlan {
       id: 'starter',
       slug: 'starter',
       name: 'Starter',
-      description: 'Camada inicial com fee padrao e limites basicos.',
+      description: 'Camada inicial com fee padrão e limites básicos.',
       price: 0,
       billingCycle: 'monthly',
       features: ['standard_checkout'],
@@ -71,7 +71,7 @@ function buildFallbackPlan(slug = 'starter'): BillingSubscriptionPlan {
       id: 'pro',
       slug: 'pro',
       name: 'Pro',
-      description: 'Operacao em crescimento com checkout premium e analytics.',
+      description: 'Operação em crescimento com checkout premium e analytics.',
       price: 149,
       billingCycle: 'monthly',
       features: ['standard_checkout', 'premium_checkout', 'advanced_analytics', 'campaign_automation', 'priority_support'],
@@ -82,7 +82,7 @@ function buildFallbackPlan(slug = 'starter'): BillingSubscriptionPlan {
       id: 'business',
       slug: 'business',
       name: 'Business',
-      description: 'White-label, dominios e integracoes para operacoes maiores.',
+      description: 'White-label, domínios e integrações para operações maiores.',
       price: 499,
       billingCycle: 'monthly',
       features: ['standard_checkout', 'premium_checkout', 'advanced_analytics', 'campaign_automation', 'priority_support', 'white_label', 'api_access', 'custom_domain'],
@@ -372,7 +372,7 @@ export const billingService = {
         .single()
 
       if (planResult.error || !planResult.data) {
-        throw planResult.error ?? new Error('Plano nao encontrado')
+        throw planResult.error ?? new Error('Plano não encontrado')
       }
 
       const plan = mapSubscriptionPlan(planResult.data as Record<string, unknown>)

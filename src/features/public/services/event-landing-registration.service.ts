@@ -36,10 +36,10 @@ export const eventLandingRegistrationService = {
 
     if (error) {
       if (error.code === '23505') {
-        throw new Error('Ja existe uma inscricao com este e-mail para este evento.')
+        throw new Error('Já existe uma inscrição com este e-mail para este evento.')
       }
 
-      throw new Error(error.message || 'Nao foi possivel salvar a inscricao.')
+      throw new Error(error.message || 'Não foi possível salvar a inscrição.')
     }
 
     return data

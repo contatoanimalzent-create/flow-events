@@ -64,7 +64,7 @@ export function CheckinPageContent() {
           </h1>
           <div className="mt-1 flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-status-success" />
-            <span className="text-xs font-mono tracking-wider text-text-muted">AO VIVO · operacao de acesso e validacao</span>
+            <span className="text-xs font-mono tracking-wider text-text-muted">AO VIVO · operação de acesso e válidação</span>
           </div>
         </div>
 

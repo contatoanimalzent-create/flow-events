@@ -24,7 +24,7 @@ interface CheckoutModalProps {
 }
 
 const INSTALLMENT_OPTIONS = [
-  { value: 0,  label: 'PIX',       icon: '⚡', badge: 'Menor preço' },
+  { value: 0,  label: 'PIX',       icon: '⚡', badge: 'Menor préço' },
   { value: 1,  label: 'Cartão 1x', icon: '💳', badge: null },
   { value: 2,  label: 'Cartão 2x', icon: '💳', badge: null },
   { value: 3,  label: 'Cartão 3x', icon: '💳', badge: null },

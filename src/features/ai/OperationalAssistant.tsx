@@ -29,7 +29,7 @@ const SECTION_TITLES: Record<NavSection, string> = {
   suppliers: 'Fornecedores',
   products: 'PDV',
   inventory: 'Estoque',
-  intelligence: 'Inteligencia',
+  intelligence: 'Inteligência',
   communication: 'Comunicacao',
   financial: 'Financeiro',
   billing: 'Cobranca',
@@ -48,32 +48,32 @@ const SECTION_TITLES: Record<NavSection, string> = {
 }
 
 const SECTION_PROMPTS: Record<NavSection, string[]> = {
-  dashboard: ['O que olhar primeiro hoje?', 'Como acompanhar a operacao?', 'Quais modulos eu uso agora?'],
-  events: ['Como publicar um evento?', 'Onde ajusto agenda e local?', 'Como revisar configuracao?'],
-  tickets: ['Como montar lotes?', 'Onde mexo em precos?', 'Como abrir novos ingressos?'],
+  dashboard: ['O que olhar primeiro hoje?', 'Como acompanhar a operação?', 'Quais módulos eu uso agora?'],
+  events: ['Como publicar um evento?', 'Onde ajusto agenda e local?', 'Como revisar configuração?'],
+  tickets: ['Como montar lotes?', 'Onde mexo em preços?', 'Como abrir novos ingressos?'],
   sales: ['Como acompanhar pagamentos?', 'Onde vejo pedidos?', 'Como agir em venda travada?'],
-  crm: ['Como organizar publico?', 'Onde encontro recorrencia?', 'Como trabalhar relacionamento?'],
-  checkin: ['Como acompanhar filas?', 'Onde vejo leituras em tempo real?', 'Como tratar uma excecao no acesso?'],
+  crm: ['Como organizar público?', 'Onde encontro recorrencia?', 'Como trabalhar relacionamento?'],
+  checkin: ['Como acompanhar filas?', 'Onde vejo leituras em tempo real?', 'Como tratar uma exceção no acesso?'],
   staff: ['Como cadastrar a equipe?', 'Onde aloco por turno?', 'Como emitir credencial?'],
   suppliers: ['Como organizar fornecedores?', 'Onde controlar parceiros?', 'Como registrar entregas?'],
-  products: ['Como vender no PDV?', 'Onde monto o catalogo?', 'Como separar PDV de estoque?'],
+  products: ['Como vender no PDV?', 'Onde monto o catálogo?', 'Como separar PDV de estoque?'],
   inventory: ['Como controlar ruptura?', 'Onde vejo reposicao?', 'Como diferenciar estoque de PDV?'],
-  intelligence: ['Quais alertas importam?', 'Onde vejo anomalias?', 'Como ler a operacao?'],
-  communication: ['Como disparar campanhas?', 'Onde vejo jornadas?', 'Como acionar publico?'],
+  intelligence: ['Quais alertas importam?', 'Onde vejo anomalias?', 'Como ler a operação?'],
+  communication: ['Como disparar campanhas?', 'Onde vejo jornadas?', 'Como acionar público?'],
   financial: ['Onde fecho caixa?', 'Como acompanhar margem?', 'Como revisar repasses?'],
-  billing: ['Como ajustar plano?', 'Onde vejo cobranca?', 'Como entender monetizacao?'],
-  growth: ['Como ativar aquisicao?', 'Onde acompanho canais?', 'Como ler retorno?'],
-  help: ['Quero ajuda geral', 'Quais modulos devo usar?', 'Como treinar a equipe?'],
-  settings: ['Onde ajustar marca?', 'Como trocar dominio?', 'Como rever permissoes?'],
+  billing: ['Como ajustar plano?', 'Onde vejo cobranca?', 'Como entender monetização?'],
+  growth: ['Como ativar aquisição?', 'Onde acompanho canais?', 'Como ler retorno?'],
+  help: ['Quero ajuda geral', 'Quais módulos devo usar?', 'Como treinar a equipe?'],
+  settings: ['Onde ajustar marca?', 'Como trocar domínio?', 'Como rever permissões?'],
   registrations: ['Como emitir credenciais?', 'Onde filtro listas e perfis?', 'Como exportar a base habilitada?'],
   sponsors: ['Como organizar cotas?', 'Onde acompanho patrocinadores ativos?', 'Como registrar entregas de marca?'],
   coupons: ['Como criar um cupom?', 'Onde vejo usos por cupom?', 'Como limitar desconto por pedido?'],
   waitlist: ['Como notificar a lista de espera?', 'Onde vejo posicoes?', 'Como converter espera em venda?'],
   map: ['Como ver a ocupacao ao vivo?', 'Onde monitoro o staff?', 'Como identificar zonas criticas?'],
-  organizations: ['Como configurar a organizacao?', 'Onde gerencio membros?', 'Como rever permissoes?'],
+  organizations: ['Como configurar a organização?', 'Onde gerencio membros?', 'Como rever permissões?'],
   community: ['Como moderar o feed?', 'Onde gerencio anuncios?', 'Como ativar networking?'],
   monetization: ['Como criar uma oferta?', 'Onde vejo receita interna?', 'Como ativar ativacoes de marca?'],
-  audit: ['Como exportar logs?', 'Onde vejo eventos de seguranca?', 'Como filtrar por severidade?'],
+  audit: ['Como exportar logs?', 'Onde vejo eventos de segurança?', 'Como filtrar por severidade?'],
 }
 
 function buildSuggestedActions(query: string, section: NavSection) {
@@ -145,7 +145,7 @@ function buildFallbackReply(query: string, section: NavSection) {
   const normalized = query.toLowerCase()
 
   if (normalized.includes('pdv') || normalized.includes('venda') || normalized.includes('caixa')) {
-    return 'PDV fica responsavel por vender rapido: selecionar item, montar pedido, cobrar e concluir atendimento. Quando a pergunta for saldo disponivel, alerta de ruptura ou reposicao, use Estoque.'
+    return 'PDV fica responsável por vender rápido: selecionar item, montar pedido, cobrar e concluir atendimento. Quando a pergunta for saldo disponível, alerta de ruptura ou reposicao, use Estoque.'
   }
 
   if (normalized.includes('estoque') || normalized.includes('ruptura') || normalized.includes('repos')) {
@@ -153,14 +153,14 @@ function buildFallbackReply(query: string, section: NavSection) {
   }
 
   if (normalized.includes('staff') || normalized.includes('equipe') || normalized.includes('cadastro') || normalized.includes('credencial')) {
-    return 'Para staff, pense em tres passos: identificar a pessoa, alocar em area e turno, e liberar acesso operacional. Se a pessoa vai operar o evento, ela nasce em Staff; se vai apenas entrar no evento, a logica e outra.'
+    return 'Para staff, pense em tres passos: identificar a pessoa, alocar em área e turno, e liberar acesso operacional. Se a pessoa vai operar o evento, ela nasce em Staff; se vai apenas entrar no evento, a lógica e outra.'
   }
 
   if (normalized.includes('patrocin') || normalized.includes('cota') || normalized.includes('marca parceira')) {
-    return 'Patrocinios concentram cotas comerciais, status de negociacao, entregas prometidas e investimento por marca. Quando a conversa for fornecedor operacional ou terceirizacao da execucao, use Fornecedores.'
+    return 'Patrocinios concentram cotas comerciais, status de negociacao, entregas prometidas e investimento por marca. Quando a conversa for fornecedor operacional ou terceirizacao da execução, use Fornecedores.'
   }
 
-  return `Estou olhando ${SECTION_TITLES[section]}. Posso te orientar sobre o objetivo desse modulo, o proximo passo operacional e qual outra area usar quando essa nao for a tela certa.`
+  return `Estou olhando ${SECTION_TITLES[section]}. Posso te orientar sobre o objetivo desse módulo, o próximo passo operacional e qual outra área usar quando essa não for a tela certa.`
 }
 
 function getConversationStorageKey(organizationId?: string | null) {
@@ -196,7 +196,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
     return {
       id: `assistant-welcome-${activeSection}`,
       role: 'assistant',
-      content: `Estou acompanhando ${section}. Posso te orientar no modulo atual, diferenciar areas parecidas do produto e usar a memoria das duvidas anteriores da operacao para responder melhor.`,
+      content: `Estou acompanhando ${section}. Posso te orientar no módulo atual, diferenciar areas parecidas do produto e usar a memoria das dúvidas anteriores da operação para responder melhor.`,
       actions: buildSuggestedActions(section, activeSection),
       meta: 'Memoria operacional ativa',
     }
@@ -253,7 +253,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
 
     try {
       if (!organization?.id || !conversationId) {
-        throw new Error('AI ainda sem contexto da organizacao')
+        throw new Error('AI ainda sem contexto da organização')
       }
 
       const result = await assistantService.ask({
@@ -284,7 +284,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
           role: 'assistant',
           content: buildFallbackReply(trimmedPrompt, activeSection),
           actions: buildSuggestedActions(trimmedPrompt, activeSection),
-          meta: 'Fallback local enquanto a chave nova nao entra',
+          meta: 'Fallback local enquanto a chave nova não entra',
         },
       ])
     } finally {
@@ -331,7 +331,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                   {SECTION_TITLES[activeSection]}
                 </h3>
                 <p className="mt-3 text-sm leading-6 text-[#b8b0a8]/72">
-                  Presente no app inteiro, com memoria das duvidas operacionais da sua equipe.
+                  Presente no app inteiro, com memoria das dúvidas operacionais da sua equipe.
                 </p>
               </div>
               <button
@@ -371,7 +371,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
               >
                 <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] text-[#4285F4]">
                   {message.role === 'assistant' ? <Bot className="h-3.5 w-3.5" /> : <MessageSquare className="h-3.5 w-3.5" />}
-                  {message.role === 'assistant' ? 'AI' : 'Voce'}
+                  {message.role === 'assistant' ? 'AI' : 'Você'}
                 </div>
                 <p>{message.content}</p>
 
@@ -415,7 +415,7 @@ export function OperationalAssistant({ activeSection, onNavigate }: OperationalA
                     void handleSubmit()
                   }
                 }}
-                placeholder="Pergunte sobre modulo, fluxo ou proximo passo..."
+                placeholder="Pergunte sobre módulo, fluxo ou próximo passo..."
                 className="flex-1 bg-transparent text-sm text-[#ebe7e0] outline-none placeholder:text-[#6f6660]"
               />
               <button

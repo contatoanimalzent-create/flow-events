@@ -37,7 +37,7 @@ export function OrderSummaryPanel({
         </div>
         <p className="mt-3 text-sm leading-7 text-white/66">
           {isPortuguese
-            ? 'Resumo sempre visivel, atualizado em tempo real enquanto voce ajusta a selecao, confirma os dados e conclui o pagamento.'
+            ? 'Resumo sempre visivel, atualizado em tempo real enquanto você ajusta a selecao, confirma os dados e conclui o pagamento.'
             : 'Always-visible summary, updated in real time while you adjust selection, confirm details and complete payment.'}
         </p>
 
@@ -132,9 +132,9 @@ export function OrderSummaryPanel({
 
         <div className="mt-6 space-y-3">
           {[
-            { icon: Lock, text: isPortuguese ? 'Reserva com expiracao automatica' : 'Reservation with automatic expiration' },
+            { icon: Lock, text: isPortuguese ? 'Reserva com expiracao automática' : 'Reservation with automatic expiration' },
             { icon: Ticket, text: isPortuguese ? 'Inventario controlado por lote' : 'Batch-controlled inventory' },
-            { icon: Check, text: isPortuguese ? 'Emissao automatica apos confirmacao' : 'Automatic issuance after confirmation' },
+            { icon: Check, text: isPortuguese ? 'Emissão automática após confirmação' : 'Automatic issuance after confirmation' },
           ].map((item) => {
             const Icon = item.icon
 

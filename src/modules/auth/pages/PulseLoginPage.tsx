@@ -35,7 +35,7 @@ export default function PulseLoginPage({ onNavigate }: PulsePageProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#060d1f]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-      {/* Logo area */}
+      {/* Logo área */}
       <div className="flex flex-col items-center pt-20 pb-10">
         <div className="w-16 h-16 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center mb-4">
           <Zap size={32} className="text-blue-400" />

@@ -24,7 +24,7 @@ const EVENT_TYPES: { value: EventType; labelPt: string; labelEn: string }[] = [
 ]
 
 const EVENT_SIZES: { value: EventSize; labelPt: string; labelEn: string }[] = [
-  { value: 'ate200', labelPt: 'Ate 200 pessoas', labelEn: 'Up to 200 people' },
+  { value: 'ate200', labelPt: 'Até 200 pessoas', labelEn: 'Up to 200 people' },
   { value: '200_1000', labelPt: '200 a 1.000 pessoas', labelEn: '200 to 1,000 people' },
   { value: '1000_5000', labelPt: '1.000 a 5.000 pessoas', labelEn: '1,000 to 5,000 people' },
   { value: 'mais5000', labelPt: 'Mais de 5.000 pessoas', labelEn: 'Over 5,000 people' },
@@ -40,7 +40,7 @@ const BENEFITS = [
   },
   {
     icon: Sparkles,
-    labelPt: 'Personalizado para voce',
+    labelPt: 'Personalizado para você',
     labelEn: 'Personalized for you',
     descPt: 'Mostramos o que e relevante para o seu tipo de evento.',
     descEn: 'We show what is relevant to your event type.',
@@ -49,14 +49,14 @@ const BENEFITS = [
     icon: Shield,
     labelPt: 'Sem compromisso',
     labelEn: 'No commitment',
-    descPt: 'Voce decide se faz sentido para voce, sem pressao.',
+    descPt: 'Você decide se faz sentido para você, sem pressao.',
     descEn: 'You decide if it makes sense for you, no pressure.',
   },
   {
     icon: MessageCircle,
     labelPt: 'Com especialista',
     labelEn: 'With a specialist',
-    descPt: 'Alguem que entende de eventos, nao so de software.',
+    descPt: 'Alguem que entende de eventos, não so de software.',
     descEn: 'Someone who understands events, not just software.',
   },
 ]
@@ -75,7 +75,7 @@ export function DemoPage({ onLogin }: { onLogin: () => void }) {
   useSeoMeta({
     title: isPortuguese ? 'Solicitar Demonstracao | Pulse' : 'Request a Demo | Pulse',
     description: isPortuguese
-      ? 'Veja a Pulse em acao. Agende uma demonstracao personalizada com nossa equipe.'
+      ? 'Veja a Pulse em ação. Agende uma demonstracao personalizada com nossa equipe.'
       : 'See Pulse in action. Schedule a personalized demonstration with our team.',
   })
 
@@ -128,7 +128,7 @@ export function DemoPage({ onLogin }: { onLogin: () => void }) {
             {/* Left: benefits */}
             <div>
               <div className="mb-8 text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
-                {isPortuguese ? 'O que voce vai ver' : 'What you will see'}
+                {isPortuguese ? 'O que você vai ver' : 'What you will see'}
               </div>
               <div className="grid gap-4">
                 {BENEFITS.map((b) => {
@@ -157,7 +157,7 @@ export function DemoPage({ onLogin }: { onLogin: () => void }) {
               {/* Badges */}
               <div className="mt-8 flex flex-wrap gap-3">
                 {(isPortuguese
-                  ? ['Resposta em ate 2 horas uteis', 'Demo gratuita e sem compromisso']
+                  ? ['Resposta em até 2 horas uteis', 'Demo gratuita e sem compromisso']
                   : ['Response within 2 business hours', 'Free and no-commitment demo']
                 ).map((badge) => (
                   <div
@@ -214,7 +214,7 @@ export function DemoPage({ onLogin }: { onLogin: () => void }) {
                   <input
                     type="email"
                     required
-                    placeholder="voce@empresa.com"
+                    placeholder="você@empresa.com"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className={inputClass}
@@ -287,8 +287,8 @@ export function DemoPage({ onLogin }: { onLogin: () => void }) {
 
                 <p className="text-center text-[11px] text-white/28">
                   {isPortuguese
-                    ? 'Voce sera redirecionado para o WhatsApp com os dados preenchidos.'
-                    : 'You will be redirected to WhatsApp with the details pre-filled.'}
+                    ? 'Você sera redirecionado para o WhatsApp com os dados preenchidos.'
+                    : 'You will be redirected to WhatsApp with the details pré-filled.'}
                 </p>
               </form>
             </div>

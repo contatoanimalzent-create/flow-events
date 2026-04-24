@@ -49,7 +49,7 @@ export function CostEntryModal({
 
   async function handleSave() {
     if (!values.description.trim()) {
-      setError('Descricao e obrigatoria.')
+      setError('Descrição e obrigatoria.')
       return
     }
 
@@ -121,7 +121,7 @@ export function CostEntryModal({
           {events.length > 0 ? (
             <FormField label="Evento vinculado">
               <select className="input" value={eventId} onChange={(event) => setEventId(event.target.value)}>
-                <option value="">Custo corporativo nao alocado</option>
+                <option value="">Custo corporativo não alocado</option>
                 {events.map((eventOption) => (
                   <option key={eventOption.id} value={eventOption.id}>
                     {eventOption.name}

@@ -50,7 +50,7 @@ interface NavGroup {
 function createNavGroups(isPortuguese: boolean): NavGroup[] {
   return [
     {
-      label: isPortuguese ? 'Operacao central' : 'Core operation',
+      label: isPortuguese ? 'Operação central' : 'Core operation',
       items: [
         { id: 'dashboard',  label: isPortuguese ? 'Painel'     : 'Dashboard', blurb: isPortuguese ? 'Leitura executiva do dia.' : 'Executive daily read.',          icon: LayoutDashboard },
         { id: 'events',     label: isPortuguese ? 'Eventos'    : 'Events',    blurb: isPortuguese ? 'Agenda e portfolio.'       : 'Schedule and portfolio.',        icon: CalendarDays    },
@@ -61,30 +61,30 @@ function createNavGroups(isPortuguese: boolean): NavGroup[] {
     {
       label: isPortuguese ? 'Campo e pessoas' : 'Field and people',
       items: [
-        { id: 'crm',           label: isPortuguese ? 'Participantes' : 'Participants',   blurb: isPortuguese ? 'Publico, CRM e audiencias.'     : 'Audience, CRM and retention.',    icon: Users       },
-        { id: 'checkin',       label: isPortuguese ? 'Credenciamento' : 'Check-in',      blurb: isPortuguese ? 'Acesso e validacao.'             : 'Access and validation.',          icon: ScanLine    },
+        { id: 'crm',           label: isPortuguese ? 'Participantes' : 'Participants',   blurb: isPortuguese ? 'Público, CRM e audiencias.'     : 'Audience, CRM and retention.',    icon: Users       },
+        { id: 'checkin',       label: isPortuguese ? 'Credenciamento' : 'Check-in',      blurb: isPortuguese ? 'Acesso e válidação.'             : 'Access and validation.',          icon: ScanLine    },
         { id: 'staff',         label: isPortuguese ? 'Staff'          : 'Staff',         blurb: isPortuguese ? 'Cadastro e escala.'              : 'Roster and shifts.',              icon: Users       },
         { id: 'suppliers',     label: isPortuguese ? 'Fornecedores'   : 'Suppliers',     blurb: isPortuguese ? 'Parceiros.'                      : 'Partners.',                       icon: Truck       },
-        { id: 'registrations', label: isPortuguese ? 'Inscricoes'     : 'Registrations', blurb: isPortuguese ? 'Capital Strike.'                 : 'External registrations.',         icon: ClipboardList },
+        { id: 'registrations', label: isPortuguese ? 'Inscrições'     : 'Registrations', blurb: isPortuguese ? 'Capital Strike.'                 : 'External registrations.',         icon: ClipboardList },
         { id: 'sponsors',      label: isPortuguese ? 'Patrocinios'    : 'Sponsors',      blurb: isPortuguese ? 'Cotas e entregas.'               : 'Tiers and deliverables.',         icon: Handshake   },
       ],
     },
     {
       label: isPortuguese ? 'Comercial e leitura' : 'Commerce and reading',
       items: [
-        { id: 'products',      label: isPortuguese ? 'PDV'        : 'POS',           blurb: isPortuguese ? 'Catalogo e caixa.'       : 'Catalog and checkout.',    icon: ShoppingBag  },
+        { id: 'products',      label: isPortuguese ? 'PDV'        : 'POS',           blurb: isPortuguese ? 'Catálogo e caixa.'       : 'Catalog and checkout.',    icon: ShoppingBag  },
         { id: 'inventory',     label: isPortuguese ? 'Estoque'    : 'Inventory',     blurb: isPortuguese ? 'Saldo e ruptura.'         : 'Stock and stockouts.',      icon: Package      },
         { id: 'communication', label: isPortuguese ? 'Comunicacao': 'Communication', blurb: isPortuguese ? 'Campanhas.'               : 'Campaigns.',                icon: MessageSquare },
-        { id: 'intelligence',  label: isPortuguese ? 'Inteligencia': 'Intelligence', blurb: isPortuguese ? 'Alertas e leitura.'       : 'Alerts and readouts.',      icon: BrainCircuit },
+        { id: 'intelligence',  label: isPortuguese ? 'Inteligência': 'Intelligence', blurb: isPortuguese ? 'Alertas e leitura.'       : 'Alerts and readouts.',      icon: BrainCircuit },
         { id: 'financial',     label: isPortuguese ? 'Financeiro' : 'Financial',     blurb: isPortuguese ? 'Margem e fechamento.'     : 'Margin and closeout.',      icon: DollarSign   },
         { id: 'billing',       label: isPortuguese ? 'Cobranca'   : 'Billing',       blurb: isPortuguese ? 'Planos.'                  : 'Plans.',                    icon: WalletCards  },
-        { id: 'growth',        label: isPortuguese ? 'Crescimento': 'Growth',        blurb: isPortuguese ? 'Aquisicao e retorno.'     : 'Acquisition and return.',   icon: Zap          },
+        { id: 'growth',        label: isPortuguese ? 'Crescimento': 'Growth',        blurb: isPortuguese ? 'Aquisição e retorno.'     : 'Acquisition and return.',   icon: Zap          },
       ],
     },
     {
       label: isPortuguese ? 'Sistema' : 'System',
       items: [
-        { id: 'settings', label: isPortuguese ? 'Governanca' : 'Governance', blurb: isPortuguese ? 'Marca, permissoes e documentos.' : 'Brand, permissions and documents.', icon: Settings   },
+        { id: 'settings', label: isPortuguese ? 'Governança' : 'Governance', blurb: isPortuguese ? 'Marca, permissões e documentos.' : 'Brand, permissions and documents.', icon: Settings   },
         { id: 'help',     label: isPortuguese ? 'Ajuda'         : 'Help',     blurb: isPortuguese ? 'Suporte.'            : 'Support.',               icon: HelpCircle },
       ],
     },
@@ -171,7 +171,7 @@ function NavButton({
   )
 }
 
-/* ── Sidebar nav scroll area ── */
+/* ── Sidebar nav scroll área ── */
 function SidebarNav({
   activeSection,
   onNavigate,
@@ -242,7 +242,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
         </div>
         <div className="min-w-0">
           <div className="text-[9px] font-semibold uppercase tracking-[0.38em] text-[#9CA3AF]">
-            {isPortuguese ? 'Area do produtor' : 'Producer area'}
+            {isPortuguese ? 'Área do produtor' : 'Producer área'}
           </div>
           <div className="mt-0.5 text-lg font-bold leading-none tracking-[-0.02em] text-[#0A0A0A]">
             Pulse
@@ -266,7 +266,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
             {profile?.first_name} {profile?.last_name}
           </div>
           <div className="truncate text-[11px] text-[#9CA3AF]">
-            {organization?.name ?? (isPortuguese ? 'Operacao principal' : 'Primary operation')}
+            {organization?.name ?? (isPortuguese ? 'Operação principal' : 'Primary operation')}
           </div>
         </div>
 
@@ -302,7 +302,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
           {/* Backdrop */}
           <button
             type="button"
-            aria-label={isPortuguese ? 'Fechar navegacao' : 'Close navigation'}
+            aria-label={isPortuguese ? 'Fechar navegação' : 'Close navigation'}
             className="absolute inset-0 bg-black/30 backdrop-blur-sm"
             onClick={onClose}
           />
@@ -316,7 +316,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
                   <img src="/logo.png" alt="Pulse" className="h-8 w-auto object-contain" />
                 </div>
                 <div className="text-lg font-bold leading-none tracking-[-0.02em] text-[#0A0A0A]">
-                  {isPortuguese ? 'Navegacao' : 'Navigation'}
+                  {isPortuguese ? 'Navegação' : 'Navigation'}
                 </div>
               </div>
 

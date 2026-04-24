@@ -54,7 +54,7 @@ Foi realizada auditoria completa de **todas as 27 páginas** do produto Animalz 
 
 ### 3. ❌ LoadingState - CRÍTICO (Afeta múltiplas páginas)
 **Problema:**
-- Copy genérica e técnica: "Estamos preparando esta experiencia"
+- Copy genérica e técnica: "Estamos preparando esta experiência"
 - Afeta HomePage, EventsCatalogPage, AboutPage, CreateEventPage
 - Minava sensação premium
 
@@ -166,16 +166,16 @@ Foi realizada auditoria completa de **todas as 27 páginas** do produto Animalz 
 ### Melhorias Implementadas
 
 **Removido:**
-- ❌ "Estamos preparando esta experiencia" (genérico)
+- ❌ "Estamos preparando esta experiência" (genérico)
 - ❌ "Carregando eventos" (técnico)
 - ❌ "🚧 Em breve disponível" (unprofessional)
-- ❌ "Montando o cockpit de aquisicao" (internal language)
+- ❌ "Montando o cockpit de aquisição" (internal language)
 
 **Adicionado:**
 - ✅ "Estamos montando tudo para você" (premium)
 - ✅ "Um momento, por favor" (polido)
 - ✅ "Sua privacidade importa" (human-centric)
-- ✅ "Eventos que valem a experiencia" (aspirational)
+- ✅ "Eventos que valem a experiência" (aspirational)
 - ✅ "Termos claros, confiança garantida" (reassuring)
 
 ### Pilares de Copy Premium
@@ -273,7 +273,7 @@ npx tsc --noEmit   # ✅ PASSOU - 0 TypeScript errors
 - ❌ TermsPage e PrivacyPage com design inconsistente
 - ❌ Copy genérica em loading states
 - ❌ HelpPage incompleta
-- ❌ Varias páginas com copy técnico
+- ❌ Várias páginas com copy técnico
 - ⚠️ Falta de alinhamento premium
 
 **Depois:**
@@ -287,7 +287,7 @@ npx tsc --noEmit   # ✅ PASSOU - 0 TypeScript errors
 
 ## 📞 PRÓXIMAS ETAPAS
 
-1. **Deploy para staging** e validação visual
+1. **Deploy para staging** e válidação visual
 2. **User testing** com produtores de eventos
 3. **A/B testing** em copy de conversão
 4. **Performance optimization** se necessário

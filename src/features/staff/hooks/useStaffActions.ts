@@ -131,7 +131,7 @@ export function useStaffActions(eventId?: string) {
           entity_type: 'staff',
           entity_id: staffId,
           action_type: 'status_change',
-          title: type === 'clock_in' ? 'Entrada registrada' : 'Saida registrada',
+          title: type === 'clock_in' ? 'Entrada registrada' : 'Saída registrada',
           description: gateId ? `Gate ${gateId}` : null,
         })
       }

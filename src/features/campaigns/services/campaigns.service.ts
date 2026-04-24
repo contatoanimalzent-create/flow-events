@@ -301,7 +301,7 @@ export const campaignsService = {
       assertCampaignsResult(runResult)
 
       if (!runResult.data) {
-        throw new CampaignsServiceError('Nao foi possivel iniciar a execucao da campanha', 'campaign_launch_failed')
+        throw new CampaignsServiceError('Não foi possível iniciar a execução da campanha', 'campaign_launch_failed')
       }
 
       const initialRun = mapCampaignRunRow(runResult.data as Record<string, unknown>)

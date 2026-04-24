@@ -37,7 +37,7 @@ export function useEventAssetUpload({ eventId, organizationId }: UseEventAssetUp
 
   async function uploadAsset(input: Omit<EventAssetUploadInput, 'organizationId' | 'eventId' | 'createdBy'>) {
     if (!organizationId || !eventId) {
-      throw new Error('Evento ou organizacao nao informados')
+      throw new Error('Evento ou organização não informados')
     }
 
     const asset = await uploadMutation.mutateAsync({
@@ -56,7 +56,7 @@ export function useEventAssetUpload({ eventId, organizationId }: UseEventAssetUp
       entity_id: asset.id,
       action_type: 'create',
       title: 'Novo asset publicado',
-      description: `${asset.asset_type} adicionado a biblioteca de midia do evento.`,
+      description: `${asset.asset_type} adicionado a biblioteca de mídia do evento.`,
     })
 
     return asset

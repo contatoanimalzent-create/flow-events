@@ -100,7 +100,7 @@ export const ordersService = {
       const order = await this.getOrderById(orderId)
 
       if (!order) {
-        throw new OrdersServiceError('Pedido nao encontrado', 'order_not_found')
+        throw new OrdersServiceError('Pedido não encontrado', 'order_not_found')
       }
 
       if (order.status === 'paid') {
@@ -158,9 +158,9 @@ export const ordersService = {
 
       const [order, orderItems] = await Promise.all([this.getOrderById(orderId), this.listOrderItemsByOrder(orderId)])
 
-      if (!order) throw new OrdersServiceError('Pedido nao encontrado para emissao', 'order_not_found')
+      if (!order) throw new OrdersServiceError('Pedido não encontrado para emissão', 'order_not_found')
       if (order.status !== 'paid') throw new OrdersServiceError('Somente pedidos pagos podem emitir ingressos digitais', 'order_not_paid')
-      if (orderItems.length === 0) throw new OrdersServiceError('Pedido sem itens nao pode emitir ingressos', 'order_has_no_items')
+      if (orderItems.length === 0) throw new OrdersServiceError('Pedido sem itens não pode emitir ingressos', 'order_has_no_items')
 
       const insertResult = await supabase.from('digital_tickets').insert(buildDigitalTicketInsertPayload(order, orderItems))
       assertOrdersResult(insertResult)

@@ -376,7 +376,7 @@ function ScannerScreen({
           </div>
         </header>
 
-        {/* Scanner area */}
+        {/* Scanner área */}
         <div className="relative flex-1 flex flex-col items-center justify-center bg-gray-950">
           {/* QR frame */}
           <div className="relative h-64 w-64">

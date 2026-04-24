@@ -53,7 +53,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
             <span className="admin-title-accent">.</span>
           </>
         }
-        subtitle={`Etapa ${step} de ${TOTAL_STEPS} para configurar posicionamento, agenda, operacao e media.`}
+        subtitle={`Etapa ${step} de ${TOTAL_STEPS} para configurar posicionamento, agenda, operação e media.`}
         onClose={onClose}
       />
 
@@ -115,7 +115,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                   </FormField>
                 </FormGrid>
 
-                <FormField label="Descricao curta">
+                <FormField label="Descrição curta">
                   <textarea
                     className="input resize-none"
                     rows={4}
@@ -144,7 +144,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
 
                 <FormToggleCard
                   title="Evento online"
-                  description="Quando ativado, a experiencia usa URL remota no lugar do venue presencial."
+                  description="Quando ativado, a experiência usa URL remota no lugar do venue presencial."
                   checked={form.is_online}
                   onToggle={() => setField('is_online', !form.is_online)}
                 />
@@ -159,11 +159,11 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                       <input className="input" placeholder="ex: Arena XP" value={form.venue_name} onChange={(event) => setField('venue_name', event.target.value)} />
                     </FormField>
                     <FormField label="Endereco">
-                      <input className="input" placeholder="Rua, numero" value={form.venue_street} onChange={(event) => setField('venue_street', event.target.value)} />
+                      <input className="input" placeholder="Rua, número" value={form.venue_street} onChange={(event) => setField('venue_street', event.target.value)} />
                     </FormField>
                     <FormGrid>
                       <FormField label="Cidade">
-                        <input className="input" placeholder="Sao Paulo" value={form.venue_city} onChange={(event) => setField('venue_city', event.target.value)} />
+                        <input className="input" placeholder="São Paulo" value={form.venue_city} onChange={(event) => setField('venue_city', event.target.value)} />
                       </FormField>
                       <FormField label="Estado">
                         <input className="input" placeholder="SP" value={form.venue_state} onChange={(event) => setField('venue_state', event.target.value)} />
@@ -176,7 +176,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
 
             {step === 3 ? (
               <>
-                <FormSection title="Capacidade e operacao" description="Consolide a base operacional antes de seguir para a landing e a midia.">
+                <FormSection title="Capacidade e operação" description="Consolide a base operacional antes de seguir para a landing e a mídia.">
                   <FormField label="Capacidade total">
                     <input
                       type="number"
@@ -216,7 +216,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
 
                   <FormToggleCard
                     title="Evento privado"
-                    description="Exige senha de acesso na pagina publica. Ideal para eventos corporativos ou exclusivos."
+                    description="Exige senha de acesso na página pública. Ideal para eventos corporativos ou exclusivos."
                     checked={form.is_private}
                     onToggle={() => setField('is_private', !form.is_private)}
                   />
@@ -233,7 +233,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                   )}
                 </FormSection>
 
-                <FormSection title="Monetizacao do evento" description="Defina como a plataforma monetiza este evento e como a taxa aparece para o comprador.">
+                <FormSection title="Monetização do evento" description="Defina como a plataforma monetiza este evento e como a taxa aparece para o comprador.">
                   <FeeConfigurationPanel
                     feeType={form.fee_type}
                     feeValue={form.fee_value}
@@ -245,12 +245,12 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                 </FormSection>
 
                 <ConfirmActionBox
-                  title="Resumo da configuracao"
+                  title="Resumo da configuração"
                   description={`${form.name || 'Evento sem nome'} · ${form.venue_city || (form.is_online ? 'Online' : 'Local pendente')}`}
                 >
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-text-muted">Inicio</span>
+                      <span className="text-text-muted">Início</span>
                       <span className="font-mono text-xs text-text-primary">
                         {form.starts_at ? formatDate(form.starts_at, 'dd/MM/yyyy HH:mm') : '-'}
                       </span>
@@ -272,7 +272,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                 <div className="rounded-[20px] border border-brand-acid/20 bg-brand-acid/5 p-4 space-y-3">
                   <div className="flex items-center gap-2">
                     <ImageIcon className="h-3.5 w-3.5 text-brand-acid shrink-0" />
-                    <span className="text-[11px] font-mono uppercase tracking-widest text-brand-acid">Especificacoes de midia</span>
+                    <span className="text-[11px] font-mono uppercase tracking-widest text-brand-acid">Especificacoes de mídia</span>
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {([
@@ -294,7 +294,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                     ))}
                   </div>
                   <p className="text-[10px] text-text-muted leading-relaxed">
-                    Use arquivos otimizados para carregamento rapido na pagina publica. Arquivos acima do limite serao rejeitados automaticamente.
+                    Use arquivos otimizados para carregamento rápido na página pública. Arquivos acima do limite serao rejeitados automaticamente.
                   </p>
                 </div>
 
@@ -369,11 +369,11 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                       value={form.video_url}
                       onChange={(event) => setField('video_url', event.target.value)}
                     />
-                    <FormHint>O video toca em loop no hero da pagina publica do evento.</FormHint>
+                    <FormHint>O video toca em loop no hero da página pública do evento.</FormHint>
                   </FormField>
                 </FormSection>
 
-                <FormSection title="Tema do email de ingresso" description="Personalize as cores do email de confirmacao que o comprador recebe com o QR code.">
+                <FormSection title="Tema do email de ingresso" description="Personalize as cores do email de confirmação que o comprador recebe com o QR code.">
                   <div className="grid grid-cols-3 gap-4">
                     <FormField label="Cor de destaque">
                       <div className="flex items-center gap-2">
@@ -468,7 +468,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                     <EventMediaManager eventId={eventId} organizationId={organizationId} />
                   ) : (
                     <div className="rounded-[22px] border border-dashed border-bg-border bg-bg-secondary px-4 py-5 text-sm text-text-muted">
-                      Salve o evento primeiro para liberar uploads, ordenacao e gestao completa da media library.
+                      Salve o evento primeiro para liberar uploads, ordenacao e gestão completa da media library.
                     </div>
                   )}
                 </FormSection>

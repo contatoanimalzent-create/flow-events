@@ -94,7 +94,7 @@ function buildInstructions(event: AccountEventRecord) {
   return [
     `Apresente o QR code na entrada a partir de ${dateLabel}, ${timeLabel}.`,
     `O acesso acontece em ${event.venueName}${event.city ? `, ${event.city}` : ''}.`,
-    'Mantenha este ingresso disponivel no celular para uma entrada mais fluida.',
+    'Mantenha este ingresso disponível no celular para uma entrada mais fluida.',
   ]
 }
 
@@ -217,7 +217,7 @@ export const accountService = {
           const venueAddress = getRelationRecord(eventRow.venue_address)
           const startsAt = getString(eventRow.starts_at)
           const endsAt = getOptionalString(eventRow.ends_at)
-          const category = getString(eventRow.category, 'Experiencia premium')
+          const category = getString(eventRow.category, 'Experiência premium')
           const isPast = new Date(endsAt ?? startsAt).getTime() < Date.now()
 
           const existingEvent = eventsMap.get(eventId)
@@ -231,7 +231,7 @@ export const accountService = {
               category,
               startsAt,
               endsAt,
-              venueName: getString(eventRow.venue_name, 'Venue em confirmacao'),
+              venueName: getString(eventRow.venue_name, 'Venue em confirmação'),
               city: getString(venueAddress?.city),
               state: getString(venueAddress?.state),
               status: getString(eventRow.status, 'published'),
@@ -373,7 +373,7 @@ export const accountService = {
             statusLabel:
               activeTickets > 0
                 ? 'Acessos ativos na plataforma'
-                : 'Conta pronta para novas experiencias',
+                : 'Conta pronta para novas experiências',
             phone: input.phone ?? null,
             avatarUrl: input.avatarUrl ?? null,
           },

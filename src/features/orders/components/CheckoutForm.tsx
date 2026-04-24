@@ -14,28 +14,28 @@ export function CheckoutForm({ buyer, setBuyerField }: CheckoutFormProps) {
       key: 'name',
       label: isPortuguese ? 'Nome completo *' : 'Full name *',
       type: 'text',
-      placeholder: isPortuguese ? 'Seu nome como deseja receber a confirmacao' : 'Your name as it should appear on the confirmation',
+      placeholder: isPortuguese ? 'Seu nome como deseja receber a confirmação' : 'Your name as it should appear on the confirmation',
     },
     {
       key: 'email',
       label: 'E-mail *',
       type: 'email',
       placeholder: isPortuguese ? 'seu@email.com' : 'you@email.com',
-      helper: isPortuguese ? 'Enviaremos confirmacao e ticket digital para este endereco.' : 'We will send confirmation and digital ticket details to this address.',
+      helper: isPortuguese ? 'Enviaremos confirmação e ticket digital para este endereço.' : 'We will send confirmation and digital ticket details to this address.',
     },
     {
       key: 'phone',
       label: isPortuguese ? 'WhatsApp' : 'Phone',
       type: 'tel',
       placeholder: isPortuguese ? '(00) 00000-0000' : '+1 (000) 000-0000',
-      helper: isPortuguese ? 'Usado apenas para atualizacoes relevantes da compra.' : 'Used only for relevant purchase updates.',
+      helper: isPortuguese ? 'Usado apenas para atualizações relevantes da compra.' : 'Used only for relevant purchase updates.',
     },
     {
       key: 'cpf',
       label: isPortuguese ? 'Documento' : 'Document',
       type: 'text',
       placeholder: isPortuguese ? 'CPF ou documento exigido pelo evento' : 'ID or document required by the event',
-      helper: isPortuguese ? 'Preencha se a experiencia exigir identificacao nominal.' : 'Fill this in if the experience requires named identification.',
+      helper: isPortuguese ? 'Preencha se a experiência exigir identificacao nominal.' : 'Fill this in if the experience requires named identification.',
     },
   ] as Array<{
     key: keyof CheckoutBuyerForm
@@ -52,11 +52,11 @@ export function CheckoutForm({ buyer, setBuyerField }: CheckoutFormProps) {
           {isPortuguese ? 'Dados do comprador' : 'Buyer details'}
         </div>
         <div className="mt-4 font-display text-[2.4rem] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
-          {isPortuguese ? 'Quem recebe esta experiencia?' : 'Who receives this experience?'}
+          {isPortuguese ? 'Quem recebe esta experiência?' : 'Who receives this experience?'}
         </div>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/66">
           {isPortuguese
-            ? 'Um formulario curto, claro e sem friccao. Apenas o necessario para reservar, pagar e emitir os ingressos com seguranca.'
+            ? 'Um formulário curto, claro e sem friccao. Apenas o necessário para reservar, pagar e emitir os ingressos com segurança.'
             : 'A short, clear and low-friction form. Only what is needed to reserve, pay and issue tickets with confidence.'}
         </p>
 

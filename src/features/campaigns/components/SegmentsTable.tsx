@@ -15,7 +15,7 @@ export function SegmentsTable({ segments, onPreview, onEdit, onCreateDraft, onDe
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">NENHUM PUBLICO SALVO</div>
-        <p className="mt-2 text-sm text-text-muted">Estruture segmentos de alto valor para transformar o CRM em audiencias prontas para acao.</p>
+        <p className="mt-2 text-sm text-text-muted">Estruture segmentos de alto valor para transformar o CRM em audiencias prontas para ação.</p>
       </div>
     )
   }
@@ -41,7 +41,7 @@ export function SegmentsTable({ segments, onPreview, onEdit, onCreateDraft, onDe
               </td>
               <td className="table-cell font-mono text-brand-acid">{segment.audience_count}</td>
               <td className="table-cell text-[11px] text-text-muted">
-                {segment.last_previewed_at ? formatDate(segment.last_previewed_at, 'dd/MM/yyyy HH:mm') : 'Ainda nao analisado'}
+                {segment.last_previewed_at ? formatDate(segment.last_previewed_at, 'dd/MM/yyyy HH:mm') : 'Ainda não analisado'}
               </td>
               <td className="table-cell text-[11px] text-text-muted">{formatDate(segment.updated_at, 'dd/MM/yyyy HH:mm')}</td>
               <td className="table-cell">

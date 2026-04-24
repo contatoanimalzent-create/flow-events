@@ -16,7 +16,7 @@ export function CampaignDraftsTable({ drafts, onEdit, onDelete, onLaunch, launch
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">NENHUMA CAMPANHA EM PREPARO</div>
-        <p className="mt-2 text-sm text-text-muted">Monte o proximo disparo com calma e deixe a operacao pronta para lancar no melhor momento.</p>
+        <p className="mt-2 text-sm text-text-muted">Monte o próximo disparo com calma e deixe a operação pronta para lancar no melhor momento.</p>
       </div>
     )
   }
@@ -38,7 +38,7 @@ export function CampaignDraftsTable({ drafts, onEdit, onDelete, onLaunch, launch
             <tr key={draft.id} className="table-row">
               <td className="table-cell">
                 <div className="text-[13px] font-medium text-text-primary">{draft.name}</div>
-                <div className="text-[11px] text-text-muted">{draft.subject ?? draft.message_body ?? 'Conteudo editorial ainda em construcao'}</div>
+                <div className="text-[11px] text-text-muted">{draft.subject ?? draft.message_body ?? 'Conteúdo editorial ainda em construção'}</div>
               </td>
               <td className="table-cell text-xs text-text-secondary">{CAMPAIGN_CHANNEL_LABELS[draft.channel]}</td>
               <td className="table-cell text-xs text-text-secondary">{draft.segment?.name ?? 'Segmento livre'}</td>

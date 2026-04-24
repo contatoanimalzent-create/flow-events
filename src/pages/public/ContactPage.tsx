@@ -13,7 +13,7 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
   useSeoMeta({
     title: isPortuguese ? 'Contato | Pulse' : 'Contact | Pulse',
     description: isPortuguese
-      ? 'Entre em contato com a equipe Pulse. Tire duvidas, fale sobre parcerias ou solicite suporte.'
+      ? 'Entre em contato com a equipe Pulse. Tire dúvidas, fale sobre parcerias ou solicite suporte.'
       : 'Contact the Pulse team. Ask questions, discuss partnerships or request support.',
     url: typeof window !== 'undefined' ? window.location.href : '/contact',
   })
@@ -47,7 +47,7 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
                 </h1>
                 <p className="mt-6 max-w-lg text-base leading-8 text-[#5f5549] md:text-lg">
                   {isPortuguese
-                    ? 'Tem duvidas, quer saber mais sobre a plataforma ou precisa de ajuda? Envie uma mensagem e responderemos em breve.'
+                    ? 'Tem dúvidas, quer saber mais sobre a plataforma ou precisa de ajuda? Envie uma mensagem e responderemos em breve.'
                     : 'Do you have questions, want to know more about the platform or need help? Send a message and we will reply soon.'}
                 </p>
 

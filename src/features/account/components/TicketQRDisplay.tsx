@@ -52,7 +52,7 @@ export function TicketQRDisplay({ value, status, className }: TicketQRDisplayPro
         <div>
           <div className="font-medium text-[#1f1a15]">Apresente este QR na entrada</div>
           <div className="mt-1 text-xs leading-6 text-[#7c6f60]">
-            O codigo e unico para este ingresso e fica disponivel offline apos o carregamento.
+            O código e único para este ingresso e fica disponível offline após o carregamento.
           </div>
         </div>
       </div>

@@ -40,8 +40,8 @@ export function AccountPage() {
             eyebrow={t('Account', 'Conta')}
             title={t('Your events, your tickets, your access.', 'Seus eventos, seus ingressos, seu acesso.')}
             description={t(
-              'An authenticated area built for post-purchase: simple to open, clear to use and ready to carry you all the way to entry.',
-              'Uma area autenticada pensada para o pos-compra: simples para abrir, clara para usar e pronta para acompanhar voce ate a entrada.',
+              'An authenticated área built for post-purchase: simple to open, clear to use and ready to carry you all the way to entry.',
+              'Uma área autenticada pensada para o pós-compra: simples para abrir, clara para usar e pronta para acompanhar você até a entrada.',
             )}
           />
 
@@ -50,13 +50,13 @@ export function AccountPage() {
               title={t('Loading your account', 'Carregando sua conta')}
               description={t(
                 'We are gathering your purchased events, digital tickets and recent history.',
-                'Estamos reunindo seus eventos comprados, ingressos digitais e historico recente.',
+                'Estamos reunindo seus eventos comprados, ingressos digitais e histórico recente.',
               )}
               className="min-h-[20rem]"
             />
           ) : overviewQuery.isError ? (
             <ErrorState
-              title={t('Unable to open your account right now', 'Nao foi possivel abrir sua conta agora')}
+              title={t('Unable to open your account right now', 'Não foi possível abrir sua conta agora')}
               description={t(
                 'Try again in a moment. Your tickets remain safe inside the platform.',
                 'Tente novamente em instantes. Seus ingressos continuam seguros na plataforma.',
@@ -64,7 +64,7 @@ export function AccountPage() {
             />
           ) : !overview ? (
             <EmptyState
-              title={t('Your account does not have any access loaded yet', 'Sua conta ainda nao tem acessos carregados')}
+              title={t('Your account does not have any access loaded yet', 'Sua conta ainda não tem acessos carregados')}
               description={t(
                 'As soon as a confirmed order is linked to your email, it appears here automatically.',
                 'Assim que um pedido confirmado estiver associado ao seu email, ele aparece aqui automaticamente.',
@@ -79,7 +79,7 @@ export function AccountPage() {
                   title={t('No events linked to your profile', 'Nenhum evento associado ao seu perfil')}
                   description={t(
                     'Once you complete a purchase or registration, your tickets and instructions will appear here.',
-                    'Quando voce concluir uma compra ou inscricao, seus ingressos e instrucoes passam a aparecer aqui.',
+                    'Quando você concluir uma compra ou inscrição, seus ingressos e instruções passam a aparecer aqui.',
                   )}
                   action={
                     <a
@@ -95,10 +95,10 @@ export function AccountPage() {
                 <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_28rem]">
                   <div className="space-y-8">
                     <UserEventsSection
-                      title={t('Upcoming events', 'Proximos eventos')}
+                      title={t('Upcoming events', 'Próximos eventos')}
                       description={t(
                         'Active access and experiences already on your agenda.',
-                        'Acessos ativos e experiencias que ja fazem parte da sua agenda.',
+                        'Acessos ativos e experiências que já fazem parte da sua agenda.',
                       )}
                       events={overview.upcomingEvents}
                       activeEventId={selectedEventId}
@@ -106,7 +106,7 @@ export function AccountPage() {
                       emptyTitle={t('No upcoming events right now', 'Nenhum evento futuro no momento')}
                       emptyDescription={t(
                         'When a new experience is confirmed, it will appear here with quick ticket access.',
-                        'Quando uma nova experiencia estiver confirmada, ela aparece aqui com acesso rapido ao ticket.',
+                        'Quando uma nova experiência estiver confirmada, ela aparece aqui com acesso rápido ao ticket.',
                       )}
                     />
 
@@ -114,15 +114,15 @@ export function AccountPage() {
                       title={t('Past events', 'Eventos passados')}
                       description={t(
                         'Recent history so you can revisit used tickets and previous experiences.',
-                        'Historico recente para voce reencontrar ingressos usados e experiencias anteriores.',
+                        'Histórico recente para você reencontrar ingressos usados e experiências anteriores.',
                       )}
                       events={overview.pastEvents}
                       activeEventId={selectedEventId}
                       onSelect={setSelectedEventId}
-                      emptyTitle={t('Your history is still empty', 'Seu historico ainda esta vazio')}
+                      emptyTitle={t('Your history is still empty', 'Seu histórico ainda esta vazio')}
                       emptyDescription={t(
                         'After your first event, this space becomes your memory of experiences already lived.',
-                        'Depois do primeiro evento, este espaco vira sua memoria de experiencias ja vividas.',
+                        'Depois do primeiro evento, este espaco vira sua memoria de experiências já vividas.',
                       )}
                     />
                   </div>

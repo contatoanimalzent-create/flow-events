@@ -23,8 +23,8 @@ interface EventsFilterBarProps {
 
 const DATE_OPTIONS = [
   { label: 'Qualquer data', value: 'all' },
-  { label: 'Proximos 30 dias', value: '30d' },
-  { label: 'Proximos 90 dias', value: '90d' },
+  { label: 'Próximos 30 dias', value: '30d' },
+  { label: 'Próximos 90 dias', value: '90d' },
   { label: 'Mais adiante', value: 'later' },
 ] as const
 

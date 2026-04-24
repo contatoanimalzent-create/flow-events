@@ -86,8 +86,8 @@ function SidebarSurface({
     <div
       className="flex h-full flex-col bg-[var(--pulse-app-sidebar-bg)]"
       style={{
-        paddingTop: mobile ? 'env(safe-area-inset-top, 0px)' : undefined,
-        paddingBottom: mobile ? 'env(safe-area-inset-bottom, 0px)' : undefined,
+        paddingTop: mobile ? 'env(safe-área-inset-top, 0px)' : undefined,
+        paddingBottom: mobile ? 'env(safe-área-inset-bottom, 0px)' : undefined,
       }}
     >
       <div className="flex h-[var(--pulse-app-header-height)] items-center justify-between border-b border-[var(--pulse-app-sidebar-border)] px-5">
@@ -101,7 +101,7 @@ function SidebarSurface({
             type="button"
             onClick={onCloseMobile}
             className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-white/44 transition hover:bg-white/[0.04] hover:text-white/80"
-            title={t('Close navigation', 'Fechar navegacao')}
+            title={t('Close navigation', 'Fechar navegação')}
           >
             <X className="h-4 w-4" />
           </button>

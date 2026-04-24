@@ -74,7 +74,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
               {isPortuguese ? (
                 <>
                   Onde cada evento vira{' '}
-                  <span className="text-brand-acid">experiencia.</span>
+                  <span className="text-brand-acid">experiência.</span>
                 </>
               ) : (
                 <>
@@ -88,7 +88,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
           <PublicReveal delayMs={140}>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/60">
               {isPortuguese
-                ? 'Descubra, compre e viva eventos unicos. Uma plataforma feita para quem busca algo alem do comum.'
+                ? 'Descubra, compre e viva eventos unicos. Uma plataforma feita para quem busca algo além do comum.'
                 : 'Discover, buy and live unique events. A platform built for those who seek something beyond ordinary.'}
             </p>
           </PublicReveal>

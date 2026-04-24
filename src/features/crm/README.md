@@ -1,4 +1,4 @@
 # CRM
 
-Responsavel por consolidar compradores, participantes e historico de relacionamento por evento.
-Organiza perfil do cliente, recorrencia, presenca, tags comerciais e contexto para retencao e reengajamento.
+Responsável por consolidar compradores, participantes e histórico de relacionamento por evento.
+Organiza perfil do cliente, recorrencia, presença, tags comerciais e contexto para retenção e reengajamento.

@@ -79,7 +79,7 @@ export function OrderDetailModal({
           </span>
           <span className="flex items-center gap-1.5 text-xs text-text-secondary">
             <PaymentMethodIcon method={order.payment_method} />
-            {paymentMethod?.label ?? 'Forma de pagamento nao definida'}
+            {paymentMethod?.label ?? 'Forma de pagamento não definida'}
           </span>
           {order.paid_at ? (
             <span className="text-[11px] font-mono text-status-success">Pago em {formatDate(order.paid_at, 'dd/MM/yyyy HH:mm')}</span>
@@ -151,7 +151,7 @@ export function OrderDetailModal({
                         {ticket.ticket_number}
                       </div>
                       <div className="mt-1 text-[11px] text-text-muted">
-                        {ticket.holder_name || ticket.holder_email || 'Titular nao definido'}
+                        {ticket.holder_name || ticket.holder_email || 'Titular não definido'}
                       </div>
                     </div>
                     <span className="text-[11px] font-mono text-text-muted">{DIGITAL_TICKET_STATUS_LABELS[ticket.status]}</span>
@@ -226,7 +226,7 @@ export function OrderDetailModal({
         open={confirmCancelOpen}
         title="Cancelar pedido"
         description={`O pedido #${order.id.slice(0, 8).toUpperCase()} deixara de seguir no fluxo comercial.`}
-        impact="Pagamentos, emissao digital e acompanhamento operacional deste comprador podem precisar de nova revisao apos o cancelamento."
+        impact="Pagamentos, emissão digital e acompanhamento operacional deste comprador podem precisar de nova revisao após o cancelamento."
         confirmLabel="Cancelar pedido"
         confirming={cancelling}
         onCancel={() => setConfirmCancelOpen(false)}

@@ -106,7 +106,7 @@ export function ModeSwitcher({ availableModes, activeMode, onSelect, onClose }: 
           })}
         </div>
 
-        {/* Safe area spacer */}
+        {/* Safe área spacer */}
         <div style={{ height: 'env(safe-area-inset-bottom)' }} />
       </div>
     </>

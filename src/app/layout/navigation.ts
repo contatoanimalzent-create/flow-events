@@ -99,7 +99,7 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
   }
 
   const labels2 = {
-    intelligence: isPortuguese ? 'Inteligencia & Dados' : 'Intelligence & Data',
+    intelligence: isPortuguese ? 'Inteligência & Dados' : 'Intelligence & Data',
   }
 
   return [
@@ -108,9 +108,9 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
       label: labels.operation,
       items: [
         createItem('dashboard', isPortuguese ? 'Dashboard' : 'Dashboard', 'Dashboard',
-          isPortuguese ? 'Visao executiva do sistema.' : 'Executive view of the system.', labels.operation, LayoutDashboard),
+          isPortuguese ? 'Visão executiva do sistema.' : 'Executive view of the system.', labels.operation, LayoutDashboard),
         createItem('events', isPortuguese ? 'Eventos' : 'Events', isPortuguese ? 'Eventos' : 'Events',
-          isPortuguese ? 'Gestao central do portfolio de eventos.' : 'Central management for the event portfolio.', labels.operation, CalendarDays),
+          isPortuguese ? 'Gestão central do portfolio de eventos.' : 'Central management for the event portfolio.', labels.operation, CalendarDays),
         createItem('tickets', isPortuguese ? 'Ingressos' : 'Tickets', isPortuguese ? 'Ingressos' : 'Tickets',
           isPortuguese ? 'Lotes, regras e disponibilidade comercial.' : 'Releases, rules and commercial availability.', labels.operation, Ticket),
         createItem('financial', isPortuguese ? 'Financeiro' : 'Financial', isPortuguese ? 'Financeiro' : 'Financial',
@@ -126,9 +126,9 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
         createItem('registrations', isPortuguese ? 'Credenciamento' : 'Credentialing', isPortuguese ? 'Credenciamento' : 'Credentialing',
           isPortuguese ? 'Listas, emissoes e fluxos de habilitacao.' : 'Lists, badge issuing and enablement flows.', labels.people, BadgeCheck),
         createItem('staff', isPortuguese ? 'Equipe' : 'Team', isPortuguese ? 'Equipe' : 'Team',
-          isPortuguese ? 'Pessoas, cargos e operacao de campo.' : 'People, roles and field operations.', labels.people, BriefcaseBusiness),
+          isPortuguese ? 'Pessoas, cargos e operação de campo.' : 'People, roles and field operations.', labels.people, BriefcaseBusiness),
         createItem('checkin', isPortuguese ? 'Check-in' : 'Check-in', 'Check-in',
-          isPortuguese ? 'Leitura, filas e validacao em campo.' : 'Scanning, queues and field validation.', labels.people, ScanLine),
+          isPortuguese ? 'Leitura, filas e válidação em campo.' : 'Scanning, queues and field validation.', labels.people, ScanLine),
       ],
     },
     {
@@ -136,17 +136,17 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
       label: labels.business,
       items: [
         createItem('crm', 'CRM', 'CRM',
-          isPortuguese ? 'Relacionamento com publico e recorrencia.' : 'Audience relationship and retention.', labels.business, UsersRound),
+          isPortuguese ? 'Relacionamento com público e recorrencia.' : 'Audience relationship and retention.', labels.business, UsersRound),
         createItem('community', isPortuguese ? 'Comunidade' : 'Community', isPortuguese ? 'Comunidade' : 'Community',
-          isPortuguese ? 'Feed, posts, reacoes e networking pos-evento.' : 'Feed, posts, reactions and post-event networking.', labels.business, Globe),
+          isPortuguese ? 'Feed, posts, reacoes e networking pós-evento.' : 'Feed, posts, reactions and post-event networking.', labels.business, Globe),
         createItem('monetization', isPortuguese ? 'Monetizacao' : 'Monetization', isPortuguese ? 'Monetizacao' : 'Monetization',
-          isPortuguese ? 'Upgrades, experiencias premium e ativacoes internas.' : 'Upgrades, premium experiences and internal activations.', labels.business, Sparkles),
+          isPortuguese ? 'Upgrades, experiências premium e ativacoes internas.' : 'Upgrades, premium experiences and internal activations.', labels.business, Sparkles),
         createItem('communication', isPortuguese ? 'Comunicacao' : 'Communication', isPortuguese ? 'Comunicacao' : 'Communication',
-          isPortuguese ? 'Mensagens, campanhas e operacao de comunicacao.' : 'Messages, campaigns and communication operations.', labels.business, MessageSquare),
+          isPortuguese ? 'Mensagens, campanhas e operação de comunicacao.' : 'Messages, campaigns and communication operations.', labels.business, MessageSquare),
         createItem('coupons', isPortuguese ? 'Cupons' : 'Coupons', isPortuguese ? 'Cupons' : 'Coupons',
           isPortuguese ? 'Codigos promocionais e descontos estrategicos.' : 'Promo codes and strategic discounts.', labels.business, Tag),
         createItem('waitlist', isPortuguese ? 'Lista de Espera' : 'Waitlist', isPortuguese ? 'Lista de Espera' : 'Waitlist',
-          isPortuguese ? 'Demanda reprimida e conversao de fila.' : 'Suppressed demand and queue conversion.', labels.business, Clock),
+          isPortuguese ? 'Demanda reprimida e conversão de fila.' : 'Suppressed demand and queue conversion.', labels.business, Clock),
       ],
     },
     {
@@ -154,9 +154,9 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
       label: labels2.intelligence,
       items: [
         createItem('intelligence', isPortuguese ? 'IA Operacional' : 'AI Operational', isPortuguese ? 'IA' : 'AI',
-          isPortuguese ? 'Alertas, recomendacoes e previsoes em tempo real.' : 'Real-time alerts, recommendations and forecasts.', labels2.intelligence, BrainCircuit),
+          isPortuguese ? 'Alertas, recomendações e previsoes em tempo real.' : 'Real-time alerts, recommendations and forecasts.', labels2.intelligence, BrainCircuit),
         createItem('audit', isPortuguese ? 'Auditoria' : 'Audit', isPortuguese ? 'Auditoria' : 'Audit',
-          isPortuguese ? 'Logs, seguranca, webhooks e historico de acoes.' : 'Logs, security, webhooks and action history.', labels2.intelligence, ClipboardList),
+          isPortuguese ? 'Logs, segurança, webhooks e histórico de ações.' : 'Logs, security, webhooks and action history.', labels2.intelligence, ClipboardList),
       ],
     },
     {
@@ -164,9 +164,9 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
       label: labels.system,
       items: [
         createItem('organizations', isPortuguese ? 'Organizacao' : 'Organization', isPortuguese ? 'Org' : 'Org',
-          isPortuguese ? 'Dados, membros, permissoes e integracoes da org.' : 'Org data, members, permissions and integrations.', labels.system, Building2),
+          isPortuguese ? 'Dados, membros, permissões e integrações da org.' : 'Org data, members, permissions and integrations.', labels.system, Building2),
         createItem('settings', isPortuguese ? 'Configuracoes' : 'Settings', isPortuguese ? 'Configuracoes' : 'Settings',
-          isPortuguese ? 'Preferencias, governanca e ajustes da conta.' : 'Preferences, governance and account settings.', labels.system, Settings2),
+          isPortuguese ? 'Preferências, governança e ajustes da conta.' : 'Preferences, governance and account settings.', labels.system, Settings2),
       ],
     },
   ]
@@ -180,7 +180,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
     return visibleItem
   }
 
-  const advancedGroupLabel = isPortuguese ? 'Modulos conectados' : 'Connected modules'
+  const advancedGroupLabel = isPortuguese ? 'Módulos conectados' : 'Connected modules'
   const hiddenItems: Record<NavSection, AppNavItem> = {
     dashboard: visibleItems.find((item) => item.id === 'dashboard')!,
     events: visibleItems.find((item) => item.id === 'events')!,
@@ -196,7 +196,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       'sales',
       isPortuguese ? 'Vendas' : 'Sales',
       isPortuguese ? 'Vendas' : 'Sales',
-      isPortuguese ? 'Pedidos, conversao e performance comercial.' : 'Orders, conversion and sales performance.',
+      isPortuguese ? 'Pedidos, conversão e performance comercial.' : 'Orders, conversion and sales performance.',
       advancedGroupLabel,
       TrendingUp,
       false,
@@ -205,7 +205,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       'suppliers',
       isPortuguese ? 'Fornecedores' : 'Suppliers',
       isPortuguese ? 'Fornecedores' : 'Suppliers',
-      isPortuguese ? 'Operacao terceirizada e parceiros de entrega.' : 'Third-party operations and delivery partners.',
+      isPortuguese ? 'Operação terceirizada e parceiros de entrega.' : 'Third-party operations and delivery partners.',
       advancedGroupLabel,
       CircleHelp,
       false,
@@ -214,7 +214,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       'products',
       isPortuguese ? 'PDV' : 'POS',
       isPortuguese ? 'PDV' : 'POS',
-      isPortuguese ? 'Catalogo, atendimento e venda assistida.' : 'Catalog, checkout and assisted sales.',
+      isPortuguese ? 'Catálogo, atendimento e venda assistida.' : 'Catalog, checkout and assisted sales.',
       advancedGroupLabel,
       TrendingUp,
       false,
@@ -230,9 +230,9 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
     ),
     intelligence: createItem(
       'intelligence',
-      isPortuguese ? 'Inteligencia' : 'Intelligence',
-      isPortuguese ? 'Inteligencia' : 'Intel',
-      isPortuguese ? 'Alertas, leitura executiva e saude da operacao.' : 'Alerts, executive readout and operational health.',
+      isPortuguese ? 'Inteligência' : 'Intelligence',
+      isPortuguese ? 'Inteligência' : 'Intel',
+      isPortuguese ? 'Alertas, leitura executiva e saude da operação.' : 'Alerts, executive readout and operational health.',
       advancedGroupLabel,
       CircleHelp,
       false,
@@ -241,7 +241,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       'billing',
       isPortuguese ? 'Cobranca' : 'Billing',
       isPortuguese ? 'Cobranca' : 'Billing',
-      isPortuguese ? 'Planos, faturamento e monetizacao.' : 'Plans, billing and monetization.',
+      isPortuguese ? 'Planos, faturamento e monetização.' : 'Plans, billing and monetization.',
       advancedGroupLabel,
       Wallet,
       false,
@@ -250,7 +250,7 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       'growth',
       isPortuguese ? 'Crescimento' : 'Growth',
       isPortuguese ? 'Crescimento' : 'Growth',
-      isPortuguese ? 'Aquisicao, canais e retorno de investimento.' : 'Acquisition, channels and return on investment.',
+      isPortuguese ? 'Aquisição, canais e retorno de investimento.' : 'Acquisition, channels and return on investment.',
       advancedGroupLabel,
       TrendingUp,
       false,
@@ -283,17 +283,17 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
       false,
     ),
     waitlist: createItem('waitlist', isPortuguese ? 'Lista de Espera' : 'Waitlist', isPortuguese ? 'Lista de Espera' : 'Waitlist',
-      isPortuguese ? 'Demanda reprimida e conversao de fila.' : 'Suppressed demand and queue conversion.', advancedGroupLabel, Clock, false),
+      isPortuguese ? 'Demanda reprimida e conversão de fila.' : 'Suppressed demand and queue conversion.', advancedGroupLabel, Clock, false),
     organizations: createItem('organizations', isPortuguese ? 'Organizacao' : 'Organization', isPortuguese ? 'Org' : 'Org',
-      isPortuguese ? 'Dados, membros, permissoes e integracoes da org.' : 'Org data, members, permissions and integrations.', advancedGroupLabel, Building2, false),
+      isPortuguese ? 'Dados, membros, permissões e integrações da org.' : 'Org data, members, permissions and integrations.', advancedGroupLabel, Building2, false),
     map: createItem('map', isPortuguese ? 'Mapa Operacional' : 'Operational Map', isPortuguese ? 'Mapa' : 'Map',
       isPortuguese ? 'Visualizacao em tempo real de zonas, staff e densidade.' : 'Real-time zones, staff and density.', advancedGroupLabel, Map, false),
     community: createItem('community', isPortuguese ? 'Comunidade' : 'Community', isPortuguese ? 'Comunidade' : 'Community',
-      isPortuguese ? 'Feed, posts, reacoes e networking pos-evento.' : 'Feed, posts, reactions and post-event networking.', advancedGroupLabel, Globe, false),
+      isPortuguese ? 'Feed, posts, reacoes e networking pós-evento.' : 'Feed, posts, reactions and post-event networking.', advancedGroupLabel, Globe, false),
     monetization: createItem('monetization', isPortuguese ? 'Monetizacao' : 'Monetization', isPortuguese ? 'Monetizacao' : 'Monetization',
-      isPortuguese ? 'Upgrades, experiencias premium e ativacoes internas.' : 'Upgrades, premium experiences and activations.', advancedGroupLabel, Sparkles, false),
+      isPortuguese ? 'Upgrades, experiências premium e ativacoes internas.' : 'Upgrades, premium experiences and activations.', advancedGroupLabel, Sparkles, false),
     audit: createItem('audit', isPortuguese ? 'Auditoria' : 'Audit', isPortuguese ? 'Auditoria' : 'Audit',
-      isPortuguese ? 'Logs, seguranca, webhooks e historico de acoes.' : 'Logs, security, webhooks and action history.', advancedGroupLabel, ClipboardList, false),
+      isPortuguese ? 'Logs, segurança, webhooks e histórico de ações.' : 'Logs, security, webhooks and action history.', advancedGroupLabel, ClipboardList, false),
   }
 
   return hiddenItems[section]

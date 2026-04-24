@@ -341,7 +341,7 @@ export async function buildOrderConfirmationWithQREmail(
                 <tr>
                   <td style="padding: 20px 32px 0 32px;">
                     <div style="font-size: 11px; color: ${textDim}; line-height: 1.6; border-left: 3px solid ${accent}44; padding-left: 12px;">
-                      <strong style="color: ${textMuted};">Importante:</strong> QR code pessoal e intransferivel. Cada participante deve apresentar seu proprio codigo.
+                      <strong style="color: ${textMuted};">Importante:</strong> QR code pessoal e intransferivel. Cada participante deve apresentar seu proprio código.
                     </div>
                   </td>
                 </tr>

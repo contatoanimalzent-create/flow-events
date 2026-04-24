@@ -24,7 +24,7 @@ export function FinancialClosuresTable({ reports, onReviewClosure }: FinancialCl
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">SEM FECHAMENTOS</div>
-        <p className="mt-2 text-sm text-text-muted">A operacao financeira por evento aparecera aqui assim que houver movimento.</p>
+        <p className="mt-2 text-sm text-text-muted">A operação financeira por evento aparecera aqui assim que houver movimento.</p>
       </div>
     )
   }
@@ -60,7 +60,7 @@ export function FinancialClosuresTable({ reports, onReviewClosure }: FinancialCl
                 <div>
                   <div className="text-[10px] font-mono uppercase text-text-muted">Pendencias</div>
                   <div className={cn('mt-1 text-[12px]', report.closure_pending_count === 0 ? 'text-status-success' : 'text-status-warning')}>
-                    {report.closure_pending_items[0] ?? 'Nenhuma pendencia critica'}
+                    {report.closure_pending_items[0] ?? 'Nenhuma pendencia crítica'}
                   </div>
                 </div>
                 <button onClick={() => onReviewClosure(report)} className="btn-secondary shrink-0 text-xs">

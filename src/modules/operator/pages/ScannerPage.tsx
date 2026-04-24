@@ -127,7 +127,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       setResult(res)
       setScanState(res.valid ? 'valid' : 'invalid')
     } catch (err) {
-      setResult({ valid: false, name: '-', ticketLabel: token.slice(0, 16), message: 'Erro na validação' })
+      setResult({ valid: false, name: '-', ticketLabel: token.slice(0, 16), message: 'Erro na válidação' })
       setScanState('invalid')
     }
 
@@ -151,7 +151,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       {/* Top overlay */}
       <div
         className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', paddingBottom: 12 }}
+        style={{ paddingTop: 'calc(env(safe-área-inset-top) + 12px)', paddingBottom: 12 }}
       >
         <div className="bg-black/70 backdrop-blur-sm rounded-xl px-3 py-1.5">
           <p className="text-white text-xs font-semibold">{context?.eventName ?? 'Scanner'}</p>
@@ -174,7 +174,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       </div>
 
       {/* Mode toggle */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex justify-center" style={{ top: 'calc(env(safe-area-inset-top) + 58px)' }}>
+      <div className="absolute top-0 left-0 right-0 z-10 flex justify-center" style={{ top: 'calc(env(safe-área-inset-top) + 58px)' }}>
         <div className="bg-black/60 backdrop-blur-sm rounded-full flex gap-1 p-1">
           <button
             onClick={() => { setInputMode('camera'); setCameraError(null) }}
@@ -316,7 +316,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       {/* Bottom bar */}
       <div
         className="bg-[#0a0f1e] border-t border-white/8 px-4 py-3"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' }}
+        style={{ paddingBottom: 'calc(env(safe-área-inset-bottom) + 8px)' }}
       >
         <p className="text-slate-600 text-xs text-center">
           {isOnline ? `${scanCount} validado${scanCount !== 1 ? 's' : ''} nesta sessão` : `⚡ Offline, ${scanCount} salvo${scanCount !== 1 ? 's' : ''} localmente`}

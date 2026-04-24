@@ -98,7 +98,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
           res.valid ? 3_000 : 2_000
         )
       } catch {
-        setResult({ valid: false, name: '-', message: 'Erro na validação' })
+        setResult({ valid: false, name: '-', message: 'Erro na válidação' })
         setKioskState('invalid')
         resetTimerRef.current = setTimeout(resetToScanning, 2_000)
       }
@@ -174,7 +174,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
         </div>
       </div>
 
-      {/* Main scanner area */}
+      {/* Main scanner área */}
       <div className="flex-1 flex flex-col items-center justify-center gap-8">
         {/* Pulsing ring + scan frame */}
         <div className="relative flex items-center justify-center">
@@ -254,7 +254,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
               />
             ))}
 
-            {/* Content area */}
+            {/* Content área */}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
               {kioskState === 'processing' && (
                 <Loader2 size={48} className="text-white/60 animate-spin" />
@@ -297,7 +297,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
       {/* Bottom status bar */}
       <div className="pb-8 flex justify-center">
         <p className="text-slate-700 text-xs">
-          {isOnline ? 'Modo online, validação em tempo real' : 'Modo offline, sincronizará ao reconectar'}
+          {isOnline ? 'Modo online, válidação em tempo real' : 'Modo offline, sincronizará ao reconectar'}
         </p>
       </div>
     </div>

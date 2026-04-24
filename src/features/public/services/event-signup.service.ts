@@ -24,7 +24,7 @@ export const eventSignupService = {
       .single()
 
     if (eventResult.error || !eventResult.data) {
-      throw new Error('Nao foi possivel localizar o evento para concluir a inscricao.')
+      throw new Error('Não foi possível localizar o evento para concluir a inscrição.')
     }
 
     const insertResult = await supabase
@@ -48,10 +48,10 @@ export const eventSignupService = {
 
     if (insertResult.error || !insertResult.data) {
       if (insertResult.error?.code === '23505') {
-        throw new Error('Ja existe uma inscricao com este e-mail para este evento.')
+        throw new Error('Já existe uma inscrição com este e-mail para este evento.')
       }
 
-      throw new Error(insertResult.error?.message || 'Nao foi possivel salvar a inscricao.')
+      throw new Error(insertResult.error?.message || 'Não foi possível salvar a inscrição.')
     }
 
     const code = `PULSE-${insertResult.data.id.slice(0, 8).toUpperCase()}`

@@ -34,23 +34,23 @@ interface StoredMemoryRow {
 const OPENAI_MODEL = Deno.env.get('OPENAI_MODEL') ?? 'gpt-5.2'
 
 const SECTION_GUIDES: Record<string, string> = {
-  dashboard: 'Painel executivo para ler gargalos, receita, operacao e proximos riscos.',
-  events: 'Modulo de eventos para agenda, portfolio, publicacao e configuracao geral do evento.',
-  tickets: 'Modulo de ingressos para lotes, precos, ocupacao e configuracao comercial do acesso.',
-  sales: 'Modulo de vendas para pedidos, pagamentos, emissao e acompanhamento do caixa comercial.',
-  crm: 'Modulo de relacionamento para publico, recorrencia, audiencia, historico e acionamento.',
-  checkin: 'Modulo de credenciamento e acesso. Aqui entram filas, leitura de ingresso, validacao e excecoes.',
-  staff: 'Modulo de equipe operacional. Aqui entram cadastro, escala, turno, area, credencial e permissoes.',
-  suppliers: 'Modulo de fornecedores e parceiros externos da operacao.',
-  products: 'PDV e modulo de venda rapida. Serve para catalogo comercial, caixa e fechamento de pedido.',
-  inventory: 'Estoque e modulo de saldo, ruptura, reposicao e controle de disponibilidade.',
-  intelligence: 'Modulo de inteligencia para alertas, leitura executiva e recomendacoes.',
-  communication: 'Modulo de comunicacao para campanhas, jornadas e disparos.',
-  financial: 'Modulo financeiro para margem, repasse, custos e fechamento.',
-  billing: 'Modulo de cobranca e monetizacao da plataforma.',
-  growth: 'Modulo de crescimento para aquisicao, canais, referral e retorno.',
-  help: 'Modulo de ajuda e orientacao operacional.',
-  settings: 'Modulo de configuracoes, marca, dominio e permissoes.',
+  dashboard: 'Painel executivo para ler gargalos, receita, operação e próximos riscos.',
+  events: 'Módulo de eventos para agenda, portfolio, publicação e configuração geral do evento.',
+  tickets: 'Módulo de ingressos para lotes, preços, ocupacao e configuração comercial do acesso.',
+  sales: 'Módulo de vendas para pedidos, pagamentos, emissão e acompanhamento do caixa comercial.',
+  crm: 'Módulo de relacionamento para público, recorrencia, audiencia, histórico e acionamento.',
+  checkin: 'Módulo de credenciamento e acesso. Aqui entram filas, leitura de ingresso, válidação e exceções.',
+  staff: 'Módulo de equipe operacional. Aqui entram cadastro, escala, turno, área, credencial e permissões.',
+  suppliers: 'Módulo de fornecedores e parceiros externos da operação.',
+  products: 'PDV e módulo de venda rápida. Serve para catálogo comercial, caixa e fechamento de pedido.',
+  inventory: 'Estoque e módulo de saldo, ruptura, reposicao e controle de disponibilidade.',
+  intelligence: 'Módulo de inteligência para alertas, leitura executiva e recomendações.',
+  communication: 'Módulo de comunicacao para campanhas, jornadas e disparos.',
+  financial: 'Módulo financeiro para margem, repasse, custos e fechamento.',
+  billing: 'Módulo de cobranca e monetização da plataforma.',
+  growth: 'Módulo de crescimento para aquisição, canais, referral e retorno.',
+  help: 'Módulo de ajuda e orientacao operacional.',
+  settings: 'Módulo de configurações, marca, domínio e permissões.',
 }
 
 function tokenize(text: string) {
@@ -101,16 +101,16 @@ function extractOutputText(payload: Record<string, unknown>) {
 
 function buildInstructions(section: string) {
   return [
-    'Voce e a AI operacional da Animalz Events.',
+    'Você e a AI operacional da Animalz Events.',
     'Responda sempre em portugues do Brasil.',
-    'Seja direta, clara, pratica e orientada para uso real diario do produto.',
-    'Quando houver confusao entre modulos, explique a diferenca de forma objetiva.',
-    'Nao invente funcionalidades inexistentes. Quando algo nao estiver confirmado, diga que e uma recomendacao operacional.',
-    'Priorize orientar o usuario dentro do app: qual modulo usar, o proximo passo e o que evitar.',
-    `Modulo atual: ${section}. Guia do modulo atual: ${SECTION_GUIDES[section] ?? 'Ajuda operacional geral do produto.'}`,
-    'Diferencas criticas do produto: PDV vende; Estoque controla saldo e ruptura; Staff cuida da equipe operacional; Credenciamento cuida do acesso do publico.',
-    'Se o usuario parecer irritado, mantenha calma e seja ainda mais objetiva.',
-    'Responda em no maximo 6 frases curtas.',
+    'Seja direta, clara, prática e orientada para uso real diario do produto.',
+    'Quando houver confusao entre módulos, explique a diferenca de forma objetiva.',
+    'Não invente funcionalidades inexistentes. Quando algo não estiver confirmado, diga que e uma recomendação operacional.',
+    'Priorize orientar o usuário dentro do app: qual módulo usar, o próximo passo e o que evitar.',
+    `Módulo atual: ${section}. Guia do módulo atual: ${SECTION_GUIDES[section] ?? 'Ajuda operacional geral do produto.'}`,
+    'Diferencas criticas do produto: PDV vende; Estoque controla saldo e ruptura; Staff cuida da equipe operacional; Credenciamento cuida do acesso do público.',
+    'Se o usuário parecer irritado, mantenha calma e seja ainda mais objetiva.',
+    'Responda em no máximo 6 frases curtas.',
   ].join('\n')
 }
 
@@ -139,14 +139,14 @@ function buildInput({
     ? recentMessages
         .map((item) => `${item.role === 'assistant' ? 'AI' : 'Usuario'}: ${item.content}`)
         .join('\n')
-    : 'Sem historico anterior nesta conversa.'
+    : 'Sem histórico anterior nesta conversa.'
 
   return [
-    `Organizacao: ${organizationName ?? 'Operacao principal'}`,
+    `Organização: ${organizationName ?? 'Operacao principal'}`,
     `Perfil de quem perguntou: ${userRole ?? 'usuario interno'}`,
-    `Modulo atual: ${section}`,
-    `Guia do modulo: ${SECTION_GUIDES[section] ?? 'Ajuda operacional geral.'}`,
-    `Historico recente:\n${recentBlock}`,
+    `Módulo atual: ${section}`,
+    `Guia do módulo: ${SECTION_GUIDES[section] ?? 'Ajuda operacional geral.'}`,
+    `Histórico recente:\n${recentBlock}`,
     `Memorias operacionais recuperadas:\n${memoryBlock}`,
     `Pergunta atual:\n${message}`,
   ].join('\n\n')
@@ -168,7 +168,7 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get('OPENAI_API_KEY')
 
     if (!apiKey) {
-      return Response.json({ error: 'OPENAI_API_KEY nao configurada' }, { status: 500, headers: corsHeaders })
+      return Response.json({ error: 'OPENAI_API_KEY não configurada' }, { status: 500, headers: corsHeaders })
     }
 
     const body = (await req.json()) as AssistantRequest

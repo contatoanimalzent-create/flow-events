@@ -73,20 +73,20 @@ export function PaymentSection({
           {phase === 'review'
             ? isPortuguese ? 'Escolha o metodo e confirme a reserva.' : 'Choose your method and confirm the reservation.'
             : phase === 'payment'
-              ? isPortuguese ? 'Finalize com seguranca.' : 'Complete your purchase securely.'
-              : isPortuguese ? 'Aguardando aprovacao.' : 'Awaiting approval.'}
+              ? isPortuguese ? 'Finalize com segurança.' : 'Complete your purchase securely.'
+              : isPortuguese ? 'Aguardando aprovação.' : 'Awaiting approval.'}
         </div>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/66">
           {phase === 'review'
             ? isPortuguese
-              ? 'Seu pedido ja esta reservado temporariamente. Agora e so escolher como deseja concluir.'
+              ? 'Seu pedido já esta reservado temporariamente. Agora e so escolher como deseja concluir.'
               : 'Your order is already temporarily reserved. Now choose how you want to complete it.'
             : phase === 'payment'
               ? isPortuguese
-                ? 'A etapa de pagamento foi simplificada para aumentar confianca, reduzir atrito e manter a leitura limpa.'
+                ? 'A etapa de pagamento foi simplificada para aumentar confiança, reduzir atrito e manter a leitura limpa.'
                 : 'The payment step has been simplified to increase trust, reduce friction and keep the reading clean.'
               : isPortuguese
-                ? 'O gateway esta processando a transacao. Assim que a aprovacao chegar, o pedido avanca para emissao automatica.'
+                ? 'O gateway esta processando a transação. Assim que a aprovação chegar, o pedido avanca para emissão automática.'
                 : 'The gateway is processing the transaction. As soon as approval arrives, the order moves into automatic issuance.'}
         </p>
 
@@ -195,11 +195,11 @@ export function PaymentSection({
             <Loader2 className="mt-1 h-5 w-5 animate-spin text-[#ff6a5c]" />
             <div>
               <div className="text-base font-semibold text-white">
-                {isPortuguese ? 'Aguardando confirmacao do gateway' : 'Waiting for gateway confirmation'}
+                {isPortuguese ? 'Aguardando confirmação do gateway' : 'Waiting for gateway confirmation'}
               </div>
               <div className="mt-2 text-sm leading-6 text-white/66">
                 {isPortuguese
-                  ? 'O pagamento ja foi enviado ao provedor. Assim que o webhook confirmar a transacao, o pedido avancara automaticamente.'
+                  ? 'O pagamento já foi enviado ao provedor. Assim que o webhook confirmar a transação, o pedido avancara automaticamente.'
                   : 'The payment has already been sent to the provider. As soon as the webhook confirms the transaction, the order will advance automatically.'}
               </div>
             </div>

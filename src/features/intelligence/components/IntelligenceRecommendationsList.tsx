@@ -10,7 +10,7 @@ export function IntelligenceRecommendationsList({ recommendations }: Intelligenc
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">SEM RECOMENDACOES</div>
-        <p className="mt-2 text-sm text-text-muted">As recomendacoes acionaveis vao aparecer aqui conforme surgirem sinais relevantes.</p>
+        <p className="mt-2 text-sm text-text-muted">As recomendações acionaveis vao aparecer aqui conforme surgirem sinais relevantes.</p>
       </div>
     )
   }

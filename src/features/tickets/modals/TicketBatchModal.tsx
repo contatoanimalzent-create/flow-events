@@ -54,11 +54,11 @@ export function TicketBatchModal({ eventId, ticketTypeId, batchId, position, onC
       ) : (
         <>
           <ModalBody>
-            <FormSection title="Configuracao comercial">
+            <FormSection title="Configuração comercial">
               <FormField label="Nome do lote" required>
                 <input
                   className="input"
-                  placeholder="ex: 1o Lote, Early Bird, Ultimo Lote"
+                  placeholder="ex: 1o Lote, Early Bird, Último Lote"
                   value={form.name}
                   onChange={(event) => setField('name', event.target.value)}
                   autoFocus
@@ -66,7 +66,7 @@ export function TicketBatchModal({ eventId, ticketTypeId, batchId, position, onC
               </FormField>
 
               <FormGrid>
-                <FormField label="Preco (R$)" required>
+                <FormField label="Preço (R$)" required>
                   <input
                     type="number"
                     className="input"
@@ -90,7 +90,7 @@ export function TicketBatchModal({ eventId, ticketTypeId, batchId, position, onC
               </FormGrid>
 
               <FormGrid>
-                <FormField label="Inicio das vendas">
+                <FormField label="Início das vendas">
                   <input type="datetime-local" className="input" value={form.starts_at} onChange={(event) => setField('starts_at', event.target.value)} />
                 </FormField>
                 <FormField label="Fim das vendas">
@@ -99,22 +99,22 @@ export function TicketBatchModal({ eventId, ticketTypeId, batchId, position, onC
               </FormGrid>
 
               <FormToggleCard
-                title="Abrir proximo lote automaticamente"
-                description="Quando este lote esgotar, o proximo entra em venda sozinho."
+                title="Abrir próximo lote automaticamente"
+                description="Quando este lote esgotar, o próximo entra em venda sozinho."
                 checked={form.auto_open_next}
                 onToggle={() => setField('auto_open_next', !form.auto_open_next)}
               />
             </FormSection>
 
             {price > 0 && quantity > 0 ? (
-              <FormSection title="Resumo financeiro" description="Estimativa rapida para conferencia comercial.">
+              <FormSection title="Resumo financeiro" description="Estimativa rápida para conferencia comercial.">
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-text-muted">Receita potencial</span>
                     <span className="font-semibold text-brand-acid">{formatCurrency(price * quantity)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-muted">Preco por ingresso</span>
+                    <span className="text-text-muted">Preço por ingresso</span>
                     <span className="text-text-primary">{formatCurrency(price)}</span>
                   </div>
                   <div className="flex justify-between">

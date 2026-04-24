@@ -71,14 +71,14 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
             <div className="grid gap-6 rounded-[2.6rem] border border-white/8 bg-[linear-gradient(135deg,rgba(0,87,231,0.16)_0%,rgba(11,13,18,0.98)_36%,rgba(66,133,244,0.08)_100%)] px-8 py-10 shadow-[0_28px_90px_rgba(0,0,0,0.3)] lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-end">
               <div className="max-w-4xl">
                 <div className="text-[11px] uppercase tracking-[0.34em] text-[#4285F4]">
-                  {isPortuguese ? 'Catalogo operacional de eventos' : 'Operational event catalog'}
+                  {isPortuguese ? 'Catálogo operacional de eventos' : 'Operational event catalog'}
                 </div>
                 <h1 className="mt-5 font-display text-[clamp(3.6rem,8vw,6.8rem)] uppercase leading-[0.84] tracking-[-0.04em] text-[#FFFFFF]">
                   {isPortuguese ? 'Descubra e compre sem cair em um marketplace comum.' : 'Discover and buy without falling into a generic marketplace.'}
                 </h1>
                 <p className="mt-5 max-w-3xl text-base leading-8 text-white/62 md:text-lg">
                   {isPortuguese
-                    ? 'Cada evento tem atmosfera propria, mas todos compartilham a mesma fundacao premium de venda, agenda, acesso e operacao.'
+                    ? 'Cada evento tem atmosfera própria, mas todos compartilham a mesma fundação premium de venda, agenda, acesso e operação.'
                     : 'Each event has its own atmosphere, but all share the same premium foundation for sales, schedule, access and operations.'}
                 </p>
               </div>
@@ -127,7 +127,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
           <div className="mx-auto max-w-[1540px]">
             <LoadingState
               title={isPortuguese ? 'Carregando eventos' : 'Loading events'}
-              description={isPortuguese ? 'Montando o catalogo operacional.' : 'Building the operational catalog.'}
+              description={isPortuguese ? 'Montando o catálogo operacional.' : 'Building the operational catalog.'}
               className="min-h-[18rem]"
             />
           </div>
@@ -225,7 +225,7 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                     {isPortuguese ? 'Lista ativa' : 'Active list'}
                   </div>
                   <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.4rem)] uppercase leading-[0.9] tracking-[-0.04em] text-[#FFFFFF]">
-                    {isPortuguese ? 'Eventos prontos para venda, inscricao e acesso.' : 'Events ready for sales, registration and access.'}
+                    {isPortuguese ? 'Eventos prontos para venda, inscrição e acesso.' : 'Events ready for sales, registration and access.'}
                   </h2>
                 </div>
                 <button

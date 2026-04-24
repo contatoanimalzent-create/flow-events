@@ -52,7 +52,7 @@ export function EventAssetEditModal({ asset, saving = false, onClose, onSubmit }
       })
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Nao foi possivel atualizar o asset.')
+      setError(err instanceof Error ? err.message : 'Não foi possível atualizar o asset.')
     }
   }
 
@@ -65,12 +65,12 @@ export function EventAssetEditModal({ asset, saving = false, onClose, onSubmit }
             Editar asset<span className="admin-title-accent">.</span>
           </>
         }
-        subtitle="Ajuste uso, copy e estado de exibicao sem alterar a logica atual do evento."
+        subtitle="Ajuste uso, copy e estado de exibicao sem alterar a lógica atual do evento."
         onClose={onClose}
       />
 
       <ModalBody>
-        <FormSection title="Configuracao do asset">
+        <FormSection title="Configuração do asset">
           <FormField label="Uso do asset">
             <select className="input" value={usageType} onChange={(event) => setUsageType(event.target.value as EventMediaUsageType)}>
               {usageOptions
@@ -117,7 +117,7 @@ export function EventAssetEditModal({ asset, saving = false, onClose, onSubmit }
 
           <FormToggleCard
             title="Asset ativo"
-            description="Quando desligado, sai do hero e da galeria publica."
+            description="Quando desligado, sai do hero e da galeria pública."
             checked={isActive}
             onToggle={() => setIsActive((current) => !current)}
           />

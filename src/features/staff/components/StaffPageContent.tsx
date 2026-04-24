@@ -58,12 +58,12 @@ export function StaffPageContent() {
     <div className="admin-page">
       <div className="admin-header">
         <div>
-          <div className="admin-eyebrow">Operacao de pessoas</div>
+          <div className="admin-eyebrow">Operação de pessoas</div>
           <h1 className="admin-title">
             Staff<span className="admin-title-accent">.</span>
           </h1>
           <p className="admin-subtitle">
-            Cadastre pessoas da operacao, defina area e turno, e libere acesso operacional com clareza. Use Staff para equipe; use Credenciamento para publico.
+            Cadastre pessoas da operação, defina área e turno, e libere acesso operacional com clareza. Use Staff para equipe; use Credenciamento para público.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -91,15 +91,15 @@ export function StaffPageContent() {
         {[
           {
             title: '1. Identificacao',
-            description: 'Nome, contato e documento para o time saber exatamente quem esta entrando na operacao.',
+            description: 'Nome, contato e documento para o time saber exatamente quem esta entrando na operação.',
           },
           {
             title: '2. Alocacao',
-            description: 'Defina funcao, area, turno e portaria para a pessoa cair no lugar certo sem retrabalho.',
+            description: 'Defina funcao, área, turno e portaria para a pessoa cair no lugar certo sem retrabalho.',
           },
           {
             title: '3. Acesso',
-            description: 'Libere permissoes, emita credencial e acompanhe presenca direto da mesma area.',
+            description: 'Libere permissões, emita credencial e acompanhe presença direto da mesma área.',
           },
         ].map((item) => (
           <div key={item.title} className="card p-5">
@@ -110,19 +110,19 @@ export function StaffPageContent() {
       </div>
 
       <div className="card p-5">
-        <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Quando usar este modulo</div>
+        <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Quando usar este módulo</div>
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
           <div>
             <div className="font-medium text-text-primary">Staff</div>
-            <div className="mt-2 text-sm leading-7 text-text-muted">Equipe, escala, credencial, presencia e permissao operacional.</div>
+            <div className="mt-2 text-sm leading-7 text-text-muted">Equipe, escala, credencial, presencia e permissão operacional.</div>
           </div>
           <div>
             <div className="font-medium text-text-primary">Credenciamento</div>
-            <div className="mt-2 text-sm leading-7 text-text-muted">Fluxo de acesso do publico, validacao e leitura de entrada.</div>
+            <div className="mt-2 text-sm leading-7 text-text-muted">Fluxo de acesso do público, válidação e leitura de entrada.</div>
           </div>
           <div>
             <div className="font-medium text-text-primary">Fornecedores</div>
-            <div className="mt-2 text-sm leading-7 text-text-muted">Parceiros externos, contratos e execucao terceirizada.</div>
+            <div className="mt-2 text-sm leading-7 text-text-muted">Parceiros externos, contratos e execução terceirizada.</div>
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@ export function StaffPageContent() {
       </div>
 
       {loading ? (
-        <PageLoadingState title="Carregando staff" description="Buscando equipe, presenca e alocacoes operacionais." />
+        <PageLoadingState title="Carregando staff" description="Buscando equipe, presença e alocacoes operacionais." />
       ) : allStaff.length === 0 ? (
         <PageEmptyState
           title="NENHUM MEMBRO"
@@ -193,7 +193,7 @@ export function StaffPageContent() {
           <table className="w-full">
             <thead className="border-b border-bg-border">
               <tr>
-                {['Membro', 'Funcao / Area', 'Status', 'Ultimo ponto', 'Custo', 'Acoes'].map((header) => (
+                {['Membro', 'Funcao / Área', 'Status', 'Último ponto', 'Custo', 'Ações'].map((header) => (
                   <th key={header} className="table-header">
                     {header}
                   </th>
@@ -250,7 +250,7 @@ export function StaffPageContent() {
             ? `O cadastro de ${pendingDeleteMember.first_name} ${pendingDeleteMember.last_name} sera removido deste evento.`
             : undefined
         }
-        impact="A remocao afeta alocacao, credencial e historico operacional vinculado a este membro no contexto do evento."
+        impact="A remocao afeta alocacao, credencial e histórico operacional vinculado a este membro no contexto do evento."
         confirmLabel="Remover membro"
         onCancel={() => setPendingDeleteMember(null)}
         onConfirm={async () => {

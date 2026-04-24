@@ -48,7 +48,7 @@ export const mediaStockService = {
     })
 
     if (error) {
-      throw new Error(error.message ?? 'Erro ao buscar na biblioteca de midia.')
+      throw new Error(error.message ?? 'Erro ao buscar na biblioteca de mídia.')
     }
 
     if (data?.error) {

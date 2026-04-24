@@ -187,8 +187,8 @@ export function buildGateCommandCenterSnapshot(params: {
       result.push({
         id: `gate-offline-${summary.gate.id}`,
         severity: 'critical',
-        title: `Portaria ${summary.gate.name} indisponivel`,
-        description: 'A portaria esta inativa ou offline e precisa de atencao imediata.',
+        title: `Portaria ${summary.gate.name} indisponível`,
+        description: 'A portaria esta inativa ou offline e precisa de atenção imediata.',
         gate_id: summary.gate.id,
       })
     }
@@ -198,7 +198,7 @@ export function buildGateCommandCenterSnapshot(params: {
         id: `gate-staff-${summary.gate.id}`,
         severity: 'warning',
         title: `Sem operador em ${summary.gate.name}`,
-        description: 'Nao ha membro de equipe em campo vinculado a esta portaria.',
+        description: 'Não há membro de equipe em campo vinculado a esta portaria.',
         gate_id: summary.gate.id,
       })
     }
@@ -208,7 +208,7 @@ export function buildGateCommandCenterSnapshot(params: {
         id: `gate-invalid-${summary.gate.id}`,
         severity: 'warning',
         title: `Tentativas invalidas em ${summary.gate.name}`,
-        description: `${summary.recent_invalid_attempts} tentativas invalidas nos ultimos 15 minutos.`,
+        description: `${summary.recent_invalid_attempts} tentativas invalidas nos últimos 15 minutos.`,
         gate_id: summary.gate.id,
       })
     }

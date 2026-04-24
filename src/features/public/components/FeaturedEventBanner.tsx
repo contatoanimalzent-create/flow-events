@@ -63,7 +63,7 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                   {event.subtitle ||
                     event.short_description ||
                     (isPortuguese
-                      ? 'Uma experiencia pensada para transformar compra em expectativa e presenca em memoria.'
+                      ? 'Uma experiência pensada para transformar compra em expectativa e presença em memoria.'
                       : 'An experience designed to turn purchase into anticipation and attendance into memory.')}
                 </p>
 
@@ -113,7 +113,7 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                     href={`/e/${event.slug}`}
                     className="inline-flex items-center gap-3 rounded-full bg-brand-acid px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-[0_4px_20px_rgba(214,42,11,0.3)] transition-all duration-500 hover:-translate-y-1 hover:bg-[#e14425]"
                   >
-                    {isPortuguese ? 'Ver experiencia' : 'View experience'}
+                    {isPortuguese ? 'Ver experiência' : 'View experience'}
                     <ArrowRight className="h-4 w-4" />
                   </a>
                   <div className="text-sm font-medium text-white/65">{priceLabel}</div>
@@ -127,11 +127,11 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                     value:
                       event.status === 'ongoing'
                         ? isPortuguese ? 'Ao vivo' : 'Live'
-                        : isPortuguese ? 'Proxima abertura' : 'Next release',
+                        : isPortuguese ? 'Próxima abertura' : 'Next release',
                   },
                   {
                     label: isPortuguese ? 'Categoria' : 'Category',
-                    value: event.category || (isPortuguese ? 'Experiencia premium' : 'Premium experience'),
+                    value: event.category || (isPortuguese ? 'Experiência premium' : 'Premium experience'),
                   },
                   {
                     label: isPortuguese ? 'Compra' : 'Purchase',

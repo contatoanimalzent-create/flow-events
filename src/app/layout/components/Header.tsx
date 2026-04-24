@@ -27,14 +27,14 @@ export function Header({ activeSection, onOpenMobileMenu }: HeaderProps) {
   return (
     <header
       className="app-safe-top sticky top-0 z-20 border-b border-[var(--pulse-app-header-border)] bg-[var(--pulse-app-header-bg)] backdrop-blur-xl"
-      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      style={{ paddingTop: 'env(safe-área-inset-top, 0px)' }}
     >
       <div className="flex h-[var(--pulse-app-header-height)] items-center gap-3 px-3 sm:gap-4 sm:px-4 lg:px-6">
         <button
           type="button"
           onClick={onOpenMobileMenu}
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white lg:hidden"
-          title={t('Open navigation', 'Abrir navegacao')}
+          title={t('Open navigation', 'Abrir navegação')}
         >
           <Menu className="h-4 w-4" />
         </button>

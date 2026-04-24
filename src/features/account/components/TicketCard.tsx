@@ -19,8 +19,8 @@ function handleDownload(event: AccountEventRecord, ticket: AccountTicketRecord) 
     `Status: ${ticket.visualStatus}`,
     `Portador: ${ticket.holderName}`,
     `E-mail: ${ticket.holderEmail}`,
-    `Codigo: ${ticket.qrToken}`,
-    `Numero: ${ticket.ticketNumber}`,
+    `Código: ${ticket.qrToken}`,
+    `Número: ${ticket.ticketNumber}`,
     `Data: ${new Date(event.startsAt).toLocaleString('pt-BR')}`,
     `Local: ${[event.venueName, event.city, event.state].filter(Boolean).join(' / ')}`,
   ].join('\n')
@@ -72,7 +72,7 @@ export function TicketCard({ event, ticket }: TicketCardProps) {
             <div className="rounded-[1.25rem] border border-[#eee2cf] bg-white/70 p-4">
               <div className="text-[11px] uppercase tracking-[0.24em] text-[#8e7f68]">Valor</div>
               <div className="mt-2 text-sm font-medium text-[#1f1a15]">
-                {ticket.price > 0 ? formatCurrency(ticket.price) : 'Cortesia / inscricao'}
+                {ticket.price > 0 ? formatCurrency(ticket.price) : 'Cortesia / inscrição'}
               </div>
             </div>
             <div className="rounded-[1.25rem] border border-[#eee2cf] bg-white/70 p-4">
@@ -81,7 +81,7 @@ export function TicketCard({ event, ticket }: TicketCardProps) {
                 {ticket.visualStatus === 'used'
                   ? 'Utilizado no check-in'
                   : ticket.visualStatus === 'cancelled'
-                    ? 'Acesso indisponivel'
+                    ? 'Acesso indisponível'
                     : 'Pronto para entrada'}
               </div>
             </div>
@@ -101,7 +101,7 @@ export function TicketCard({ event, ticket }: TicketCardProps) {
               className="inline-flex items-center gap-2 rounded-full border border-[#ddd1bf] bg-white px-5 py-3 text-sm font-medium text-[#1f1a15] transition-colors hover:border-[#b79e74]"
             >
               <Sparkles className="h-4 w-4" />
-              Ver pagina do evento
+              Ver página do evento
             </a>
           </div>
         </div>

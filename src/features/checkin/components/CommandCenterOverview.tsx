@@ -62,7 +62,7 @@ export function CommandCenterOverview({ snapshot }: CommandCenterOverviewProps) 
                 <div className="text-sm font-semibold text-text-primary">{summary.gate.name}</div>
                 <div className="text-[11px] text-text-muted">
                   {summary.gate.gate_type === 'mixed'
-                    ? 'Entrada / Saida'
+                    ? 'Entrada / Saída'
                     : summary.gate.gate_type === 'entry'
                       ? 'Entrada'
                       : 'Saida'}

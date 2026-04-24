@@ -8,13 +8,13 @@ function translate(locale: AppLocale, english: string, portuguese: string) {
 export function translateBillingFeature(feature: BillingFeatureKey, locale: AppLocale) {
   switch (feature) {
     case 'standard_checkout':
-      return translate(locale, 'Standard purchase flow', 'Fluxo padrao de compra')
+      return translate(locale, 'Standard purchase flow', 'Fluxo padrão de compra')
     case 'premium_checkout':
       return translate(locale, 'Premium purchase flow', 'Fluxo premium de compra')
     case 'advanced_analytics':
-      return translate(locale, 'Advanced analytics', 'Analises avancadas')
+      return translate(locale, 'Advanced analytics', 'Análises avancadas')
     case 'campaign_automation':
-      return translate(locale, 'Campaign automation', 'Automacao de campanhas')
+      return translate(locale, 'Campaign automation', 'Automação de campanhas')
     case 'priority_support':
       return translate(locale, 'Priority support', 'Suporte prioritario')
     case 'white_label':
@@ -22,7 +22,7 @@ export function translateBillingFeature(feature: BillingFeatureKey, locale: AppL
     case 'api_access':
       return translate(locale, 'API access', 'Acesso a API')
     case 'custom_domain':
-      return translate(locale, 'Custom domain', 'Dominio personalizado')
+      return translate(locale, 'Custom domain', 'Domínio personalizado')
     case 'enterprise_support':
       return translate(locale, 'Enterprise support', 'Suporte empresarial')
     case 'sso':
@@ -53,25 +53,25 @@ export function translateBillingPlanDescription(slug: string, fallback: string, 
       return translate(
         locale,
         'Entry layer with standard fees and core operating limits.',
-        'Camada inicial com taxas padrao e limites essenciais de operacao.',
+        'Camada inicial com taxas padrão e limites essenciais de operação.',
       )
     case 'pro':
       return translate(
         locale,
         'Growing operation with premium purchase flow, automation and analytics.',
-        'Operacao em crescimento com compra premium, automacao e analises.',
+        'Operação em crescimento com compra premium, automação e análises.',
       )
     case 'business':
       return translate(
         locale,
         'Brand control, domains and integrations for larger operations.',
-        'Controle de marca, dominios e integracoes para operacoes maiores.',
+        'Controle de marca, domínios e integrações para operações maiores.',
       )
     case 'enterprise':
       return translate(
         locale,
         'Negotiated fees, custom limits and support for large-scale operations.',
-        'Taxas negociadas, limites personalizados e suporte para operacoes em grande escala.',
+        'Taxas negociadas, limites personalizados e suporte para operações em grande escala.',
       )
     default:
       return fallback

@@ -33,7 +33,7 @@ export function UserHeader({ overview, onSignOut }: UserHeaderProps) {
         <p className="mt-6 max-w-2xl text-base leading-7 text-[#5f5549]">
           {t(
             'Your access, your events and your relationship with the platform gathered in a simple visual experience that is ready for event day.',
-            'Seus acessos, seus eventos e o relacionamento com a plataforma reunidos em uma experiencia simples, visual e pronta para o dia do evento.',
+            'Seus acessos, seus eventos e o relacionamento com a plataforma reunidos em uma experiência simples, visual e pronta para o dia do evento.',
           )}
         </p>
 
@@ -72,7 +72,7 @@ export function UserHeader({ overview, onSignOut }: UserHeaderProps) {
             </div>
           </div>
           <div className="mt-2 text-sm text-[#5f5549]">
-            {overview.stats.usedTickets} {t('already used', 'ja utilizados')} · {formatCurrency(overview.stats.totalSpent)} {t('in purchases', 'em compras')}
+            {overview.stats.usedTickets} {t('already used', 'já utilizados')} · {formatCurrency(overview.stats.totalSpent)} {t('in purchases', 'em compras')}
           </div>
         </PremiumCard>
       </div>

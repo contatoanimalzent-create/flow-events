@@ -212,7 +212,7 @@ export function MediaStockBrowser({ defaultType = 'image', onSelect }: MediaStoc
             })}
           </div>
 
-          {/* Paginação */}
+          {/* Páginação */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <span className="text-[11px] text-text-muted">

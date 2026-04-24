@@ -18,7 +18,7 @@ export function UserEventDetail({ event }: UserEventDetailProps) {
         title={t('Choose an event to open your access', 'Escolha um evento para abrir seus acessos')}
         description={t(
           'As soon as you select a card, we show the tickets, QR code and the main instructions for the experience day.',
-          'Assim que voce selecionar um card, mostramos os ingressos, o QR code e as instrucoes principais para o dia da experiencia.',
+          'Assim que você selecionar um card, mostramos os ingressos, o QR code e as instruções principais para o dia da experiência.',
         )}
       />
     )
@@ -31,7 +31,7 @@ export function UserEventDetail({ event }: UserEventDetailProps) {
         title={event.name}
         description={t(
           'Everything you need to arrive with clarity: tickets, QR codes and operational instructions.',
-          'Tudo o que voce precisa para chegar ao evento com clareza: ingressos, QR codes e instrucoes operacionais.',
+          'Tudo o que você precisa para chegar ao evento com clareza: ingressos, QR codes e instruções operacionais.',
         )}
       />
 
@@ -43,9 +43,9 @@ export function UserEventDetail({ event }: UserEventDetailProps) {
 
           <div className="space-y-5">
             <div className="flex flex-wrap gap-2">
-              <PremiumBadge tone="accent">{event.category || t('Premium experience', 'Experiencia premium')}</PremiumBadge>
+              <PremiumBadge tone="accent">{event.category || t('Premium experience', 'Experiência premium')}</PremiumBadge>
               <PremiumBadge tone={event.timeframe === 'upcoming' ? 'success' : 'info'}>
-                {event.timeframe === 'upcoming' ? t('Next event', 'Proximo evento') : t('Past event', 'Evento passado')}
+                {event.timeframe === 'upcoming' ? t('Next event', 'Próximo evento') : t('Past event', 'Evento passado')}
               </PremiumBadge>
             </div>
 
@@ -85,7 +85,7 @@ export function UserEventDetail({ event }: UserEventDetailProps) {
             </div>
 
             <div className="rounded-[1.5rem] border border-[#eadcc6] bg-[#faf4e8] p-5">
-              <div className="text-[11px] uppercase tracking-[0.24em] text-[#8e7f68]">{t('Key instructions', 'Instrucoes principais')}</div>
+              <div className="text-[11px] uppercase tracking-[0.24em] text-[#8e7f68]">{t('Key instructions', 'Instruções principais')}</div>
               <div className="mt-3 space-y-2 text-sm leading-7 text-[#5f5549]">
                 {event.instructions.map((instruction) => (
                   <div key={instruction} className="flex items-start gap-3">
@@ -101,7 +101,7 @@ export function UserEventDetail({ event }: UserEventDetailProps) {
 
       {event.tickets.length === 0 ? (
         <EmptyState
-          title={t('Your tickets are still being issued', 'Seus ingressos ainda estao em emissao')}
+          title={t('Your tickets are still being issued', 'Seus ingressos ainda estao em emissão')}
           description={t(
             'As soon as payment is confirmed by the gateway, your digital tickets appear here automatically.',
             'Assim que o pagamento for confirmado pelo gateway, os ingressos digitais aparecem aqui automaticamente.',

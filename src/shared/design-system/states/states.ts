@@ -4,7 +4,7 @@ export const stateSystem = {
     tone: 'success',
   },
   error: {
-    label: 'Nao foi possivel concluir a acao',
+    label: 'Não foi possível concluir a ação',
     tone: 'error',
   },
   info: {

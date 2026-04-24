@@ -68,7 +68,7 @@ export function useCampaignsMutations({ organizationId }: UseCampaignsMutationsP
         entity_id: params.draftId,
         action_type: 'execute',
         title: 'Campanha lancada',
-        description: `Draft ${params.draftId} enviado para execucao.`,
+        description: `Draft ${params.draftId} enviado para execução.`,
       })
     }
     return true

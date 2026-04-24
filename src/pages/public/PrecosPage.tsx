@@ -8,31 +8,31 @@ const FAQS = [
   {
     questionPt: 'A taxa e cobrada sobre o valor bruto?',
     questionEn: 'Is the fee charged on the gross amount?',
-    answerPt: 'Sim. A taxa de 2,9% e calculada sobre o valor bruto de cada ingresso vendido. Nao ha taxas ocultas ou encargos adicionais.',
+    answerPt: 'Sim. A taxa de 2,9% e calculada sobre o valor bruto de cada ingresso vendido. Não há taxas ocultas ou encargos adicionais.',
     answerEn: 'Yes. The 2.9% fee is calculated on the gross value of each ticket sold. There are no hidden fees or additional charges.',
   },
   {
-    questionPt: 'Posso absorver a taxa no preco do ingresso?',
+    questionPt: 'Posso absorver a taxa no preço do ingresso?',
     questionEn: 'Can I absorb the fee into the ticket price?',
-    answerPt: 'Sim. Durante a configuracao do evento voce pode ativar o repasse de taxa para o comprador, mantendo o valor liquido para voce.',
+    answerPt: 'Sim. Durante a configuração do evento você pode ativar o repasse de taxa para o comprador, mantendo o valor liquido para você.',
     answerEn: 'Yes. During event setup you can activate fee transfer to the buyer, keeping the net amount for yourself.',
   },
   {
-    questionPt: 'Ha taxa para ingressos gratuitos?',
+    questionPt: 'Há taxa para ingressos gratuitos?',
     questionEn: 'Is there a fee for free tickets?',
-    answerPt: 'Nao. Ingressos com valor zero nao geram nenhuma taxa. Voce pode usar a plataforma para eventos gratuitos sem custo.',
+    answerPt: 'Não. Ingressos com valor zero não geram nenhuma taxa. Você pode usar a plataforma para eventos gratuitos sem custo.',
     answerEn: 'No. Zero-value tickets generate no fee. You can use the platform for free events at no cost.',
   },
   {
     questionPt: 'Quando recebo o repasse?',
     questionEn: 'When do I receive the transfer?',
-    answerPt: 'O repasse financeiro e processado automaticamente em D+2 apos o encerramento do evento, direto para a conta cadastrada.',
+    answerPt: 'O repasse financeiro é processado automaticamente em D+2 após o encerramento do evento, direto para a conta cadastrada.',
     answerEn: 'The financial transfer is processed automatically D+2 after the event closes, directly to the registered account.',
   },
   {
     questionPt: 'Posso cancelar a qualquer momento?',
     questionEn: 'Can I cancel at any time?',
-    answerPt: 'Sim. Nao ha contrato de fidelidade ou multa de cancelamento. Voce pode encerrar sua conta quando quiser.',
+    answerPt: 'Sim. Não há contrato de fidelidade ou multa de cancelamento. Você pode encerrar sua conta quando quiser.',
     answerEn: 'Yes. There is no loyalty contract or cancellation fee. You can close your account whenever you want.',
   },
 ]
@@ -42,7 +42,7 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   useSeoMeta({
-    title: isPortuguese ? 'Planos e Precos | Pulse' : 'Plans & Pricing | Pulse',
+    title: isPortuguese ? 'Planos e Preços | Pulse' : 'Plans & Pricing | Pulse',
     description: isPortuguese
       ? 'Comece gratis. Pague so quando vender. Planos flexiveis para eventos de todos os tamanhos.'
       : 'Start free. Pay only when you sell. Flexible plans for events of all sizes.',
@@ -89,8 +89,8 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
               <ul className="mt-7 space-y-3">
                 {(isPortuguese
                   ? [
-                      'Ate 3 eventos ativos',
-                      'Ate 200 ingressos por evento',
+                      'Até 3 eventos ativos',
+                      'Até 200 ingressos por evento',
                       'Check-in mobile por QR code',
                       '1 operador por evento',
                     ]
@@ -142,7 +142,7 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
                       'Ingressos ilimitados',
                       'Staff ilimitado',
                       'Supervisor em tempo real',
-                      'Relatorios avancados',
+                      'Relatórios avancados',
                       'Suporte prioritario',
                     ]
                   : [
@@ -180,14 +180,14 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
               </div>
               <p className="mt-5 text-sm leading-7 text-white/50">
                 {isPortuguese
-                  ? 'Para organizacoes com operacoes de grande escala e necessidades especificas.'
+                  ? 'Para organizações com operações de grande escala e necessidades especificas.'
                   : 'For organizations with large-scale operations and specific needs.'}
               </p>
               <ul className="mt-7 space-y-3">
                 {(isPortuguese
                   ? [
                       'Tudo do plano Pro',
-                      'Integracao via API',
+                      'Integração via API',
                       'White-label',
                       'SLA dedicado',
                       'Gerente de conta',
@@ -227,8 +227,8 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
           <div className="flex flex-wrap items-center justify-center gap-8 rounded-2xl border border-[#d4ff00]/20 bg-[#d4ff00]/[0.04] px-8 py-6 text-center">
             {(isPortuguese
               ? [
-                  'Nao cobra taxa de setup.',
-                  'Nao cobra mensalidade fixa no Pro.',
+                  'Não cobra taxa de setup.',
+                  'Não cobra mensalidade fixa no Pro.',
                   'So paga quando vender.',
                 ]
               : [

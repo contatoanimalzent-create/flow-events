@@ -69,7 +69,7 @@ export function FeeConfigurationPanel({
             <FormHint>
               {t(
                 'Use percentage for varied prices or a fixed fee when you want linear pricing per access.',
-                'Use percentual para precos variados ou taxa fixa quando quiser linearidade por acesso.',
+                'Use percentual para preços variados ou taxa fixa quando quiser linearidade por acesso.',
               )}
             </FormHint>
           </FormField>
@@ -99,7 +99,7 @@ export function FeeConfigurationPanel({
             <p className="mt-1 text-sm leading-6 text-text-muted">
               {t(
                 'When enabled, the buyer sees a clean total and the organization absorbs the fee in the payout without losing platform revenue.',
-                'Quando ativado, o comprador ve o total limpo e a organizacao absorve a taxa no repasse, sem perder a receita gerada para a plataforma.',
+                'Quando ativado, o comprador ve o total limpo e a organização absorve a taxa no repasse, sem perder a receita gerada para a plataforma.',
               )}
             </p>
           </div>

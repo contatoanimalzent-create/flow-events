@@ -27,13 +27,13 @@ export function DashboardPageContent() {
           <h1 className="admin-title">
             Dashboard<span className="admin-title-accent">.</span>
           </h1>
-          <p className="admin-subtitle">Visao executiva de receita, operacao, acesso, clientes e governanca do evento.</p>
+          <p className="admin-subtitle">Visão executiva de receita, operação, acesso, clientes e governança do evento.</p>
         </div>
         <div className="novare-stage-panel-dark">
           <div className="novare-stage-label">Executive cockpit</div>
-          <div className="novare-stage-title">Receita, ocupacao, risco e ritmo operacional em uma unica leitura.</div>
+          <div className="novare-stage-title">Receita, ocupacao, risco e ritmo operacional em uma única leitura.</div>
           <div className="novare-stage-copy">
-            Painel premium para produtores que precisam enxergar caixa, conversao, check-in, alertas e saude da operacao sem alternar entre modulos.
+            Painel premium para produtores que precisam enxergar caixa, conversão, check-in, alertas e saude da operação sem alternar entre módulos.
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button onClick={() => void dashboard.refresh()} className="btn-primary flex items-center gap-2 text-xs">
@@ -97,7 +97,7 @@ export function DashboardPageContent() {
           }
         />
       ) : dashboard.overview.events.length === 0 ? (
-        <PageEmptyState title="NENHUM EVENTO DISPONIVEL" description="Crie ou publique eventos para liberar a visao executiva consolidada." />
+        <PageEmptyState title="NENHUM EVENTO DISPONÍVEL" description="Crie ou publique eventos para liberar a visão executiva consolidada." />
       ) : (
         <>
           <section className="novare-stage">
@@ -114,7 +114,7 @@ export function DashboardPageContent() {
                 {
                   label: 'Receita bruta',
                   value: formatCurrency(dashboard.overview.summary.grossRevenue),
-                  note: 'Volume consolidado entrando na operacao.',
+                  note: 'Volume consolidado entrando na operação.',
                 },
                 {
                   label: 'Eventos ativos',

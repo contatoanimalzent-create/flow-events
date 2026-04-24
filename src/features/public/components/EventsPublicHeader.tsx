@@ -189,7 +189,7 @@ export function EventsPublicHeader({
               <div className="mt-12 grid gap-14 lg:grid-cols-[1.05fr_0.95fr]">
                 <div>
                   <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
-                    {isPortuguese ? 'Navegacao' : 'Navigation'}
+                    {isPortuguese ? 'Navegação' : 'Navigation'}
                   </div>
                   <nav className="mt-8 grid gap-2">
                     {navLinks.map((link, index) => (

@@ -92,14 +92,14 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
     }
 
     await navigator.clipboard.writeText(submitResult.code)
-    setSnackbar({ tone: 'success', message: 'Codigo copiado para a area de transferencia.' })
+    setSnackbar({ tone: 'success', message: 'Código copiado para a área de transferência.' })
   }
 
   function handleDownloadQr() {
     const svg = qrWrapperRef.current?.querySelector('svg')
 
     if (!svg || !submitResult) {
-      setSnackbar({ tone: 'error', message: 'Nao foi possivel gerar o download do QR Code.' })
+      setSnackbar({ tone: 'error', message: 'Não foi possível gerar o download do QR Code.' })
       return
     }
 
@@ -123,7 +123,7 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
       })
 
       setSubmitResult(result)
-      setSnackbar({ tone: 'success', message: 'Inscricao confirmada com sucesso.' })
+      setSnackbar({ tone: 'success', message: 'Inscrição confirmada com sucesso.' })
       reset({
         name: '',
         email: '',
@@ -131,7 +131,7 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
         ticketType: values.ticketType,
       })
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Nao foi possivel concluir a inscricao.'
+      const message = error instanceof Error ? error.message : 'Não foi possível concluir a inscrição.'
       setSubmitError(message)
       setSnackbar({ tone: 'error', message })
     }
@@ -150,10 +150,10 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
             Event signup
           </div>
           <h3 className="mt-3 text-[clamp(1.7rem,3vw,2.4rem)] font-semibold tracking-[-0.05em] text-[var(--pulse-color-text-primary)]">
-            Garanta seu acesso com um fluxo simples e rapido.
+            Garanta seu acesso com um fluxo simples e rápido.
           </h3>
           <p className="mt-4 text-sm leading-7 text-[var(--pulse-color-text-secondary)]">
-            O envio usa apenas o client publico do Supabase e environment variables do app. Confirmacoes por Resend ou Twilio devem continuar passando por edge functions para manter segredos fora do frontend.
+            O envio usa apenas o client público do Supabase e environment variables do app. Confirmações por Resend ou Twilio devem continuar passando por edge functions para manter segredos fora do frontend.
           </p>
         </div>
 
@@ -182,7 +182,7 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
                 validate: (value) => validateEmail(value) || 'Formato de email invalido.',
               })}
               className={inputClassName}
-              placeholder="voce@email.com"
+              placeholder="você@email.com"
               type="email"
             />
             {errors.email ? <p className="mt-1.5 text-xs text-[var(--pulse-status-error)]">{errors.email.message}</p> : null}
@@ -233,13 +233,13 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
 
           {submitError ? (
             <div className="md:col-span-2">
-              <FeedbackBanner tone="error" title="Nao foi possivel concluir" message={submitError} />
+              <FeedbackBanner tone="error" title="Não foi possível concluir" message={submitError} />
             </div>
           ) : null}
 
           <div className="md:col-span-2 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="text-xs leading-6 text-[var(--pulse-color-text-secondary)]">
-              Ao enviar, a confirmacao transacional deve ser disparada no backend por edge function.
+              Ao enviar, a confirmação transacional deve ser disparada no backend por edge function.
             </div>
 
             <button
@@ -248,7 +248,7 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
               className="inline-flex min-h-[3.25rem] items-center justify-center gap-2 rounded-full bg-[var(--pulse-color-primary)] px-6 text-sm font-semibold text-[var(--pulse-color-text-inverse)] shadow-[var(--pulse-shadow-medium)] transition-all duration-200 hover:bg-[var(--pulse-color-primary-light)] hover:shadow-[var(--pulse-shadow-strong)] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              {isSubmitting ? 'Enviando...' : 'Confirmar inscricao'}
+              {isSubmitting ? 'Enviando...' : 'Confirmar inscrição'}
             </button>
           </div>
         </form>
@@ -257,7 +257,7 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
           <div className="mt-8 rounded-[var(--pulse-radius-lg)] border border-[var(--pulse-status-success-border)] bg-[var(--pulse-status-success-surface)] p-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-[var(--pulse-status-success)]">
               <CheckCircle2 className="h-4 w-4" />
-              Inscricao recebida com sucesso
+              Inscrição recebida com sucesso
             </div>
 
             <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,13rem)_minmax(0,1fr)]">
@@ -282,7 +282,7 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
               <div className="space-y-4">
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--pulse-color-text-secondary)]">
-                    Codigo da inscricao
+                    Código da inscrição
                   </div>
                   <div className="mt-2 rounded-[var(--pulse-radius-md)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-background)] px-4 py-3 font-mono text-sm text-[var(--pulse-color-text-primary)]">
                     {submitResult.code}
@@ -296,7 +296,7 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
                     className="inline-flex min-h-[2.9rem] items-center justify-center gap-2 rounded-full border border-[var(--pulse-color-border)] bg-[var(--pulse-color-background)] px-5 text-sm font-semibold text-[var(--pulse-color-text-primary)] transition-all hover:border-[var(--pulse-color-primary)] hover:text-[var(--pulse-color-primary)]"
                   >
                     <Copy className="h-4 w-4" />
-                    Copiar codigo
+                    Copiar código
                   </button>
                   <button
                     type="button"

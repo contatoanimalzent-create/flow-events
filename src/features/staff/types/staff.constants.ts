@@ -10,10 +10,10 @@ export const STAFF_STATUS_CONFIG: Record<StaffStatus, { label: string; color: st
 
 export const STAFF_PERMISSION_OPTIONS: Array<{ value: StaffPermission; label: string }> = [
   { value: 'checkin.scan', label: 'Scanner de check-in' },
-  { value: 'checkin.override', label: 'Override de excecoes' },
-  { value: 'gate.manage', label: 'Operacao de portaria' },
-  { value: 'command.view', label: 'Visao do command center' },
-  { value: 'staff.manage', label: 'Gestao de equipe' },
+  { value: 'checkin.override', label: 'Override de exceções' },
+  { value: 'gate.manage', label: 'Operação de portaria' },
+  { value: 'command.view', label: 'Visão do command center' },
+  { value: 'staff.manage', label: 'Gestão de equipe' },
 ]
 
 export const EMPTY_STAFF_FORM: StaffFormData = {

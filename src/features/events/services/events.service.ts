@@ -73,7 +73,7 @@ export const eventsService = {
       const result = await supabase.storage.from('event-covers').upload(path, file, { upsert: true })
 
       if (result.error || !result.data) {
-        throw new EventsServiceError('Nao foi possivel enviar a capa do evento', 'event_cover_upload_failed')
+        throw new EventsServiceError('Não foi possível enviar a capa do evento', 'event_cover_upload_failed')
       }
 
       const { data } = supabase.storage.from('event-covers').getPublicUrl(result.data.path)

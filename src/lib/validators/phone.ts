@@ -8,7 +8,7 @@ export function validatePhone(phone: string): boolean {
 
   const cleanPhone = phone.replace(/\D/g, '')
 
-  // Brazilian phone: 11 digits (2 area code + 9 digits)
+  // Brazilian phone: 11 digits (2 área code + 9 digits)
   if (cleanPhone.startsWith('55')) {
     return cleanPhone.length === 13
   }

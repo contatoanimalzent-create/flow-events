@@ -27,7 +27,7 @@ export function ExploreMoreSection({ currentEventId, events }: ExploreMoreSectio
                 {isPortuguese ? 'Continue explorando' : 'Keep exploring'}
               </div>
               <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3.2rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
-                {isPortuguese ? 'Mais experiencias para voce' : 'More experiences for you'}
+                {isPortuguese ? 'Mais experiências para você' : 'More experiences for you'}
               </h2>
             </div>
             <a

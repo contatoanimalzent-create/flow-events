@@ -19,7 +19,7 @@ export function RevenueDashboard({ summary, series }: RevenueDashboardProps) {
         title={t('Platform revenue', 'Receita da plataforma')}
         description={t(
           'The monetization layer now combines operating fees, recurring plans and immediate take-rate visibility.',
-          'A camada de monetizacao agora combina taxa operacional, recorrencia do plano e visibilidade imediata da taxa media.',
+          'A camada de monetização agora combina taxa operacional, recorrencia do plano e visibilidade imediata da taxa media.',
         )}
       />
 

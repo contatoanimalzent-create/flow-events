@@ -1098,7 +1098,7 @@ export interface EventAsset {
   updated_at: string
 }
 
-// ─── Inscricoes (External Registrations, Capital Strike) ────────────────────
+// ─── Inscrições (External Registrations, Capital Strike) ────────────────────
 
 export type CapitalStrikeArmy = 'coalizao' | 'alianca'
 

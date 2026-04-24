@@ -61,7 +61,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
       setRecoveryMessage(
         t(
           'Recovery instructions sent. Check your inbox.',
-          'Instrucoes de recuperacao enviadas. Verifique sua caixa de entrada.',
+          'Instruções de recuperacao enviadas. Verifique sua caixa de entrada.',
         ),
       )
     }
@@ -106,18 +106,18 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
               </div>
               <h1 className="mt-5 text-[clamp(3.2rem,6vw,5.8rem)] font-bold leading-[0.88] tracking-[-0.04em] text-white">
                 {recoveryMode
-                  ? t('Recover your operation.', 'Recupere sua operacao.')
+                  ? t('Recover your operation.', 'Recupere sua operação.')
                   : t('Enter the event cockpit.', 'Entre no cockpit do evento.')}
               </h1>
               <p className="mt-5 max-w-md text-sm leading-8 text-white/58">
                 {recoveryMode
                   ? t(
                       'We send a secure link back to the email connected to your operation.',
-                      'Enviamos um link seguro para o email conectado a sua operacao.',
+                      'Enviamos um link seguro para o email conectado a sua operação.',
                     )
                   : t(
                       'One entrance for sales, access control, finance, staff and governance.',
-                      'Uma unica entrada para vendas, controle de acesso, financeiro, equipe e governanca.',
+                      'Uma única entrada para vendas, controle de acesso, financeiro, equipe e governança.',
                     )}
               </p>
               {!recoveryMode ? (
@@ -125,7 +125,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                   {[
                     t('Vendas e ingressos em tempo real', 'Real-time sales and tickets'),
                     t('Check-in com QR Code', 'QR Code check-in'),
-                    t('Relatorios e financeiro', 'Reports and finance'),
+                    t('Relatórios e financeiro', 'Reports and finance'),
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-3 text-sm text-white/60">
                       <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0057E7]/20 text-[#4285F4]">
@@ -210,7 +210,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="input border-white/10 bg-white/[0.03] pl-10 text-white placeholder:text-white/30 focus:border-[#0057E7]"
-                    placeholder={t('you@email.com', 'voce@email.com')}
+                    placeholder={t('you@email.com', 'você@email.com')}
                     required
                     autoFocus
                   />
@@ -306,7 +306,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
             <div className="mt-6 text-center text-xs text-white/42">
               {!recoveryMode ? (
                 <>
-                  {t("Don't have an account?", 'Nao tem uma conta?')}{' '}
+                  {t("Don't have an account?", 'Não tem uma conta?')}{' '}
                   <button onClick={onSignup} className="text-[#4285F4] transition-colors hover:text-[#0057E7]">
                     {t('Create one', 'Criar conta')}
                   </button>

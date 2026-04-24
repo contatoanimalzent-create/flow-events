@@ -53,7 +53,7 @@ export function SegmentBuilderModal({
             <span className="admin-title-accent">.</span>
           </>
         }
-        subtitle="Combine filtros de comportamento, cidade, gasto e presenca com preview vivo da audiencia."
+        subtitle="Combine filtros de comportamento, cidade, gasto e presença com preview vivo da audiencia."
         onClose={onClose}
       />
 
@@ -68,7 +68,7 @@ export function SegmentBuilderModal({
             </FormField>
           </FormSection>
 
-          <FormSection title="Comportamento de compra e presenca">
+          <FormSection title="Comportamento de compra e presença">
             <FormGrid>
               <FormField label="Compraram evento">
                 <select className="input" value={values.purchased_event_id} onChange={(event) => updateField('purchased_event_id', event.target.value)}>
@@ -93,7 +93,7 @@ export function SegmentBuilderModal({
             </FormGrid>
 
             <FormGrid>
-              <FormField label="Compraram e nao compareceram">
+              <FormField label="Compraram e não compareceram">
                 <select className="input" value={values.bought_not_attended_event_id} onChange={(event) => updateField('bought_not_attended_event_id', event.target.value)}>
                   <option value="">Todos</option>
                   {events.map((event) => (
@@ -117,24 +117,24 @@ export function SegmentBuilderModal({
               <FormField label="Estado">
                 <input className="input" value={values.state} onChange={(event) => updateField('state', event.target.value)} />
               </FormField>
-              <FormField label="Inativos ha X dias">
+              <FormField label="Inativos há X dias">
                 <input className="input" value={values.inactive_days} onChange={(event) => updateField('inactive_days', event.target.value)} placeholder="60" />
               </FormField>
             </FormGrid>
 
             <FormGrid columns={3}>
-              <FormField label="Minimo gasto">
+              <FormField label="Mínimo gasto">
                 <input className="input" value={values.min_total_revenue} onChange={(event) => updateField('min_total_revenue', event.target.value)} placeholder="500" />
               </FormField>
-              <FormField label="Minimo pedidos">
+              <FormField label="Mínimo pedidos">
                 <input className="input" value={values.min_orders} onChange={(event) => updateField('min_orders', event.target.value)} placeholder="2" />
               </FormField>
-              <FormField label="Ticket medio minimo">
+              <FormField label="Ticket medio mínimo">
                 <input className="input" value={values.min_average_ticket} onChange={(event) => updateField('min_average_ticket', event.target.value)} placeholder="80" />
               </FormField>
             </FormGrid>
 
-            <FormField label="Ticket medio maximo">
+            <FormField label="Ticket medio máximo">
               <input className="input" value={values.max_average_ticket} onChange={(event) => updateField('max_average_ticket', event.target.value)} placeholder="350" />
             </FormField>
           </FormSection>

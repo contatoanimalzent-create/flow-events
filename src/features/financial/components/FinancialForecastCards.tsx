@@ -18,7 +18,7 @@ export function FinancialForecastCards({ overview }: FinancialForecastCardsProps
     {
       label: 'Custo projetado',
       value: formatCurrency(overview.total_projected_cost),
-      sublabel: 'Base esperada para operacao',
+      sublabel: 'Base esperada para operação',
       icon: BarChart3,
       color: 'text-status-warning',
     },

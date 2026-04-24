@@ -78,7 +78,7 @@ export function OrdersPageContent() {
           <h1 className="admin-title">
             Vendas<span className="admin-title-accent">.</span>
           </h1>
-          <p className="admin-subtitle">Pedidos, pagamentos e emissao digital.</p>
+          <p className="admin-subtitle">Pedidos, pagamentos e emissão digital.</p>
         </div>
         <div className="flex items-center gap-2">
           {filteredOrders.length > 0 && (

@@ -43,7 +43,7 @@ export async function generateQRCodeDataUrl(text: string, size = 280): Promise<s
 }
 
 /**
- * Alternative: Generate using Canvas API with pre-rendered component
+ * Alternative: Generate using Canvas API with pré-rendered component
  * This is a fallback that generates a simple visual QR code representation
  */
 export async function generateCheckInQRCode(

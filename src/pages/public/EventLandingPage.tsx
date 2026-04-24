@@ -87,9 +87,9 @@ function readAgendaItems(
     {
       id: 'agenda-main',
       time: isPortuguese ? 'Em seguida' : 'Next',
-      title: isPortuguese ? 'Conteudo principal e momentos de palco' : 'Main content and stage moments',
+      title: isPortuguese ? 'Conteúdo principal e momentos de palco' : 'Main content and stage moments',
       description: isPortuguese
-        ? 'Bloco central da experiencia com palestras, showcases ou apresentacoes principais.'
+        ? 'Bloco central da experiência com palestras, showcases ou apresentacoes principais.'
         : 'The central experience block with talks, showcases or headline presentations.',
       category: isPortuguese ? 'Palco' : 'Stage',
     },
@@ -107,7 +107,7 @@ function readAgendaItems(
       time: endsAt ? formatPublicTime(endsAt, locale) : isPortuguese ? 'Encerramento' : 'Closing',
       title: isPortuguese ? 'Fechamento da jornada' : 'Closing moment',
       description: isPortuguese
-        ? 'Ultimo chamado, orientacoes finais e transicao elegante para a saida.'
+        ? 'Último chamado, orientacoes finais e transicao elegante para a saída.'
         : 'Final call, closing notes and an elegant transition into departure.',
       category: isPortuguese ? 'Final' : 'Finale',
     },
@@ -142,21 +142,21 @@ function readFaqItems(settings: Record<string, unknown>, isPortuguese: boolean):
 
   return [
     {
-      question: isPortuguese ? 'Como funciona a confirmacao da inscricao?' : 'How does registration confirmation work?',
+      question: isPortuguese ? 'Como funciona a confirmação da inscrição?' : 'How does registration confirmation work?',
       answer: isPortuguese
-        ? 'Assim que o formulario for enviado, o registro entra no fluxo operacional do Pulse e a confirmacao segue pelos canais definidos pelo evento.'
+        ? 'Assim que o formulário for enviado, o registro entra no fluxo operacional do Pulse e a confirmação segue pelos canais definidos pelo evento.'
         : 'Once the form is submitted, the record enters the Pulse operational flow and confirmation follows the event communication rules.',
     },
     {
       question: isPortuguese ? 'Posso transferir meu ingresso?' : 'Can I transfer my ticket?',
       answer: isPortuguese
-        ? 'A disponibilidade de transferencia depende da politica do evento e do lote selecionado. O time de suporte pode orientar caso a caso.'
+        ? 'A disponibilidade de transferência depende da política do evento e do lote selecionado. O time de suporte pode orientar caso a caso.'
         : 'Transfer availability depends on the event policy and the selected ticket release. Support can guide each case.',
     },
     {
-      question: isPortuguese ? 'Receberei informacoes de acesso antes do evento?' : 'Will I receive access details before the event?',
+      question: isPortuguese ? 'Receberei informações de acesso antes do evento?' : 'Will I receive access details before the event?',
       answer: isPortuguese
-        ? 'Sim. Orientacoes de acesso, horario e documentos exigidos podem ser compartilhados por e-mail ou WhatsApp conforme configuracao do produtor.'
+        ? 'Sim. Orientacoes de acesso, horario e documentos exigidos podem ser compartilhados por e-mail ou WhatsApp conforme configuração do produtor.'
         : 'Yes. Access guidance, timing and required documents can be shared by email or WhatsApp based on the producer setup.',
     },
   ]
@@ -176,12 +176,12 @@ function buildTicketOptions(ticketTypes: EventLandingPageDetail['ticketTypes'], 
         description:
           ticketType.description ||
           (isPortuguese
-            ? 'Acesso pensado para manter clareza de valor, disponibilidade e decisao rapida.'
+            ? 'Acesso pensado para manter clareza de valor, disponibilidade e decisão rápida.'
             : 'Access designed to keep value, availability and decision-making clear.'),
         price: batch.price,
         isFree,
         badge: isFree ? (isPortuguese ? 'Gratuito' : 'Free') : batch.name,
-        availability: isPortuguese ? `${available} disponiveis` : `${available} available`,
+        availability: isPortuguese ? `${available} disponíveis` : `${available} available`,
         label: `${ticketType.name} - ${batch.name}${isFree ? '' : ` - ${formatPublicCurrency(batch.price, locale)}`}`,
       }
     })
@@ -194,15 +194,15 @@ function buildTicketOptions(ticketTypes: EventLandingPageDetail['ticketTypes'], 
   return [
     {
       id: 'pulse-general-registration',
-      name: isPortuguese ? 'Inscricao geral' : 'General registration',
+      name: isPortuguese ? 'Inscrição geral' : 'General registration',
       description: isPortuguese
-        ? 'Confirmacao de interesse para acesso, lista ou liberacao posterior.'
+        ? 'Confirmação de interesse para acesso, lista ou liberacao posterior.'
         : 'A general registration for access, waitlist or a later release.',
       price: 0,
       isFree: true,
       badge: isPortuguese ? 'Gratuito' : 'Free',
-      availability: isPortuguese ? 'Vagas mediante confirmacao' : 'Spots subject to confirmation',
-      label: isPortuguese ? 'Inscricao geral - Gratuito' : 'General registration - Free',
+      availability: isPortuguese ? 'Vagas mediante confirmação' : 'Spots subject to confirmation',
+      label: isPortuguese ? 'Inscrição geral - Gratuito' : 'General registration - Free',
     },
   ]
 }
@@ -223,11 +223,11 @@ function NotFoundState({ isPortuguese }: { isPortuguese: boolean }) {
       <div className="flex min-h-[70vh] items-center justify-center bg-[var(--pulse-color-surface)] px-6 py-16 text-center">
         <div className="max-w-xl rounded-[calc(var(--pulse-radius-lg)+0.35rem)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-background)] px-8 py-10 shadow-[var(--pulse-shadow-medium)]">
           <h1 className="text-4xl font-semibold tracking-[-0.05em] text-[var(--pulse-color-primary)]">
-            {isPortuguese ? 'Evento nao encontrado' : 'Event not found'}
+            {isPortuguese ? 'Evento não encontrado' : 'Event not found'}
           </h1>
           <p className="mt-4 text-base leading-8 text-[var(--pulse-color-text-secondary)]">
             {isPortuguese
-              ? 'O link pode ter expirado ou esta experiencia nao esta mais publica.'
+              ? 'O link pode ter expirado ou esta experiência não esta mais pública.'
               : 'This link may have expired or the experience is no longer public.'}
           </p>
           <a
@@ -338,7 +338,7 @@ function PrivateEventGate({ eventName, onUnlock, isPortuguese }: PrivateEventGat
 
           <p className="mt-6 text-center text-xs text-white/30">
             {isPortuguese
-              ? 'Nao tem a senha? Fale com o organizador do evento.'
+              ? 'Não tem a senha? Fale com o organizador do evento.'
               : "Don't have the password? Contact the event organizer."}
           </p>
         </div>
@@ -397,7 +397,7 @@ export function EventLandingPage({ slug }: EventLandingPageProps) {
       event?.short_description ||
       event?.full_description ||
       (isPortuguese
-        ? 'Inscricoes, agenda e informacoes do evento em uma landing Pulse mais clara e premium.'
+        ? 'Inscrições, agenda e informações do evento em uma landing Pulse mais clara e premium.'
         : 'Registrations, agenda and event information in a clearer premium Pulse landing page.'),
     image: heroImageUrl,
     url: typeof window !== 'undefined' ? window.location.href : `/e/${slug}`,
@@ -476,7 +476,7 @@ export function EventLandingPage({ slug }: EventLandingPageProps) {
       />
 
       <AboutSection
-        description={eventRecord.full_description || eventRecord.short_description || (isPortuguese ? 'Uma experiencia premium com narrativa clara, agenda objetiva e foco em conversao.' : 'A premium experience with clear storytelling, objective scheduling and conversion focus.')}
+        description={eventRecord.full_description || eventRecord.short_description || (isPortuguese ? 'Uma experiência premium com narrativa clara, agenda objetiva e foco em conversão.' : 'A premium experience with clear storytelling, objective scheduling and conversion focus.')}
         startsAt={eventRecord.starts_at}
         endsAt={eventRecord.ends_at}
         doorsOpenAt={eventRecord.doors_open_at}

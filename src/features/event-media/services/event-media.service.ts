@@ -22,7 +22,7 @@ function assertUploadResult(asset: {
   duration: number | null
 }, assetType: EventAssetUploadInput['assetType']) {
   if (!asset.provider || !asset.url || !asset.secureUrl) {
-    throw new Error('Upload incompleto: provider e URLs finais sao obrigatorios')
+    throw new Error('Upload incompleto: provider e URLs finais são obrigatorios')
   }
 
   if (assetType === 'video' && !asset.thumbnailUrl) {
@@ -30,7 +30,7 @@ function assertUploadResult(asset: {
   }
 
   if (assetType === 'image' && asset.duration) {
-    throw new Error('Upload invalido: imagens nao devem registrar duracao')
+    throw new Error('Upload invalido: imagens não devem registrar duracao')
   }
 }
 
@@ -54,7 +54,7 @@ async function getEventAssetOrThrow(assetId: string) {
   const result = await supabase.from('event_assets').select('*').eq('id', assetId).single()
 
   if (result.error || !result.data) {
-    throw new Error(result.error?.message ?? 'Asset nao encontrado')
+    throw new Error(result.error?.message ?? 'Asset não encontrado')
   }
 
   return result.data as EventMediaAsset
@@ -79,7 +79,7 @@ async function syncLegacyEventMediaFields(eventId: string) {
   const eventResult = await supabase.from('events').select('cover_url, settings').eq('id', eventId).single()
 
   if (eventResult.error || !eventResult.data) {
-    throw new Error(eventResult.error?.message ?? 'Evento nao encontrado')
+    throw new Error(eventResult.error?.message ?? 'Evento não encontrado')
   }
 
   const assets = await getEventActiveAssets(eventId)
@@ -183,7 +183,7 @@ export const eventMediaService = {
         .single()
 
       if (insertResult.error || !insertResult.data) {
-        throw new Error(insertResult.error?.message ?? 'Nao foi possivel salvar o asset')
+        throw new Error(insertResult.error?.message ?? 'Não foi possível salvar o asset')
       }
 
       const asset = insertResult.data as EventMediaAsset
@@ -220,7 +220,7 @@ export const eventMediaService = {
         .single()
 
       if (result.error || !result.data) {
-        throw new Error(result.error?.message ?? 'Nao foi possivel atualizar o asset')
+        throw new Error(result.error?.message ?? 'Não foi possível atualizar o asset')
       }
 
       const asset = result.data as EventMediaAsset

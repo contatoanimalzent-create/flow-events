@@ -112,7 +112,7 @@ export function RegistrationsPage() {
 
         setRegistrations((data ?? []) as CapitalStrikeRegistration[])
       } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : 'Erro ao carregar inscricoes')
+        setError(loadError instanceof Error ? loadError.message : 'Erro ao carregar inscrições')
       } finally {
         setLoading(false)
       }
@@ -176,7 +176,7 @@ export function RegistrationsPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-[10px] uppercase tracking-[0.38em] text-[#ae936f]">Capital Strike - A Origem</div>
-          <h1 className="mt-2 font-display text-[2.8rem] leading-none tracking-tight text-[#ebe7e0]">Inscricoes</h1>
+          <h1 className="mt-2 font-display text-[2.8rem] leading-none tracking-tight text-[#ebe7e0]">Inscrições</h1>
           <p className="mt-2 text-sm text-[#8e847d]">Registros recebidos do site capitalstrike.com.br</p>
         </div>
 
@@ -192,7 +192,7 @@ export function RegistrationsPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Total" value={stats.total} sub="inscricoes recebidas" />
+        <StatCard label="Total" value={stats.total} sub="inscrições recebidas" />
         <StatCard label="Coalizao" value={stats.coalizao} sub={`${stats.total ? Math.round((stats.coalizao / stats.total) * 100) : 0}% do total`} color="yellow" />
         <StatCard label="Alianca" value={stats.alianca} sub={`${stats.total ? Math.round((stats.alianca / stats.total) * 100) : 0}% do total`} color="sky" />
         <StatCard label="Com squad" value={stats.comSquad} sub="equipes identificadas" color="green" />
@@ -260,7 +260,7 @@ export function RegistrationsPage() {
         ) : null}
 
         <div className="text-xs text-[#6b6560]">
-          {filtered.length} de {registrations.length} inscricoes
+          {filtered.length} de {registrations.length} inscrições
         </div>
       </div>
 
@@ -330,7 +330,7 @@ export function RegistrationsPage() {
           <div className="relative w-full max-w-lg overflow-hidden rounded-[1.5rem] border border-white/12 bg-[#0f0d0c] shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/8 p-5">
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-[#ae936f]">Detalhe da inscricao</div>
+                <div className="text-[10px] uppercase tracking-widest text-[#ae936f]">Detalhe da inscrição</div>
                 <div className="mt-1 font-display text-[1.6rem] leading-none text-[#ebe7e0]">{selected.full_name}</div>
               </div>
               <button

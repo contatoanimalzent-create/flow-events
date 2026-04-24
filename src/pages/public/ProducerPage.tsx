@@ -19,69 +19,69 @@ const FEATURES = [
     icon: Ticket,
     titlePt: 'Venda de ingressos',
     titleEn: 'Ticket sales',
-    descPt: 'Crie lotes, cupons, cortesias e controle estoque em tempo real. Checkout otimizado com taxa de conversao acima de 94%.',
+    descPt: 'Crie lotes, cupons, cortesias e controle estoque em tempo real. Checkout otimizado com taxa de conversão acima de 94%.',
     descEn: 'Create batches, coupons, complimentary tickets and control inventory in real time. Optimized checkout with 94%+ conversion rate.',
   },
   {
     icon: QrCode,
     titlePt: 'Check-in com QR Code',
     titleEn: 'QR Code check-in',
-    descPt: 'Leitura instantanea por camera, validacao anti-fraude e controle de acesso por area. Funciona offline.',
-    descEn: 'Instant camera scanning, anti-fraud validation and area-based access control. Works offline.',
+    descPt: 'Leitura instantanea por camera, válidação anti-fraude e controle de acesso por área. Funciona offline.',
+    descEn: 'Instant camera scanning, anti-fraud validation and área-based access control. Works offline.',
   },
   {
     icon: Users,
-    titlePt: 'Gestao de equipe',
+    titlePt: 'Gestão de equipe',
     titleEn: 'Team management',
-    descPt: 'Convide staff via link, defina funcoes e permissoes, controle ponto e avalie performance apos o evento.',
+    descPt: 'Convide staff via link, defina funcoes e permissões, controle ponto e avalie performance após o evento.',
     descEn: 'Invite staff via link, set roles and permissions, track attendance and evaluate performance after the event.',
   },
   {
     icon: BarChart3,
     titlePt: 'Dashboard executivo',
     titleEn: 'Executive dashboard',
-    descPt: 'Receita, conversao, ticket medio, ranking de eventos e clientes, tudo consolidado em um cockpit visual.',
+    descPt: 'Receita, conversão, ticket medio, ranking de eventos e clientes, tudo consolidado em um cockpit visual.',
     descEn: 'Revenue, conversion, average ticket, event and customer rankings, all consolidated in a visual cockpit.',
   },
   {
     icon: CreditCard,
     titlePt: 'Financeiro integrado',
     titleEn: 'Integrated finance',
-    descPt: 'Receita bruta, taxas, repasses e conciliacao automatica. Exportacao contabil pronta para seu escritorio.',
+    descPt: 'Receita bruta, taxas, repasses e conciliacao automática. Exportacao contabil pronta para seu escritorio.',
     descEn: 'Gross revenue, fees, transfers and automatic reconciliation. Accounting exports ready for your office.',
   },
   {
     icon: Shield,
     titlePt: 'Credenciamento inteligente',
     titleEn: 'Smart credentialing',
-    descPt: 'Inscricoes externas, formularios personalizados, aprovacao manual ou automatica e comunicacao por email.',
+    descPt: 'Inscrições externas, formularios personalizados, aprovação manual ou automática e comunicacao por email.',
     descEn: 'External registrations, custom forms, manual or automatic approval and email communication.',
   },
   {
     icon: LineChart,
-    titlePt: 'CRM e inteligencia',
+    titlePt: 'CRM e inteligência',
     titleEn: 'CRM and intelligence',
-    descPt: 'Base de clientes unificada, historico de compras, segmentacao e insights automaticos sobre comportamento.',
+    descPt: 'Base de clientes unificada, histórico de compras, segmentação e insights automáticos sobre comportamento.',
     descEn: 'Unified customer base, purchase history, segmentation and automatic behavioral insights.',
   },
   {
     icon: Globe,
-    titlePt: 'Pagina publica do evento',
+    titlePt: 'Página pública do evento',
     titleEn: 'Public event page',
-    descPt: 'Cada evento ganha uma landing page propria com galeria, programacao, mapa e checkout integrado.',
+    descPt: 'Cada evento ganha uma landing page própria com galeria, programação, mapa e checkout integrado.',
     descEn: 'Each event gets its own landing page with gallery, schedule, map and integrated checkout.',
   },
   {
     icon: Zap,
     titlePt: 'Comunicacao e notificacoes',
     titleEn: 'Communication and notifications',
-    descPt: 'Emails automaticos de confirmacao, lembretes pre-evento e mensagens segmentadas para sua base.',
+    descPt: 'Emails automáticos de confirmação, lembretes pré-evento e mensagens segmentadas para sua base.',
     descEn: 'Automatic confirmation emails, pre-event reminders and segmented messages to your audience.',
   },
 ]
 
 const STATS = [
-  { valuePt: '94%', valueEn: '94%', labelPt: 'Taxa de conversao', labelEn: 'Conversion rate' },
+  { valuePt: '94%', valueEn: '94%', labelPt: 'Taxa de conversão', labelEn: 'Conversion rate' },
   { valuePt: '< 2s', valueEn: '< 2s', labelPt: 'Tempo de check-in', labelEn: 'Check-in time' },
   { valuePt: '24/7', valueEn: '24/7', labelPt: 'Suporte operacional', labelEn: 'Operational support' },
   { valuePt: 'R$ 0', valueEn: '$0', labelPt: 'Para comecar', labelEn: 'To get started' },
@@ -102,12 +102,12 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
             </div>
             <h1 className="mt-6 text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.88] tracking-[-0.04em] text-white">
               {isPortuguese
-                ? 'Tudo que voce precisa para operar eventos de verdade.'
+                ? 'Tudo que você precisa para operar eventos de verdade.'
                 : 'Everything you need to run real events.'}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/58">
               {isPortuguese
-                ? 'Venda, credenciamento, check-in, equipe, financeiro e inteligencia, uma plataforma completa para produtores que exigem controle total.'
+                ? 'Venda, credenciamento, check-in, equipe, financeiro e inteligência, uma plataforma completa para produtores que exigem controle total.'
                 : 'Sales, credentialing, check-in, staff, finance and intelligence, a complete platform for producers who demand total control.'}
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
@@ -156,11 +156,11 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
         <div className="mx-auto max-w-[1540px]">
           <div className="mb-12 max-w-2xl">
             <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
-              {isPortuguese ? 'Modulos da plataforma' : 'Platform modules'}
+              {isPortuguese ? 'Módulos da plataforma' : 'Platform modules'}
             </div>
             <h2 className="mt-5 text-[clamp(2.4rem,5vw,4rem)] font-bold leading-[0.9] tracking-[-0.03em] text-white">
               {isPortuguese
-                ? 'Uma pilha unica para governar toda a operacao.'
+                ? 'Uma pilha única para governar toda a operação.'
                 : 'One stack to govern the entire operation.'}
             </h2>
           </div>
@@ -202,14 +202,14 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
                   step: '01',
                   titlePt: 'Crie sua conta',
                   titleEn: 'Create your account',
-                  descPt: 'Cadastro gratuito em 30 segundos. Sem cartao de credito, sem compromisso.',
+                  descPt: 'Cadastro gratuito em 30 segundos. Sem cartao de crédito, sem compromisso.',
                   descEn: 'Free signup in 30 seconds. No credit card, no commitment.',
                 },
                 {
                   step: '02',
                   titlePt: 'Configure seu evento',
                   titleEn: 'Set up your event',
-                  descPt: 'Defina ingressos, equipe, areas de acesso e personalize a pagina publica do evento.',
+                  descPt: 'Defina ingressos, equipe, areas de acesso e personalize a página pública do evento.',
                   descEn: 'Define tickets, staff, access areas and customize the public event page.',
                 },
                 {
@@ -245,12 +245,12 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
               </div>
               <h2 className="mt-5 text-[clamp(2.2rem,4vw,3.6rem)] font-bold leading-[0.9] tracking-[-0.03em] text-white">
                 {isPortuguese
-                  ? 'Construido para produtores que nao aceitam gambiarra.'
+                  ? 'Construido para produtores que não aceitam gambiarra.'
                   : 'Built for producers who refuse workarounds.'}
               </h2>
               <p className="mt-5 text-sm leading-7 text-white/50">
                 {isPortuguese
-                  ? 'Cada funcionalidade foi pensada por quem ja operou evento de verdade. Sem friccao, sem planilha, sem improvisar.'
+                  ? 'Cada funcionalidade foi pensada por quem já operou evento de verdade. Sem friccao, sem planilha, sem improvisar.'
                   : 'Every feature was designed by people who have run real events. No friction, no spreadsheets, no improvising.'}
               </p>
             </div>
@@ -259,15 +259,15 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
               {(isPortuguese
                 ? [
                     'Zero custo para comecar, pague apenas quando vender',
-                    'Checkout com taxa de conversao superior a 94%',
+                    'Checkout com taxa de conversão superior a 94%',
                     'Check-in por QR Code em menos de 2 segundos',
-                    'Controle financeiro com conciliacao automatica',
-                    'Gestao completa de equipe com convites por link',
+                    'Controle financeiro com conciliacao automática',
+                    'Gestão completa de equipe com convites por link',
                     'Dashboard executivo em tempo real',
-                    'Pagina publica personalizada para cada evento',
+                    'Página pública personalizada para cada evento',
                     'Suporte operacional 24/7 durante o evento',
-                    'CRM com historico completo de participantes',
-                    'Relatorios exportaveis para contabilidade',
+                    'CRM com histórico completo de participantes',
+                    'Relatórios exportaveis para contabilidade',
                   ]
                 : [
                     'Zero cost to start, pay only when you sell',

@@ -19,7 +19,7 @@ export function EventsSearchInput({ value, onChange, isPending = false, tone = '
         'mb-3 text-[11px] uppercase tracking-[0.28em]',
         isDark ? 'text-white/50' : 'text-[#8e7f68]'
       )}>
-        {isPortuguese ? 'Buscar experiencias' : 'Search experiences'}
+        {isPortuguese ? 'Buscar experiências' : 'Search experiences'}
       </div>
       <div className="relative">
         <Search className={cn(

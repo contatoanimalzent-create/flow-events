@@ -50,8 +50,8 @@ const SECOES = [
     tituloEn: 'Configure tickets and batches',
     conteudo: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
-        <p>Crie múltiplos tipos de ingresso (ex: Pista, VIP, Camarote) com preços e capacidades independentes.</p>
-        <p>Para cada tipo, crie lotes com preços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida, você define o gatilho.</p>
+        <p>Crie múltiplos tipos de ingresso (ex: Pista, VIP, Camarote) com préços e capacidades independentes.</p>
+        <p>Para cada tipo, crie lotes com préços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida, você define o gatilho.</p>
         <p>Configure cupons de desconto (percentual ou valor fixo) e cortesias (ingressos gratuitos com código).</p>
         <p>Ingressos podem ser nominais (nome do comprador obrigatório) ou não-nominais. Você escolhe.</p>
       </div>
@@ -88,7 +88,7 @@ const SECOES = [
   {
     titulo: 'Operar o check-in',
     tituloEn: 'Operate check-in',
-    conteudo: (
+    conteúdo: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>Baixe o app Pulse (iOS ou Android) e faça login com as credenciais de operador.</p>
         <p>Escaneie o QR code do ingresso com a câmera do celular. O resultado é exibido em menos de 1 segundo.</p>
@@ -108,7 +108,7 @@ const SECOES = [
   {
     titulo: 'Relatórios e financeiro',
     tituloEn: 'Reports and financials',
-    conteudo: (
+    conteúdo: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>O dashboard mostra em tempo real: receita total, ticket médio, taxa de conversão, ingressos vendidos por lote e presença por hora.</p>
         <p>Exporte os dados em CSV para análise externa ou integração com planilhas.</p>
@@ -128,7 +128,7 @@ const SECOES = [
   {
     titulo: 'Configurar o supervisor',
     tituloEn: 'Configure supervisor view',
-    conteudo: (
+    conteúdo: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>O supervisor tem uma visão consolidada do evento em tempo real: health score, ocupação por zona, status da equipe e ocorrências abertas.</p>
         <p>O health score é calculado automaticamente com base em velocidade de check-in, taxa de ocupação, ocorrências ativas e status do staff.</p>
@@ -140,7 +140,7 @@ const SECOES = [
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>The supervisor has a consolidated real-time view: health score, occupancy by zone, team status and open incidents.</p>
         <p>The health score is calculated automatically based on check-in speed, occupancy rate, active incidents and staff status.</p>
-        <p>Configure the event zone map and assign operators to each area for granular access control.</p>
+        <p>Configure the event zone map and assign operators to each área for granular access control.</p>
         <p>Log incidents (security, technical issue, etc.) directly in the app. The supervisor receives an immediate alert and can approve actions remotely.</p>
       </div>
     ),
@@ -204,7 +204,7 @@ export function AjudaProdutoresPage({ onLogin }: { onLogin: () => void }) {
               </button>
               {aberto === i && (
                 <div className="px-6 pb-6 border-t border-white/8 pt-5">
-                  {isPortuguese ? secao.conteudo : secao.conteudoEn}
+                  {isPortuguese ? secao.conteúdo : secao.conteudoEn}
                 </div>
               )}
             </div>

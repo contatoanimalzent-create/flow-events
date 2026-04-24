@@ -31,11 +31,11 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsPt: [
       {
         title: 'Controle de acesso por setor',
-        desc: 'Gerencie pistas, camarotes e áreas VIP com check-in por QR code e validação offline.',
+        desc: 'Gerencie pistas, camarotes e áreas VIP com check-in por QR code e válidação offline.',
       },
       {
         title: 'Virada de lote automática',
-        desc: 'Configure lotes com preços progressivos. A virada acontece automaticamente por data ou quantidade vendida.',
+        desc: 'Configure lotes com préços progressivos. A virada acontece automaticamente por data ou quantidade vendida.',
       },
       {
         title: 'Dashboard ao vivo',
@@ -57,7 +57,7 @@ const categoryMap: Record<string, CategoryInfo> = {
       },
     ],
     stepsPt: [
-      { number: '01', title: 'Crie o evento e os lotes', desc: 'Configure nome, data, local, capacidade e preços em minutos.' },
+      { number: '01', title: 'Crie o evento e os lotes', desc: 'Configure nome, data, local, capacidade e préços em minutos.' },
       { number: '02', title: 'Divulgue sua página pública', desc: 'Link personalizado com galeria, mapa e botão de compra.' },
       { number: '03', title: 'Opere com o app Pulse', desc: 'Check-in por QR code, controle de filas e supervisão em tempo real.' },
     ],
@@ -77,11 +77,11 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsPt: [
       {
         title: 'Controle de acesso por setor',
-        desc: 'Gerencie pistas, camarotes e áreas VIP com check-in por QR code e validação offline.',
+        desc: 'Gerencie pistas, camarotes e áreas VIP com check-in por QR code e válidação offline.',
       },
       {
         title: 'Virada de lote automática',
-        desc: 'Configure lotes com preços progressivos. A virada acontece automaticamente por data ou quantidade vendida.',
+        desc: 'Configure lotes com préços progressivos. A virada acontece automaticamente por data ou quantidade vendida.',
       },
       {
         title: 'Dashboard ao vivo',
@@ -103,7 +103,7 @@ const categoryMap: Record<string, CategoryInfo> = {
       },
     ],
     stepsPt: [
-      { number: '01', title: 'Crie o evento e os lotes', desc: 'Configure nome, data, local, capacidade e preços em minutos.' },
+      { number: '01', title: 'Crie o evento e os lotes', desc: 'Configure nome, data, local, capacidade e préços em minutos.' },
       { number: '02', title: 'Divulgue sua página pública', desc: 'Link personalizado com galeria, mapa e botão de compra.' },
       { number: '03', title: 'Opere com o app Pulse', desc: 'Check-in por QR code, controle de filas e supervisão em tempo real.' },
     ],
@@ -426,8 +426,8 @@ const categoryMap: Record<string, CategoryInfo> = {
     ],
     stepsPt: [
       { number: '01', title: 'Crie o programa', desc: 'Adicione sessões, horários e elenco na página pública do evento.' },
-      { number: '02', title: 'Venda com segurança', desc: 'Controle de capacidade e validação individual de cada ingresso.' },
-      { number: '03', title: 'Receba e analise', desc: 'Dados de público e receita disponíveis em tempo real.' },
+      { number: '02', title: 'Venda com segurança', desc: 'Controle de capacidade e válidação individual de cada ingresso.' },
+      { number: '03', title: 'Receba e análise', desc: 'Dados de público e receita disponíveis em tempo real.' },
     ],
     stepsEn: [
       { number: '01', title: 'Build the programme', desc: 'Add sessions, schedules and cast to the event public page.' },
@@ -472,8 +472,8 @@ const categoryMap: Record<string, CategoryInfo> = {
     ],
     stepsPt: [
       { number: '01', title: 'Crie o programa', desc: 'Adicione sessões, horários e elenco na página pública do evento.' },
-      { number: '02', title: 'Venda com segurança', desc: 'Controle de capacidade e validação individual de cada ingresso.' },
-      { number: '03', title: 'Receba e analise', desc: 'Dados de público e receita disponíveis em tempo real.' },
+      { number: '02', title: 'Venda com segurança', desc: 'Controle de capacidade e válidação individual de cada ingresso.' },
+      { number: '03', title: 'Receba e análise', desc: 'Dados de público e receita disponíveis em tempo real.' },
     ],
     stepsEn: [
       { number: '01', title: 'Build the programme', desc: 'Add sessions, schedules and cast to the event public page.' },
@@ -491,7 +491,7 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsPt: [
       {
         title: 'Ingresso por faixa etária',
-        desc: 'Crie categorias separadas para bebês, crianças e acompanhantes com preços diferenciados.',
+        desc: 'Crie categorias separadas para bebês, crianças e acompanhantes com préços diferenciados.',
       },
       {
         title: 'Controle de acompanhantes',
@@ -537,7 +537,7 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsPt: [
       {
         title: 'Ingresso por faixa etária',
-        desc: 'Crie categorias separadas para bebês, crianças e acompanhantes com preços diferenciados.',
+        desc: 'Crie categorias separadas para bebês, crianças e acompanhantes com préços diferenciados.',
       },
       {
         title: 'Controle de acompanhantes',
@@ -705,7 +705,7 @@ const FALLBACK: CategoryInfo = {
   stepsPt: [
     { number: '01', title: 'Crie seu evento', desc: 'Configure em minutos e publique sua página de vendas.' },
     { number: '02', title: 'Venda ingressos', desc: 'Checkout otimizado para mobile com múltiplas formas de pagamento.' },
-    { number: '03', title: 'Opere e analise', desc: 'App de operação + dashboard de resultados em tempo real.' },
+    { number: '03', title: 'Opere e análise', desc: 'App de operação + dashboard de resultados em tempo real.' },
   ],
   stepsEn: [
     { number: '01', title: 'Create your event', desc: 'Set up in minutes and publish your sales page.' },

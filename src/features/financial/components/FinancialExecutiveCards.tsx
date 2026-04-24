@@ -18,7 +18,7 @@ export function FinancialExecutiveCards({ overview }: FinancialExecutiveCardsPro
     {
       label: 'Custos operacionais',
       value: formatCurrency(overview.operational_costs),
-      sublabel: overview.unallocated_costs > 0 ? `${formatCurrency(overview.unallocated_costs)} nao alocados` : 'Tudo alocado por evento',
+      sublabel: overview.unallocated_costs > 0 ? `${formatCurrency(overview.unallocated_costs)} não alocados` : 'Tudo alocado por evento',
       icon: Receipt,
       color: 'text-status-error',
     },

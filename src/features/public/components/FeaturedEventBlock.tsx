@@ -22,8 +22,8 @@ export function FeaturedEventBlock({ primaryEvent, secondaryEvents }: FeaturedEv
   if (!primaryEvent) {
     return (
       <EmptyState
-        title="Nenhuma experiencia pronta para destaque"
-        description="Assim que o calendario publico tiver eventos ativos, esta curadoria editorial aparecera aqui automaticamente."
+        title="Nenhuma experiência pronta para destaque"
+        description="Assim que o calendario público tiver eventos ativos, esta curadoria editorial aparecera aqui automaticamente."
         className="min-h-[20rem]"
       />
     )
@@ -37,7 +37,7 @@ export function FeaturedEventBlock({ primaryEvent, secondaryEvents }: FeaturedEv
             <div>
               <div className="text-[11px] uppercase tracking-[0.32em] text-[#4285F4]">Curadoria editorial</div>
               <h2 className="mt-4 font-display text-[clamp(2.7rem,4vw,4rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#f0ebe2]">
-                Um destaque principal para abrir a descoberta com presenca.
+                Um destaque principal para abrir a descoberta com presença.
               </h2>
             </div>
           </PublicReveal>
@@ -75,7 +75,7 @@ export function FeaturedEventBlock({ primaryEvent, secondaryEvents }: FeaturedEv
                     {primaryEvent.name}
                   </div>
                   <p className="mt-4 max-w-xl text-base leading-7 text-white/76">
-                    {primaryEvent.subtitle || primaryEvent.short_description || 'Landing rica, assets reais e uma narrativa pronta para conversao.'}
+                    {primaryEvent.subtitle || primaryEvent.short_description || 'Landing rica, assets reais e uma narrativa pronta para conversão.'}
                   </p>
                   <div className="mt-6 flex flex-wrap gap-5 text-sm text-white/76">
                     <span className="inline-flex items-center gap-2">
@@ -92,7 +92,7 @@ export function FeaturedEventBlock({ primaryEvent, secondaryEvents }: FeaturedEv
                     </span>
                   </div>
                   <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white">
-                    Ver experiencia
+                    Ver experiência
                     <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
                   </div>
                 </div>
@@ -131,7 +131,7 @@ export function FeaturedEventBlock({ primaryEvent, secondaryEvents }: FeaturedEv
                         {event.minPrice === null
                           ? 'Sob consulta'
                           : event.minPrice === 0
-                            ? 'Inscricao gratuita'
+                            ? 'Inscrição gratuita'
                             : formatCurrency(event.minPrice)}
                       </span>
                     </div>

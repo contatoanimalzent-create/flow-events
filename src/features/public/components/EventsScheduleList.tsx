@@ -34,7 +34,7 @@ export function EventsScheduleList({ events, title, subtitle }: EventsScheduleLi
                 {subtitle ? <p className="mt-4 text-base leading-8 text-text-secondary md:text-lg">{subtitle}</p> : null}
               </div>
               <div className="text-[11px] uppercase tracking-[0.28em] text-text-muted">
-                {sortedEvents.length} {isPortuguese ? 'experiencias disponiveis' : 'experiences available'}
+                {sortedEvents.length} {isPortuguese ? 'experiências disponíveis' : 'experiences available'}
               </div>
             </div>
           </PublicReveal>

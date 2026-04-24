@@ -110,7 +110,7 @@ https://res.cloudinary.com/{cloud}/image/upload/e_blur:300/{public_id}
 
 - ✅ Use upload presets **Unsigned** apenas para dados públicos
 - ✅ Nunca compartilhe API Secret
-- ✅ Configure regras de validação no upload preset
+- ✅ Configure regras de válidação no upload preset
 - ❌ Não armazene credenciais sensíveis no frontend
 
 ## Referências

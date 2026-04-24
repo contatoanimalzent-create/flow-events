@@ -52,7 +52,7 @@ async function getBatchInventory(batchId: string) {
     const row = result.data as TicketBatchInventoryRow | null
 
     if (!row) {
-      throw new OrdersServiceError('Lote de ingresso nao encontrado', 'ticket_batch_not_found')
+      throw new OrdersServiceError('Lote de ingresso não encontrado', 'ticket_batch_not_found')
     }
 
     return {
@@ -91,7 +91,7 @@ async function updateEventSoldTickets(eventId: string, delta: number) {
       }
     }
 
-    throw new OrdersServiceError('Nao foi possivel atualizar o total vendido do evento', 'event_sold_tickets_update_failed')
+    throw new OrdersServiceError('Não foi possível atualizar o total vendido do evento', 'event_sold_tickets_update_failed')
   }, { eventId, delta })
 }
 
@@ -106,7 +106,7 @@ async function reserveBatchInventoryFallback(batchId: string, quantity: number) 
       }
 
       if (available < quantity) {
-        throw new OrdersServiceError('Nao ha disponibilidade suficiente neste lote', 'ticket_batch_inventory_unavailable')
+        throw new OrdersServiceError('Não há disponibilidade suficiente neste lote', 'ticket_batch_inventory_unavailable')
       }
 
       const result = await supabase
@@ -158,7 +158,7 @@ async function captureBatchInventoryFallback(batchId: string, quantity: number) 
       const batch = await getBatchInventory(batchId)
 
       if (batch.reserved_count < quantity) {
-        throw new OrdersServiceError('A reserva do lote nao esta mais disponivel para confirmacao', 'ticket_batch_reservation_missing')
+        throw new OrdersServiceError('A reserva do lote não esta mais disponível para confirmação', 'ticket_batch_reservation_missing')
       }
 
       const result = await supabase
@@ -231,7 +231,7 @@ export async function createOrderDraftWithReservations(input: CreateOrderDraftIn
 
     if (!rpcResult.error) {
       // RPC now returns full order as JSONB (avoids anon RLS block on orders SELECT)
-      return toOrderRow(rpcResult.data as Record<string, unknown> | null, 'Nao foi possivel carregar o pedido criado')
+      return toOrderRow(rpcResult.data as Record<string, unknown> | null, 'Não foi possível carregar o pedido criado')
     }
 
     if (!isMissingRpc(rpcResult.error)) {
@@ -253,7 +253,7 @@ export async function createOrderDraftWithReservations(input: CreateOrderDraftIn
 
     assertOrdersResult(orderInsertResult)
 
-    const createdOrder = toOrderRow(orderInsertResult.data as Record<string, unknown> | null, 'Nao foi possivel criar o pedido')
+    const createdOrder = toOrderRow(orderInsertResult.data as Record<string, unknown> | null, 'Não foi possível criar o pedido')
 
     try {
       if (input.items.length > 0) {
@@ -287,7 +287,7 @@ export async function confirmOrderAndCaptureInventory(orderId: string, paymentMe
     })
 
     if (!rpcResult.error) {
-      return toOrderRow(rpcResult.data as Record<string, unknown> | null, 'Nao foi possivel confirmar o pedido')
+      return toOrderRow(rpcResult.data as Record<string, unknown> | null, 'Não foi possível confirmar o pedido')
     }
 
     if (!isMissingRpc(rpcResult.error)) {
@@ -297,14 +297,14 @@ export async function confirmOrderAndCaptureInventory(orderId: string, paymentMe
     const orderResult = await supabase.from('orders').select('*').eq('id', orderId).single()
     assertOrdersResult(orderResult)
 
-    const order = toOrderRow(orderResult.data as Record<string, unknown> | null, 'Pedido nao encontrado para confirmacao')
+    const order = toOrderRow(orderResult.data as Record<string, unknown> | null, 'Pedido não encontrado para confirmação')
 
     if (order.status === 'paid') {
       return order
     }
 
     if (order.status === 'cancelled' || order.status === 'expired') {
-      throw new OrdersServiceError('Este pedido nao pode mais ser confirmado', 'order_not_confirmable')
+      throw new OrdersServiceError('Este pedido não pode mais ser confirmado', 'order_not_confirmable')
     }
 
     const itemsResult = await supabase.from('order_items').select('batch_id,quantity').eq('order_id', orderId)
@@ -339,7 +339,7 @@ export async function confirmOrderAndCaptureInventory(orderId: string, paymentMe
 
     await updateEventSoldTickets(order.event_id, totalQuantity)
 
-    return toOrderRow(updateResult.data as Record<string, unknown> | null, 'Nao foi possivel atualizar o pedido confirmado')
+    return toOrderRow(updateResult.data as Record<string, unknown> | null, 'Não foi possível atualizar o pedido confirmado')
   }, { orderId, paymentMethod: paymentMethod ?? null })
 }
 
@@ -351,7 +351,7 @@ export async function releaseOrderInventory(orderId: string, targetStatus: Extra
     })
 
     if (!rpcResult.error) {
-      return toOrderRow(rpcResult.data as Record<string, unknown> | null, 'Nao foi possivel atualizar o pedido')
+      return toOrderRow(rpcResult.data as Record<string, unknown> | null, 'Não foi possível atualizar o pedido')
     }
 
     if (!isMissingRpc(rpcResult.error)) {
@@ -361,14 +361,14 @@ export async function releaseOrderInventory(orderId: string, targetStatus: Extra
     const orderResult = await supabase.from('orders').select('*').eq('id', orderId).single()
     assertOrdersResult(orderResult)
 
-    const order = toOrderRow(orderResult.data as Record<string, unknown> | null, 'Pedido nao encontrado')
+    const order = toOrderRow(orderResult.data as Record<string, unknown> | null, 'Pedido não encontrado')
 
     if (order.status === 'cancelled' || order.status === 'expired') {
       return order
     }
 
     if (order.status === 'paid') {
-      throw new OrdersServiceError('Pedidos pagos nao podem liberar reserva automaticamente', 'paid_order_release_not_allowed')
+      throw new OrdersServiceError('Pedidos pagos não podem liberar reserva automaticamente', 'paid_order_release_not_allowed')
     }
 
     const itemsResult = await supabase.from('order_items').select('batch_id,quantity').eq('order_id', orderId)
@@ -396,7 +396,7 @@ export async function releaseOrderInventory(orderId: string, targetStatus: Extra
       .single()
 
     assertOrdersResult(updateResult)
-    return toOrderRow(updateResult.data as Record<string, unknown> | null, 'Nao foi possivel atualizar o pedido')
+    return toOrderRow(updateResult.data as Record<string, unknown> | null, 'Não foi possível atualizar o pedido')
   }, { orderId, targetStatus })
 }
 

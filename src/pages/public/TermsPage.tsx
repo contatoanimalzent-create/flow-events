@@ -12,77 +12,77 @@ export function TermsPage() {
         {
           title: '1. Aceitacao dos termos',
           content: [
-            'Ao acessar e usar a plataforma Pulse, voce concorda com estes termos. Se nao concordar com alguma parte, nao utilize o servico.',
+            'Ao acessar e usar a plataforma Pulse, você concorda com estes termos. Se não concordar com alguma parte, não utilize o serviço.',
           ],
         },
         {
-          title: '2. Licenca de uso',
+          title: '2. Licença de uso',
           content: [
-            'Concedemos a voce uma licenca limitada, nao exclusiva e revogavel para acessar e usar a plataforma para fins pessoais ou comerciais legitimos.',
-            'Nao e permitido reproduzir, modificar ou usar a plataforma para atividades ilegais, acesso nao autorizado ou qualquer pratica abusiva.',
+            'Concedemos a você uma licença limitada, não exclusiva e revogável para acessar e usar a plataforma para fins pessoais ou comerciais legítimos.',
+            'Não é permitido reproduzir, modificar ou usar a plataforma para atividades ilegais, acesso não autorizado ou qualquer prática abusiva.',
           ],
         },
         {
-          title: '3. Contas de usuario',
+          title: '3. Contas de usuário',
           content: [
-            'Algumas funcionalidades exigem cadastro com informacoes precisas e atualizadas.',
-            'Voce e responsavel por manter suas credenciais seguras e por toda atividade realizada em sua conta.',
+            'Algumas funcionalidades exigem cadastro com informações precisas e atualizadas.',
+            'Você e responsável por manter suas credenciais seguras e por toda atividade realizada em sua conta.',
           ],
         },
         {
-          title: '4. Transacoes e pagamentos',
+          title: '4. Transações e pagamentos',
           content: [
             'A Pulse viabiliza compras de ingressos entre compradores e produtores, com processamento seguro de pagamentos.',
-            'Taxas e condicoes aplicaveis devem ser apresentadas com clareza antes da confirmacao da compra.',
+            'Taxas e condições aplicáveis devem ser apresentadas com clareza antes da confirmação da compra.',
           ],
         },
         {
           title: '5. Propriedade intelectual',
           content: [
             'Textos, imagens, marcas, layouts e demais elementos da plataforma pertencem a Pulse ou aos respectivos licenciadores.',
-            'Nao e permitido reproduzir ou distribuir esse conteudo sem autorizacao previa.',
+            'Não é permitido reproduzir ou distribuir esse conteúdo sem autorização prévia.',
           ],
         },
         {
           title: '6. Isencao de responsabilidade',
           content: [
-            'A plataforma e disponibilizada na forma em que se encontra, sem garantias absolutas de disponibilidade, seguranca ou ausencia de erros.',
+            'A plataforma é disponibilizada na forma em que se encontra, sem garantias absolutas de disponibilidade, segurança ou ausência de erros.',
           ],
         },
         {
           title: '7. Limitacao de responsabilidade',
           content: [
-            'Na extensao permitida por lei, a Pulse nao responde por danos indiretos, incidentais ou consequentes decorrentes do uso da plataforma.',
+            'Na extensao permitida por lei, a Pulse não responde por danos indiretos, incidentais ou consequentes decorrentes do uso da plataforma.',
           ],
         },
         {
-          title: '8. Conduta do usuario',
+          title: '8. Conduta do usuário',
           content: [
-            'Voce concorda em usar a plataforma apenas para fins legais e sem violar direitos de terceiros, regras de seguranca ou politicas internas.',
+            'Você concorda em usar a plataforma apenas para fins legais e sem violar direitos de terceiros, regras de segurança ou políticas internas.',
           ],
         },
         {
           title: '9. Privacidade',
           content: [
-            'O tratamento de dados pessoais segue nossa Politica de Privacidade, que deve ser lida em conjunto com estes termos.',
+            'O tratamento de dados pessoais segue nossa Política de Privacidade, que deve ser lida em conjunto com estes termos.',
           ],
         },
         {
-          title: '10. Alteracoes nos termos',
+          title: '10. Alterações nos termos',
           content: [
-            'Podemos atualizar estes termos periodicamente. O uso continuo da plataforma apos as mudancas representa aceitacao da versao vigente.',
+            'Podemos atualizar estes termos periodicamente. O uso continuo da plataforma após as mudancas representa aceitacao da versao vigente.',
           ],
         },
         {
-          title: '11. Lei aplicavel',
+          title: '11. Lei aplicável',
           content: [
-            'Estes termos sao regidos pela legislacao aplicavel ao servico e as disputas serao tratadas no foro competente, conforme permitido por lei.',
+            'Estes termos são regidos pela legislação aplicável ao serviço e as disputas serao tratadas no foro competente, conforme permitido por lei.',
           ],
         },
         {
           title: '12. Contato',
           content: [
-            'Para duvidas sobre estes termos, escreva para support@animalz.events ou acesse nossa pagina de contato.',
+            'Para dúvidas sobre estes termos, escreva para support@animalz.events ou acesse nossa página de contato.',
           ],
         },
       ]
@@ -168,7 +168,7 @@ export function TermsPage() {
   useSeoMeta({
     title: isPortuguese ? 'Termos de uso | Pulse' : 'Terms of use | Pulse',
     description: isPortuguese
-      ? 'Conheca os termos e condicoes de uso da plataforma Pulse.'
+      ? 'Conheca os termos e condições de uso da plataforma Pulse.'
       : 'Read the terms and conditions for using the Pulse platform.',
     url: typeof window !== 'undefined' ? window.location.href : '/terms',
   })
@@ -192,7 +192,7 @@ export function TermsPage() {
 
             <p className="mt-6 text-base leading-8 text-text-secondary md:text-lg">
               {isPortuguese
-                ? 'Ao usar a plataforma Pulse, voce concorda com os seguintes termos. Leia com atencao.'
+                ? 'Ao usar a plataforma Pulse, você concorda com os seguintes termos. Leia com atenção.'
                 : 'By using the Pulse platform, you agree to the following terms. Please read them carefully.'}
             </p>
           </PublicReveal>

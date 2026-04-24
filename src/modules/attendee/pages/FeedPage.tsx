@@ -166,7 +166,7 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
 
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
-      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
+      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-área-inset-top) + 20px)' }}>
         <button onClick={() => onNavigate('/pulse/attendee')} className="p-2 -ml-2">
           <ChevronLeft size={22} className="text-slate-300" />
         </button>
@@ -218,7 +218,7 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
       ) : posts.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-center px-6">
           <Rss size={36} className="text-slate-700 mb-3" />
-          <p className="text-slate-400 text-sm">Nenhuma publicação ainda</p>
+          <p className="text-slate-400 text-sm">Nenhuma públicação ainda</p>
           <p className="text-slate-600 text-xs mt-1">As novidades do evento aparecerão aqui</p>
         </div>
       ) : (

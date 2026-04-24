@@ -35,9 +35,9 @@ export function ReferralDashboard({ overview, isLoading = false }: ReferralDashb
       <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-[2.2rem] border border-[#e6dac9] bg-white/92 p-7 shadow-[0_18px_55px_rgba(66,48,24,0.06)]">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">{t('Referral links', 'Links de indicacao')}</div>
+            <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">{t('Referral links', 'Links de indicação')}</div>
             <h2 className="mt-3 font-display text-[2.6rem] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
-              {t('Shareable links ready to activate the next cycle.', 'Links compartilhaveis prontos para ativar o proximo ciclo.')}
+              {t('Shareable links ready to activate the next cycle.', 'Links compartilhaveis prontos para ativar o próximo ciclo.')}
             </h2>
           </div>
 
@@ -95,7 +95,7 @@ export function ReferralDashboard({ overview, isLoading = false }: ReferralDashb
             {isLoading ? (
               <div className="flex items-center gap-3 rounded-[1.6rem] border border-[#ece1d1] bg-[#fcfaf6] p-5 text-sm text-[#6b5d4d]">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                {t('Loading recent acquisition signals.', 'Carregando sinais recentes de aquisicao.')}
+                {t('Loading recent acquisition signals.', 'Carregando sinais recentes de aquisição.')}
               </div>
             ) : (
               overview.recentSignals.map((signal) => (

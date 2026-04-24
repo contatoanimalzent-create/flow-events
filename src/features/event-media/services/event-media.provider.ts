@@ -50,7 +50,7 @@ function buildCloudinaryThumbnailUrl(publicId: string, assetType: EventMediaAsse
 
 async function uploadToCloudinary(input: UploadProviderInput): Promise<UploadedProviderAsset> {
   if (!input.file || !hasSupabaseFunctionConfig()) {
-    throw new Error('Cloudinary upload indisponivel')
+    throw new Error('Cloudinary upload indisponível')
   }
 
   const formData = new FormData()
@@ -91,7 +91,7 @@ async function uploadToCloudinary(input: UploadProviderInput): Promise<UploadedP
     | null
 
   if (!response.ok) {
-    throw new Error(payload?.error ?? 'Nao foi possivel enviar o arquivo para o Cloudinary')
+    throw new Error(payload?.error ?? 'Não foi possível enviar o arquivo para o Cloudinary')
   }
 
   if (!payload?.secureUrl) {
@@ -124,7 +124,7 @@ async function uploadToSupabaseStorage(input: UploadProviderInput): Promise<Uplo
   const result = await supabase.storage.from(SUPABASE_BUCKET).upload(filePath, input.file, { upsert: true })
 
   if (result.error || !result.data) {
-    throw new Error(result.error?.message ?? 'Nao foi possivel enviar o arquivo para o storage')
+    throw new Error(result.error?.message ?? 'Não foi possível enviar o arquivo para o storage')
   }
 
   const { data } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(result.data.path)

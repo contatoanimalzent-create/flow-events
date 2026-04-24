@@ -136,21 +136,21 @@ export function InventoryPage() {
             Estoque<span className="admin-title-accent">.</span>
           </h1>
           <p className="admin-subtitle">
-            Estoque cuida de saldo, alerta e ruptura. Venda rapida continua no PDV para a equipe de caixa operar sem ruir a
+            Estoque cuida de saldo, alerta e ruptura. Venda rápida continua no PDV para a equipe de caixa operar sem ruir a
             leitura do estoque.
           </p>
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">
           <div className="card p-5">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Papel do modulo</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Papel do módulo</div>
             <div className="mt-4 font-display text-[2rem] leading-none text-text-primary">Disponibilidade real.</div>
             <p className="mt-4 text-sm leading-7 text-text-muted">
-              Leia o que precisa de reposicao, o que ja travou a operacao e quanto capital esta parado no estoque.
+              Leia o que precisa de reposicao, o que já travou a operação e quanto capital esta parado no estoque.
             </p>
           </div>
           <div className="card p-5">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Nao confundir</div>
+            <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Não confundir</div>
             <div className="mt-4 flex items-center gap-3 text-sm text-text-secondary">
               <Warehouse className="h-4 w-4 text-[#0057E7]" />
               Estoque controla.
@@ -188,7 +188,7 @@ export function InventoryPage() {
         {[
           { label: 'Itens em ruptura', value: metrics.critical, icon: ShieldAlert, tone: 'text-status-error' },
           { label: 'Reposicao urgente', value: metrics.warning, icon: AlertTriangle, tone: 'text-status-warning' },
-          { label: 'Unidades disponiveis', value: formatNumber(metrics.totalUnits), icon: Boxes, tone: 'text-text-primary' },
+          { label: 'Unidades disponíveis', value: formatNumber(metrics.totalUnits), icon: Boxes, tone: 'text-text-primary' },
           { label: 'Valor em estoque', value: formatCurrency(metrics.stockValue), icon: Package, tone: 'text-brand-acid' },
         ].map((item) => {
           const Icon = item.icon
@@ -249,7 +249,7 @@ export function InventoryPage() {
           <table className="w-full">
             <thead className="border-b border-bg-border">
               <tr>
-                {['Item', 'Categoria', 'Disponivel', 'Threshold', 'Status', 'Valor em saldo'].map((header) => (
+                {['Item', 'Categoria', 'Disponível', 'Threshold', 'Status', 'Valor em saldo'].map((header) => (
                   <th key={header} className="table-header">
                     {header}
                   </th>

@@ -117,7 +117,7 @@ const demoImages = {
 }
 
 const cityMatrix = [
-  { city: 'Sao Paulo', state: 'SP' },
+  { city: 'São Paulo', state: 'SP' },
   { city: 'Rio de Janeiro', state: 'RJ' },
   { city: 'Belo Horizonte', state: 'MG' },
   { city: 'Curitiba', state: 'PR' },
@@ -145,21 +145,21 @@ const lastNames = [
 
 const staffDepartments: Array<{ department: string; area: string; role: string; count: number; dailyRate: number; gateKey?: string }> = [
   { department: 'Coordenacao geral', area: 'War room', role: 'Coordenador operacional', count: 8, dailyRate: 780 },
-  { department: 'Producao', area: 'Backoffice', role: 'Produtor de pista', count: 26, dailyRate: 520 },
+  { department: 'Produção', area: 'Backoffice', role: 'Produtor de pista', count: 26, dailyRate: 520 },
   { department: 'Credenciamento', area: 'Front of house', role: 'Agente de credenciamento', count: 20, dailyRate: 280, gateKey: 'main' },
   { department: 'Bilheteria', area: 'Front of house', role: 'Operador de bilheteria', count: 16, dailyRate: 290, gateKey: 'main' },
-  { department: 'Check-in', area: 'Operacao de acesso', role: 'Scanner lead', count: 54, dailyRate: 260, gateKey: 'main' },
-  { department: 'Seguranca', area: 'Perimetro', role: 'Agente de seguranca', count: 58, dailyRate: 300, gateKey: 'vip' },
+  { department: 'Check-in', area: 'Operação de acesso', role: 'Scanner lead', count: 54, dailyRate: 260, gateKey: 'main' },
+  { department: 'Seguranca', area: 'Perimetro', role: 'Agente de segurança', count: 58, dailyRate: 300, gateKey: 'vip' },
   { department: 'Brigada', area: 'Safety', role: 'Brigadista', count: 12, dailyRate: 340 },
   { department: 'Limpeza', area: 'Venue care', role: 'Auxiliar de limpeza', count: 22, dailyRate: 210 },
   { department: 'Logistica', area: 'Doca', role: 'Assistente logistico', count: 14, dailyRate: 260, gateKey: 'service' },
-  { department: 'Runners', area: 'Operacao interna', role: 'Runner', count: 10, dailyRate: 220 },
+  { department: 'Runners', area: 'Operação interna', role: 'Runner', count: 10, dailyRate: 220 },
   { department: 'Bar', area: 'Bebidas', role: 'Bartender', count: 20, dailyRate: 250 },
   { department: 'Catering', area: 'Hospitality', role: 'Catering attendant', count: 12, dailyRate: 240 },
   { department: 'Backstage', area: 'Artist services', role: 'Backstage concierge', count: 8, dailyRate: 420, gateKey: 'backstage' },
   { department: 'Hospitality', area: 'VIP', role: 'Hospitality host', count: 8, dailyRate: 380, gateKey: 'hospitality' },
   { department: 'Caixa', area: 'PDV', role: 'Cashless operator', count: 6, dailyRate: 260 },
-  { department: 'Operacao tecnica', area: 'FOH tech', role: 'Tecnico de palco', count: 4, dailyRate: 580 },
+  { department: 'Operação técnica', area: 'FOH tech', role: 'Técnico de palco', count: 4, dailyRate: 580 },
   { department: 'Audiovisual', area: 'Show control', role: 'Operador de video', count: 6, dailyRate: 600 },
   { department: 'Suporte ao cliente', area: 'CX', role: 'Guest experience analyst', count: 8, dailyRate: 260 },
   { department: 'Ambulancia', area: 'Saude', role: 'Socorrista', count: 6, dailyRate: 420 },
@@ -169,9 +169,9 @@ const staffDepartments: Array<{ department: string; area: string; role: string; 
 const supplierSeeds = [
   ['Nebula Drinks', 'Bebidas', 184000, 'active', 'signed', 'Portfolio premium de destilados e mixers'],
   ['Maison Hospitality', 'Catering & Alimentacao', 226000, 'active', 'signed', 'Menu VIP e camarotes corporativos'],
-  ['Alpha Shield Security', 'Seguranca', 312000, 'active', 'signed', 'Operacao de perimetro e backstage'],
-  ['Pure Venue Services', 'Limpeza', 86000, 'active', 'signed', 'Turnos completos pre, live e pos-evento'],
-  ['Aurora Visual Works', 'Video & Projecao', 174000, 'contracted', 'signed', 'Painel de LED, IMAG e conteudo'],
+  ['Alpha Shield Security', 'Seguranca', 312000, 'active', 'signed', 'Operação de perimetro e backstage'],
+  ['Pure Venue Services', 'Limpeza', 86000, 'active', 'signed', 'Turnos completos pré, live e pós-evento'],
+  ['Aurora Visual Works', 'Video & Projecao', 174000, 'contracted', 'signed', 'Painel de LED, IMAG e conteúdo'],
   ['Kinetic Structures', 'Palco & Estrutura', 498000, 'active', 'signed', 'Estrutura principal e lounges'],
   ['Pulse Staffing', 'Staff terceirizado', 142000, 'contracted', 'sent', 'Reforco de credenciamento e runners'],
   ['Vital Rescue', 'Ambulancia', 49000, 'active', 'signed', 'UTI movel e time medico'],
@@ -201,13 +201,13 @@ const productCatalog = [
   ['Suco Verde Fresh', 'food', 19, 7.5, 150, 'Cold pressed hospitality'],
   ['Burger Angus Prime', 'food', 38, 15.2, 520, 'Burger assinatura do evento'],
   ['Hot Dog Gourmet Trufado', 'food', 32, 11.4, 360, 'Hot dog premium com crispy onions'],
-  ['Pizza Slice Pepperoni', 'food', 26, 8.2, 430, 'Slice rapido de pista'],
+  ['Pizza Slice Pepperoni', 'food', 26, 8.2, 430, 'Slice rápido de pista'],
   ['Wrap de Frango Caesar', 'food', 27, 9.4, 260, 'Opcao leve premium'],
   ['Salada Burrata Garden', 'food', 36, 14.1, 120, 'Camarote e backstage'],
   ['Pasta Pomodoro Artisan', 'food', 42, 16.9, 90, 'Hospitality lounge'],
   ['Churrasco Sandwich Fire', 'food', 34, 12.6, 210, 'Grill station'],
   ['Bowl Veggie Protein', 'food', 31, 10.8, 140, 'Opcao wellness'],
-  ['Brownie Double Chocolate', 'food', 16, 5.1, 320, 'Sobremesa de alta saida'],
+  ['Brownie Double Chocolate', 'food', 16, 5.1, 320, 'Sobremesa de alta saída'],
   ['Cafeteria Espresso', 'food', 11, 2.3, 420, 'Cafe premium'],
   ['Croissant Butter Bakery', 'food', 14, 4.7, 180, 'Breakfast hospitality'],
   ['Fruit Cup Seasonal', 'food', 18, 6.1, 160, 'Hospitality breakfast'],
@@ -224,7 +224,7 @@ const productCatalog = [
   ['Gin Bottle Tanqueray No.10', 'vip', 580, 332, 20, 'Bottle service VIP'],
   ['Whisky Bottle Black Label', 'vip', 620, 355, 24, 'Bottle service VIP'],
   ['Combo Friends 4 Drinks', 'bar', 148, 58, 120, 'Combo acelerador de fila'],
-  ['Combo Hospitality Wine Pairing', 'vip', 420, 214, 16, 'Experiencia harmonizada'],
+  ['Combo Hospitality Wine Pairing', 'vip', 420, 214, 16, 'Experiência harmonizada'],
   ['Mocktail Botanical Zero', 'bar', 28, 9.2, 140, 'Drink zero alcool'],
 ]
 
@@ -332,7 +332,7 @@ function buildTicketTypePlans() {
       key: 'vip-lounge',
       name: 'VIP Lounge',
       description: 'Lounge com open snacks, mixologia assinada e concierge dedicado.',
-      benefits: ['Lounge premium', 'Open snacks', 'Acesso lateral rapido'],
+      benefits: ['Lounge premium', 'Open snacks', 'Acesso lateral rápido'],
       sector: 'VIP Lounge',
       color: '#FFC857',
       soldTarget: 1100,
@@ -348,7 +348,7 @@ function buildTicketTypePlans() {
     {
       key: 'backstage',
       name: 'Backstage Experience',
-      description: 'Experiencia backstage com hostess dedicada e viewing deck.',
+      description: 'Experiência backstage com hostess dedicada e viewing deck.',
       benefits: ['Backstage access', 'Guest host', 'Viewing deck'],
       sector: 'Backstage',
       color: '#F76E6E',
@@ -480,8 +480,8 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
     ['vip', 'Entrada VIP', true, false, 'warning', 4, 420, 'Equipe premium com atendimento prioritario'],
     ['backstage', 'Entrada Backstage', true, false, 'active', 2, 120, 'Controle nominal e lista quente'],
     ['hospitality', 'Entrada Hospitality', true, false, 'active', 3, 220, 'Mesa corporativa e camarotes'],
-    ['exit', 'Saida Operacional', false, true, 'active', 4, 900, 'Fluxo de dispersao controlada'],
-    ['service', 'Servico / Staff', true, true, 'active', 3, 320, 'Acesso de doca, staff e fornecedores'],
+    ['exit', 'Saída Operacional', false, true, 'active', 4, 900, 'Fluxo de dispersao controlada'],
+    ['service', 'Serviço / Staff', true, true, 'active', 3, 320, 'Acesso de doca, staff e fornecedores'],
   ].map(([key, name, isEntrance, isExit, status, deviceCount, throughputTarget, description], index) => ({
     id: stableUuid(`gate-${key}`),
     organization_id: DEMO_ORGANIZATION_ID,
@@ -501,12 +501,12 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
 
   const eventSettings = {
     mood: 'editorial-night-festival',
-    city: 'Sao Paulo',
+    city: 'São Paulo',
     state: 'SP',
     video_url: demoImages.heroVideo,
     hero_video_url: demoImages.heroVideo,
     show_remaining_tickets: true,
-    highlight_badges: ['Festival urbano premium', '10.000 pessoas', 'Experiencia cashless + command center'],
+    highlight_badges: ['Festival urbano premium', '10.000 pessoas', 'Experiência cashless + command center'],
     public_visibility: 'public',
   }
 
@@ -515,11 +515,11 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
     organization_id: DEMO_ORGANIZATION_ID,
     name: 'Animalz Nocturne Sessions 2026',
     slug: DEMO_EVENT_SLUG,
-    subtitle: 'Uma experiencia urbana premium com musica, gastronomia, hospitalidade e operacao em escala.',
+    subtitle: 'Uma experiência urbana premium com musica, gastronomia, hospitalidade e operação em escala.',
     short_description:
-      'Um megaevento urbano de alta energia que combina show principal, arte imersiva, lounges premium, gastronomia curada e uma operacao enterprise pensada para milhares de convidados.',
+      'Um megaevento urbano de alta energia que combina show principal, arte imersiva, lounges premium, gastronomia curada e uma operação enterprise pensada para milhares de convidados.',
     full_description:
-      'Nocturne Sessions e o flagship demo da Animalz Grand Experiences: um festival de alto padrao desenhado para demonstrar vendas, hospitalidade, CRM, campanhas, command center, financeiro e intelligence funcionando de forma integrada em um unico sistema.',
+      'Nocturne Sessions e o flagship demo da Animalz Grand Experiences: um festival de alto padrão desenhado para demonstrar vendas, hospitalidade, CRM, campanhas, command center, financeiro e intelligence funcionando de forma integrada em um único sistema.',
     category: 'Festival premium',
     starts_at: isoFromNow(178, 19, 0),
     ends_at: isoFromNow(179, 6, 0),
@@ -528,7 +528,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
     venue_address: {
       street: 'Av. Olavo Fontoura, 1209',
       district: 'Santana',
-      city: 'Sao Paulo',
+      city: 'São Paulo',
       state: 'SP',
       zip_code: '02012-021',
       country: 'Brasil',
@@ -563,7 +563,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       height: 1200,
       duration: null,
       mime_type: 'image/jpeg',
-      alt_text: 'Vista premium do palco principal com publico e lasers',
+      alt_text: 'Vista premium do palco principal com público e lasers',
       caption: 'Capa principal da landing editorial do evento',
       sort_order: 0,
       is_active: true,
@@ -631,7 +631,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
         'Main stage com visual editorial de alto impacto',
         'Hospitality lounge e circulacao premium',
         'Crowd energy no pico do headline show',
-        'Area de experiencias e ativacoes da marca',
+        'Área de experiências e ativacoes da marca',
       ][index],
       sort_order: 3 + index,
       is_active: true,
@@ -652,8 +652,8 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       height: 1080,
       duration: 32,
       mime_type: 'video/mp4',
-      alt_text: 'Clip de atmosfera premium da experience area',
-      caption: 'Momento de atmosfera premium para a galeria publica',
+      alt_text: 'Clip de atmosfera premium da experience área',
+      caption: 'Momento de atmosfera premium para a galeria pública',
       sort_order: 8,
       is_active: true,
       created_by: attachProfileId,
@@ -887,7 +887,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       payment_method: pick(['pix', 'card_1x', 'card_3x'], failedIndex),
       source_channel: pick(['site', 'campaign', 'retargeting'], failedIndex),
       expires_at: failedStatus === 'pending' || failedStatus === 'expired' ? isoFromNow(-2 + (failedIndex % 3), 18, 0) : null,
-      notes: failedStatus === 'failed' ? 'Tentativa recusada pelo emissor' : 'Reserva demo sem conversao final',
+      notes: failedStatus === 'failed' ? 'Tentativa recusada pelo emissor' : 'Reserva demo sem conversão final',
       customer_id: buyer.id,
       metadata: { demo: true, abandoned: true },
       created_at: createdAt,
@@ -969,7 +969,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
         device_id: `scanner-exit-${(index % 4) + 1}`,
         reason_code: 'ticket_valid',
         was_offline: false,
-        notes: 'Saida temporaria liberada',
+        notes: 'Saída temporaria liberada',
         metadata: { demo: true, flow: 'exit' },
         result: 'success',
         checked_in_at: exitAt,
@@ -1033,9 +1033,9 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
     if (customer.tags.includes('high-spender')) {
       customer.notes = 'Cliente com alto potencial para hospitality e early access.'
     } else if (customer.tags.includes('no-show')) {
-      customer.notes = 'Historico pede campanha de reengajamento e incentivos.'
+      customer.notes = 'Histórico pede campanha de reengajamento e incentivos.'
     } else {
-      customer.notes = 'Perfil demo gerado para validacao comercial do produto.'
+      customer.notes = 'Perfil demo gerado para válidação comercial do produto.'
     }
   }
 
@@ -1234,7 +1234,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       id: stableUuid('cost-entry-marketing'),
       organization_id: DEMO_ORGANIZATION_ID,
       event_id: DEMO_EVENT_ID,
-      description: 'Midia performance, creators e OOH premium',
+      description: 'Mídia performance, creators e OOH premium',
       category: 'marketing',
       amount: 236400,
       due_date: isoFromNow(120, 13, 0),
@@ -1261,7 +1261,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       status: 'scheduled',
       scheduled_at: isoFromNow(185, 12, 0),
       paid_out_at: null,
-      notes: 'Repasse principal agendado apos fechamento de divergencias menores.',
+      notes: 'Repasse principal agendado após fechamento de divergencias menores.',
     },
   ]
 
@@ -1363,7 +1363,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       severity: 'info',
       status: 'active',
       title: 'Final release de Frontstage acelerando',
-      description: 'Conversao do ultimo lote 22% acima da semana anterior.',
+      description: 'Conversão do último lote 22% acima da semana anterior.',
       recommendation_summary: 'Disparar campanha de urgencia para capitais premium.',
       source_context: { batch_name: 'Last Call', sold_count: 270, available: 230 },
       first_detected_at: isoFromNow(170, 14, 0),
@@ -1379,7 +1379,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       category: 'operations',
       severity: 'warning',
       status: 'acknowledged',
-      title: 'Janela critica de staff na doca de servico',
+      title: 'Janela crítica de staff na doca de serviço',
       description: 'Escala com gap de 3 pessoas entre 17h30 e 18h15 para reposicao de bar.',
       recommendation_summary: 'Confirmar runners extra com Pulse Staffing.',
       source_context: { planned_staff: 12, confirmed_staff: 9 },
@@ -1410,7 +1410,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       recommendation_type: 'cost_control',
       priority: 'medium',
       title: 'Ajustar menu hospitality e porcionamento',
-      description: 'Reduzir itens de baixissima saida e reforcar tracking de desperdicio.',
+      description: 'Reduzir itens de baixissima saída e reforcar tracking de desperdicio.',
       action_payload: { supplier: 'Maison Hospitality', expected_saving: 18400 },
       status: 'in_review',
     },
@@ -1422,7 +1422,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       recommendation_type: 'launch_campaign',
       priority: 'medium',
       title: 'Disparar campanha de final lote',
-      description: 'Usar segmento de high spenders e capitais premium para puxar o ultimo lote.',
+      description: 'Usar segmento de high spenders e capitais premium para puxar o último lote.',
       action_payload: { draft_name: 'Final lote urgency' },
       status: 'executed',
     },
@@ -1457,7 +1457,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       status: 'acknowledged',
       acknowledged_at: isoFromNow(176, 12, 0),
       acknowledged_by: attachProfileId,
-      notes: 'Equipe de producao acionada para cobertura.',
+      notes: 'Equipe de produção acionada para cobertura.',
     },
   ]
 
@@ -1466,10 +1466,10 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
 
   const audienceSegments = [
     ['High Spenders', 'Clientes com maior potencial de receita', { min_total_revenue: 1800 }],
-    ['No-Show Recovery', 'Compraram mas nao compareceram', { bought_not_attended_event_id: DEMO_EVENT_ID }],
+    ['No-Show Recovery', 'Compraram mas não compareceram', { bought_not_attended_event_id: DEMO_EVENT_ID }],
     ['VIP Buyers', 'Compradores premium e hospitalidade', { min_average_ticket: 700 }],
-    ['Capitais Prioritarias', 'Base de Sao Paulo e Rio para urgency', { city: 'Sao Paulo' }],
-    ['Inactive Customers', 'Sem compra recente e com historico anterior', { inactive_days: 45, min_orders: 1 }],
+    ['Capitais Prioritarias', 'Base de São Paulo e Rio para urgency', { city: 'São Paulo' }],
+    ['Inactive Customers', 'Sem compra recente e com histórico anterior', { inactive_days: 45, min_orders: 1 }],
     ['Repeat Customers', 'Clientes com 3 ou mais pedidos', { min_orders: 3 }],
   ].map(([name, description, filterDefinition], index) => ({
     id: stableUuid(`audience-segment-${index}`),
@@ -1480,7 +1480,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
     audience_count: index === 0 ? customersRows.filter((row) => Number(row.total_spent) >= 1800).length
       : index === 1 ? customerEventProfiles.filter((row) => Number(row.no_show_count) > 0).length
         : index === 2 ? customerEventProfiles.filter((row) => Number(row.net_revenue) / Math.max(Number(row.tickets_count), 1) >= 700).length
-          : index === 3 ? customersRows.filter((row) => row.city === 'Sao Paulo').length
+          : index === 3 ? customersRows.filter((row) => row.city === 'São Paulo').length
             : index === 4 ? customersRows.filter((row) => row.total_orders >= 1).length
               : customersRows.filter((row) => Number(row.total_orders) >= 3).length,
     last_previewed_at: isoFromNow(-3 + index, 11, 0),
@@ -1488,9 +1488,9 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
   }))
 
   const campaignDrafts = [
-    ['Early Access VIP', 0, 'email', 'Abertura antecipada para o lounge premium', 'Liberamos uma janela privada para upgrade VIP antes do proximo drop.'],
-    ['Final lote urgency', 3, 'email', 'Ultimas unidades premium do lineup', 'O ultimo lote esta acelerando e a disponibilidade mudou nas ultimas horas.'],
-    ['Post-event reengagement', 5, 'email', 'Priority list para a proxima experience', 'Queremos te colocar no topo da lista da proxima flagship.'],
+    ['Early Access VIP', 0, 'email', 'Abertura antecipada para o lounge premium', 'Liberamos uma janela privada para upgrade VIP antes do próximo drop.'],
+    ['Final lote urgency', 3, 'email', 'Ultimas unidades premium do lineup', 'O último lote esta acelerando e a disponibilidade mudou nas ultimas horas.'],
+    ['Post-event reengagement', 5, 'email', 'Priority list para a próxima experience', 'Queremos te colocar no topo da lista da próxima flagship.'],
     ['No-show recovery', 1, 'email', 'Sua energia merece uma nova chance', 'Preparamos uma oferta de retorno para reduzir friccao e reativar sua jornada.'],
     ['Hospitality offer', 2, 'email', 'Hospitality tables para convidados chave', 'Abrimos novas mesas corporativas com concierge e bottle service.'],
   ].map(([name, segmentIndex, channel, subject, messageBody], index) => ({
@@ -1610,14 +1610,14 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
   }))
 
   const auditLogs = [
-    ['event.published', 'event', DEMO_EVENT_ID, 'Evento publicado para a area publica', 'critical'],
+    ['event.published', 'event', DEMO_EVENT_ID, 'Evento publicado para a área pública', 'critical'],
     ['tickets.release_opened', 'ticket', ticketTypes[1].id, 'Lote final de Frontstage habilitado', 'info'],
     ['order.paid', 'order', orders[12].id, 'Venda premium confirmada via PIX', 'info'],
     ['payment.refund', 'payment', payments.find((payment) => payment.status === 'refunded')?.id, 'Reembolso parcial processado no lote de Arena', 'warning'],
     ['staff.credentials_issued', 'staff', staffMembers[4].id, 'Credenciais emitidas para time de acessos', 'info'],
-    ['campaign.launched', 'campaign', campaignRuns[1].id, 'Campanha Final lote urgency colocada em execucao', 'info'],
-    ['financial.forecast_updated', 'financial', financialForecasts[0].id, 'Forecast ajustado apos revisao de catering', 'warning'],
-    ['event_media.updated', 'event_media_asset', eventAssets[1].id, 'Hero video atualizado para a landing publica', 'info'],
+    ['campaign.launched', 'campaign', campaignRuns[1].id, 'Campanha Final lote urgency colocada em execução', 'info'],
+    ['financial.forecast_updated', 'financial', financialForecasts[0].id, 'Forecast ajustado após revisao de catering', 'warning'],
+    ['event_media.updated', 'event_media_asset', eventAssets[1].id, 'Hero video atualizado para a landing pública', 'info'],
   ].map(([action, entityType, entityId, description, severity], index) => ({
     id: stableUuid(`audit-log-${index}`),
     organization_id: DEMO_ORGANIZATION_ID,
@@ -1633,10 +1633,10 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
         'Lote premium em destaque',
         'Venda high value registrada',
         'Reembolso monitorado',
-        'Operacao de acesso equipada',
+        'Operação de acesso equipada',
         'Campanha de urgencia disparada',
         'Forecast financeiro revisado',
-        'Midia hero sincronizada',
+        'Mídia hero sincronizada',
       ][index],
       description,
     },
@@ -1652,10 +1652,10 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
 
   const systemNotificationUserId = attachProfileId ?? stableUuid('demo-system-user')
   const internalNotifications = [
-    ['operational', 'critical', 'Gate VIP precisa de reforco', 'Fila prevista acima da meta nas proximas janelas.', '/checkin'],
-    ['financial', 'warning', 'Fechamento financeiro ainda nao concluido', 'Custos de catering pendentes de consolidacao.', '/financial'],
-    ['sales', 'info', 'Frontstage em aceleracao', 'Ultimo lote converteu acima do baseline nas ultimas 24h.', '/tickets'],
-    ['campaign', 'info', 'Campanha Final lote urgency em execucao', 'Open rate inicial acima da media da base.', '/communication'],
+    ['operational', 'critical', 'Gate VIP precisa de reforco', 'Fila prevista acima da meta nas próximas janelas.', '/checkin'],
+    ['financial', 'warning', 'Fechamento financeiro ainda não concluido', 'Custos de catering pendentes de consolidacao.', '/financial'],
+    ['sales', 'info', 'Frontstage em aceleracao', 'Último lote converteu acima do baseline nas ultimas 24h.', '/tickets'],
+    ['campaign', 'info', 'Campanha Final lote urgency em execução', 'Open rate inicial acima da media da base.', '/communication'],
     ['operational', 'warning', 'Pulse Staffing com gap de reposicao', 'Reforco adicional precisa ser confirmado para a doca.', '/staff'],
   ].map(([type, severity, title, body, actionUrl], index) => ({
     id: stableUuid(`internal-notification-${index}`),

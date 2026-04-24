@@ -17,7 +17,7 @@ export function DashboardPerformancePanel({ items }: DashboardPerformancePanelPr
     <div className="card p-5">
       <div className="mb-4 text-[10px] font-mono uppercase tracking-widest text-text-muted">Performance consolidada</div>
       {items.length === 0 ? (
-        <div className="text-sm text-text-muted">Nenhum indicador consolidado disponivel.</div>
+        <div className="text-sm text-text-muted">Nenhum indicador consolidado disponível.</div>
       ) : (
         <div className="space-y-3">
           {items.map((item) => (

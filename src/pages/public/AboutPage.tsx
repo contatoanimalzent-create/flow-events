@@ -33,7 +33,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
               </div>
               <h1 className="mt-6 font-display text-[clamp(4rem,7vw,7.2rem)] font-semibold leading-[0.86] tracking-[-0.05em] text-[#f0ebe2]">
                 {isPortuguese
-                  ? 'Eventos que valem a experiencia. Acesso simples e garantido.'
+                  ? 'Eventos que valem a experiência. Acesso simples e garantido.'
                   : 'Events worth the experience. Simple and guaranteed access.'}
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#9a9088] md:text-lg">
@@ -52,14 +52,14 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
                     icon: Layers3,
                     label: isPortuguese ? 'Para compradores' : 'For buyers',
                     text: isPortuguese
-                      ? 'Descubra eventos com criterio, compre ingressos em segundos e garanta seu lugar com QR code.'
+                      ? 'Descubra eventos com critério, compre ingressos em segundos e garanta seu lugar com QR code.'
                       : 'Discover events with curation, buy tickets in seconds and secure your place with a QR code.',
                   },
                   {
                     icon: Globe,
                     label: isPortuguese ? 'Para produtores' : 'For creators',
                     text: isPortuguese
-                      ? 'Publique seu evento, venda ingressos, gerencie credenciamento e acompanhe resultados em um unico lugar.'
+                      ? 'Publique seu evento, venda ingressos, gerencie credenciamento e acompanhe resultados em um único lugar.'
                       : 'Publish your event, sell tickets, manage check-in and track results in one place.',
                   },
                 ].map((item) => {
@@ -88,7 +88,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
         <div className="px-5 pb-16 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <LoadingState
-              title={isPortuguese ? 'Carregando informacoes' : 'Loading information'}
+              title={isPortuguese ? 'Carregando informações' : 'Loading information'}
               description={isPortuguese ? 'Buscando os dados mais recentes da plataforma.' : 'Loading the latest platform data.'}
               className="min-h-[18rem]"
             />
@@ -96,21 +96,21 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
         </div>
       ) : (
         <SocialProofSection
-          title={isPortuguese ? 'Numeros reais de quem ja escolheu a plataforma.' : 'Real numbers from people already using the platform.'}
-          description={isPortuguese ? 'Eventos publicados, ingressos vendidos e cidades alcancadas. Cada numero representa uma experiencia real vivida por pessoas reais.' : 'Published events, sold tickets and reached cities. Each number represents a real experience lived by real people.'}
+          title={isPortuguese ? 'Números reais de quem já escolheu a plataforma.' : 'Real numbers from people already using the platform.'}
+          description={isPortuguese ? 'Eventos publicados, ingressos vendidos e cidades alcancadas. Cada número representa uma experiência real vivida por pessoas reais.' : 'Published events, sold tickets and reached cities. Each number represents a real experience lived by real people.'}
           metrics={[
             {
               label: isPortuguese ? 'Eventos publicados' : 'Published events',
               value: events.length.toLocaleString(locale),
-              note: isPortuguese ? 'Eventos, festivais e experiencias disponiveis para compra na plataforma.' : 'Events, festivals and experiences available for purchase on the platform.',
+              note: isPortuguese ? 'Eventos, festivais e experiências disponíveis para compra na plataforma.' : 'Events, festivals and experiences available for purchase on the platform.',
             },
             {
               label: isPortuguese ? 'Ingressos vendidos' : 'Tickets sold',
               value: participants.toLocaleString(locale),
-              note: isPortuguese ? 'Compradores que garantiram seu lugar e viveram suas experiencias.' : 'Buyers who secured their place and lived their experiences.',
+              note: isPortuguese ? 'Compradores que garantiram seu lugar e viveram suas experiências.' : 'Buyers who secured their place and lived their experiences.',
             },
             {
-              label: isPortuguese ? 'Vagas disponiveis' : 'Available spots',
+              label: isPortuguese ? 'Vagas disponíveis' : 'Available spots',
               value: capacity.toLocaleString(locale),
               note: isPortuguese
                 ? `${cities.toLocaleString(locale)} cidades com eventos ativos na plataforma.`
@@ -127,7 +127,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
               <div>
                 <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">{isPortuguese ? 'Comece agora' : 'Start now'}</div>
                 <div className="mt-4 font-display text-[clamp(2.8rem,4.5vw,4.8rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-white">
-                  {isPortuguese ? 'Encontre seu proximo evento ou publique o seu.' : 'Find your next event or publish your own.'}
+                  {isPortuguese ? 'Encontre seu próximo evento ou publique o seu.' : 'Find your next event or publish your own.'}
                 </div>
                 <p className="mt-5 max-w-2xl text-base leading-8 text-white/72">
                   {isPortuguese

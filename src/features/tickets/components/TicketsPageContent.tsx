@@ -192,7 +192,7 @@ export function TicketsPageContent() {
         open={Boolean(pendingDeleteTicket)}
         title={t('Remove ticket type', 'Remover tipo de ingresso')}
         description={pendingDeleteTicket ? t(`The type "${pendingDeleteTicket.name}" and all linked releases will be removed.`, `O tipo "${pendingDeleteTicket.name}" e todos os lotes vinculados serao removidos.`) : undefined}
-        impact={t('This deletion changes the commercial structure of the ticket and removes its setup from the administrative catalog.', 'A exclusao afeta a arquitetura comercial desse ingresso e remove sua configuracao do catalogo administrativo.')}
+        impact={t('This deletion changes the commercial structure of the ticket and removes its setup from the administrative catalog.', 'A exclusao afeta a arquitetura comercial desse ingresso e remove sua configuração do catálogo administrativo.')}
         confirmLabel={t('Delete type and releases', 'Excluir tipo e lotes')}
         onCancel={() => setPendingDeleteTicket(null)}
         onConfirm={async () => {
@@ -209,7 +209,7 @@ export function TicketsPageContent() {
         open={Boolean(pendingDeleteBatch)}
         title={t('Remove release', 'Remover lote')}
         description={pendingDeleteBatch ? t(`The release "${pendingDeleteBatch.name}" will be removed from the sales structure.`, `O lote "${pendingDeleteBatch.name}" sera retirado da estrutura de vendas.`) : undefined}
-        impact={t('Use this action only when the release should no longer exist in the commercial planning of the ticket.', 'Use esta acao apenas quando o lote nao deve mais existir no planejamento comercial do ingresso.')}
+        impact={t('Use this action only when the release should no longer exist in the commercial planning of the ticket.', 'Use esta ação apenas quando o lote não deve mais existir no planejamento comercial do ingresso.')}
         confirmLabel={t('Delete release', 'Excluir lote')}
         onCancel={() => setPendingDeleteBatch(null)}
         onConfirm={async () => {

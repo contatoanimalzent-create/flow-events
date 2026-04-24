@@ -95,12 +95,12 @@ export function useEventAssetActions({ eventId, organizationId }: UseEventAssetA
       thumbnailUrl: updates.thumbnailUrl,
     })
 
-    await recordAudit('update', 'Asset de evento atualizado', `${asset.asset_type} ajustado na biblioteca de midia.`)
+    await recordAudit('update', 'Asset de evento atualizado', `${asset.asset_type} ajustado na biblioteca de mídia.`)
   }
 
   async function deleteAsset(asset: EventMediaAsset) {
     await deleteMutation.mutateAsync(asset.id)
-    await recordAudit('delete', 'Asset de evento removido', `${asset.asset_type} removido da biblioteca de midia.`)
+    await recordAudit('delete', 'Asset de evento removido', `${asset.asset_type} removido da biblioteca de mídia.`)
   }
 
   async function reorderAssets(orderedIds: string[]) {
@@ -109,7 +109,7 @@ export function useEventAssetActions({ eventId, organizationId }: UseEventAssetA
     }
 
     await reorderMutation.mutateAsync({ eventId, orderedIds })
-    await recordAudit('update', 'Ordem dos assets atualizada', `Biblioteca de midia reorganizada com ${orderedIds.length} itens.`)
+    await recordAudit('update', 'Ordem dos assets atualizada', `Biblioteca de mídia reorganizada com ${orderedIds.length} itens.`)
   }
 
   async function setCoverAsset(asset: EventMediaAsset) {

@@ -271,7 +271,7 @@ export function ActionConfirmationDialog({
     <ModalShell size="md" className="z-[130]">
       <ModalHeader eyebrow={t('Confirmation', 'Confirmacao')} title={title} subtitle={description} onClose={onCancel} />
       <ModalBody>
-        <ConfirmActionBox tone={tone} title={t('Impact of this action', 'Impacto desta acao')} description={impact} />
+        <ConfirmActionBox tone={tone} title={t('Impact of this action', 'Impacto desta ação')} description={impact} />
       </ModalBody>
       <ModalFooter>
         <button onClick={onCancel} className="btn-secondary text-sm">

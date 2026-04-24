@@ -1,4 +1,4 @@
 # CORE
 
-Camada compartilhada de configuracao, contratos e utilitarios tecnicos.
+Camada compartilhada de configuração, contratos e utilitarios técnicos.
 Serve como base estavel para a migracao gradual da arquitetura V2.

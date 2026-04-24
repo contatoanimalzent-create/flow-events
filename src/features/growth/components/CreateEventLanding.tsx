@@ -18,7 +18,7 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
   useSeoMeta({
     title: isPortuguese ? 'Criar evento | Pulse' : 'Create event | Pulse',
     description: isPortuguese
-      ? 'Publique seu evento, venda ingressos e gerencie tudo em um lugar so. Pagamento, credenciamento, financeiro e dados do seu publico.'
+      ? 'Publique seu evento, venda ingressos e gerencie tudo em um lugar so. Pagamento, credenciamento, financeiro e dados do seu público.'
       : 'Publish your event, sell tickets and manage everything in one place. Checkout, check-in, finance and audience data together.',
     image: events[0]?.mediaPresentation.coverAsset?.secure_url ?? events[0]?.cover_url ?? null,
     url: typeof window !== 'undefined' ? window.location.href : '/create-event',
@@ -41,7 +41,7 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#9a9088] md:text-lg">
                 {isPortuguese
-                  ? 'Da pagina do evento ao credenciamento no dia, passando pela venda de ingressos e pelo controle financeiro. Tudo na mesma plataforma, simples de configurar e facil de acompanhar.'
+                  ? 'Da página do evento ao credenciamento no dia, passando pela venda de ingressos e pelo controle financeiro. Tudo na mesma plataforma, simples de configurar e facil de acompanhar.'
                   : 'From the event page to day-of check-in, including ticket sales and financial control. Everything lives on the same platform, simple to configure and easy to follow.'}
               </p>
 
@@ -65,20 +65,20 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
 
           <PublicReveal>
             <div className="rounded-[2.6rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-7 shadow-[0_22px_65px_rgba(0,0,0,0.5)] md:p-9">
-              <div className="text-[11px] uppercase tracking-[0.28em] text-[#6a6058]">{isPortuguese ? 'O que voce ganha' : 'What you get'}</div>
+              <div className="text-[11px] uppercase tracking-[0.28em] text-[#6a6058]">{isPortuguese ? 'O que você ganha' : 'What you get'}</div>
               <div className="mt-4 font-display text-[3rem] font-semibold leading-[0.92] tracking-[-0.05em] text-[#f0ebe2]">
-                {isPortuguese ? 'Venda mais, trabalhe menos e entenda seu publico.' : 'Sell more, work less and understand your audience.'}
+                {isPortuguese ? 'Venda mais, trabalhe menos e entenda seu público.' : 'Sell more, work less and understand your audience.'}
               </div>
               <div className="mt-8 space-y-4">
                 {[
                   isPortuguese
-                    ? 'Pagina do evento com visual profissional, ingressos configurados e compra em segundos.'
+                    ? 'Página do evento com visual profissional, ingressos configurados e compra em segundos.'
                     : 'An event page with a professional look, configured tickets and purchase in seconds.',
                   isPortuguese
                     ? 'Controle de vendas, receita e credenciamento em tempo real, sem planilhas nem ferramentas separadas.'
                     : 'Sales, revenue and check-in control in real time, without spreadsheets or disconnected tools.',
                   isPortuguese
-                    ? 'Dados do seu publico para planejar melhor o proximo evento e fidelizar quem ja veio.'
+                    ? 'Dados do seu público para planejar melhor o próximo evento e fidelizar quem já veio.'
                     : 'Audience data to plan your next event better and retain people who have already attended.',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-3 rounded-[1.5rem] border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] p-4">
@@ -108,13 +108,13 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
       </section>
 
       <SocialProofBlock
-        title={isPortuguese ? 'Produtores que ja escolheram a plataforma estao vendendo.' : 'Creators already using the platform are selling.'}
-        description={isPortuguese ? 'Eventos publicados, ingressos vendidos, publico fidelizado. Resultados reais de quem ja usa.' : 'Published events, sold tickets and loyal audiences. Real results from teams already using it.'}
+        title={isPortuguese ? 'Produtores que já escolheram a plataforma estao vendendo.' : 'Creators already using the platform are selling.'}
+        description={isPortuguese ? 'Eventos publicados, ingressos vendidos, público fidelizado. Resultados reais de quem já usa.' : 'Published events, sold tickets and loyal audiences. Real results from teams already using it.'}
         items={[
           {
             label: isPortuguese ? 'Eventos publicados' : 'Published events',
             value: events.length.toLocaleString(locale),
-            note: isPortuguese ? 'Eventos ativos com pagina, ingressos e compra habilitados na plataforma.' : 'Active events with page, tickets and purchase enabled on the platform.',
+            note: isPortuguese ? 'Eventos ativos com página, ingressos e compra habilitados na plataforma.' : 'Active events with page, tickets and purchase enabled on the platform.',
           },
           {
             label: isPortuguese ? 'Ingressos vendidos' : 'Tickets sold',
@@ -135,11 +135,11 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
             <div>
               <div className="text-[11px] uppercase tracking-[0.3em] text-white/54">{isPortuguese ? 'Pronto para comecar?' : 'Ready to start?'}</div>
               <div className="mt-4 font-display text-[clamp(2.8rem,4.5vw,4.6rem)] font-semibold leading-[0.9] tracking-[-0.05em] text-white">
-                {isPortuguese ? 'Publique seu proximo evento em minutos.' : 'Publish your next event in minutes.'}
+                {isPortuguese ? 'Publique seu próximo evento em minutos.' : 'Publish your next event in minutes.'}
               </div>
               <p className="mt-5 max-w-2xl text-base leading-8 text-white/72">
                 {isPortuguese
-                  ? 'Crie sua conta, configure os ingressos, publique a pagina e comece a vender. Sem burocracia, sem integracao complicada.'
+                  ? 'Crie sua conta, configure os ingressos, publique a página e comece a vender. Sem burocracia, sem integração complicada.'
                   : 'Create your account, configure tickets, publish the page and start selling. No bureaucracy, no complicated integrations.'}
               </p>
             </div>

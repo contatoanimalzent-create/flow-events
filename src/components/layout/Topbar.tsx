@@ -135,7 +135,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
             <button
               onClick={onMenuToggle}
               className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#0A0A0A] transition-all hover:border-[#D1D5DB] hover:bg-[#F7F8FA] lg:hidden"
-              title={t('Open navigation', 'Abrir navegacao')}
+              title={t('Open navigation', 'Abrir navegação')}
             >
               <Menu className="h-4 w-4" />
             </button>
@@ -168,7 +168,7 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
             </div>
             <div className="px-5 py-10 text-center text-sm text-[#9CA3AF]">
               {searchQuery
-                ? t('Search captured for future integration.', 'Busca registrada para integracao futura.')
+                ? t('Search captured for future integration.', 'Busca registrada para integração futura.')
                 : t('Type to search', 'Digite para buscar')}
             </div>
           </div>

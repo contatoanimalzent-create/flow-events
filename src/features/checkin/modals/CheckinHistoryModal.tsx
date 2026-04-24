@@ -18,7 +18,7 @@ export function CheckinHistoryModal({ digitalTicketId, onClose }: CheckinHistory
         eyebrow="Auditoria"
         title={
           <>
-            Historico de acesso<span className="admin-title-accent">.</span>
+            Histórico de acesso<span className="admin-title-accent">.</span>
           </>
         }
         subtitle="Linha do tempo operacional do ingresso, com tentativas, saidas e motivos."

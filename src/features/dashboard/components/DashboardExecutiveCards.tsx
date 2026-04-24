@@ -30,7 +30,7 @@ export function DashboardExecutiveCards({ summary }: DashboardExecutiveCardsProp
             </div>
             <div className={cn('metric-value text-[2rem]', card.color)}>{card.value}</div>
             <div className="mt-4 flex items-center justify-between text-[11px] text-text-muted">
-              <span>Visao consolidada</span>
+              <span>Visão consolidada</span>
               <span className="font-mono uppercase tracking-[0.24em]">Live</span>
             </div>
           </div>

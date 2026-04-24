@@ -36,13 +36,13 @@ function formatNumber(value: number, locale?: AppLocale) {
 function formatSourceLabel(source: string | null | undefined, locale?: AppLocale) {
   switch (source) {
     case 'public_referral':
-      return translate(locale, 'shared referral link', 'link compartilhado de indicacao')
+      return translate(locale, 'shared referral link', 'link compartilhado de indicação')
     case 'public_checkout':
-      return translate(locale, 'public checkout', 'compra publica')
+      return translate(locale, 'public checkout', 'compra pública')
     case 'free_checkout':
       return translate(locale, 'free checkout', 'compra gratuita')
     case 'public_event_page':
-      return translate(locale, 'public event page', 'pagina publica do evento')
+      return translate(locale, 'public event page', 'página pública do evento')
     default:
       return source ?? translate(locale, 'product flow', 'fluxo do produto')
   }
@@ -179,7 +179,7 @@ function formatBenefitLabel(link: ReferralLinkRecord, locale?: AppLocale) {
   }
 
   if (link.benefit_type === 'future_credit') {
-    return translate(locale, `${formatCurrency(link.benefit_value, locale)} in future credit`, `${formatCurrency(link.benefit_value, locale)} em credito futuro`)
+    return translate(locale, `${formatCurrency(link.benefit_value, locale)} in future credit`, `${formatCurrency(link.benefit_value, locale)} em crédito futuro`)
   }
 
   return translate(locale, 'Future VIP benefit', 'Beneficio VIP futuro')
@@ -229,7 +229,7 @@ export const growthService = {
             benefit_description: translate(
               params.locale,
               'Automatic benefit for the next purchase cycle.',
-              'Beneficio automatico para o proximo ciclo de compra.',
+              'Beneficio automático para o próximo ciclo de compra.',
             ),
             metadata: {
               event_slug: params.eventSlug,
@@ -278,7 +278,7 @@ export const growthService = {
         await createInternalRemarketingSignal({
           organizationId: input.organizationId,
           eventId: input.eventId ?? '',
-          title: translate(input.locale, 'New lead captured in the public layer', 'Novo contato capturado na camada publica'),
+          title: translate(input.locale, 'New lead captured in the public layer', 'Novo contato capturado na camada pública'),
           body: translate(
             input.locale,
             `${input.email.trim().toLowerCase()} entered the organic flow through ${formatSourceLabel(input.source, input.locale)}.`,
@@ -362,7 +362,7 @@ export const growthService = {
       await createInternalRemarketingSignal({
         organizationId: input.organizationId,
         eventId: input.eventId,
-        title: translate(input.locale, 'New conversion via referral', 'Nova conversao por indicacao'),
+        title: translate(input.locale, 'New conversion via referral', 'Nova conversão por indicação'),
         body: translate(
           input.locale,
           `${input.buyerEmail ?? 'A buyer'} converted through a shareable event link.`,
@@ -423,19 +423,19 @@ export const growthService = {
           note: translate(locale, 'Paid orders sustaining the organic layer and repurchase cycle.', 'Pedidos pagos que sustentam a camada organica e o ciclo de recompra.'),
         },
         {
-          label: translate(locale, 'Referral revenue', 'Receita por indicacao'),
+          label: translate(locale, 'Referral revenue', 'Receita por indicação'),
           value: formatCurrency(referralRevenue, locale),
           note: translate(locale, 'Conversions attributed to shareable links and active viral loops.', 'Conversoes atribuidas a links compartilhaveis e ciclos virais ativos.'),
         },
         {
           label: translate(locale, 'Captured leads', 'Contatos capturados'),
           value: formatNumber(leads.length, locale),
-          note: translate(locale, 'Demand preserved through exit capture and invitations from the public layer.', 'Demandas salvas pela captura de saida e convites da camada publica.'),
+          note: translate(locale, 'Demand preserved through exit capture and invitations from the public layer.', 'Demandas salvas pela captura de saída e convites da camada pública.'),
         },
         {
-          label: translate(locale, 'Live experiences', 'Experiencias em movimento'),
+          label: translate(locale, 'Live experiences', 'Experiências em movimento'),
           value: formatNumber(activeEvents, locale),
-          note: translate(locale, `${formatNumber(soldTickets, locale)} attendees have already gone through events in this operation.`, `${formatNumber(soldTickets, locale)} participantes ja passaram por eventos desta operacao.`),
+          note: translate(locale, `${formatNumber(soldTickets, locale)} attendees have already gone through events in this operation.`, `${formatNumber(soldTickets, locale)} participantes já passaram por eventos desta operação.`),
         },
       ]
 
@@ -452,7 +452,7 @@ export const growthService = {
       const recentSignals = [
         ...conversions.map((conversion) => ({
           id: `conversion-${conversion.id}`,
-          title: translate(locale, 'Referral conversion', 'Conversao por indicacao'),
+          title: translate(locale, 'Referral conversion', 'Conversão por indicação'),
           description: translate(
             locale,
             `${conversion.buyer_email ?? 'New buyer'} converted ${formatCurrency(conversion.gross_amount, locale)} in ${eventNameById.get(conversion.event_id) ?? 'the main event'}.`,
@@ -467,7 +467,7 @@ export const growthService = {
           description: translate(
             locale,
             `${String(lead.email ?? 'Lead')} came in through ${formatSourceLabel(String(lead.source ?? 'public_capture'), locale)} and can already move into campaigns.`,
-            `${String(lead.email ?? 'Contato')} entrou por ${formatSourceLabel(String(lead.source ?? 'captura_publica'), locale)} e ja pode seguir para campanhas.`,
+            `${String(lead.email ?? 'Contato')} entrou por ${formatSourceLabel(String(lead.source ?? 'captura_publica'), locale)} e já pode seguir para campanhas.`,
           ),
           timestamp: String(lead.created_at ?? new Date().toISOString()),
           tone: 'neutral' as const,

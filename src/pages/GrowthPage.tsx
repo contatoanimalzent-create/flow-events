@@ -17,14 +17,14 @@ export function GrowthPage() {
           title={t('Growth loops', 'Ciclos de crescimento')}
           description={t(
             'Connect referrals, sharing, social proof and remarketing from the authenticated organization.',
-            'Conecte indicacoes, compartilhamento, prova social e reativacao a partir da organizacao autenticada.',
+            'Conecte indicacoes, compartilhamento, prova social e reativacao a partir da organização autenticada.',
           )}
         />
         <ErrorState
-          title={t('Organization not found', 'Organizacao nao encontrada')}
+          title={t('Organization not found', 'Organização não encontrada')}
           description={t(
             'Sign in with a profile linked to an organization to open the growth cockpit.',
-            'Entre com um perfil vinculado a uma organizacao para abrir o painel de crescimento.',
+            'Entre com um perfil vinculado a uma organização para abrir o painel de crescimento.',
           )}
           className="mt-8"
         />
@@ -40,14 +40,14 @@ export function GrowthPage() {
           title={t('Growth loops', 'Ciclos de crescimento')}
           description={t(
             'We are consolidating referrals, organic signals, sharing and social proof into a single layer.',
-            'Estamos consolidando indicacoes, sinais organicos, compartilhamento e prova social em uma unica camada.',
+            'Estamos consolidando indicacoes, sinais organicos, compartilhamento e prova social em uma única camada.',
           )}
         />
         <LoadingState
-          title={t('Building the acquisition cockpit', 'Montando o painel de aquisicao')}
+          title={t('Building the acquisition cockpit', 'Montando o painel de aquisição')}
           description={t(
             'Bringing in links, leads, conversions and recent signals for the new visual foundation.',
-            'Trazendo links, contatos, conversoes e sinais recentes para a nova fundacao visual.',
+            'Trazendo links, contatos, conversoes e sinais recentes para a nova fundação visual.',
           )}
           className="mt-8"
         />
@@ -67,7 +67,7 @@ export function GrowthPage() {
           )}
         />
         <ErrorState
-          title={t('Unable to load growth', 'Nao foi possivel carregar crescimento')}
+          title={t('Unable to load growth', 'Não foi possível carregar crescimento')}
           description={t(
             'Review the growth migration or try again in a moment to recover the cockpit.',
             'Revise a migracao de crescimento ou tente novamente em instantes para recuperar o painel.',
@@ -82,10 +82,10 @@ export function GrowthPage() {
     <div className="admin-page">
       <PageHeader
         eyebrow={t('Growth', 'Crescimento')}
-        title={t('Acquisition, referral and retention in one flow.', 'Aquisicao, indicacao e retencao em um unico fluxo.')}
+        title={t('Acquisition, referral and retention in one flow.', 'Aquisição, indicação e retenção em um único fluxo.')}
         description={t(
           'This page now surfaces referrals, leads captured by the public layer, internal remarketing signals and the real conversion trail coming from checkout.',
-          'Esta pagina agora mostra indicacoes, contatos capturados pela camada publica, sinais internos de reativacao e a trilha real de conversao vinda da compra.',
+          'Esta página agora mostra indicacoes, contatos capturados pela camada pública, sinais internos de reativacao e a trilha real de conversão vinda da compra.',
         )}
         actions={
           <div className="flex flex-wrap items-center gap-3">
@@ -93,14 +93,14 @@ export function GrowthPage() {
               href="/create-event"
               className="inline-flex items-center gap-2 rounded-full border border-[#d4c6b3] bg-white/92 px-4 py-2 text-sm font-medium text-[#1f1a15] transition-all hover:-translate-y-0.5"
             >
-              {t('View creator landing', 'Ver pagina para criadores')}
+              {t('View creator landing', 'Ver página para criadores')}
               <ArrowUpRight className="h-4 w-4" />
             </a>
             <a
               href="/events"
               className="inline-flex items-center gap-2 rounded-full bg-[#1f1a15] px-4 py-2 text-sm font-medium text-[#f7f2e8] transition-all hover:-translate-y-0.5"
             >
-              {t('Open public layer', 'Abrir camada publica')}
+              {t('Open public layer', 'Abrir camada pública')}
               <Zap className="h-4 w-4" />
             </a>
           </div>
@@ -113,13 +113,13 @@ export function GrowthPage() {
           <div className="novare-stage-title">
             {t(
               'Viral loops that begin in media, pass through checkout and return to CRM and campaigns.',
-              'Ciclos virais que comecam na midia, passam pela compra e retornam para relacionamento e campanhas.',
+              'Ciclos virais que comecam na mídia, passam pela compra e retornam para relacionamento e campanhas.',
             )}
           </div>
           <p className="novare-stage-copy">
             {t(
               'Every share can become an attributed link, every exit can capture a lead, and every conversion can feed internal notifications and future automations.',
-              'Cada compartilhamento pode virar um link atribuido, cada saida pode capturar um contato e cada conversao pode alimentar notificacoes internas e automacoes futuras.',
+              'Cada compartilhamento pode virar um link atribuido, cada saída pode capturar um contato e cada conversão pode alimentar notificacoes internas e automações futuras.',
             )}
           </p>
         </div>
@@ -132,13 +132,13 @@ export function GrowthPage() {
           <div className="novare-stage-title">
             {t(
               'Sharing, referrals and remarketing now appear as product features, not as a parallel layer.',
-              'Compartilhamento, indicacoes e reativacao agora aparecem como recursos de produto, nao como camada paralela.',
+              'Compartilhamento, indicacoes e reativacao agora aparecem como recursos de produto, não como camada paralela.',
             )}
           </div>
           <div className="novare-stage-copy">
-            <p>{t('Shareable links carry referral attribution when an authenticated user generates an invite.', 'Links compartilhaveis levam atribuicao de indicacao quando um usuario autenticado gera um convite.')}</p>
-            <p className="mt-3">{t('Leads captured by the public layer feed this cockpit and can trigger existing notifications and campaigns.', 'Contatos capturados pela camada publica alimentam este painel e podem disparar notificacoes e campanhas existentes.')}</p>
-            <p className="mt-3">{t('Checkout conversions return to operations as attributable proof of growth.', 'Conversoes da compra retornam para a operacao como prova atribuivel de crescimento.')}</p>
+            <p>{t('Shareable links carry referral attribution when an authenticated user generates an invite.', 'Links compartilhaveis levam atribuicao de indicação quando um usuário autenticado gera um convite.')}</p>
+            <p className="mt-3">{t('Leads captured by the public layer feed this cockpit and can trigger existing notifications and campaigns.', 'Contatos capturados pela camada pública alimentam este painel e podem disparar notificacoes e campanhas existentes.')}</p>
+            <p className="mt-3">{t('Checkout conversions return to operations as attributable proof of growth.', 'Conversoes da compra retornam para a operação como prova atribuivel de crescimento.')}</p>
           </div>
         </div>
       </section>

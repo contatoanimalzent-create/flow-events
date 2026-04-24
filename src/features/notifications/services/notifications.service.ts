@@ -100,7 +100,7 @@ export const notificationsService = {
             type: 'campaign',
             priority: String(row.status) === 'failed' ? 'high' : 'medium',
             title: String(row.status) === 'failed' ? 'Campanha com falha' : 'Campanha em processamento',
-            description: String(row.name ?? 'Execucao de campanha'),
+            description: String(row.name ?? 'Execução de campanha'),
             created_at: String(row.created_at ?? new Date().toISOString()),
             read: readIds.has(`campaign-${String(row.id)}`),
           })

@@ -1,3 +1,3 @@
 # NOTIFICATIONS
 
-Responsavel por consolidar alertas internos de operacao, vendas, financeiro, campanhas e erros na UI.
+Responsável por consolidar alertas internos de operação, vendas, financeiro, campanhas e erros na UI.

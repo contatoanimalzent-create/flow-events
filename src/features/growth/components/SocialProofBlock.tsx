@@ -16,7 +16,7 @@ interface SocialProofBlockProps {
 
 export function SocialProofBlock({ eyebrow, title, description, items }: SocialProofBlockProps) {
   const { isPortuguese } = usePublicLocale()
-  const resolvedEyebrow = eyebrow || (isPortuguese ? 'Numeros reais' : 'Real numbers')
+  const resolvedEyebrow = eyebrow || (isPortuguese ? 'Números reais' : 'Real numbers')
 
   return (
     <PublicReveal className="px-5 py-10 md:px-10 lg:px-16">

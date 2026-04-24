@@ -40,10 +40,10 @@ export function BillingPage() {
     return (
       <AdminPageLayout>
         <EmptyState
-          title={t('Monetization unavailable', 'Monetizacao indisponivel')}
+          title={t('Monetization unavailable', 'Monetização indisponível')}
           description={t(
             'Connect a profile linked to an organization to view plans, fees and platform revenue.',
-            'Conecte um perfil com organizacao vinculada para visualizar planos, taxas e receita da plataforma.',
+            'Conecte um perfil com organização vinculada para visualizar planos, taxas e receita da plataforma.',
           )}
         />
       </AdminPageLayout>
@@ -54,10 +54,10 @@ export function BillingPage() {
     return (
       <AdminPageLayout>
         <LoadingState
-          title={t('Loading monetization', 'Carregando monetizacao')}
+          title={t('Loading monetization', 'Carregando monetização')}
           description={t(
             'We are consolidating plan, usage and revenue for this organization.',
-            'Estamos consolidando plano, uso e receita para esta organizacao.',
+            'Estamos consolidando plano, uso e receita para esta organização.',
           )}
         />
       </AdminPageLayout>
@@ -68,10 +68,10 @@ export function BillingPage() {
     return (
       <AdminPageLayout>
         <EmptyState
-          title={t('Unable to assemble the billing layer', 'Nao foi possivel montar a camada de faturamento')}
+          title={t('Unable to assemble the billing layer', 'Não foi possível montar a camada de faturamento')}
           description={t(
             'The organization did not return a valid monetization overview yet.',
-            'A organizacao ainda nao retornou uma visao geral valida de monetizacao.',
+            'A organização ainda não retornou uma visão geral válida de monetização.',
           )}
         />
       </AdminPageLayout>
@@ -84,13 +84,13 @@ export function BillingPage() {
         eyebrow={t('Billing', 'Faturamento')}
         title={
           <>
-            {t('Platform monetization', 'Monetizacao da plataforma')}
+            {t('Platform monetization', 'Monetização da plataforma')}
             <span className="admin-title-accent">.</span>
           </>
         }
         description={t(
           'Plans, limits, event fees and platform revenue now live in a single layer ready to scale as software.',
-          'Planos, limites, taxas por evento e receita da plataforma agora vivem em uma camada unica, pronta para escalar como software.',
+          'Planos, limites, taxas por evento e receita da plataforma agora vivem em uma camada única, pronta para escalar como software.',
         )}
         actions={
           <AdminActionBar>
@@ -117,10 +117,10 @@ export function BillingPage() {
         <PremiumCard className="p-6">
           <SectionHeader
             eyebrow={t('Usage', 'Uso')}
-            title={t('Plan limits and operations', 'Limites e operacao do plano')}
+            title={t('Plan limits and operations', 'Limites e operação do plano')}
             description={t(
               'The guardrails now follow the plan structure and make clear how much room is left before an upgrade.',
-              'Os limites agora seguem a estrutura do plano e deixam claro quanto ainda cabe de operacao antes de um upgrade.',
+              'Os limites agora seguem a estrutura do plano e deixam claro quanto ainda cabe de operação antes de um upgrade.',
             )}
           />
 
@@ -135,7 +135,7 @@ export function BillingPage() {
               </div>
               <div className="mt-2 text-sm text-text-muted">
                 {overview.usage.eventLimit == null
-                  ? t('This plan has no practical event limit.', 'Este plano nao tem limite pratico de eventos.')
+                  ? t('This plan has no practical event limit.', 'Este plano não tem limite pratico de eventos.')
                   : t(
                       `${overview.usage.remainingEvents} remaining before the limit.`,
                       `${overview.usage.remainingEvents} restantes antes do limite.`,
@@ -170,7 +170,7 @@ export function BillingPage() {
               <div className="mt-2 text-sm text-text-muted">
                 {t(
                   'Premium capabilities enabled for purchase flow, analytics and automation.',
-                  'Capacidades premium em operacao para compra, analises e automacao.',
+                  'Capacidades premium em operação para compra, análises e automação.',
                 )}
               </div>
             </SurfacePanel>
@@ -187,11 +187,11 @@ export function BillingPage() {
 
         <PremiumCard className="p-6">
           <SectionHeader
-            eyebrow={t('Fee strategy', 'Estrategia de taxas')}
+            eyebrow={t('Fee strategy', 'Estratégia de taxas')}
             title={t('Event fee model', 'Modelo de taxa por evento')}
             description={t(
               'Each event can charge a fixed or percentage fee and decide whether the buyer sees it or the organization absorbs it.',
-              'Cada evento pode cobrar taxa fixa ou percentual e decidir se o comprador ve essa taxa ou se a organizacao a absorve.',
+              'Cada evento pode cobrar taxa fixa ou percentual e decidir se o comprador ve essa taxa ou se a organização a absorve.',
             )}
           />
 
@@ -224,8 +224,8 @@ export function BillingPage() {
           ) : (
             <div className="mt-6 rounded-[1.5rem] border border-dashed border-bg-border px-5 py-8 text-sm text-text-muted">
               {t(
-                'As soon as events are configured, this area will show the fee strategy used in each experience.',
-                'Assim que os eventos forem configurados, esta area passa a mostrar a estrategia de taxa usada em cada experiencia.',
+                'As soon as events are configured, this área will show the fee strategy used in each experience.',
+                'Assim que os eventos forem configurados, esta área passa a mostrar a estratégia de taxa usada em cada experiência.',
               )}
             </div>
           )}
@@ -238,7 +238,7 @@ export function BillingPage() {
           title={t('Producer plans', 'Planos de produtor')}
           description={t(
             'The subscription base is now structured in its own table, with limits and features already feeding the product.',
-            'A base de assinatura agora esta estruturada em tabela propria, com limites e recursos que ja alimentam o produto.',
+            'A base de assinatura agora esta estruturada em tabela própria, com limites e recursos que já alimentam o produto.',
           )}
         />
 
@@ -258,10 +258,10 @@ export function BillingPage() {
       <section className="space-y-6">
         <SectionHeader
           eyebrow={t('Events', 'Eventos')}
-          title={t('Fee configuration by event', 'Configuracao de taxas por evento')}
+          title={t('Fee configuration by event', 'Configuração de taxas por evento')}
           description={t(
             'A single panel to quickly see who is passing the fee to the buyer and who is absorbing it in the payout.',
-            'Um painel unico para ver rapidamente quem esta repassando taxa ao comprador e quem a absorve dentro do repasse.',
+            'Um painel único para ver rapidamente quem esta repassando taxa ao comprador e quem a absorve dentro do repasse.',
           )}
         />
 
@@ -313,10 +313,10 @@ export function BillingPage() {
         <PremiumCard className="p-6">
           <SectionHeader
             eyebrow={t('Feature flags', 'Controle de recursos')}
-            title={t('Premium capabilities already controlled by plan', 'Recursos premium ja controlados por plano')}
+            title={t('Premium capabilities already controlled by plan', 'Recursos premium já controlados por plano')}
             description={t(
               'The feature-flag foundation already allows premium capabilities to be enabled or blocked without changing the current app contracts.',
-              'A fundacao de controle ja permite ativar ou bloquear recursos premium sem alterar os contratos atuais do app.',
+              'A fundação de controle já permite ativar ou bloquear recursos premium sem alterar os contratos atuais do app.',
             )}
           />
           <div className="mt-5 grid gap-3">
@@ -342,7 +342,7 @@ export function BillingPage() {
             title={t('How this layer monetizes the product', 'Como essa camada monetiza o produto')}
             description={t(
               'This foundation was designed to charge per-event fees, generate recurring plan revenue and reflect that directly in the purchase flow and finance.',
-              'Esta fundacao foi desenhada para cobrar taxa por evento, gerar receita recorrente por plano e refletir isso direto na compra e no financeiro.',
+              'Esta fundação foi desenhada para cobrar taxa por evento, gerar receita recorrente por plano e refletir isso direto na compra e no financeiro.',
             )}
           />
           <div className="mt-5 space-y-4 text-sm leading-7 text-text-muted">
@@ -361,14 +361,14 @@ export function BillingPage() {
             <p>
               {t(
                 'Creation flows also consult plan limits before expanding the operation further, reducing silent overuse and preparing real upgrades.',
-                'Os fluxos de criacao tambem consultam os limites do plano antes de abrir ainda mais a operacao, reduzindo sobreuso silencioso e preparando upgrades reais.',
+                'Os fluxos de criacao também consultam os limites do plano antes de abrir ainda mais a operação, reduzindo sobreuso silencioso e preparando upgrades reais.',
               )}
             </p>
           </div>
           <div className="mt-6">
             <PremiumButton variant="secondary" className="gap-2" disabled>
               <Lock className="h-4 w-4" />
-              {t('Upgrade automation in the next step', 'Automacao de upgrade na proxima etapa')}
+              {t('Upgrade automation in the next step', 'Automação de upgrade na próxima etapa')}
             </PremiumButton>
           </div>
         </PremiumCard>

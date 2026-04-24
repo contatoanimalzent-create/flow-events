@@ -66,7 +66,7 @@ export function getLogAppearance(result: CheckinLogResult, reasonCode?: CheckinR
   if (isExit) {
     return {
       label: 'Saida',
-      description: reasonCode ? CHECKIN_REASON_LABELS[reasonCode] : 'Saida registrada',
+      description: reasonCode ? CHECKIN_REASON_LABELS[reasonCode] : 'Saída registrada',
       color: 'text-brand-blue',
       icon: DoorOpen,
     }

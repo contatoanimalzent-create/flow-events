@@ -13,7 +13,7 @@ export function FinancialEventsTable({ reports, expandedEventId, onToggleEvent }
     return (
       <div className="surface-panel p-16 text-center">
         <div className="font-display text-2xl text-text-primary">Nenhum evento com DRE</div>
-        <p className="mt-2 text-sm text-text-muted">Crie eventos e movimente vendas para gerar a visao financeira.</p>
+        <p className="mt-2 text-sm text-text-muted">Crie eventos e movimente vendas para gerar a visão financeira.</p>
       </div>
     )
   }

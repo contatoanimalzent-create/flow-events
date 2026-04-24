@@ -77,8 +77,8 @@ export function ExperienceVisualSection({ events }: ExperienceVisualSectionProps
   return (
     <PremiumSection
       eyebrow="Atmosfera"
-      title="Uma linguagem visual que vende presenca, escala e desejo."
-      description="Imagem, video e composicao trabalham como prova emocional de que cada experiencia tem identidade propria."
+      title="Uma linguagem visual que vende presença, escala e desejo."
+      description="Imagem, video e composicao trabalham como prova emocional de que cada experiência tem identidade própria."
     >
       <div className="grid gap-6 lg:grid-cols-[1.18fr_0.82fr]">
         <PublicReveal>
@@ -96,12 +96,12 @@ export function ExperienceVisualSection({ events }: ExperienceVisualSectionProps
             <div className="rounded-[2rem] border border-white/10 p-7 shadow-[0_22px_70px_rgba(0,0,0,0.32)]"
               style={{ background: 'linear-gradient(150deg, #1c1610 0%, #14110c 100%)' }}
             >
-              <div className="text-[11px] uppercase tracking-[0.3em] text-white/40">Direcao</div>
+              <div className="text-[11px] uppercase tracking-[0.3em] text-white/40">Direção</div>
               <div className="mt-4 font-display text-[2.1rem] font-semibold leading-[0.94] tracking-[-0.04em] text-white">
-                Menos vitrine tecnica. Mais atmosfera, ritmo e vontade de entrar.
+                Menos vitrine técnica. Mais atmosfera, ritmo e vontade de entrar.
               </div>
               <p className="mt-4 text-sm leading-7 text-white/58">
-                O design foi pensado para sustentar experiencias aspiracionais, com presenca cinematografica, tipografia editorial e um senso de curadoria constante.
+                O design foi pensado para sustentar experiências aspiracionais, com presença cinematográfica, tipografia editorial e um senso de curadoria constante.
               </p>
             </div>
           </PublicReveal>

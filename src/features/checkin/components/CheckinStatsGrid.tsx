@@ -27,7 +27,7 @@ export function CheckinStatsGrid({ stats }: CheckinStatsGridProps) {
               </div>
             </div>
             <div className={cn(stat.big ? 'metric-value text-[2.2rem]' : 'metric-value text-[1.85rem]', stat.color)}>{stat.value}</div>
-            <div className="mt-3 text-[11px] text-text-muted">Leitura em tempo real da operacao de acesso.</div>
+            <div className="mt-3 text-[11px] text-text-muted">Leitura em tempo real da operação de acesso.</div>
           </div>
         )
       })}

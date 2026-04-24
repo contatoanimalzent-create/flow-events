@@ -100,7 +100,7 @@ export const ticketsService = {
       const duplicatedType = duplicateTypeResult.data as TicketType | null
 
       if (!duplicatedType) {
-        throw new TicketsServiceError('Nao foi possivel duplicar o tipo de ingresso', 'ticket_duplicate_failed')
+        throw new TicketsServiceError('Não foi possível duplicar o tipo de ingresso', 'ticket_duplicate_failed')
       }
 
       if (ticket.batches.length === 0) {

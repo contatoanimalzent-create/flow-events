@@ -42,20 +42,20 @@ export function RequireOrganization({ children }: { children: ReactNode }) {
 
         {/* Heading */}
         <h1 className="mb-1 text-4xl font-bold leading-none tracking-[-0.03em] text-white">
-          {t('One last', 'Um ultimo')}
+          {t('One last', 'Um último')}
           <br />
           {t('step', 'passo')}
           <span className="text-[#0057E7]">.</span>
         </h1>
         <p className="mb-8 mt-3 text-sm text-white/48">
-          {t('Name your organization to get started', 'Nomeie sua organizacao para comecar')}
+          {t('Name your organization to get started', 'Nomeie sua organização para comecar')}
         </p>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-[11px] font-semibold mb-2 uppercase tracking-[0.2em] text-white/50">
-              {t('Organization name', 'Nome da organizacao')}
+              {t('Organization name', 'Nome da organização')}
             </label>
             <input
               type="text"
@@ -67,7 +67,7 @@ export function RequireOrganization({ children }: { children: ReactNode }) {
               autoFocus
             />
             <p className="mt-1.5 text-[11px] text-white/30">
-              {t('Can be changed later in Settings', 'Pode ser alterado depois nas Configuracoes')}
+              {t('Can be changed later in Settings', 'Pode ser alterado depois nas Configurações')}
             </p>
           </div>
 

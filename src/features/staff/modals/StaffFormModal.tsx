@@ -41,8 +41,8 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
       { label: 'Empresa', key: 'company', placeholder: 'Nome da empresa' },
     ],
     [
-      { label: 'Funcao', key: 'role_title', placeholder: 'ex: Seguranca' },
-      { label: 'Departamento', key: 'department', placeholder: 'ex: Operacoes' },
+      { label: 'Funcao', key: 'role_title', placeholder: 'ex: Segurança' },
+      { label: 'Departamento', key: 'department', placeholder: 'ex: Operações' },
     ],
     [
       { label: 'Area', key: 'area', placeholder: 'ex: Portaria A' },
@@ -78,9 +78,9 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
             <div className="mb-6 rounded-[24px] border border-bg-border bg-bg-secondary/55 p-4">
               <div className="text-[11px] uppercase tracking-[0.28em] text-[#4285F4]">Ordem recomendada</div>
               <div className="mt-3 grid gap-3 md:grid-cols-3">
-                <div className="text-sm leading-6 text-text-secondary">1. Preencha dados basicos para identificar a pessoa.</div>
-                <div className="text-sm leading-6 text-text-secondary">2. Defina funcao, area, turno e portaria de trabalho.</div>
-                <div className="text-sm leading-6 text-text-secondary">3. Libere permissoes e observacoes para a operacao.</div>
+                <div className="text-sm leading-6 text-text-secondary">1. Preencha dados básicos para identificar a pessoa.</div>
+                <div className="text-sm leading-6 text-text-secondary">2. Defina funcao, área, turno e portaria de trabalho.</div>
+                <div className="text-sm leading-6 text-text-secondary">3. Libere permissões e observacoes para a operação.</div>
               </div>
             </div>
 
@@ -103,7 +103,7 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
               </div>
             </FormSection>
 
-            <FormSection title="Operacao e alocacao">
+            <FormSection title="Operação e alocacao">
               <div className="space-y-4">
                 {rows.slice(3).map((row, rowIndex) => (
                   <FormGrid key={rowIndex}>
@@ -121,7 +121,7 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
                 ))}
 
                 <FormGrid>
-                  <FormField label="Inicio do turno">
+                  <FormField label="Início do turno">
                     <input
                       type="datetime-local"
                       className="input"
@@ -152,8 +152,8 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
               </div>
             </FormSection>
 
-            <FormSection title="Permissoes e notas">
-              <FormField label="Permissoes operacionais">
+            <FormSection title="Permissões e notas">
+              <FormField label="Permissões operacionais">
                 <div className="grid grid-cols-1 gap-2 rounded-[22px] border border-bg-border bg-bg-secondary/55 p-4">
                   {STAFF_PERMISSION_OPTIONS.map((permission) => {
                     const checked = form.permissions.includes(permission.value)

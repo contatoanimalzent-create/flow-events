@@ -227,7 +227,7 @@ export function useCheckoutFlow({
     const currentOrderId = draftOrderId
 
     if (!currentOrderId) {
-      throw new Error('Nenhum pedido em rascunho disponivel para pagamento.')
+      throw new Error('Nenhum pedido em rascunho disponível para pagamento.')
     }
 
     const result = await createPaymentIntentMutation.mutateAsync({
@@ -248,7 +248,7 @@ export function useCheckoutFlow({
     const currentOrderId = draftOrderId
 
     if (!currentOrderId) {
-      throw new Error('Nenhum pedido em rascunho disponivel para confirmacao.')
+      throw new Error('Nenhum pedido em rascunho disponível para confirmação.')
     }
 
     const order = await confirmOrderMutation.mutateAsync({

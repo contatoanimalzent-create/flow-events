@@ -22,7 +22,7 @@ const STEPS = [
     icon: CalendarDays,
     titlePt: 'Crie seu evento',
     titleEn: 'Create your event',
-    descPt: 'Defina nome, data, local e capacidade. Adicione descricao, galeria de midia e pagina publica em minutos.',
+    descPt: 'Defina nome, data, local e capacidade. Adicione descrição, galeria de mídia e página pública em minutos.',
     descEn: 'Set name, date, venue and capacity. Add description, media gallery and a public page in minutes.',
   },
   {
@@ -30,7 +30,7 @@ const STEPS = [
     icon: Tag,
     titlePt: 'Configure ingressos e lotes',
     titleEn: 'Set up tickets and batches',
-    descPt: 'Crie multiplos lotes com precos diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida.',
+    descPt: 'Crie multiplos lotes com preços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida.',
     descEn: 'Create multiple batches with different prices. Batch turnover happens automatically by date or sold quantity.',
   },
   {
@@ -38,15 +38,15 @@ const STEPS = [
     icon: Smartphone,
     titlePt: 'Opere com o app Pulse',
     titleEn: 'Operate with the Pulse app',
-    descPt: 'Check-in por QR code, gestao de staff, ocorrencias e supervisor em tempo real. Funciona offline.',
+    descPt: 'Check-in por QR code, gestão de staff, ocorrências e supervisor em tempo real. Funciona offline.',
     descEn: 'QR code check-in, staff management, incidents and real-time supervisor view. Works offline.',
   },
   {
     number: '04',
     icon: BarChart3,
-    titlePt: 'Analise os resultados',
+    titlePt: 'Análise os resultados',
     titleEn: 'Analyze the results',
-    descPt: 'Dashboard com receita, conversao, ticket medio e presenca por hora. Repasse financeiro automatico apos o evento.',
+    descPt: 'Dashboard com receita, conversão, ticket medio e presença por hora. Repasse financeiro automático após o evento.',
     descEn: 'Dashboard with revenue, conversion, average ticket and hourly attendance. Automatic financial transfer after the event.',
   },
 ]
@@ -59,7 +59,7 @@ const ROLES = [
     bulletsPt: [
       'Cria e configura eventos, lotes e cupons',
       'Acompanha vendas e financeiro em tempo real',
-      'Gerencia equipe, credenciamento e relatorios',
+      'Gerencia equipe, credenciamento e relatórios',
     ],
     bulletsEn: [
       'Creates and configures events, batches and coupons',
@@ -73,8 +73,8 @@ const ROLES = [
     titleEn: 'Supervisor',
     bulletsPt: [
       'Ve o health score do evento ao vivo',
-      'Aprova ocorrencias e decisoes criticas',
-      'Acompanha mapa e posicao da equipe',
+      'Aprova ocorrências e decisões criticas',
+      'Acompanha mapa e posição da equipe',
     ],
     bulletsEn: [
       'Views the live event health score',
@@ -89,7 +89,7 @@ const ROLES = [
     bulletsPt: [
       'Realiza check-in por QR code ou manual',
       'Controla acesso por setor e capacidade',
-      'Registra ocorrencias com foto e localizacao',
+      'Registra ocorrências com foto e localização',
     ],
     bulletsEn: [
       'Performs QR code or manual check-in',
@@ -103,8 +103,8 @@ const ROLES = [
     titleEn: 'Staff',
     bulletsPt: [
       'Recebe convite por link sem precisar de conta',
-      'Registra ponto de entrada e saida no app',
-      'Recebe instrucoes e comunicados do supervisor',
+      'Registra ponto de entrada e saída no app',
+      'Recebe instruções e comunicados do supervisor',
     ],
     bulletsEn: [
       'Receives invite via link without needing an account',
@@ -117,9 +117,9 @@ const ROLES = [
     titlePt: 'Promotor',
     titleEn: 'Promoter',
     bulletsPt: [
-      'Acessa link unico com seu codigo de indicacao',
+      'Acessa link único com seu código de indicação',
       'Acompanha vendas geradas pelo seu link',
-      'Ve comissao acumulada em tempo real',
+      'Ve comissão acumulada em tempo real',
     ],
     bulletsEn: [
       'Accesses unique link with referral code',
@@ -135,7 +135,7 @@ export function ComoFuncionaPage({ onLogin }: { onLogin: () => void }) {
   useSeoMeta({
     title: isPortuguese ? 'Como funciona a Pulse | Plataforma de eventos' : 'How Pulse Works | Event Platform',
     description: isPortuguese
-      ? 'Crie, venda, opere e analise seus eventos em um unico lugar. Veja como a Pulse funciona do inicio ao fim.'
+      ? 'Crie, venda, opere e análise seus eventos em um único lugar. Veja como a Pulse funciona do início ao fim.'
       : 'Create, sell, operate and analyze your events in one place. See how Pulse works from start to finish.',
   })
 
@@ -155,7 +155,7 @@ export function ComoFuncionaPage({ onLogin }: { onLogin: () => void }) {
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-white/58">
             {isPortuguese
-              ? 'A Pulse cobre todo o ciclo de vida do seu evento, da configuracao inicial ao repasse financeiro pos-evento.'
+              ? 'A Pulse cobre todo o ciclo de vida do seu evento, da configuração inicial ao repasse financeiro pós-evento.'
               : 'Pulse covers your entire event lifecycle, from initial setup to post-event financial transfer.'}
           </p>
         </div>
@@ -250,7 +250,7 @@ export function ComoFuncionaPage({ onLogin }: { onLogin: () => void }) {
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-base leading-8 text-white/50">
                 {isPortuguese
-                  ? 'Sem cartao de credito. Sem mensalidade. So paga quando vender.'
+                  ? 'Sem cartao de crédito. Sem mensalidade. So paga quando vender.'
                   : 'No credit card. No monthly fee. Pay only when you sell.'}
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">

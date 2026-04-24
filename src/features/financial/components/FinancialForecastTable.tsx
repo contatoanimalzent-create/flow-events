@@ -34,7 +34,7 @@ export function FinancialForecastTable({ reports, onEditForecast }: FinancialFor
       <table className="w-full">
         <thead className="border-b border-bg-border">
           <tr>
-            {['Evento', 'Previsto', 'Realizado', 'Delta', 'Margem proj.', 'Risco', 'Acoes'].map((header) => (
+            {['Evento', 'Previsto', 'Realizado', 'Delta', 'Margem proj.', 'Risco', 'Ações'].map((header) => (
               <th key={header} className="table-header">
                 {header}
               </th>

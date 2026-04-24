@@ -53,7 +53,7 @@ export function CheckinScannerPanel({
             {processing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
           </button>
           <button onClick={() => void onScan(scanInput, true)} disabled={processing || !scanInput} className="btn-secondary px-5">
-            Saida
+            Saída
           </button>
         </div>
       </div>

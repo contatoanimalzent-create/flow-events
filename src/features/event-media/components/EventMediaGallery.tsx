@@ -15,7 +15,7 @@ export function EventMediaGallery({ presentation }: EventMediaGalleryProps) {
     <section className="px-5 py-6 md:px-10 lg:px-16 lg:py-10">
       <div className="mx-auto max-w-7xl space-y-10">
         <div>
-          <div className="mb-4 text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Galeria de midia</div>
+          <div className="mb-4 text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Galeria de mídia</div>
           <h2 className="font-serif text-4xl font-semibold leading-none text-[#1f1a15] md:text-6xl">
             Assets reais para uma landing mais aspiracional.
           </h2>

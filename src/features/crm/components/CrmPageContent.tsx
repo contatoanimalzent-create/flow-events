@@ -51,7 +51,7 @@ export function CrmPageContent() {
             CRM<span className="admin-title-accent">.</span>
           </h1>
           <p className="admin-subtitle">
-            Customers, relacionamento, historico de compras e presenca por evento
+            Customers, relacionamento, histórico de compras e presença por evento
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -149,7 +149,7 @@ export function CrmPageContent() {
       </div>
 
       {dashboard.loading ? (
-        <PageLoadingState title="Carregando CRM" description="Consolidando clientes, tags e historico de relacionamento." />
+        <PageLoadingState title="Carregando CRM" description="Consolidando clientes, tags e histórico de relacionamento." />
       ) : dashboard.error ? (
         <PageErrorState title="ERRO AO CARREGAR CRM" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : dashboard.allCustomers.length === 0 ? (

@@ -181,7 +181,7 @@ async function ensurePersistedCustomerRecord(organizationId: string, customerId:
     const customer = snapshot.detailMap[normalizeCustomerId(customerId)]?.customer
 
     if (!customer) {
-      throw new CrmServiceError('Cliente nao encontrado', 'customer_not_found')
+      throw new CrmServiceError('Cliente não encontrado', 'customer_not_found')
     }
 
     const result = await supabase

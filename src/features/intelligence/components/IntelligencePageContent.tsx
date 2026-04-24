@@ -31,7 +31,7 @@ export function IntelligencePageContent() {
           <h1 className="admin-title">
             Intelligence<span className="admin-title-accent">.</span>
           </h1>
-          <p className="admin-subtitle">Health score, alertas e recomendacoes acionaveis por evento.</p>
+          <p className="admin-subtitle">Health score, alertas e recomendações acionaveis por evento.</p>
         </div>
         <button onClick={() => void dashboard.refresh()} className="btn-secondary flex items-center gap-2 text-xs">
           <RefreshCw className="h-3.5 w-3.5" /> Atualizar
@@ -42,7 +42,7 @@ export function IntelligencePageContent() {
         {[
           { label: 'Health medio', value: dashboard.overview?.summary.average_overall_health ?? 0, sublabel: 'score consolidado', color: 'text-brand-blue' },
           { label: 'Alertas ativos', value: dashboard.overview?.summary.active_alerts_count ?? 0, sublabel: 'sinais abertos', color: 'text-status-warning' },
-          { label: 'Criticos', value: dashboard.overview?.summary.critical_alerts_count ?? 0, sublabel: 'exigem acao rapida', color: 'text-status-error' },
+          { label: 'Criticos', value: dashboard.overview?.summary.critical_alerts_count ?? 0, sublabel: 'exigem ação rápida', color: 'text-status-error' },
           { label: 'Eventos em risco', value: dashboard.overview?.summary.high_risk_events_count ?? 0, sublabel: 'overall health < 60', color: 'text-brand-acid' },
           { label: 'Issues de dados', value: dashboard.overview?.summary.consistency_issues_count ?? 0, sublabel: 'consistencia operacional', color: 'text-brand-purple' },
           { label: 'Criticas de dados', value: dashboard.overview?.summary.critical_consistency_issues_count ?? 0, sublabel: 'impacto enterprise', color: 'text-status-error' },
@@ -62,7 +62,7 @@ export function IntelligencePageContent() {
         {([
           { key: 'overview', label: 'Health score' },
           { key: 'alerts', label: 'Alertas' },
-          { key: 'recommendations', label: 'Recomendacoes' },
+          { key: 'recommendations', label: 'Recomendações' },
           { key: 'consistency', label: 'Data consistency' },
         ] as const).map((tab) => (
           <button
@@ -182,7 +182,7 @@ export function IntelligencePageContent() {
       ) : null}
 
       {dashboard.loading ? (
-        <PageLoadingState title="Carregando intelligence" description="Calculando health score, alertas e recomendacoes acionaveis." />
+        <PageLoadingState title="Carregando intelligence" description="Calculando health score, alertas e recomendações acionaveis." />
       ) : dashboard.error ? (
         <PageErrorState title="ERRO AO CARREGAR INTELLIGENCE" description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : dashboard.tab === 'overview' ? (

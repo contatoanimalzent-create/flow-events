@@ -49,12 +49,12 @@ function DiscoverCard({ event, index }: { event: PublicEventSummary; index: numb
               {event.minPrice === null
                 ? 'Sob consulta'
                 : event.minPrice === 0
-                  ? 'Inscricao gratuita'
+                  ? 'Inscrição gratuita'
                   : formatCurrency(event.minPrice)}
             </span>
           </div>
           <div className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-white">
-            Descobrir experiencia
+            Descobrir experiência
             <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
           </div>
         </div>
@@ -68,7 +68,7 @@ export function DiscoverSection({ events, categories }: DiscoverSectionProps) {
     <PremiumSection
       eyebrow="Mais eventos"
       title="Continue explorando."
-      description="Filtre por cidade, categoria ou data e encontre o proximo evento que vale a sua presenca."
+      description="Filtre por cidade, categoria ou data e encontre o próximo evento que vale a sua presença."
     >
       <div className="flex flex-wrap gap-3">
         {categories.map((category, index) => (

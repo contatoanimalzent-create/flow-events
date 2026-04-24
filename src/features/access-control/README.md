@@ -1,3 +1,3 @@
 # ACCESS CONTROL
 
-Responsavel por mapear perfis da plataforma para papeis enterprise, permissões por modulo e bloqueio de UI.
+Responsável por mapear perfis da plataforma para papeis enterprise, permissões por módulo e bloqueio de UI.

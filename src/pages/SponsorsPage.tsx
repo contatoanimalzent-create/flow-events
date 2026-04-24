@@ -214,7 +214,7 @@ export function SponsorsPage() {
         <div className="card flex flex-col items-center justify-center p-16 text-center">
           <Handshake className="mb-3 h-10 w-10 text-text-muted" />
           <div className="mb-1 font-display text-2xl text-text-primary">NENHUM PATROCINADOR</div>
-          <p className="mb-5 text-sm text-text-muted">Cadastre marcas parceiras e acompanhe as cotas comerciais em um unico lugar.</p>
+          <p className="mb-5 text-sm text-text-muted">Cadastre marcas parceiras e acompanhe as cotas comerciais em um único lugar.</p>
           <button onClick={() => setShowForm(true)} className="btn-primary">+ Novo patrocinador</button>
         </div>
       ) : null}
@@ -445,7 +445,7 @@ function SponsorFormModal({
         <div className="flex items-center justify-between border-t border-bg-border px-6 py-4">
           <button onClick={onClose} className="btn-secondary text-sm">Cancelar</button>
           <button onClick={() => void handleSave()} disabled={saving} className="btn-primary flex min-w-[180px] items-center justify-center gap-2 text-sm">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : sponsor ? 'Salvar alteracoes' : 'Cadastrar patrocinador'}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : sponsor ? 'Salvar alterações' : 'Cadastrar patrocinador'}
           </button>
         </div>
       </div>

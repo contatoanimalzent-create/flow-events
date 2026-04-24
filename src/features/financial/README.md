@@ -1,4 +1,4 @@
 # FINANCIAL
 
-Responsavel pela visao economica e financeira do evento.
+Responsável pela visão econômica e financeira do evento.
 Inclui receita, taxa, repasse, custo, conciliacao e fechamento operacional.

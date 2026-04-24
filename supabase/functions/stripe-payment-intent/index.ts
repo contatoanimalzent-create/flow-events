@@ -39,11 +39,11 @@ Deno.serve(async (req) => {
       .single()
 
     if (!order) {
-      return Response.json({ error: 'Pedido nao encontrado' }, { status: 404, headers: corsHeaders })
+      return Response.json({ error: 'Pedido não encontrado' }, { status: 404, headers: corsHeaders })
     }
 
     if (order.status === 'paid') {
-      return Response.json({ error: 'Pedido ja pago' }, { status: 409, headers: corsHeaders })
+      return Response.json({ error: 'Pedido já pago' }, { status: 409, headers: corsHeaders })
     }
 
     const [{ data: event }, { data: organization }] = await Promise.all([
@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
     ])
 
     if (!event) {
-      return Response.json({ error: 'Evento nao encontrado' }, { status: 404, headers: corsHeaders })
+      return Response.json({ error: 'Evento não encontrado' }, { status: 404, headers: corsHeaders })
     }
 
     const installments = getInstallmentsFromMethod(paymentMethod ?? order.payment_method)

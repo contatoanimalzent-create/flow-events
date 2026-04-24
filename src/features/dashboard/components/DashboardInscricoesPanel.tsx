@@ -41,7 +41,7 @@ export function DashboardInscricoesPanel() {
       <div className="mb-4 flex items-center justify-between">
         <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted">Capital Strike, A Origem</div>
         <span className="rounded-full border border-bg-border px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-text-muted">
-          Inscricoes externas
+          Inscrições externas
         </span>
       </div>
 
@@ -51,7 +51,7 @@ export function DashboardInscricoesPanel() {
           Carregando...
         </div>
       ) : stats.total === 0 ? (
-        <div className="py-4 text-sm text-text-muted">Nenhuma inscricao registrada ainda.</div>
+        <div className="py-4 text-sm text-text-muted">Nenhuma inscrição registrada ainda.</div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {items.map((item) => {

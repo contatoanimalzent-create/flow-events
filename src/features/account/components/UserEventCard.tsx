@@ -18,7 +18,7 @@ function getEventStatusLabel(event: AccountEventRecord, isPortuguese: boolean) {
     return isPortuguese ? 'Encerrado' : 'Closed'
   }
 
-  return isPortuguese ? 'Proximo acesso' : 'Next access'
+  return isPortuguese ? 'Próximo acesso' : 'Next access'
 }
 
 export function UserEventCard({ event, active = false, onSelect }: UserEventCardProps) {

@@ -376,7 +376,7 @@ export function VenueMapBuilder({ eventId, readOnly = false }: VenueMapBuilderPr
         )}
       </aside>
 
-      {/* ── Main canvas area ──────────────────────────────────────────── */}
+      {/* ── Main canvas área ──────────────────────────────────────────── */}
       <div className="relative flex-1 overflow-hidden bg-gray-50">
 
         {/* Zoom controls */}

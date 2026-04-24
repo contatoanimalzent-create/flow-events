@@ -21,7 +21,7 @@ interface CouponState {
   code: string
   type: 'percentage' | 'fixed'
   value: number
-  discount: number // pre-computed discount in R$
+  discount: number // pré-computed discount in R$
 }
 
 function CouponInput({
@@ -270,12 +270,12 @@ export function PublicCheckoutContent({
         void expireDraft()
           .then(() => {
       clearPaymentState()
-      setError(isPortuguese ? 'Sua reserva expirou e o inventario foi devolvido aos lotes disponiveis.' : 'Your reservation has expired and inventory has been returned to the available batches.')
+      setError(isPortuguese ? 'Sua reserva expirou e o inventario foi devolvido aos lotes disponíveis.' : 'Your reservation has expired and inventory has been returned to the available batches.')
             setPhase('form')
             setCurrentStep(2)
           })
           .catch((draftError) => {
-            setError(draftError instanceof Error ? draftError.message : isPortuguese ? 'Nao foi possivel expirar a reserva.' : 'Unable to expire the reservation.')
+            setError(draftError instanceof Error ? draftError.message : isPortuguese ? 'Não foi possível expirar a reserva.' : 'Unable to expire the reservation.')
             setPhase('form')
             setCurrentStep(2)
           })
@@ -323,7 +323,7 @@ export function PublicCheckoutContent({
     if (paymentStatus.isFailed) {
       markPaymentStatus('failed')
       clearPaymentState()
-      setError(isPortuguese ? 'Pagamento nao aprovado. Revise os dados e tente novamente antes da reserva expirar.' : 'Payment was not approved. Review your details and try again before the reservation expires.')
+      setError(isPortuguese ? 'Pagamento não aprovado. Revise os dados e tente novamente antes da reserva expirar.' : 'Payment was not approved. Review your details and try again before the reservation expires.')
       setPhase('review')
       setCurrentStep(3)
       return
@@ -332,7 +332,7 @@ export function PublicCheckoutContent({
     if (paymentStatus.isCancelled || paymentStatus.isExpired) {
       markPaymentStatus(paymentStatus.isCancelled ? 'cancelled' : null)
       clearPaymentState()
-      setError(isPortuguese ? 'O pagamento nao foi concluido e a reserva nao esta mais ativa.' : 'Payment was not completed and the reservation is no longer active.')
+      setError(isPortuguese ? 'O pagamento não foi concluido e a reserva não esta mais ativa.' : 'Payment was not completed and the reservation is no longer active.')
       setPhase('form')
       setCurrentStep(2)
       return
@@ -384,7 +384,7 @@ export function PublicCheckoutContent({
       setPhase('review')
       setCurrentStep(3)
     } catch (draftError) {
-      setError(draftError instanceof Error ? draftError.message : isPortuguese ? 'Nao foi possivel reservar o pedido.' : 'Unable to reserve the order.')
+      setError(draftError instanceof Error ? draftError.message : isPortuguese ? 'Não foi possível reservar o pedido.' : 'Unable to reserve the order.')
       setCurrentStep(2)
     }
   }
@@ -425,7 +425,7 @@ export function PublicCheckoutContent({
       setPhase('payment')
       setCurrentStep(3)
     } catch (confirmError) {
-      setError(confirmError instanceof Error ? confirmError.message : isPortuguese ? 'Nao foi possivel iniciar o pagamento.' : 'Unable to start payment.')
+      setError(confirmError instanceof Error ? confirmError.message : isPortuguese ? 'Não foi possível iniciar o pagamento.' : 'Unable to start payment.')
       setCurrentStep(3)
     }
   }
@@ -454,7 +454,7 @@ export function PublicCheckoutContent({
         setCurrentStep(2)
         return
       } catch (cancelError) {
-        setError(cancelError instanceof Error ? cancelError.message : isPortuguese ? 'Nao foi possivel liberar a reserva.' : 'Unable to release the reservation.')
+        setError(cancelError instanceof Error ? cancelError.message : isPortuguese ? 'Não foi possível liberar a reserva.' : 'Unable to release the reservation.')
         return
       }
     }
@@ -482,12 +482,12 @@ export function PublicCheckoutContent({
     currentStep === 1
       ? isPortuguese ? 'Escolha seu acesso.' : 'Choose your access.'
       : currentStep === 2
-        ? isPortuguese ? 'Confirme quem recebe a experiencia.' : 'Confirm who receives the experience.'
+        ? isPortuguese ? 'Confirme quem recebe a experiência.' : 'Confirm who receives the experience.'
         : currentStep === 3
           ? phase === 'payment'
             ? isPortuguese ? 'Finalize a compra.' : 'Complete your purchase.'
             : phase === 'processing'
-              ? isPortuguese ? 'Sua transacao esta em processamento.' : 'Your transaction is being processed.'
+              ? isPortuguese ? 'Sua transação esta em processamento.' : 'Your transaction is being processed.'
               : isPortuguese ? 'Sua reserva esta pronta.' : 'Your reservation is ready.'
           : isPortuguese ? 'Compra concluida.' : 'Purchase completed.'
 
@@ -498,18 +498,18 @@ export function PublicCheckoutContent({
         : 'Compare access options, availability and pricing in a direct flow with real-time validated inventory.'
       : currentStep === 2
         ? isPortuguese
-          ? 'Mantivemos apenas os campos essenciais para reservar, pagar e emitir os ingressos com confianca.'
+          ? 'Mantivemos apenas os campos essenciais para reservar, pagar e emitir os ingressos com confiança.'
           : 'We kept only the essential fields to reserve, pay and issue tickets with confidence.'
       : phase === 'processing'
           ? isPortuguese
-            ? 'O processador esta tratando a transacao. Assim que a confirmacao chegar, os ingressos digitais serao emitidos automaticamente.'
+            ? 'O processador esta tratando a transação. Assim que a confirmação chegar, os ingressos digitais serao emitidos automaticamente.'
             : 'The gateway is processing the transaction. As soon as confirmation arrives, digital tickets will be issued automatically.'
       : event.absorb_fee
             ? isPortuguese
-              ? 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional, com taxa absorvida pelo produtor para manter o total limpo ao comprador.'
+              ? 'Reserva, pagamento e emissão acontecem sobre a mesma base operacional, com taxa absorvida pelo produtor para manter o total limpo ao comprador.'
               : 'Reservation, payment and issuance happen on the same operational foundation, with fees absorbed by the producer to keep the buyer total clean.'
             : isPortuguese
-              ? 'Reserva, pagamento e emissao acontecem sobre a mesma base operacional do produto, agora com apresentacao mais clara e comercial.'
+              ? 'Reserva, pagamento e emissão acontecem sobre a mesma base operacional do produto, agora com apresentacao mais clara e comercial.'
               : 'Reservation, payment and issuance happen on the same operational foundation, now with a clearer and more commercial presentation.'
 
   return (

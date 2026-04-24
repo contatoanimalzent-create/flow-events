@@ -38,7 +38,7 @@ function PageFallback() {
 
   return (
     <LoadingState
-      title={t('Loading area', 'Carregando area')}
+      title={t('Loading área', 'Carregando área')}
       description={t(
         'We are preparing this internal Pulse workspace.',
         'Estamos preparando este workspace interno do Pulse.',

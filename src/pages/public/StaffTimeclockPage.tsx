@@ -617,7 +617,7 @@ export function StaffTimeclockPage() {
   return (
     <div
       className="flex min-h-screen flex-col bg-brand-navy font-sans"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 24px)' }}
+      style={{ paddingBottom: 'env(safe-área-inset-bottom, 24px)' }}
       onClick={errorMessage ? clearError : undefined}
     >
       {/* ---- Header ---- */}

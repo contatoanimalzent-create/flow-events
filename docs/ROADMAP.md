@@ -1,154 +1,154 @@
 # ROADMAP
 
-## Visao De Produto
+## Visão De Produto
 
-O roadmap do Animalz Events nao e a soma de features isoladas. Ele representa a construcao de uma plataforma operacional completa para empresas que tratam eventos como negocio recorrente, com exigencia real de receita, controle, margem e inteligencia.
+O roadmap do Animalz Events não é a soma de features isoladas. Ele representa a construção de uma plataforma operacional completa para empresas que tratam eventos como negócio recorrente, com exigência real de receita, controle, margem e inteligência.
 
-Cada fase precisa entregar valor utilizavel e, ao mesmo tempo, fortalecer o efeito plataforma: um modulo alimenta o proximo e todos compartilham a mesma base operacional.
+Cada fase precisa entregar valor utilizável e, ao mesmo tempo, fortalecer o efeito plataforma: um módulo alimenta o próximo e todos compartilham a mesma base operacional.
 
-## Fase 1: Fundacao
+## Fase 1: Fundação
 
 ### Objetivo
 
-Criar a fundacao tecnica e de produto que sustenta um SaaS multi-tenant, seguro, auditavel e pronto para crescimento sem retrabalho estrutural.
+Criar a fundação técnica e de produto que sustenta um SaaS multi-tenant, seguro, auditavel e pronto para crescimento sem retrabalho estrutural.
 
 ### Capacidades
 
-- autenticacao e sessao confiaveis;
+- autenticacao e sessão confiaveis;
 - RBAC por papel e escopo;
-- modelo base de organizacao, usuario e evento;
-- shell do produto e navegacao principal;
-- estrutura frontend por dominio;
+- modelo base de organização, usuário e evento;
+- shell do produto e navegação principal;
+- estrutura frontend por domínio;
 - base de observabilidade, auditoria e ambientes.
 
 ### Entregaveis
 
-- auth com login, sessao persistida, troca obrigatoria de senha e recovery;
-- modelo multi-tenant por organizacao;
-- permissoes para `admin`, `manager`, `operator`, `finance`, `staff`;
-- arquitetura V2 implementada como direcao oficial;
+- auth com login, sessão persistida, troca obrigatoria de senha e recovery;
+- modelo multi-tenant por organização;
+- permissões para `admin`, `manager`, `operator`, `finance`, `staff`;
+- arquitetura V2 implementada como direção oficial;
 - base Supabase com migrations, policies, indexes e seed;
 - query client, providers globais, guards e design system inicial;
-- monitoramento de erro e eventos operacionais basicos.
+- monitoramento de erro e eventos operacionais básicos.
 
 ### Dependencias
 
 - definicao do posicionamento oficial do produto;
 - convencoes de arquitetura e estrutura de pastas;
-- modelo inicial de perfis e organizacoes;
+- modelo inicial de perfis e organizações;
 - setup de Supabase, Vercel e ambientes.
 
-### Metricas De Sucesso
+### Métricas De Sucesso
 
 - zero vazamento entre tenants;
 - 100% das rotas privadas protegidas;
 - tempo de bootstrap autenticado menor que 3 segundos;
 - deploy continuo funcional com preview por ambiente;
-- base pronta para evolucao dos dominios core sem reorganizacao.
+- base pronta para evolucao dos domínios core sem reorganizacao.
 
 ### Riscos
 
-- superengenharia na fundacao e atraso na captura de valor;
-- permissao simplificada demais e insegura;
+- superengenharia na fundação e atraso na captura de valor;
+- permissão simplificada demais e insegura;
 - modelo de dados inflexivel para eventos de formatos diferentes;
-- pouca observabilidade logo no inicio.
+- pouca observabilidade logo no início.
 
 ## Fase 2: Core
 
 ### Objetivo
 
-Entregar a maquina comercial do produto: criacao de eventos, estruturacao de ingressos, checkout confiavel e emissao com QR.
+Entregar a maquina comercial do produto: criacao de eventos, estruturacao de ingressos, checkout confiável e emissão com QR.
 
 ### Capacidades
 
 - CRUD completo de eventos;
-- configuracao de ticket types e lotes;
+- configuração de ticket types e lotes;
 - venda online com controle de estoque;
-- checkout com pagamento e confirmacao;
-- emissao de tickets com QR unico;
-- experiencia publica do evento orientada a conversao.
+- checkout com pagamento e confirmação;
+- emissão de tickets com QR único;
+- experiência pública do evento orientada a conversão.
 
 ### Entregaveis
 
 - backoffice de eventos com status, agenda, local e branding;
-- gestao de ingressos, precos, lotes, cotas e cupons;
-- pagina publica do evento com CTA e conteudo comercial;
+- gestão de ingressos, preços, lotes, cotas e cupons;
+- página pública do evento com CTA e conteúdo comercial;
 - reserva temporaria de inventory no checkout;
-- integracao de pagamento e reconciliacao de status;
-- pedido, comprovante e area do comprador;
-- emissao segura de QR e serial de ingresso;
+- integração de pagamento e reconciliacao de status;
+- pedido, comprovante e área do comprador;
+- emissão segura de QR e serial de ingresso;
 - eventos de analytics no funil de compra.
 
 ### Dependencias
 
-- fundacao de auth, tenant e permissao;
-- arquitetura frontend orientada por dominio;
-- Edge Functions para checkout e confirmacao;
+- fundação de auth, tenant e permissão;
+- arquitetura frontend orientada por domínio;
+- Edge Functions para checkout e confirmação;
 - estrutura de dados consistente para pedidos e tickets.
 
-### Metricas De Sucesso
+### Métricas De Sucesso
 
-- conversao de checkout acima de 60% em trafego qualificado;
-- menos de 1% de falha na emissao de ingresso;
-- tempo de carregamento da pagina publica abaixo de 2 segundos;
-- divergencia de inventory proxima de zero;
+- conversão de checkout acima de 60% em trafego qualificado;
+- menos de 1% de falha na emissão de ingresso;
+- tempo de carregamento da página pública abaixo de 2 segundos;
+- divergencia de inventory próxima de zero;
 - instrumentacao completa das etapas do funil.
 
 ### Riscos
 
 - overselling por reserva mal desenhada;
-- pedido pago sem emissao consistente;
+- pedido pago sem emissão consistente;
 - QR replicavel ou pouco auditavel;
-- experiencia publica lenta e com baixa conversao.
+- experiência pública lenta e com baixa conversão.
 
-## Fase 3: Operacao
+## Fase 3: Operação
 
 ### Objetivo
 
-Transformar o Animalz Events em software de execucao ao vivo, com check-in, staff e controle de campo em tempo real.
+Transformar o Animalz Events em software de execução ao vivo, com check-in, staff e controle de campo em tempo real.
 
 ### Capacidades
 
-- check-in rapido e confiavel;
-- operacao por gate, area e dispositivo;
-- gestao de staff e escalas;
-- credenciamento e tratamento de excecao;
+- check-in rápido e confiável;
+- operação por gate, área e dispositivo;
+- gestão de staff e escalas;
+- credenciamento e tratamento de exceção;
 - auditoria operacional;
-- tolerancia a instabilidade de rede.
+- tolerância a instabilidade de rede.
 
 ### Entregaveis
 
-- modulo de check-in com leitura de QR;
+- módulo de check-in com leitura de QR;
 - painel ao vivo por evento;
-- validacao por tipo de acesso, status e regra operacional;
+- válidação por tipo de acesso, status e regra operacional;
 - registro de acesso duplicado, invalido, cancelado e bloqueado;
-- gestao de equipe, cargos e alocacoes;
+- gestão de equipe, cargos e alocacoes;
 - logs por operador, gate e horario;
-- estrategia de sincronizacao para ambientes com conectividade limitada.
+- estratégia de sincronização para ambientes com conectividade limitada.
 
 ### Dependencias
 
-- tickets e emissao totalmente estaveis;
-- modelo de permissao mais refinado;
+- tickets e emissão totalmente estáveis;
+- modelo de permissão mais refinado;
 - canais de realtime ou refresh controlado;
 - trilha auditavel de mutacoes.
 
-### Metricas De Sucesso
+### Métricas De Sucesso
 
-- validacao media de acesso abaixo de 1 segundo;
+- válidação media de acesso abaixo de 1 segundo;
 - 100% das entradas auditadas;
-- operacao simultanea em varios pontos de acesso;
-- queda drastica de retrabalho na portaria;
-- taxa minima de inconsistencias em validacao.
+- operação simultanea em vários pontos de acesso;
+- queda drástica de retrabalho na portaria;
+- taxa mínima de inconsistências em válidação.
 
 ### Riscos
 
-- dependencia excessiva de internet no local;
+- dependência excessiva de internet no local;
 - UI pesada em dispositivos modestos;
 - regra de acesso pouco flexivel para diferentes formatos de evento;
-- pouca visibilidade sobre excecoes operacionais.
+- pouca visibilidade sobre exceções operacionais.
 
-## Fase 4: Gestao
+## Fase 4: Gestão
 
 ### Objetivo
 
@@ -156,102 +156,102 @@ Tornar o produto o centro de comando administrativo e financeiro do evento, cone
 
 ### Capacidades
 
-- resumo financeiro por evento e organizacao;
+- resumo financeiro por evento e organização;
 - conciliacao e fechamento;
 - repasses, taxas e chargebacks;
 - PDV integrado;
 - estoque operacional;
 - fornecedores e custos;
-- visao de margem e rentabilidade.
+- visão de margem e rentabilidade.
 
 ### Entregaveis
 
 - dashboard financeiro com receita, taxa, custo e margem;
 - DRE operacional por evento;
 - conciliacao entre venda, pagamento e repasse;
-- modulo de PDV conectado ao ecossistema do evento;
+- módulo de PDV conectado ao ecossistema do evento;
 - controle de estoque e consumo operacional;
 - cadastro de fornecedores, contratos e centros de custo;
-- relatorios executivos por periodo, marca, cidade e unidade.
+- relatórios executivos por periodo, marca, cidade e unidade.
 
 ### Dependencias
 
 - dados comerciais confiaveis;
 - modelo financeiro consistente;
-- auditoria madura de transacoes;
-- estrutura de permissao adequada para backoffice administrativo.
+- auditoria madura de transações;
+- estrutura de permissão adequada para backoffice administrativo.
 
-### Metricas De Sucesso
+### Métricas De Sucesso
 
 - conciliacao acima de 99%;
 - visibilidade de margem em D+1;
-- reducao do tempo de fechamento operacional;
-- adesao do financeiro e da gestao como usuarios recorrentes;
-- menor divergencia entre operacao e caixa.
+- redução do tempo de fechamento operacional;
+- adesao do financeiro e da gestão como usuários recorrentes;
+- menor divergencia entre operação e caixa.
 
 ### Riscos
 
 - simplificacao excessiva da modelagem financeira;
-- integracao fraca entre PDV, estoque e financeiro;
-- dependencia de processos manuais para fechar numeros;
-- perda de confianca caso os dados atrasem ou divirjam.
+- integração fraca entre PDV, estoque e financeiro;
+- dependência de processos manuais para fechar números;
+- perda de confiança caso os dados atrasem ou divirjam.
 
-## Fase 5: Inteligencia
+## Fase 5: Inteligência
 
 ### Objetivo
 
-Converter o Animalz Events em camada de decisao e automacao, usando dados e IA para aumentar receita, reduzir risco e melhorar a execucao.
+Converter o Animalz Events em camada de decisão e automação, usando dados e IA para aumentar receita, reduzir risco e melhorar a execução.
 
 ### Capacidades
 
-- analytics por evento, organizacao e portfolio;
+- analytics por evento, organização e portfolio;
 - previsao de demanda e ritmo de venda;
-- recomendacao de preco, lote e capacidade;
-- automacoes baseadas em gatilho;
+- recomendação de preço, lote e capacidade;
+- automações baseadas em gatilho;
 - alertas operacionais e financeiros;
 - assistentes de IA para consulta e suporte;
 - growth orientado a comportamento e receita real.
 
 ### Entregaveis
 
-- dashboards de cohort, funil, presenca e recorrencia;
+- dashboards de cohort, funil, presença e recorrencia;
 - alertas de anomalia em venda, check-in e caixa;
-- automacoes para follow-up, campanha e remediacao operacional;
-- consulta em linguagem natural sobre o negocio do evento;
-- recomendacoes de acao comercial e operacional;
-- biblioteca padronizada de metricas de negocio;
-- camada analitica que cruza aquisicao, receita, presenca e margem.
+- automações para follow-up, campanha e remediacao operacional;
+- consulta em linguagem natural sobre o negócio do evento;
+- recomendações de ação comercial e operacional;
+- biblioteca padronizada de métricas de negócio;
+- camada analítica que cruza aquisição, receita, presença e margem.
 
 ### Dependencias
 
 - instrumentacao de eventos desde as fases anteriores;
-- historico confiavel de dados;
-- taxonomia comum entre modulos;
-- governanca de acesso e uso de dados.
+- histórico confiável de dados;
+- taxonomia comum entre módulos;
+- governança de acesso e uso de dados.
 
-### Metricas De Sucesso
+### Métricas De Sucesso
 
-- aumento de receita assistida por recomendacao;
-- reducao do tempo de analise manual;
+- aumento de receita assistida por recomendação;
+- redução do tempo de análise manual;
 - identificacao antecipada de riscos;
-- adocao real de insights por operacao e gestao;
+- adoção real de insights por operação e gestão;
 - crescimento da recompra e da eficiencia de campanha.
 
 ### Riscos
 
-- IA sem base confiavel gerar sugestoes ruins;
-- automacao demais criar ruido em vez de ganho;
-- metricas inconsistentes contaminarem decisoes;
-- falta de governanca sobre alertas, modelos e permissoes.
+- IA sem base confiável gerar sugestoes ruins;
+- automação demais criar ruído em vez de ganho;
+- métricas inconsistentes contaminarem decisões;
+- falta de governança sobre alertas, modelos e permissões.
 
 ## Sequenciamento Estrategico
 
-O roadmap deve obedecer a esta logica:
+O roadmap deve obedecer a esta lógica:
 
 - primeiro, construir confiabilidade estrutural;
-- depois, capturar a transacao central;
-- em seguida, dominar a operacao ao vivo;
-- depois, consolidar a unidade economica do evento;
+- depois, capturar a transação central;
+- em seguida, dominar a operação ao vivo;
+- depois, consolidar a unidade econômica do evento;
 - por fim, transformar dado em vantagem composta.
 
-Se uma fase nao alimentar a seguinte, ela foi desenhada errado. O Animalz Events precisa crescer como sistema operacional integrado, nao como marketplace de features.
+Se uma fase não alimentar a seguinte, ela foi desenhada errado. O Animalz Events precisa crescer como sistema operacional integrado, não como marketplace de features.

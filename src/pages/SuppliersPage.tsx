@@ -415,8 +415,8 @@ export function SuppliersPage() {
       <ActionConfirmationDialog
         open={Boolean(pendingDeleteSupplier)}
         title="Remover fornecedor"
-        description={pendingDeleteSupplier ? `O cadastro de ${pendingDeleteSupplier.company_name} sera removido desta operacao.` : undefined}
-        impact="Historico contratual, contato e contexto operacional deixam de ficar disponiveis para a equipe neste ambiente."
+        description={pendingDeleteSupplier ? `O cadastro de ${pendingDeleteSupplier.company_name} sera removido desta operação.` : undefined}
+        impact="Histórico contratual, contato e contexto operacional deixam de ficar disponíveis para a equipe neste ambiente."
         confirmLabel="Excluir fornecedor"
         onCancel={() => setPendingDeleteSupplier(null)}
         onConfirm={async () => {

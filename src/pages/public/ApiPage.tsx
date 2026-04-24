@@ -5,11 +5,11 @@ import { useSeoMeta } from '@/shared/lib'
 
 const INTEGRATIONS = [
   { emoji: '💳', name: 'Stripe', descPt: 'Pagamentos seguros e checkout otimizado', descEn: 'Secure payments and optimized checkout' },
-  { emoji: '📧', name: 'Mailchimp', descPt: 'Email marketing e automacoes de campanha', descEn: 'Email marketing and campaign automations' },
-  { emoji: '📲', name: 'WhatsApp', descPt: 'Notificacoes de confirmacao e lembretes', descEn: 'Confirmation notifications and reminders' },
-  { emoji: '📊', name: 'Google Analytics', descPt: 'Rastreamento de conversao e comportamento', descEn: 'Conversion tracking and behavior analysis' },
-  { emoji: '🗓️', name: 'Google Calendar', descPt: 'Sincronizacao automatica de eventos', descEn: 'Automatic event synchronization' },
-  { emoji: '🔗', name: 'Zapier', descPt: 'Automacoes com +5.000 apps conectados', descEn: 'Automations with +5,000 connected apps' },
+  { emoji: '📧', name: 'Mailchimp', descPt: 'Email marketing e automações de campanha', descEn: 'Email marketing and campaign automations' },
+  { emoji: '📲', name: 'WhatsApp', descPt: 'Notificacoes de confirmação e lembretes', descEn: 'Confirmation notifications and reminders' },
+  { emoji: '📊', name: 'Google Analytics', descPt: 'Rastreamento de conversão e comportamento', descEn: 'Conversion tracking and behavior analysis' },
+  { emoji: '🗓️', name: 'Google Calendar', descPt: 'Sincronização automática de eventos', descEn: 'Automatic event synchronization' },
+  { emoji: '🔗', name: 'Zapier', descPt: 'Automações com +5.000 apps conectados', descEn: 'Automations with +5,000 connected apps' },
   { emoji: '📱', name: 'Capacitor', descPt: 'App mobile nativo iOS e Android', descEn: 'Native iOS and Android mobile app' },
   { emoji: '🔔', name: 'Push Notifications', descPt: 'Alertas em tempo real para sua equipe', descEn: 'Real-time alerts for your team' },
 ]
@@ -17,7 +17,7 @@ const INTEGRATIONS = [
 const ENDPOINTS = [
   { method: 'GET', path: '/events', descPt: 'Lista todos os eventos do organizador', descEn: 'List all organizer events' },
   { method: 'POST', path: '/checkins', descPt: 'Registra entrada de um participante', descEn: 'Register attendee check-in' },
-  { method: 'GET', path: '/reports', descPt: 'Retorna relatorios consolidados', descEn: 'Returns consolidated reports' },
+  { method: 'GET', path: '/reports', descPt: 'Retorna relatórios consolidados', descEn: 'Returns consolidated reports' },
   { method: 'GET', path: '/tickets', descPt: 'Lista ingressos de um evento', descEn: 'List tickets for an event' },
   { method: 'POST', path: '/occurrences', descPt: 'Cria uma ocorrencia operacional', descEn: 'Create an operational incident' },
 ]
@@ -26,7 +26,7 @@ const WEBHOOKS = [
   { event: 'ticket.sold', descPt: 'Disparado quando um ingresso e vendido', descEn: 'Fired when a ticket is sold' },
   { event: 'checkin.completed', descPt: 'Disparado ao confirmar entrada no evento', descEn: 'Fired when check-in is confirmed' },
   { event: 'occurrence.created', descPt: 'Disparado ao registrar uma ocorrencia', descEn: 'Fired when an incident is recorded' },
-  { event: 'approval.requested', descPt: 'Disparado ao solicitar aprovacao ao supervisor', descEn: 'Fired when supervisor approval is requested' },
+  { event: 'approval.requested', descPt: 'Disparado ao solicitar aprovação ao supervisor', descEn: 'Fired when supervisor approval is requested' },
 ]
 
 const METHOD_COLORS: Record<string, string> = {
@@ -40,9 +40,9 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
   const { isPortuguese } = usePublicLocale()
 
   useSeoMeta({
-    title: isPortuguese ? 'API & Integracoes | Pulse' : 'API & Integrations | Pulse',
+    title: isPortuguese ? 'API & Integrações | Pulse' : 'API & Integrations | Pulse',
     description: isPortuguese
-      ? 'Conecte a Pulse ao seu ecossistema. API REST, webhooks e integracoes nativas com as ferramentas que voce ja usa.'
+      ? 'Conecte a Pulse ao seu ecossistema. API REST, webhooks e integrações nativas com as ferramentas que você já usa.'
       : 'Connect Pulse to your ecosystem. REST API, webhooks and native integrations with the tools you already use.',
   })
 
@@ -53,16 +53,16 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,87,231,0.18),transparent_50%),radial-gradient(circle_at_80%_60%,rgba(66,133,244,0.10),transparent_40%)]" />
         <div className="relative z-10 mx-auto max-w-[1540px]">
           <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
-            {isPortuguese ? 'API & Integracoes' : 'API & Integrations'}
+            {isPortuguese ? 'API & Integrações' : 'API & Integrations'}
           </div>
           <h1 className="mt-6 max-w-4xl text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.88] tracking-[-0.04em] text-white">
             {isPortuguese
-              ? 'A Pulse conecta com o que voce ja usa.'
+              ? 'A Pulse conecta com o que você já usa.'
               : 'Pulse connects with what you already use.'}
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-white/58">
             {isPortuguese
-              ? 'API REST documentada, webhooks em tempo real e integracoes nativas com as principais ferramentas do mercado de eventos.'
+              ? 'API REST documentada, webhooks em tempo real e integrações nativas com as principais ferramentas do mercado de eventos.'
               : 'Documented REST API, real-time webhooks and native integrations with the leading event industry tools.'}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -84,7 +84,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
           <div className="mb-10">
             <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
               <Globe className="mr-2 inline-block h-3.5 w-3.5" />
-              {isPortuguese ? 'Integracoes nativas' : 'Native integrations'}
+              {isPortuguese ? 'Integrações nativas' : 'Native integrations'}
             </div>
             <h2 className="mt-4 text-[clamp(2rem,4vw,3.4rem)] font-bold leading-[0.9] tracking-[-0.03em] text-white">
               {isPortuguese ? 'Conectado ao seu ecossistema.' : 'Connected to your ecosystem.'}
@@ -121,7 +121,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
               </h2>
               <p className="mt-5 text-sm leading-7 text-white/50">
                 {isPortuguese
-                  ? 'Todos os recursos da plataforma expostos via REST. Autenticacao Bearer token, respostas em JSON, documentacao OpenAPI disponivel.'
+                  ? 'Todos os recursos da plataforma expostos via REST. Autenticacao Bearer token, respostas em JSON, documentacao OpenAPI disponível.'
                   : 'All platform resources exposed via REST. Bearer token authentication, JSON responses, OpenAPI documentation available.'}
               </p>
             </div>
@@ -168,7 +168,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-white/50">
                   {isPortuguese
-                    ? 'Configure endpoints para receber notificacoes instantaneas quando algo acontece na plataforma. Ideal para integracoes customizadas e automacoes.'
+                    ? 'Configure endpoints para receber notificacoes instantaneas quando algo acontece na plataforma. Ideal para integrações customizadas e automações.'
                     : 'Configure endpoints to receive instant notifications when something happens on the platform. Ideal for custom integrations and automations.'}
                 </p>
               </div>
@@ -205,7 +205,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-base leading-8 text-white/50">
                 {isPortuguese
-                  ? 'Acesse a documentacao completa ou fale diretamente com o time tecnico.'
+                  ? 'Acesse a documentacao completa ou fale diretamente com o time técnico.'
                   : 'Access the full documentation or talk directly to the technical team.'}
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
@@ -223,7 +223,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
                   className="inline-flex items-center gap-2 rounded-full border border-white/18 px-7 py-4 text-sm font-medium uppercase tracking-[0.18em] text-white/70 transition-all hover:border-white/28 hover:text-white"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  {isPortuguese ? 'Falar com o time tecnico' : 'Talk to the tech team'}
+                  {isPortuguese ? 'Falar com o time técnico' : 'Talk to the tech team'}
                 </a>
               </div>
             </div>

@@ -41,7 +41,7 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
             <PublicReveal delayMs={80}>
               <h1 className="mt-6 max-w-4xl font-display text-[clamp(3.8rem,8vw,7rem)] font-semibold uppercase leading-[0.84] tracking-[-0.04em] text-white">
                 {isPortuguese
-                  ? 'Experiencias que definem a temporada.'
+                  ? 'Experiências que definem a temporada.'
                   : 'Premium access to the experiences shaping the season.'}
               </h1>
             </PublicReveal>
@@ -49,7 +49,7 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
             <PublicReveal delayMs={140}>
               <p className="mt-6 max-w-2xl text-base leading-8 text-white/60 md:text-lg">
                 {isPortuguese
-                  ? 'Uma plataforma feita para descoberta rapida, ritmo comercial claro e um caminho direto ate a compra.'
+                  ? 'Uma plataforma feita para descoberta rápida, ritmo comercial claro e um caminho direto até a compra.'
                   : 'A platform built for faster discovery, clearer commercial rhythm and a stronger path from event calendar to purchase.'}
               </p>
             </PublicReveal>

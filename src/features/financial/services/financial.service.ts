@@ -168,7 +168,7 @@ export const financialService = {
       assertFinancialResult(result)
 
       if (!result.data) {
-        throw new FinancialServiceError('Nao foi possivel salvar o lancamento financeiro.', 'financial_cost_entry_save_failed')
+        throw new FinancialServiceError('Não foi possível salvar o lancamento financeiro.', 'financial_cost_entry_save_failed')
       }
 
       return mapFinancialCostEntryRow(result.data as Record<string, unknown>)
@@ -185,7 +185,7 @@ export const financialService = {
       assertFinancialResult(result)
 
       if (!result.data) {
-        throw new FinancialServiceError('Nao foi possivel salvar o repasse do evento.', 'event_payout_save_failed')
+        throw new FinancialServiceError('Não foi possível salvar o repasse do evento.', 'event_payout_save_failed')
       }
 
       return mapEventPayoutRow(result.data as Record<string, unknown>)
@@ -202,7 +202,7 @@ export const financialService = {
       assertFinancialResult(result)
 
       if (!result.data) {
-        throw new FinancialServiceError('Nao foi possivel salvar o forecast financeiro.', 'financial_forecast_save_failed')
+        throw new FinancialServiceError('Não foi possível salvar o forecast financeiro.', 'financial_forecast_save_failed')
       }
 
       return mapFinancialForecastRow(result.data as Record<string, unknown>)
@@ -219,7 +219,7 @@ export const financialService = {
       assertFinancialResult(result)
 
       if (!result.data) {
-        throw new FinancialServiceError('Nao foi possivel salvar o fechamento do evento.', 'event_financial_closure_save_failed')
+        throw new FinancialServiceError('Não foi possível salvar o fechamento do evento.', 'event_financial_closure_save_failed')
       }
 
       return mapEventFinancialClosureRow(result.data as Record<string, unknown>)

@@ -12,7 +12,7 @@ interface SocialProofSectionProps {
 }
 
 export function SocialProofSection({
-  eyebrow = 'Numeros reais',
+  eyebrow = 'Números reais',
   title,
   description,
   metrics,

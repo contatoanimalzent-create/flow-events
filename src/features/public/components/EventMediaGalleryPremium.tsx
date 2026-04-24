@@ -190,7 +190,7 @@ export function EventMediaGalleryPremium({ presentation, eventName }: EventMedia
           <div className="max-w-3xl">
             <div className="text-[11px] uppercase tracking-[0.32em] text-[#8e7f68]">Gallery</div>
             <h2 className="mt-4 font-display text-[clamp(2.7rem,4vw,4.2rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-[#1f1a15]">
-              Midia real do evento, organizada como uma vitrine premium.
+              Mídia real do evento, organizada como uma vitrine premium.
             </h2>
           </div>
         </PublicReveal>

@@ -24,7 +24,7 @@ export function TicketAvailabilityBadge({ available }: { available: number }) {
     return <PremiumBadge tone="accent">{isPortuguese ? 'Ultimas vagas' : 'Final availability'}</PremiumBadge>
   }
 
-  return <PremiumBadge tone="success">{isPortuguese ? 'Disponivel' : 'Available'}</PremiumBadge>
+  return <PremiumBadge tone="success">{isPortuguese ? 'Disponível' : 'Available'}</PremiumBadge>
 }
 
 export function TicketOptionCard({
@@ -59,7 +59,7 @@ export function TicketOptionCard({
           <p className="mt-3 max-w-xl text-sm leading-7 text-white/66">
             {ticketType.description ||
               (isPortuguese
-                ? 'Acesso pensado para uma experiencia bem resolvida, com disponibilidade e operacao refletidas em tempo real.'
+                ? 'Acesso pensado para uma experiência bem resolvida, com disponibilidade e operação refletidas em tempo real.'
                 : 'Access designed for a premium experience, with live availability and operations reflected in real time.')}
           </p>
         </div>
@@ -145,7 +145,7 @@ export function StickyPurchaseCTA({
                 ? isPortuguese ? 'Gratuito' : 'Free'
                 : formatPublicCurrency(cartTotal, locale)
               : isFreeMode || minPrice === 0
-                ? isPortuguese ? 'Inscricao gratuita' : 'Free registration'
+                ? isPortuguese ? 'Inscrição gratuita' : 'Free registration'
                 : isPortuguese ? `a partir de ${formatPublicCurrency(minPrice, locale)}` : `from ${formatPublicCurrency(minPrice, locale)}`}
           </div>
         </div>
@@ -200,12 +200,12 @@ export function EventTicketPanelPremium({
             </div>
             <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.3rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
               {isPortuguese
-                ? 'Escolha seu acesso em um painel comercial, nao em uma tabela fria.'
+                ? 'Escolha seu acesso em um painel comercial, não em uma tabela fria.'
                 : 'Choose your access in a commercial panel, not in a cold table.'}
             </h2>
             <p className="mt-4 text-base leading-8 text-white/68 md:text-lg">
               {isPortuguese
-                ? 'Cada opcao abaixo reflete disponibilidade, regras e inventario reais. A apresentacao ficou premium; a operacao continua precisa.'
+                ? 'Cada opcao abaixo reflete disponibilidade, regras e inventario reais. A apresentacao ficou premium; a operação continua precisa.'
                 : 'Each option below reflects real availability, rules and inventory. The presentation is premium; the operation remains precise.'}
             </p>
           </div>
@@ -327,9 +327,9 @@ export function EventTicketPanelPremium({
                 <div className="mt-6 space-y-3 text-sm leading-7 text-white/66">
                   {[
                     isPortuguese ? 'Reserva temporaria de inventario durante a compra' : 'Temporary inventory reservation in checkout',
-                    isPortuguese ? 'Pagamento protegido e emissao automatica do ticket digital' : 'Protected payment and automatic digital ticket issuance',
+                    isPortuguese ? 'Pagamento protegido e emissão automática do ticket digital' : 'Protected payment and automatic digital ticket issuance',
                     isFreeMode
-                      ? isPortuguese ? 'Inscricao validada por QR code' : 'Registration validated by QR code'
+                      ? isPortuguese ? 'Inscrição validada por QR code' : 'Registration validated by QR code'
                       : isPortuguese ? 'Entrada sustentada por QR code antifraude' : 'Entry supported by anti-fraud QR code',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-3">

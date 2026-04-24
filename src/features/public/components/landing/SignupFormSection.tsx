@@ -92,7 +92,7 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
 
       setSubmitSuccess(
         isPortuguese
-          ? 'Inscricao enviada com sucesso. Em instantes voce recebe a confirmacao.'
+          ? 'Inscrição enviada com sucesso. Em instantes você recebe a confirmação.'
           : 'Registration submitted successfully. Confirmation is on the way.',
       )
 
@@ -109,7 +109,7 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
         error instanceof Error
           ? error.message
           : isPortuguese
-            ? 'Nao foi possivel concluir a inscricao agora.'
+            ? 'Não foi possível concluir a inscrição agora.'
             : 'We could not complete the registration right now.',
       )
     }
@@ -132,14 +132,14 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
           variants={formAnimation.variants}
         >
           <div className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[var(--pulse-color-primary)]">
-            {isPortuguese ? 'Formulario de inscricao' : 'Registration form'}
+            {isPortuguese ? 'Formulário de inscrição' : 'Registration form'}
           </div>
           <h2 className="mt-4 text-[clamp(2rem,4vw,3.2rem)] font-semibold leading-[1.04] tracking-[-0.05em] text-[var(--pulse-color-primary)]">
             {isPortuguese ? 'Confirme seus dados e reserve seu lugar.' : 'Confirm your details and secure your place.'}
           </h2>
           <p className="mt-5 max-w-[34rem] text-[1rem] leading-8 text-[var(--pulse-color-text-secondary)]">
             {isPortuguese
-              ? 'O formulario foi pensado para ser rapido no mobile, com validacao em tempo real e um fluxo direto para capturar o interesse no evento.'
+              ? 'O formulário foi pensado para ser rápido no mobile, com válidação em tempo real e um fluxo direto para capturar o interesse no evento.'
               : 'The form is built for mobile speed, with real-time validation and a direct path to capture attendee intent.'}
           </p>
         </motion.div>
@@ -165,7 +165,7 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
                       (isPortuguese ? 'Digite nome e sobrenome.' : 'Please enter first and last name.'),
                   })}
                   className={inputClassName}
-                  placeholder={isPortuguese ? 'Como voce quer aparecer na lista' : 'How you want to appear on the guest list'}
+                  placeholder={isPortuguese ? 'Como você quer aparecer na lista' : 'How you want to appear on the guest list'}
                 />
                 {errors.fullName ? <p className="mt-1.5 text-xs text-[var(--pulse-status-error)]">{errors.fullName.message}</p> : null}
               </div>
@@ -178,7 +178,7 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
                     validate: (value) => validateEmail(value) || (isPortuguese ? 'E-mail invalido.' : 'Invalid email.'),
                   })}
                   className={inputClassName}
-                  placeholder="voce@email.com"
+                  placeholder="você@email.com"
                   type="email"
                 />
                 {errors.email ? <p className="mt-1.5 text-xs text-[var(--pulse-status-error)]">{errors.email.message}</p> : null}
@@ -263,7 +263,7 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
 
               <div className="md:col-span-2">
                 <label className="text-sm font-medium text-[var(--pulse-color-text-primary)]">
-                  {isPortuguese ? 'Informacoes adicionais' : 'Additional information'}
+                  {isPortuguese ? 'Informações adicionais' : 'Additional information'}
                 </label>
                 <textarea
                   {...register('additionalInfo')}
@@ -300,10 +300,10 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               {isSubmitting
                 ? isPortuguese
-                  ? 'Enviando inscricao...'
+                  ? 'Enviando inscrição...'
                   : 'Submitting registration...'
                 : isPortuguese
-                  ? 'Confirmar inscricao'
+                  ? 'Confirmar inscrição'
                   : 'Confirm registration'}
             </button>
           </form>

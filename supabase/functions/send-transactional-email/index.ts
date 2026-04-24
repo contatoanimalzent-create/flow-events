@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       .single()
 
     if (!order) {
-      return Response.json({ error: 'Pedido nao encontrado' }, { status: 404, headers: corsHeaders })
+      return Response.json({ error: 'Pedido não encontrado' }, { status: 404, headers: corsHeaders })
     }
 
     // Fetch event details including date and location

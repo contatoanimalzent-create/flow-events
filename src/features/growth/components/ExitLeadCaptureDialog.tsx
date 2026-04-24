@@ -74,13 +74,13 @@ export function ExitLeadCaptureDialog({
   const resolvedTitle =
     title ||
     (isPortuguese
-      ? 'Receba a proxima abertura antes do restante do mercado.'
+      ? 'Receba a próxima abertura antes do restante do mercado.'
       : 'Receive the next release before the rest of the market.')
 
   const resolvedDescription =
     description ||
     (isPortuguese
-      ? 'Salvamos seu acesso a futuras experiencias, viradas de lote e convites premium sem poluir sua caixa.'
+      ? 'Salvamos seu acesso a futuras experiências, viradas de lote e convites premium sem poluir sua caixa.'
       : 'We save your access to future experiences, tier changes and premium invitations without flooding your inbox.')
 
   async function handleSubmit() {
@@ -166,7 +166,7 @@ export function ExitLeadCaptureDialog({
             </div>
           </div>
 
-          {/* Lado direito, formulario (unico coluna em mobile) */}
+          {/* Lado direito, formulário (único coluna em mobile) */}
           <div className="px-5 py-8 sm:px-8 sm:py-10 md:px-9">
             {/* Eyebrow visivel so em mobile (no desktop esta no painel esquerdo) */}
             <div className="mb-4 flex items-center gap-2 md:hidden">
@@ -195,7 +195,7 @@ export function ExitLeadCaptureDialog({
                   if (status !== 'idle') setStatus('idle')
                 }}
                 onKeyDown={(e) => { if (e.key === 'Enter') void handleSubmit() }}
-                placeholder={isPortuguese ? 'voce@exemplo.com' : 'you@example.com'}
+                placeholder={isPortuguese ? 'você@exemplo.com' : 'you@example.com'}
                 className="mt-3 h-12 w-full rounded-[1rem] px-4 py-3 text-sm text-[#f0ebe2] outline-none transition-all placeholder:text-[#4a4540]"
                 style={{
                   background: 'rgba(255,255,255,0.05)',
@@ -245,7 +245,7 @@ export function ExitLeadCaptureDialog({
                 onClick={handleClose}
                 className="w-full rounded-full border border-[rgba(255,255,255,0.08)] py-3 text-sm font-medium text-[#6a6058] transition-all hover:border-[rgba(255,255,255,0.16)] hover:text-[#f0ebe2] active:scale-95"
               >
-                {isPortuguese ? 'Agora nao' : 'Not now'}
+                {isPortuguese ? 'Agora não' : 'Not now'}
               </button>
             </div>
 
@@ -253,8 +253,8 @@ export function ExitLeadCaptureDialog({
               <p className="mt-4 text-center text-[11px] text-[#4a4540]">{footerCopy}</p>
             ) : null}
 
-            {/* Safe area para iPhones com notch */}
-            <div className="h-[env(safe-area-inset-bottom,0px)]" />
+            {/* Safe área para iPhones com notch */}
+            <div className="h-[env(safe-área-inset-bottom,0px)]" />
           </div>
         </div>
       </div>

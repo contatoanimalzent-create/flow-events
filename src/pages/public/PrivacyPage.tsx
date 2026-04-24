@@ -10,89 +10,89 @@ export function PrivacyPage() {
   const sections = isPortuguese
     ? [
         {
-          title: '1. Sobre esta politica',
+          title: '1. Sobre esta política',
           content: [
-            'Esta Politica de Privacidade descreve como a Pulse coleta, usa, armazena e protege suas informacoes pessoais quando voce utiliza nossa plataforma.',
+            'Esta Política de Privacidade descreve como a Pulse coleta, usa, armazena e protege suas informações pessoais quando você utiliza nossa plataforma.',
           ],
         },
         {
-          title: '2. Informacoes que coletamos',
+          title: '2. Informações que coletamos',
           content: [
-            'Coletamos informacoes de duas formas principais.',
-            'Informacoes fornecidas diretamente: nome, email, telefone, endereco e dados de pagamento quando voce se cadastra, compra ingressos ou cria um evento.',
-            'Informacoes coletadas automaticamente: dados de uso da plataforma, endereco IP, tipo de navegador e cookies para melhorar sua experiencia.',
+            'Coletamos informações de duas formas principais.',
+            'Informações fornecidas diretamente: nome, email, telefone, endereço e dados de pagamento quando você se cadastra, compra ingressos ou cria um evento.',
+            'Informações coletadas automaticamente: dados de uso da plataforma, endereço IP, tipo de navegador e cookies para melhorar sua experiência.',
           ],
         },
         {
           title: '3. Como usamos seus dados',
           content: [
-            'Usamos suas informacoes para processar transacoes, enviar confirmacoes de compra, melhorar sua experiencia, comunicar atualizacoes sobre eventos e ingressos, prevenir fraude e cumprir obrigacoes legais.',
-            'Com seu consentimento, tambem podemos enviar promocoes e novidades sobre novos eventos.',
+            'Usamos suas informações para processar transações, enviar confirmações de compra, melhorar sua experiência, comunicar atualizações sobre eventos e ingressos, prevenir fraude e cumprir obrigações legais.',
+            'Com seu consentimento, também podemos enviar promoções e novidades sobre novos eventos.',
           ],
         },
         {
           title: '4. Base legal para tratamento',
           content: [
-            'Processamos seus dados com base em consentimento, execucao de contrato, obrigacoes legais e interesses legitimos relacionados a seguranca e melhoria do servico.',
+            'Processamos seus dados com base em consentimento, execução de contrato, obrigações legais e interesses legítimos relacionados a segurança e melhoria do serviço.',
           ],
         },
         {
           title: '5. Compartilhamento de dados',
           content: [
-            'Compartilhamos suas informacoes apenas quando necessario, como com processadores de pagamento, produtores de eventos e autoridades competentes quando exigido por lei.',
+            'Compartilhamos suas informações apenas quando necessário, como com processadores de pagamento, produtores de eventos e autoridades competentes quando exigido por lei.',
             'Nunca vendemos seus dados para terceiros.',
           ],
         },
         {
-          title: '6. Seguranca de dados',
+          title: '6. Segurança de dados',
           content: [
-            'Adotamos medidas tecnicas e organizacionais para proteger seus dados, incluindo criptografia, controles de acesso e monitoramento continuo.',
-            'Nenhum sistema e totalmente imune a riscos. Por isso, recomendamos que voce proteja suas credenciais e nos avise sobre qualquer acesso nao autorizado.',
+            'Adotamos medidas técnicas e organizacionais para proteger seus dados, incluindo criptografia, controles de acesso e monitoramento continuo.',
+            'Nenhum sistema é totalmente imune a riscos. Por isso, recomendamos que você proteja suas credenciais e nos avise sobre qualquer acesso não autorizado.',
           ],
         },
         {
-          title: '7. Retencao de dados',
+          title: '7. Retenção de dados',
           content: [
-            'Mantemos seus dados pelo tempo necessario para operar a plataforma, cumprir exigencias legais e atender obrigacoes fiscais e contratuais.',
+            'Mantemos seus dados pelo tempo necessário para operar a plataforma, cumprir exigências legais e atender obrigações fiscais e contratuais.',
           ],
         },
         {
           title: '8. Seus direitos',
           content: [
-            'Voce pode solicitar acesso, correcao, exclusao, portabilidade e revisao do uso de seus dados, alem de revogar consentimentos quando aplicavel.',
+            'Você pode solicitar acesso, correcao, exclusao, portabilidade e revisao do uso de seus dados, além de revogar consentimentos quando aplicável.',
             'Para exercer esses direitos, escreva para privacy@animalz.events.',
           ],
         },
         {
           title: '9. Cookies',
           content: [
-            'Usamos cookies para manter sua sessao ativa, lembrar preferencias e entender como a plataforma e utilizada.',
-            'Voce pode gerenciar cookies no seu navegador, embora isso possa afetar algumas funcionalidades.',
+            'Usamos cookies para manter sua sessão ativa, lembrar preferências e entender como a plataforma é utilizada.',
+            'Você pode gerenciar cookies no seu navegador, embora isso possa afetar algumas funcionalidades.',
           ],
         },
         {
           title: '10. Transferencias internacionais',
           content: [
-            'Seus dados podem ser processados em servidores localizados em outros paises. Nesses casos, adotamos salvaguardas adequadas para proteger suas informacoes.',
+            'Seus dados podem ser processados em servidores localizados em outros países. Nesses casos, adotamos salvaguardas adequadas para proteger suas informações.',
           ],
         },
         {
           title: '11. Menores de idade',
           content: [
-            'Nao coletamos intencionalmente dados de menores sem autorizacao legal. Se identificarmos uma coleta inadequada, adotaremos as medidas necessarias para remover esses dados.',
+            'Não coletamos intencionalmente dados de menores sem autorização legal. Se identificarmos uma coleta inadequada, adotaremos as medidas necessárias para remover esses dados.',
           ],
         },
         {
           title: '12. Contato e reclamacoes',
           content: [
-            'Para duvidas sobre privacidade, fale com privacy@animalz.events ou use nossa pagina de contato.',
-            'Se necessario, voce tambem pode procurar a autoridade competente de protecao de dados.',
+            'Para dúvidas sobre privacidade, fale com privacy@animalz.events ou use nossa página de contato.',
+            'Se necessário, você também pode procurar a autoridade competente de protecao de dados.',
           ],
         },
         {
-          title: '13. Atualizacoes desta politica',
+          title: '13. Atualizações desta política',
           content: [
-            'Esta politica pode ser atualizada periodicamente. Alteracoes relevantes poderao ser comunicadas por email ou na propria plataforma.',
+            'Esta política pode ser atualizada periodicamente. Alterações relevantes poderao ser comunicadas por email ou na própria plataforma.',
           ],
         },
       ]
@@ -186,7 +186,7 @@ export function PrivacyPage() {
       ]
 
   useSeoMeta({
-    title: isPortuguese ? 'Politica de privacidade | Pulse' : 'Privacy policy | Pulse',
+    title: isPortuguese ? 'Política de privacidade | Pulse' : 'Privacy policy | Pulse',
     description: isPortuguese
       ? 'Saiba como a Pulse coleta, usa e protege seus dados pessoais.'
       : 'Learn how Pulse collects, uses and protects your personal data.',
@@ -212,7 +212,7 @@ export function PrivacyPage() {
 
             <p className="mt-6 text-base leading-8 text-[#5f5549] md:text-lg">
               {isPortuguese
-                ? 'Na Pulse, protegemos seus dados com seriedade. Esta politica explica como coletamos, usamos e mantemos seguras suas informacoes.'
+                ? 'Na Pulse, protegemos seus dados com seriedade. Esta política explica como coletamos, usamos e mantemos seguras suas informações.'
                 : 'At Pulse, we take your data seriously. This policy explains how we collect, use and protect your information.'}
             </p>
           </PublicReveal>

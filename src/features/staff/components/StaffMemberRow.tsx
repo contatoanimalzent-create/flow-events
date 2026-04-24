@@ -129,11 +129,11 @@ export function StaffMemberTableRow({
         <tr className="bg-bg-secondary/70">
           <td colSpan={6} className="px-5 py-4">
             <div className="mb-2 text-[10px] font-mono uppercase tracking-widest text-text-muted">
-              Turno e presenca - {member.first_name}
+              Turno e presença - {member.first_name}
             </div>
             <div className="mb-3 flex flex-wrap gap-2 text-[11px] text-text-muted">
               {member.shift_label && <span>Turno: {member.shift_label}</span>}
-              {member.shift_starts_at && <span>Inicio: {formatDate(member.shift_starts_at, 'dd/MM HH:mm')}</span>}
+              {member.shift_starts_at && <span>Início: {formatDate(member.shift_starts_at, 'dd/MM HH:mm')}</span>}
               {member.shift_ends_at && <span>Fim: {formatDate(member.shift_ends_at, 'dd/MM HH:mm')}</span>}
               {member.linked_device_id && <span>Dispositivo: {member.linked_device_id}</span>}
             </div>

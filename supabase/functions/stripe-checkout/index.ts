@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
               name: `${ticketType.name}, ${event.name}`,
               description: installments > 1
                 ? `${installments}x de R$ ${(unitAmount / installments / 100).toFixed(2)} (juros de parcelamento inclusos)`
-                : 'Ingresso, preço total sem taxas surpresa',
+                : 'Ingresso, préço total sem taxas surpresa',
               images: event.cover_url ? [event.cover_url] : [],
             },
           },

@@ -1,21 +1,21 @@
 # Animalz Events Redesign
 
-## 1. Diagnostico da referencia
+## 1. Diagnostico da referência
 
 ### Reference video
 - Absorvido: contraste cinematografico, profundidade por imagem, composicao escura premium, motion sutil com senso de valor.
-- Traducao: a energia visual vira uma camada editorial de um produto operacional mais robusto.
-- Nao copiar literalmente: clima social/party-first, enquadramentos especificos, narrativa de app de convite.
+- Tradução: a energia visual vira uma camada editorial de um produto operacional mais robusto.
+- Não copiar literalmente: clima social/party-first, enquadramentos especificos, narrativa de app de convite.
 
 ### Reference mobile UI
 - Absorvido: tipografia marcante, full-bleed media, overlays transluidos, CTA simples e fortes, status premium no mobile.
-- Traducao: o mobile da Animalz vira um companion premium de acesso, agenda, credencial e experiencia no evento.
-- Nao copiar literalmente: sem semantica de convite casual, sem visual de social app, sem linguagem de festa.
+- Tradução: o mobile da Animalz vira um companion premium de acesso, agenda, credencial e experiência no evento.
+- Não copiar literalmente: sem semântica de convite casual, sem visual de social app, sem linguagem de festa.
 
 ### Official logo
 - Absorvido: energia diagonal, senso de velocidade, preto profundo, roxo premium, dourado controlado, identidade proprietaria.
-- Traducao: a marca orienta um sistema premium de operacao de eventos, com assinatura visual forte e sobria.
-- Nao copiar literalmente: sem exagero de neon, chamas, efeitos gratuitos ou ornamentacao barulhenta.
+- Tradução: a marca orienta um sistema premium de operação de eventos, com assinatura visual forte e sóbria.
+- Não copiar literalmente: sem exagero de neon, chamas, efeitos gratuitos ou ornamentacao barulhenta.
 
 ## 2. Brand UI direction
 
@@ -34,38 +34,38 @@
 
 ## 3. Product architecture
 
-### Front publico
+### Front público
 - Homepage institucional/comercial
-- Catalogo de eventos
-- Pagina individual de evento
-- Checkout / inscricao
-- Area publica do participante
+- Catálogo de eventos
+- Página individual de evento
+- Checkout / inscrição
+- Área pública do participante
 
 ### App mobile do participante
 - Home contextual
 - Evento / credencial
-- Agenda / programacao
-- Mapa / informacoes
-- Perfil / configuracoes
+- Agenda / programação
+- Mapa / informações
+- Perfil / configurações
 
 ### Backoffice do produtor
 - Dashboard executivo
 - Eventos
-- Vendas e inscricoes
+- Vendas e inscrições
 - Lotes e cupons
 - Credenciamento e check-in
 - Participantes / CRM
 - Comunicacao
-- Equipe e operacao
+- Equipe e operação
 - Fornecedores
 - Financeiro
-- Documentos e governanca
-- Branding / configuracoes
+- Documentos e governança
+- Branding / configurações
 
-### Logica de navegacao
+### Lógica de navegação
 - Front: descobrir -> avaliar -> converter -> acessar.
 - Mobile: abrir -> validar status -> navegar no evento -> receber comunicacao.
-- Backoffice: monitorar -> agir por modulo -> controlar por evento -> registrar governanca.
+- Backoffice: monitorar -> agir por módulo -> controlar por evento -> registrar governança.
 
 ## 4. Design system
 
@@ -76,7 +76,7 @@
 
 ### Tipografia
 - Display: headlines comprimidas, energicas, cinematograficas.
-- Interface: leitura limpa e tecnica para tabelas, filtros, forms e dashboards.
+- Interface: leitura limpa e técnica para tabelas, filtros, forms e dashboards.
 
 ### Estrutura
 - Grid: 12 colunas no web, 4 colunas logicas no mobile.
@@ -85,7 +85,7 @@
 - Shadows: profundidade longa e controlada, sem glow infantil.
 
 ### Componentes principais
-- CTA primario / secundario / ghost
+- CTA primário / secundário / ghost
 - Tabelas refinadas
 - Filtros por chip
 - Badges premium
@@ -99,21 +99,21 @@
 - Tactical: oliva, fumaça, leitura utilitaria, tom mission-grade.
 - Fight: sombras densas, acentos quentes, intensidade controlada.
 
-Regra: o tema muda a atmosfera, nao a gramatica do produto.
+Regra: o tema muda a atmosfera, não a gramatica do produto.
 
 ## 6. Wireframes de alto nivel
 
-- Front: hero, descoberta, storytelling de evento, checkout, area do participante.
-- Mobile: credencial, agenda, mapa, informacoes, perfil.
-- Backoffice: shell executiva, cards KPI, workspace principal, trilho de governanca.
+- Front: hero, descoberta, storytelling de evento, checkout, área do participante.
+- Mobile: credencial, agenda, mapa, informações, perfil.
+- Backoffice: shell executiva, cards KPI, workspace principal, trilho de governança.
 
 ## 7. UI final
 
-- Front: sistema editorial premium, com maior autoridade de marca e conversao.
+- Front: sistema editorial premium, com maior autoridade de marca e conversão.
 - Mobile: acesso premium, status, clareza e imersao.
-- Backoffice: cockpit executivo, confiavel, modular, caro e operacional.
+- Backoffice: cockpit executivo, confiável, modular, caro e operacional.
 
 ## Implementacao no repo
 
-- Home publica redesenhada em `src/pages/public/HomePage.tsx`
-- Documento de direcao em `docs/animalz-redesign.md`
+- Home pública redesenhada em `src/pages/public/HomePage.tsx`
+- Documento de direção em `docs/animalz-redesign.md`

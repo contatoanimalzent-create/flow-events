@@ -108,7 +108,7 @@ function OnboardingScreen({ onDone }: { onDone: () => void }) {
           <current.icon className="h-10 w-10" style={{ color: ACCENT }} />
         </div>
         <div>
-          <div className="text-2xl font-bold text-white leading-tight whitespace-pre-line">{current.title}</div>
+          <div className="text-2xl font-bold text-white leading-tight whitespace-pré-line">{current.title}</div>
           <div className="mt-3 text-sm text-white/50">{current.sub}</div>
         </div>
       </div>

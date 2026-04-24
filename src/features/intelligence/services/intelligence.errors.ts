@@ -10,6 +10,6 @@ export class IntelligenceServiceError extends Error {
 
 export function assertIntelligenceResult<T extends { error: { message?: string } | null }>(result: T) {
   if (result.error) {
-    throw new IntelligenceServiceError(result.error.message ?? 'Nao foi possivel carregar intelligence.', 'intelligence_query_failed')
+    throw new IntelligenceServiceError(result.error.message ?? 'Não foi possível carregar intelligence.', 'intelligence_query_failed')
   }
 }

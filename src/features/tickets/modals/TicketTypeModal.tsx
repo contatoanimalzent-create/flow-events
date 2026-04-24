@@ -45,7 +45,7 @@ export function TicketTypeModal({ eventId, ticketId, position, onClose, onSaved 
       ) : (
         <>
           <ModalBody>
-            <FormSection title="Informacoes principais">
+            <FormSection title="Informações principais">
               <FormField label="Nome do ingresso" required>
                 <input
                   className="input"
@@ -59,14 +59,14 @@ export function TicketTypeModal({ eventId, ticketId, position, onClose, onSaved 
               <FormField label="Descricao">
                 <input
                   className="input"
-                  placeholder="Descricao breve"
+                  placeholder="Descrição breve"
                   value={form.description}
                   onChange={(event) => setField('description', event.target.value)}
                 />
               </FormField>
 
               <FormGrid>
-                <FormField label="Setor / Area">
+                <FormField label="Setor / Área">
                   <input
                     className="input"
                     placeholder="ex: Pista A, Setor Norte"
@@ -105,7 +105,7 @@ export function TicketTypeModal({ eventId, ticketId, position, onClose, onSaved 
                 </div>
               </FormField>
 
-              <FormField label="Beneficios" hint="Use uma linha por beneficio para facilitar a leitura na venda publica.">
+              <FormField label="Beneficios" hint="Use uma linha por beneficio para facilitar a leitura na venda pública.">
                 <textarea
                   className="input resize-none"
                   rows={4}
@@ -120,13 +120,13 @@ export function TicketTypeModal({ eventId, ticketId, position, onClose, onSaved 
               <div className="space-y-3">
                 <FormToggleCard
                   title="Ingresso nominal"
-                  description="Vincula o ingresso ao nome do comprador para operacao e suporte."
+                  description="Vincula o ingresso ao nome do comprador para operação e suporte."
                   checked={form.is_nominal}
                   onToggle={() => setField('is_nominal', !form.is_nominal)}
                 />
                 <FormToggleCard
-                  title="Permite transferencia"
-                  description="Autoriza troca de titularidade sem alterar a logica atual do checkout."
+                  title="Permite transferência"
+                  description="Autoriza troca de titularidade sem alterar a lógica atual do checkout."
                   checked={form.is_transferable}
                   onToggle={() => setField('is_transferable', !form.is_transferable)}
                 />

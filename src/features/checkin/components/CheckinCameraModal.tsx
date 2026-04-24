@@ -216,7 +216,7 @@ export function CheckinCameraModal({
         </div>
       )}
 
-      {/* ── Camera area ────────────────────────────────────────────────── */}
+      {/* ── Camera área ────────────────────────────────────────────────── */}
       <div className="relative flex-1 overflow-hidden bg-black">
         <video
           ref={videoRef}

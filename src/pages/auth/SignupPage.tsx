@@ -243,7 +243,7 @@ export function SignupPage({ onBack, onLogin }: { onBack?: () => void; onLogin?:
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="input border-white/10 bg-white/[0.03] text-[#ebe7e0] placeholder:text-white/30 focus:border-[#d4ff00]"
-                        placeholder={t('you@company.com', 'voce@empresa.com')}
+                        placeholder={t('you@company.com', 'você@empresa.com')}
                         required
                       />
                     </div>

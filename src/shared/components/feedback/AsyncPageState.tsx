@@ -19,7 +19,7 @@ export function PageLoadingState({
   return (
     <LoadingState
       title={title ?? t('Loading', 'Carregando')}
-      description={description ?? t('We are organizing the data for you. One moment, please.', 'Estamos organizando os dados para voce. Um momento, por favor.')}
+      description={description ?? t('We are organizing the data for you. One moment, please.', 'Estamos organizando os dados para você. Um momento, por favor.')}
       icon={<Loader2 className="h-8 w-8 animate-spin" />}
     />
   )

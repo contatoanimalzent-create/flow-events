@@ -62,12 +62,12 @@ export function ForecastModal({ organizationId, events, initialReport, defaultEv
             <span className="admin-title-accent">.</span>
           </>
         }
-        subtitle="Projete receita, custo e risco executivo do evento sem mudar a logica financeira existente."
+        subtitle="Projete receita, custo e risco executivo do evento sem mudar a lógica financeira existente."
         onClose={onClose}
       />
 
       <ModalBody>
-        <FormSection title="Visao projetada">
+        <FormSection title="Visão projetada">
           <FormField label="Evento">
             <select className="input" value={values.event_id} onChange={(event) => setField('event_id', event.target.value)}>
               <option value="">Selecione um evento</option>

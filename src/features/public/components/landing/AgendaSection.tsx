@@ -32,10 +32,10 @@ export function AgendaSection({ items }: AgendaSectionProps) {
       <div className="mx-auto max-w-[1280px] px-6 md:px-8 lg:px-10">
         <div className="max-w-3xl">
           <div className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[var(--pulse-color-primary)]">
-            {isPortuguese ? 'Programacao' : 'Agenda'}
+            {isPortuguese ? 'Programação' : 'Agenda'}
           </div>
           <h2 className="mt-4 text-[clamp(2rem,4vw,3.2rem)] font-semibold leading-[1.04] tracking-[-0.05em] text-[var(--pulse-color-primary)]">
-            {isPortuguese ? 'Uma agenda clara para guiar a jornada do publico.' : 'A clear agenda that guides the attendee journey.'}
+            {isPortuguese ? 'Uma agenda clara para guiar a jornada do público.' : 'A clear agenda that guides the attendee journey.'}
           </h2>
         </div>
 

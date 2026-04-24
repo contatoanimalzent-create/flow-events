@@ -1079,7 +1079,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                 </ul>
               </motion.div>
 
-              {/* Right — iPhone 15 Pro mockup com parallax */}
+              {/* Right, iPhone 15 Pro mockup com parallax */}
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <motion.div ref={phoneRef} style={{ y: phoneY, position: 'relative' }}>
 

@@ -90,7 +90,7 @@ export function AboutSection({
           </div>
 
           <h2 className="mt-5 text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-[1.02] tracking-[-0.05em] text-[var(--pulse-color-primary)]">
-            {title || (isPortuguese ? 'Uma experiencia desenhada para gerar presenca e decisao.' : 'An experience designed to create presence and momentum.')}
+            {title || (isPortuguese ? 'Uma experiência desenhada para gerar presença e decisão.' : 'An experience designed to create presence and momentum.')}
           </h2>
 
           <p className="mt-6 max-w-[42rem] text-[1rem] leading-8 text-[var(--pulse-color-text-secondary)] md:text-[1.06rem]">
@@ -141,7 +141,7 @@ export function AboutSection({
                 </div>
                 <div className="mt-5 grid gap-3">
                   <div className="rounded-[var(--pulse-radius-md)] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-4 text-sm text-[var(--pulse-color-text-secondary)]">
-                    {isPortuguese ? 'Recepcao, credenciamento e fluxo principal em um unico eixo claro.' : 'Reception, credentialing and the main flow aligned into one clear axis.'}
+                    {isPortuguese ? 'Recepcao, credenciamento e fluxo principal em um único eixo claro.' : 'Reception, credentialing and the main flow aligned into one clear axis.'}
                   </div>
                   <div className="rounded-[var(--pulse-radius-md)] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] p-4 text-sm text-[var(--pulse-color-text-secondary)]">
                     {isPortuguese ? 'Palco, lounges e ativacoes distribuidos para gerar circulacao natural.' : 'Stage, lounges and activations distributed to create natural movement.'}
@@ -151,11 +151,11 @@ export function AboutSection({
 
               <div className="rounded-[calc(var(--pulse-radius-lg)+0.25rem)] border border-[var(--pulse-color-border)] bg-[var(--pulse-color-primary)] p-7 text-[var(--pulse-color-text-inverse)] shadow-[var(--pulse-shadow-medium)]">
                 <div className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-white/80">
-                  {isPortuguese ? 'Operacao no detalhe' : 'Operational detail'}
+                  {isPortuguese ? 'Operação no detalhe' : 'Operational detail'}
                 </div>
                 <p className="mt-4 text-lg leading-8 text-white/88">
                   {isPortuguese
-                    ? 'Cada camada da landing ajuda a reduzir friccao entre descoberta, contexto e inscricao.'
+                    ? 'Cada camada da landing ajuda a reduzir friccao entre descoberta, contexto e inscrição.'
                     : 'Each layer of the landing reduces friction between discovery, context and registration.'}
                 </p>
               </div>

@@ -21,56 +21,56 @@ const FEATURES = [
     icon: QrCode,
     titlePt: 'Check-in Mobile',
     titleEn: 'Mobile Check-in',
-    descPt: 'QR code por camera, validacao offline e anti-fraude. Suporta 500 leituras por minuto com zero latencia.',
+    descPt: 'QR code por camera, válidação offline e anti-fraude. Suporta 500 leituras por minuto com zero latencia.',
     descEn: 'QR code via camera, offline and anti-fraud validation. Supports 500 reads per minute with zero latency.',
   },
   {
     icon: Users,
-    titlePt: 'Gestao de Staff',
+    titlePt: 'Gestão de Staff',
     titleEn: 'Staff Management',
-    descPt: 'Convide por link, defina funcoes e permissoes, registre ponto e acompanhe presenca em tempo real.',
+    descPt: 'Convide por link, defina funcoes e permissões, registre ponto e acompanhe presença em tempo real.',
     descEn: 'Invite via link, set roles and permissions, clock in/out and track presence in real time.',
   },
   {
     icon: Layers,
     titlePt: 'Controle de Fluxo',
     titleEn: 'Flow Control',
-    descPt: 'Gerencie filas, capacidade por setor e receba alertas automaticos de lotacao critica.',
+    descPt: 'Gerencie filas, capacidade por setor e receba alertas automáticos de lotacao crítica.',
     descEn: 'Manage queues, capacity per sector and receive automatic critical capacity alerts.',
   },
   {
     icon: Monitor,
     titlePt: 'Supervisor ao Vivo',
     titleEn: 'Live Supervisor',
-    descPt: 'Health score do evento em tempo real, registro de ocorrencias, aprovacoes e mapa interativo da equipe.',
+    descPt: 'Health score do evento em tempo real, registro de ocorrências, aprovações e mapa interativo da equipe.',
     descEn: 'Real-time event health score, incident logging, approvals and interactive staff map.',
   },
   {
     icon: Tag,
     titlePt: 'Virada de Lote',
     titleEn: 'Batch Turnover',
-    descPt: 'Automacao por data ou por quantidade vendida. Compradores recebem notificacao automatica de mudanca de preco.',
+    descPt: 'Automação por data ou por quantidade vendida. Compradores recebem notificacao automática de mudanca de preço.',
     descEn: 'Automation by date or sold quantity. Buyers receive automatic price change notifications.',
   },
   {
     icon: BarChart3,
-    titlePt: 'Relatorios ao Vivo',
+    titlePt: 'Relatórios ao Vivo',
     titleEn: 'Live Reports',
-    descPt: 'Receita, conversao, ticket medio e presenca por hora. Atualizacao em tempo real durante o evento.',
+    descPt: 'Receita, conversão, ticket medio e presença por hora. Atualizacao em tempo real durante o evento.',
     descEn: 'Revenue, conversion, average ticket and hourly attendance. Real-time updates during the event.',
   },
   {
     icon: CreditCard,
     titlePt: 'Pagamento Antecipado',
     titleEn: 'Early Payment',
-    descPt: 'Repasse em D+2, conciliacao automatica de transacoes e exportacao contabil pronta para uso.',
+    descPt: 'Repasse em D+2, conciliacao automática de transações e exportacao contabil pronta para uso.',
     descEn: 'Transfer in D+2, automatic transaction reconciliation and accounting exports ready to use.',
   },
   {
     icon: Shield,
     titlePt: 'Credenciamento',
     titleEn: 'Credentialing',
-    descPt: 'Formularios personalizados, aprovacao manual ou automatica e QR code unico por participante.',
+    descPt: 'Formularios personalizados, aprovação manual ou automática e QR code único por participante.',
     descEn: 'Custom forms, manual or automatic approval and unique QR code per participant.',
   },
 ]
@@ -101,7 +101,7 @@ const PLATFORMS = [
     icon: Bell,
     labelPt: 'API',
     labelEn: 'API',
-    descPt: 'Integracao com seu ecossistema',
+    descPt: 'Integração com seu ecossistema',
     descEn: 'Integration with your ecosystem',
   },
 ]
@@ -112,7 +112,7 @@ export function FuncionalidadesPage({ onLogin }: { onLogin: () => void }) {
   useSeoMeta({
     title: isPortuguese ? 'Funcionalidades | Pulse' : 'Features | Pulse',
     description: isPortuguese
-      ? 'Check-in mobile, gestao de staff, relatorios ao vivo, virada de lote e muito mais. Tudo que voce precisa para operar um evento profissional.'
+      ? 'Check-in mobile, gestão de staff, relatórios ao vivo, virada de lote e muito mais. Tudo que você precisa para operar um evento profissional.'
       : 'Mobile check-in, staff management, live reports, batch turnover and much more. Everything you need to run a professional event.',
   })
 
@@ -132,7 +132,7 @@ export function FuncionalidadesPage({ onLogin }: { onLogin: () => void }) {
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-white/58">
             {isPortuguese
-              ? 'Uma plataforma construida por quem ja operou eventos de verdade. Sem feature inutil, sem limite artificial.'
+              ? 'Uma plataforma construida por quem já operou eventos de verdade. Sem feature inutil, sem limite artificial.'
               : 'A platform built by people who have run real events. No useless features, no artificial limits.'}
           </p>
         </div>
@@ -171,7 +171,7 @@ export function FuncionalidadesPage({ onLogin }: { onLogin: () => void }) {
           <div className="rounded-2xl border border-white/8 bg-[linear-gradient(135deg,rgba(0,87,231,0.12)_0%,rgba(10,10,10,0.98)_40%,rgba(66,133,244,0.06)_100%)] p-8 lg:p-12">
             <div className="mb-10">
               <div className="text-[10px] uppercase tracking-[0.38em] text-[#4285F4]">
-                {isPortuguese ? 'Disponivel onde voce precisar' : 'Available where you need it'}
+                {isPortuguese ? 'Disponível onde você precisar' : 'Available where you need it'}
               </div>
               <h2 className="mt-4 max-w-xl text-[clamp(2rem,4vw,3.4rem)] font-bold leading-[0.9] tracking-[-0.03em] text-white">
                 {isPortuguese
@@ -216,7 +216,7 @@ export function FuncionalidadesPage({ onLogin }: { onLogin: () => void }) {
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-base leading-8 text-white/50">
                 {isPortuguese
-                  ? 'Configure seu evento em minutos. A equipe e a tecnologia estao prontos para o seu proximo evento.'
+                  ? 'Configure seu evento em minutos. A equipe e a tecnologia estao prontos para o seu próximo evento.'
                   : 'Set up your event in minutes. The team and technology are ready for your next event.'}
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">

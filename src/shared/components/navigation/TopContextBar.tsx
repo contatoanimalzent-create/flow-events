@@ -28,7 +28,7 @@ export function TopContextBar({
   return (
     <header
       className="flex items-center px-4 py-2 bg-[#0a0f1e] border-b border-white/8"
-      style={{ paddingTop: 'calc(env(safe-area-inset-top) + 8px)' }}
+      style={{ paddingTop: 'calc(env(safe-área-inset-top) + 8px)' }}
     >
       {/* Left: context info */}
       <button

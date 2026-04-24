@@ -39,7 +39,7 @@ function EmbeddedPaymentForm({
     const { error: submitError } = await elements.submit()
 
     if (submitError) {
-      setError(submitError.message ?? 'Nao foi possivel validar os dados do pagamento.')
+      setError(submitError.message ?? 'Não foi possível validar os dados do pagamento.')
       setSubmitting(false)
       return
     }
@@ -58,7 +58,7 @@ function EmbeddedPaymentForm({
     })
 
     if (confirmError) {
-      setError(confirmError.message ?? 'Nao foi possivel iniciar o pagamento.')
+      setError(confirmError.message ?? 'Não foi possível iniciar o pagamento.')
       setSubmitting(false)
       return
     }
@@ -112,7 +112,7 @@ export function PublicCheckoutPaymentStep(props: PublicCheckoutPaymentStepProps)
   if (!stripePromise) {
     return (
       <div className="rounded-[24px] border border-[#eadaba] bg-[#faf4e7] px-5 py-4 text-sm text-[#6d5324]">
-        A chave publica do Stripe nao esta configurada neste ambiente.
+        A chave pública do Stripe não esta configurada neste ambiente.
       </div>
     )
   }

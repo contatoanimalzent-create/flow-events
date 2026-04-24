@@ -121,7 +121,7 @@ export function MonetizationPageContent() {
                 {[
                   { label: 'Nome da oferta', placeholder: 'Upgrade VIP' },
                   { label: 'Tipo', placeholder: 'upgrade, backstage...' },
-                  { label: 'Preço (R$)', placeholder: '150.00' },
+                  { label: 'Préço (R$)', placeholder: '150.00' },
                   { label: 'Estoque', placeholder: '50' },
                 ].map((f) => (
                   <div key={f.label}>

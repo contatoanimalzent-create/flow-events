@@ -19,7 +19,7 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
         month: 'long',
         year: 'numeric',
       }),
-      note: isPortuguese ? 'Agenda principal da experiencia' : 'Primary date for the experience',
+      note: isPortuguese ? 'Agenda principal da experiência' : 'Primary date for the experience',
     },
     {
       icon: Clock3,
@@ -35,7 +35,7 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
       icon: MapPin,
       label: isPortuguese ? 'Local' : 'Location',
       value: [event.venue_name, event.venue_address?.city, event.venue_address?.state].filter(Boolean).join(' / '),
-      note: isPortuguese ? 'Local preparado para a operacao do evento' : 'Venue prepared for live event operations',
+      note: isPortuguese ? 'Local preparado para a operação do evento' : 'Venue prepared for live event operations',
     },
     {
       icon: Users,
@@ -46,14 +46,14 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
     {
       icon: Sparkles,
       label: isPortuguese ? 'Categoria' : 'Category',
-      value: event.category || (isPortuguese ? 'Experiencia premium' : 'Premium experience'),
+      value: event.category || (isPortuguese ? 'Experiência premium' : 'Premium experience'),
       note: event.age_rating ? (isPortuguese ? `Classificacao ${event.age_rating}` : `Age rating ${event.age_rating}`) : (isPortuguese ? 'Curadoria de atmosfera premium' : 'Curated premium atmosphere'),
     },
     {
       icon: ShieldCheck,
       label: isPortuguese ? 'Acesso' : 'Access',
-      value: isFreeMode ? (isPortuguese ? 'Inscricao com QR code digital' : 'Registration with digital QR code') : (isPortuguese ? 'Ingresso digital com validacao antifraude' : 'Digital ticket with anti-fraud validation'),
-      note: isPortuguese ? 'Compra, emissao e credenciamento ligados ao mesmo produto' : 'Purchase, issuance and check-in connected to the same product',
+      value: isFreeMode ? (isPortuguese ? 'Inscrição com QR code digital' : 'Registration with digital QR code') : (isPortuguese ? 'Ingresso digital com válidação antifraude' : 'Digital ticket with anti-fraud validation'),
+      note: isPortuguese ? 'Compra, emissão e credenciamento ligados ao mesmo produto' : 'Purchase, issuance and check-in connected to the same product',
     },
   ]
 
@@ -63,11 +63,11 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
         <PublicReveal>
           <div className="max-w-3xl">
             <div className="text-[11px] uppercase tracking-[0.32em] text-white/48">
-              {isPortuguese ? 'Informacoes do evento' : 'Event information'}
+              {isPortuguese ? 'Informações do evento' : 'Event information'}
             </div>
             <h2 className="mt-4 font-display text-[clamp(2.8rem,4vw,4.3rem)] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
               {isPortuguese
-                ? 'Informacoes essenciais, apresentadas como parte da experiencia.'
+                ? 'Informações essenciais, apresentadas como parte da experiência.'
                 : 'Essential information, presented as part of the experience.'}
             </h2>
           </div>

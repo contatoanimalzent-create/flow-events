@@ -74,7 +74,7 @@ async function main() {
 
   const summary = payload.summary ?? {}
   console.log('Demo seed aplicado com sucesso.')
-  console.log(`Organizacao: ${summary.organizationSlug ?? 'animalz-grand-experiences'}`)
+  console.log(`Organização: ${summary.organizationSlug ?? 'animalz-grand-experiences'}`)
   console.log(`Evento: ${summary.eventSlug ?? 'animalz-nocturne-sessions-2026'}`)
   console.log(`Tickets vendidos: ${summary.ticketsSold ?? 0}`)
   console.log(`Pedidos: ${summary.orders ?? 0}`)

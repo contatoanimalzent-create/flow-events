@@ -14,7 +14,7 @@ const topics = [
     title: { en: 'Creating events', pt: 'Criando eventos' },
     description: {
       en: 'Learn how to create, configure and manage your events, from free registrations to premium VIP experiences.',
-      pt: 'Aprenda a criar, configurar e operar seus eventos, de inscricoes gratuitas a experiencias VIP de alto valor.',
+      pt: 'Aprenda a criar, configurar e operar seus eventos, de inscrições gratuitas a experiências VIP de alto valor.',
     },
   },
   {
@@ -22,23 +22,23 @@ const topics = [
     title: { en: 'Ticket sales', pt: 'Vendas de ingressos' },
     description: {
       en: 'Master revenue strategy, fees, releases, promotions and the commercial details that drive conversion.',
-      pt: 'Domine estrategia de receita, taxas, lotes, promocoes e os detalhes comerciais que movem conversao.',
+      pt: 'Domine estratégia de receita, taxas, lotes, promoções e os detalhes comerciais que movem conversão.',
     },
   },
   {
     icon: '✅',
-    title: { en: 'Check-in and operations', pt: 'Credenciamento e operacao' },
+    title: { en: 'Check-in and operations', pt: 'Credenciamento e operação' },
     description: {
       en: 'Run event-day check-in, staff control, ticket validation and operational integrations with confidence.',
-      pt: 'Conduza credenciamento, equipe, validacao de ingressos e integracoes operacionais com seguranca.',
+      pt: 'Conduza credenciamento, equipe, válidação de ingressos e integrações operacionais com segurança.',
     },
   },
   {
     icon: '📊',
-    title: { en: 'Reports and data', pt: 'Relatorios e dados' },
+    title: { en: 'Reports and data', pt: 'Relatórios e dados' },
     description: {
       en: 'Understand your numbers with analytics, sales reporting, attendance data and audience insights.',
-      pt: 'Entenda seus numeros com analises, vendas, presenca e inteligencia de publico.',
+      pt: 'Entenda seus números com análises, vendas, presença e inteligência de público.',
     },
   },
   {
@@ -69,12 +69,12 @@ export function HelpPage() {
       <div className="mb-6 card p-6">
         <div className="text-[11px] uppercase tracking-[0.32em] text-[#4285F4]">{t('Operational AI', 'AI operacional')}</div>
         <h2 className="mt-3 font-display text-3xl leading-none text-text-primary">
-          {t('Help inside every module.', 'Ajuda dentro de cada modulo.')}
+          {t('Help inside every module.', 'Ajuda dentro de cada módulo.')}
         </h2>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-text-secondary">
           {t(
             'Open the AI assistant in the admin shell to ask where to work, how to register staff, when to use POS, or how to separate sales from inventory. It now keeps operational memory from previous questions to improve the next answers.',
-            'Abra a AI no shell interno para perguntar onde operar, como cadastrar staff, quando usar PDV ou como separar venda de estoque. Ela agora guarda memoria operacional das duvidas anteriores para responder melhor nas proximas.',
+            'Abra a AI no shell interno para perguntar onde operar, como cadastrar staff, quando usar PDV ou como separar venda de estoque. Ela agora guarda memoria operacional das dúvidas anteriores para responder melhor nas próximas.',
           )}
         </p>
       </div>
@@ -93,7 +93,7 @@ export function HelpPage() {
       <div className="mt-8 card p-6 space-y-5">
         <div>
           <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-1">
-            {t('Producer reference', 'Referencia do produtor')}
+            {t('Producer reference', 'Referência do produtor')}
           </div>
           <h2 className="font-display text-2xl leading-none text-text-primary">
             {t('Image & video specs', 'Especificacoes de imagem e video')}
@@ -102,20 +102,20 @@ export function HelpPage() {
           <p className="mt-2 text-sm text-text-secondary">
             {t(
               'Use these specs when preparing assets for events, logos and public pages.',
-              'Use essas medidas ao preparar os arquivos para eventos, logos e paginas publicas.',
+              'Use essas medidas ao preparar os arquivos para eventos, logos e páginas públicas.',
             )}
           </p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {([
-            { icon: '🖼️', label: t('Event cover','Capa do evento'),      spec: '1920 × 1080 px', formats: 'JPG · PNG · WebP',  size: 'max 5 MB',  ratio: '16:9',  use: t('Hero on public page','Hero da pagina publica') },
+            { icon: '🖼️', label: t('Event cover','Capa do evento'),      spec: '1920 × 1080 px', formats: 'JPG · PNG · WebP',  size: 'max 5 MB',  ratio: '16:9',  use: t('Hero on public page','Hero da página pública') },
             { icon: '📱', label: t('Mobile banner','Banner mobile'),      spec: '1080 × 1350 px', formats: 'JPG · PNG · WebP',  size: 'max 5 MB',  ratio: '4:5',   use: t('Social media feed','Feed de redes sociais') },
             { icon: '🔲', label: t('Thumbnail','Thumb / miniatura'),      spec: '800 × 800 px',   formats: 'JPG · PNG',         size: 'max 2 MB',  ratio: '1:1',   use: t('Listings and cards','Listagens e cards') },
             { icon: '🎯', label: t('Event logo','Logo do evento'),         spec: '400 × 400 px',   formats: 'PNG transparente',  size: 'max 1 MB',  ratio: '1:1',   use: t('Header and badge','Header e badge') },
-            { icon: '🎬', label: t('Hero video (loop)','Video hero loop'), spec: '1920 × 1080 px', formats: 'MP4 · WebM',        size: 'max 50 MB', ratio: '16:9',  use: t('Max 60 sec loop','Loop maximo 60s') },
+            { icon: '🎬', label: t('Hero video (loop)','Video hero loop'), spec: '1920 × 1080 px', formats: 'MP4 · WebM',        size: 'max 50 MB', ratio: '16:9',  use: t('Max 60 sec loop','Loop máximo 60s') },
             { icon: '📹', label: t('Vertical video','Video vertical'),    spec: '1080 × 1920 px', formats: 'MP4',               size: 'max 30 MB', ratio: '9:16',  use: t('Reels and Stories','Reels e Stories') },
-            { icon: '🏢', label: t('Org logo','Logo da organizacao'),      spec: '400 × 400 px',   formats: 'PNG · SVG',         size: 'max 2 MB',  ratio: '1:1',   use: t('Sidebar and emails','Sidebar e emails') },
+            { icon: '🏢', label: t('Org logo','Logo da organização'),      spec: '400 × 400 px',   formats: 'PNG · SVG',         size: 'max 2 MB',  ratio: '1:1',   use: t('Sidebar and emails','Sidebar e emails') },
             { icon: '🎨', label: t('Email banner','Banner de email'),      spec: '600 × 300 px',   formats: 'JPG · PNG',         size: 'max 1 MB',  ratio: '2:1',   use: t('Transactional emails','Emails transacionais') },
             { icon: '📸', label: t('Gallery photo','Foto da galeria'),     spec: '1200 × 800 px',  formats: 'JPG · PNG · WebP',  size: 'max 8 MB',  ratio: '3:2',   use: t('Event gallery','Galeria do evento') },
           ] as const).map((item) => (
@@ -140,7 +140,7 @@ export function HelpPage() {
         <div className="rounded-[14px] border border-status-warning/20 bg-status-warning/6 px-4 py-3 text-[11px] text-status-warning leading-relaxed">
           💡 {t(
             'All images are automatically compressed for the web. Use original high-resolution files, the platform handles optimization.',
-            'Todas as imagens sao comprimidas automaticamente para web. Envie os arquivos originais em alta resolucao, a plataforma faz a otimizacao.',
+            'Todas as imagens são comprimidas automaticamente para web. Envie os arquivos originais em alta resolucao, a plataforma faz a otimizacao.',
           )}
         </div>
       </div>

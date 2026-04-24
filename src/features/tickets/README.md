@@ -1,4 +1,4 @@
 # TICKETS
 
-Responsavel pela operacao comercial de ingressos.
-Inclui tipos, lotes, estoque, pedidos, emissao, transferencia e regras de venda.
+Responsável pela operação comercial de ingressos.
+Inclui tipos, lotes, estoque, pedidos, emissão, transferência e regras de venda.

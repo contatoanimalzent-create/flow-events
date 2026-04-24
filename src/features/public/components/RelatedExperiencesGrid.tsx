@@ -14,7 +14,7 @@ export function RelatedExperiencesGrid({
   title,
 }: RelatedExperiencesGridProps) {
   const { isPortuguese } = usePublicLocale()
-  const resolvedTitle = title || (isPortuguese ? 'Experiencias relacionadas' : 'Related experiences')
+  const resolvedTitle = title || (isPortuguese ? 'Experiências relacionadas' : 'Related experiences')
   const visibleEvents = events.slice(0, 4)
 
   if (visibleEvents.length === 0) {

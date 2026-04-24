@@ -63,7 +63,7 @@ export function EventScheduleCard({ event, index = 0 }: EventScheduleCardProps) 
               </h3>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5b6168] md:text-base">
             {event.subtitle || event.short_description || (isPortuguese
-              ? 'Uma experiencia pensada para transformar data, venue e narrativa em desejo imediato.'
+              ? 'Uma experiência pensada para transformar data, venue e narrativa em desejo imediato.'
               : 'An experience designed to turn date, venue and story into immediate desire.')}
           </p>
 

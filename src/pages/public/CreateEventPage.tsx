@@ -14,7 +14,7 @@ export function CreateEventPage({ onLogin }: { onLogin: () => void }) {
           <div className="mx-auto max-w-7xl">
             <LoadingState
               title={isPortuguese ? 'Carregando' : 'Loading'}
-              description={isPortuguese ? 'Preparando as informacoes da plataforma.' : 'Preparing platform information.'}
+              description={isPortuguese ? 'Preparando as informações da plataforma.' : 'Preparing platform information.'}
               className="min-h-[18rem]"
             />
           </div>

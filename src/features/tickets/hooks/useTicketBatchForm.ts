@@ -87,7 +87,7 @@ export function useTicketBatchForm({ eventId, ticketTypeId, batchId, position, o
     }
 
     if (!form.price || Number.isNaN(Number(form.price))) {
-      setError('Pre\u00e7o inv\u00e1lido')
+      setError('Pré\u00e7o inv\u00e1lido')
       return
     }
 

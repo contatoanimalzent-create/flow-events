@@ -89,7 +89,7 @@ export function CustomerDetailModal({
 
               <div className="mt-5 space-y-4">
                 <div className="card p-5">
-                  <div className="mb-3 text-[10px] font-mono uppercase tracking-widest text-text-muted">Historico de pedidos</div>
+                  <div className="mb-3 text-[10px] font-mono uppercase tracking-widest text-text-muted">Histórico de pedidos</div>
                   <div className="space-y-3">
                     {(detail?.orderHistory ?? []).map((order) => (
                       <div key={order.id} className="rounded-sm border border-bg-border bg-bg-surface p-3">
@@ -183,7 +183,7 @@ export function CustomerDetailModal({
                       className="input min-h-40 resize-none"
                       value={notesDraft}
                       onChange={(event) => setNotesDraft(event.target.value)}
-                      placeholder="Preferencias do cliente, contexto comercial, observacoes de atendimento..."
+                      placeholder="Preferências do cliente, contexto comercial, observacoes de atendimento..."
                     />
                     <button
                       onClick={() => void onSaveNotes(notesDraft)}
@@ -196,7 +196,7 @@ export function CustomerDetailModal({
                   </div>
 
                   <div className="rounded-sm border border-bg-border bg-bg-surface p-4 text-sm">
-                    <div className="mb-2 text-[10px] font-mono uppercase tracking-widest text-text-muted">Resumo rapido</div>
+                    <div className="mb-2 text-[10px] font-mono uppercase tracking-widest text-text-muted">Resumo rápido</div>
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-text-secondary">Ultima compra</span>
@@ -205,7 +205,7 @@ export function CustomerDetailModal({
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-text-secondary">Ultimo check-in</span>
+                        <span className="text-text-secondary">Último check-in</span>
                         <span className="font-mono text-text-primary">
                           {customer.last_attendance_at ? formatDate(customer.last_attendance_at, 'dd/MM/yyyy HH:mm') : '-'}
                         </span>

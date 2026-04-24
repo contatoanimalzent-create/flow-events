@@ -26,7 +26,7 @@ export function StaffStatsGrid({ stats }: StaffStatsGridProps) {
               </div>
             </div>
             <div className={`metric-value text-[1.85rem] ${stat.color}`}>{stat.value}</div>
-            <div className="mt-3 text-[11px] text-text-muted">Equipe, alocacao e custo em um unico painel.</div>
+            <div className="mt-3 text-[11px] text-text-muted">Equipe, alocacao e custo em um único painel.</div>
           </div>
         )
       })}

@@ -24,9 +24,9 @@ const ARTIGOS = [
   {
     categoria: 'Vendas',
     data: '5 Abr 2026',
-    titulo: 'Virada de lote: o momento certo para aumentar o preço e não perder vendas',
+    titulo: 'Virada de lote: o momento certo para aumentar o préço e não perder vendas',
     resumo:
-      'Mudar o preço cedo demais esfria o interesse. Tarde demais e você deixa dinheiro na mesa. Veja como calibrar a virada de lote para maximizar receita e urgência de compra.',
+      'Mudar o préço cedo demais esfria o interesse. Tarde demais e você deixa dinheiro na mesa. Veja como calibrar a virada de lote para maximizar receita e urgência de compra.',
     cor: 'bg-amber-500/15 text-amber-400',
   },
   {

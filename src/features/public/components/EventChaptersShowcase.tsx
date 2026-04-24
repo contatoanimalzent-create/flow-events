@@ -31,11 +31,11 @@ export function EventChaptersShowcase({ events }: EventChaptersShowcaseProps) {
           <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#4285F4]/70">
-                {isPortuguese ? 'Proximos eventos' : 'Upcoming events'}
+                {isPortuguese ? 'Próximos eventos' : 'Upcoming events'}
               </div>
               <h2 className="mt-3 max-w-2xl font-display text-[clamp(2rem,4vw,3.2rem)] font-bold uppercase leading-[0.92] tracking-tight text-white">
                 {isPortuguese
-                  ? 'Eventos selecionados para voce'
+                  ? 'Eventos selecionados para você'
                   : 'Curated events for you'}
               </h2>
             </div>

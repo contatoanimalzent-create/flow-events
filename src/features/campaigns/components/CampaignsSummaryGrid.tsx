@@ -32,7 +32,7 @@ export function CampaignsSummaryGrid({ summary }: CampaignsSummaryGridProps) {
               </div>
             </div>
             <div className={`metric-value text-[1.95rem] ${card.color}`}>{card.value.toLocaleString('pt-BR')}</div>
-            <div className="mt-3 text-[11px] text-text-muted">Leitura comercial, segmentacao e execucao.</div>
+            <div className="mt-3 text-[11px] text-text-muted">Leitura comercial, segmentação e execução.</div>
           </div>
         )
       })}

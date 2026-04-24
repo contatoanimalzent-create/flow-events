@@ -274,7 +274,7 @@ export function HomePage({ onLogin }: HomePageProps) {
         ::selection      { background: rgba(201,168,76,0.25); color: #F0E8D6; }
       `}</style>
 
-      <PublicLayout onLogin={onLogin}>
+      <PublicLayout onLogin={onLogin} heroPage>
         <div style={{ background: '#060B18', color: '#F0E8D6' }}>
 
           {/* ══════════════════════════════════════════════════════════════════

@@ -73,10 +73,10 @@ export function EventsPublicHeader({
     <>
       <header
         className={cn(
-          'sticky top-0 z-50 border-b transition-all duration-500',
+          'fixed top-0 left-0 right-0 z-50 border-b transition-all duration-500',
           isScrolled
             ? 'border-white/8 bg-[rgba(8,8,8,0.94)] backdrop-blur-2xl shadow-[0_1px_0_rgba(255,255,255,0.06)]'
-            : 'border-transparent bg-[rgba(5,5,5,0.58)] backdrop-blur-xl',
+            : 'border-transparent bg-transparent',
           className,
         )}
       >

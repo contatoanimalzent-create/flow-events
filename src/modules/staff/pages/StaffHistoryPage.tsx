@@ -95,7 +95,7 @@ export default function StaffHistoryPage({ onNavigate }: PulsePageProps) {
                   <div className="flex items-center gap-1.5">
                     <Clock size={12} />
                     {fmtTime(h.startTime)}
-                    {h.endTime ? ` – ${fmtTime(h.endTime)}` : ' – em andamento'}
+                    {h.endTime ? `, ${fmtTime(h.endTime)}` : ', em andamento'}
                     {duration ? ` (${duration})` : ''}
                   </div>
                 </div>

@@ -51,6 +51,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Camera QR (opcional — não bloqueia instalação se não tiver câmera) -->
+    <!-- Camera QR (opcional, não bloqueia instalação se não tiver câmera) -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 </manifest>

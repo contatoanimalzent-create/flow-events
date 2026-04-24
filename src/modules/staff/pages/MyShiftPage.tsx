@@ -59,7 +59,7 @@ export default function MyShiftPage({ onNavigate }: PulsePageProps) {
               })))
             }
           } catch {
-            // Teammates load failure is non-critical — show shift info without team
+            // Teammates load failure is non-critical, show shift info without team
           }
         }
       } catch (err) {

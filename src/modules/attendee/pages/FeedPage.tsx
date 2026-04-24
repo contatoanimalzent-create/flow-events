@@ -34,7 +34,7 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
 
   useEffect(() => { loadFeed() }, [context?.eventId])
 
-  // Realtime new posts — reload feed on new insert
+  // Realtime new posts, reload feed on new insert
   useRealtimeFeed(context?.eventId, (_post) => {
     if (context?.eventId) {
       attendeeService.getFeed(context.eventId).then(setPosts).catch(() => {})
@@ -152,7 +152,7 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
     try {
       return new Date(s).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
     } catch {
-      return '—'
+      return '-'
     }
   }
 

@@ -72,7 +72,7 @@ export default function OperatorHomePage({ onNavigate }: PulsePageProps) {
 
   const rate = metrics.totalValid + metrics.totalInvalid > 0
     ? ((metrics.totalValid / (metrics.totalValid + metrics.totalInvalid)) * 100).toFixed(1)
-    : '—'
+    : '-'
 
   return (
     <div className="pb-6">
@@ -81,7 +81,7 @@ export default function OperatorHomePage({ onNavigate }: PulsePageProps) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-slate-400 text-xs">Portaria ativa</p>
-            <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '—'}</h2>
+            <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '-'}</h2>
           </div>
           <div className="flex items-center gap-2">
             {isOnline

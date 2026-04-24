@@ -29,7 +29,7 @@ export function useAuthBootstrap() {
 
     async function initializeSession() {
       try {
-        // getSession lê do localStorage — rápido e síncrono
+        // getSession lê do localStorage, rápido e síncrono
         const { data } = await authService.getSession()
 
         if (!active) return

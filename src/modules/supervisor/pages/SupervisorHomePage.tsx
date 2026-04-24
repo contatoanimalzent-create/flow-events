@@ -60,7 +60,7 @@ export default function SupervisorHomePage({ onNavigate }: PulsePageProps) {
       <div className="px-4 pt-5 pb-3 flex items-start justify-between">
         <div>
           <p className="text-slate-400 text-xs">Supervisão</p>
-          <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '—'}</h2>
+          <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '-'}</h2>
         </div>
         <button onClick={load} className="p-2 mt-1">
           <RefreshCw size={14} className={`text-slate-400 ${loading ? 'animate-spin' : ''}`} />
@@ -90,7 +90,7 @@ export default function SupervisorHomePage({ onNavigate }: PulsePageProps) {
           {teamData.delayed > 0 && (
             <div className="mt-3 flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2.5">
               <Clock size={14} className="text-amber-400 shrink-0" />
-              <p className="text-amber-300 text-sm">{teamData.delayed} membro{teamData.delayed !== 1 ? 's' : ''} em atraso — verifique a equipe</p>
+              <p className="text-amber-300 text-sm">{teamData.delayed} membro{teamData.delayed !== 1 ? 's' : ''} em atraso, verifique a equipe</p>
             </div>
           )}
         </div>
@@ -151,11 +151,11 @@ export default function SupervisorHomePage({ onNavigate }: PulsePageProps) {
       {healthScore && healthScore.score < 90 && (() => {
         const recs: Array<{ icon: string; text: string; urgent: boolean }> = []
         const f = Object.fromEntries(healthScore.factors.map((x) => [x.label, x]))
-        if (f['Staff ativo'] && !f['Staff ativo'].ok) recs.push({ icon: '👥', text: 'Staff ativo abaixo de 80% — mobilize membros reserva imediatamente', urgent: true })
-        if (f['Pontualidade'] && !f['Pontualidade'].ok) recs.push({ icon: '⏰', text: `${teamData?.delayed ?? 0} membros atrasados — entre em contato pela equipe`, urgent: f['Pontualidade'].value < 70 })
-        if (f['Presença geral'] && !f['Presença geral'].ok) recs.push({ icon: '📍', text: 'Presença geral baixa — verifique absenteísmo e distribua tarefas', urgent: false })
-        if (f['Segurança'] && !f['Segurança'].ok) recs.push({ icon: '🔒', text: 'Alta taxa de tentativas inválidas — reforce o controle na portaria', urgent: true })
-        if (teamData && teamData.outOfArea > 0) recs.push({ icon: '🗺️', text: `${teamData.outOfArea} membro${teamData.outOfArea > 1 ? 's' : ''} fora da zona — verifique o mapa`, urgent: false })
+        if (f['Staff ativo'] && !f['Staff ativo'].ok) recs.push({ icon: '👥', text: 'Staff ativo abaixo de 80%, mobilize membros reserva imediatamente', urgent: true })
+        if (f['Pontualidade'] && !f['Pontualidade'].ok) recs.push({ icon: '⏰', text: `${teamData?.delayed ?? 0} membros atrasados, entre em contato pela equipe`, urgent: f['Pontualidade'].value < 70 })
+        if (f['Presença geral'] && !f['Presença geral'].ok) recs.push({ icon: '📍', text: 'Presença geral baixa, verifique absenteísmo e distribua tarefas', urgent: false })
+        if (f['Segurança'] && !f['Segurança'].ok) recs.push({ icon: '🔒', text: 'Alta taxa de tentativas inválidas, reforce o controle na portaria', urgent: true })
+        if (teamData && teamData.outOfArea > 0) recs.push({ icon: '🗺️', text: `${teamData.outOfArea} membro${teamData.outOfArea > 1 ? 's' : ''} fora da zona, verifique o mapa`, urgent: false })
         if (recs.length === 0) return null
         return (
           <div className="px-4 mb-5">

@@ -1,5 +1,5 @@
 /**
- * PulseApp — unified mobile app entry point
+ * PulseApp, unified mobile app entry point
  *
  * Single app · single auth · multi-org · multi-event · multi-role · dynamic navigation
  *
@@ -179,7 +179,7 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
   if (is('/pulse/promoter/ranking')) return <RankingPage onNavigate={navigate} />
   if (is('/pulse/promoter/goals')) return <GoalsPage onNavigate={navigate} />
 
-  // Fallback — 404
+  // Fallback, 404
   return <NotFoundPage onNavigate={navigate} />
 }
 
@@ -217,7 +217,7 @@ export function PulseApp() {
     })
   }, [isContextReady, context?.eventId])
 
-  // ── session guard — usa a sessão Supabase existente, sem login próprio ──
+  // ── session guard, usa a sessão Supabase existente, sem login próprio ──
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setAuthChecked(true)

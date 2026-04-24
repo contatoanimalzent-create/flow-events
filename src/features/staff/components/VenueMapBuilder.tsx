@@ -551,7 +551,7 @@ export function VenueMapBuilder({ eventId, readOnly = false }: VenueMapBuilderPr
             <div>
               <label className="mb-1 block text-xs font-semibold text-text-muted">Capacidade</label>
               {readOnly ? (
-                <p className="text-sm text-text-primary">{selectedZone.capacity ?? '—'}</p>
+                <p className="text-sm text-text-primary">{selectedZone.capacity ?? '-'}</p>
               ) : (
                 <input
                   type="number"
@@ -568,14 +568,14 @@ export function VenueMapBuilder({ eventId, readOnly = false }: VenueMapBuilderPr
             <div>
               <label className="mb-1 block text-xs font-semibold text-text-muted">Status</label>
               {readOnly ? (
-                <p className="text-sm text-text-primary">{selectedZone.status ?? '—'}</p>
+                <p className="text-sm text-text-primary">{selectedZone.status ?? '-'}</p>
               ) : (
                 <select
                   className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:border-brand-acid focus:outline-none"
                   value={selectedZone.status ?? ''}
                   onChange={e => updateZone(selectedZone.id, { status: e.target.value || undefined })}
                 >
-                  <option value="">—</option>
+                  <option value="">-</option>
                   <option value="active">Ativo</option>
                   <option value="inactive">Inativo</option>
                   <option value="maintenance">Manutenção</option>
@@ -588,7 +588,7 @@ export function VenueMapBuilder({ eventId, readOnly = false }: VenueMapBuilderPr
             <div>
               <label className="mb-1 block text-xs font-semibold text-text-muted">Responsável</label>
               {readOnly ? (
-                <p className="text-sm text-text-primary">{selectedZone.responsible ?? '—'}</p>
+                <p className="text-sm text-text-primary">{selectedZone.responsible ?? '-'}</p>
               ) : (
                 <input
                   className="w-full rounded border border-gray-200 px-2 py-1.5 text-sm focus:border-brand-acid focus:outline-none"

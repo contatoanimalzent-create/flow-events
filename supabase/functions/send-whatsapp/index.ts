@@ -12,7 +12,7 @@ import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
  *   { to, templateKey, variables, organizationId }
  */
 interface RequestBody {
-  /** Recipient phone number — E.164 (e.g. "+5511999990000") or plain digits */
+  /** Recipient phone number, E.164 (e.g. "+5511999990000") or plain digits */
   to: string
   /** Key column value in whatsapp_templates for this organization */
   templateKey: string
@@ -39,7 +39,7 @@ interface TwilioMessageResponse {
 type ChannelUsed = 'whatsapp' | 'sms'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TwilioError — structured error from the Twilio REST API
+// TwilioError, structured error from the Twilio REST API
 // ─────────────────────────────────────────────────────────────────────────────
 
 class TwilioError extends Error {
@@ -266,7 +266,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
           to:         recipientPhone,
           body:       renderedBody,
         })
-        sendError = null  // SMS succeeded — clear error
+        sendError = null  // SMS succeeded, clear error
       } catch (smsErr: unknown) {
         const smsMsg = smsErr instanceof TwilioError
           ? `[${smsErr.code}] ${smsErr.message}`
@@ -309,7 +309,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     .single()
 
   if (logErr) {
-    // Non-fatal — delivery already attempted; don't fail the whole request
+    // Non-fatal, delivery already attempted; don't fail the whole request
     console.warn('[send-whatsapp] communications_log insert failed:', logErr.message)
   }
 

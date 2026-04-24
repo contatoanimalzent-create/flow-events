@@ -48,7 +48,7 @@ export const authService = {
       .eq('id', profileId)
   },
   createOrganizationForUser: async (_userId: string, orgName: string, userEmail?: string) => {
-    // Usa RPC SECURITY DEFINER — contorna RLS e executa tudo atomicamente:
+    // Usa RPC SECURITY DEFINER, contorna RLS e executa tudo atomicamente:
     // 1) cria a org  2) adiciona em organization_members  3) atualiza profile
     const { data, error } = await supabase
       .rpc('create_organization', {

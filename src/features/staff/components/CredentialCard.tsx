@@ -67,7 +67,7 @@ export function CredentialCard({ credential }: CredentialCardProps) {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Credencial — ${credential.name}</title>
+          <title>Credencial, ${credential.name}</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
             * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -131,7 +131,7 @@ export function CredentialCard({ credential }: CredentialCardProps) {
         {/* Left stripe */}
         <div style={{ width: '8px', background: cfg.badge, flexShrink: 0 }} />
 
-        {/* Left panel — photo + type badge */}
+        {/* Left panel, photo + type badge */}
         <div style={{ width: '96px', padding: '14px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', borderRight: `1px solid ${cfg.badge}22`, flexShrink: 0 }}>
           {/* Photo / initials */}
           {credential.photo_url ? (
@@ -171,7 +171,7 @@ export function CredentialCard({ credential }: CredentialCardProps) {
           </div>
         </div>
 
-        {/* Center panel — info */}
+        {/* Center panel, info */}
         <div style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: '4px', overflow: 'hidden' }}>
           {/* Event name */}
           {credential.event && (
@@ -227,7 +227,7 @@ export function CredentialCard({ credential }: CredentialCardProps) {
           )}
         </div>
 
-        {/* Right panel — QR code */}
+        {/* Right panel, QR code */}
         <div style={{ width: '80px', padding: '10px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', background: '#fff', flexShrink: 0 }}>
           <img
             src={qrSrc}
@@ -260,7 +260,7 @@ export function CredentialCard({ credential }: CredentialCardProps) {
         <div className="flex flex-wrap items-center gap-4 text-xs text-text-muted">
           <span className="flex items-center gap-1">
             <Calendar className="h-3.5 w-3.5" />
-            {formatDate(credential.event.starts_at)} — {formatDate(credential.event.ends_at)}
+            {formatDate(credential.event.starts_at)}, {formatDate(credential.event.ends_at)}
           </span>
           <span className="flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5" />

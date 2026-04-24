@@ -178,8 +178,8 @@ export function AjudaPage({ onLogin }: { onLogin: () => void }) {
             </h2>
             <p className="text-[#9a9088] mb-6 text-sm">
               {isPortuguese
-                ? 'Nossa equipe responde rápido — pelo WhatsApp ou email.'
-                : 'Our team responds quickly — via WhatsApp or email.'}
+                ? 'Nossa equipe responde rápido, pelo WhatsApp ou email.'
+                : 'Our team responds quickly, via WhatsApp or email.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a

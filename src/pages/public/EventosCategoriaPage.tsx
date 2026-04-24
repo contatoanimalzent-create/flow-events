@@ -123,7 +123,7 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsPt: [
       {
         title: 'Credenciamento por cargo',
-        desc: 'Diferencie acessos por perfil — palestrante, VIP, imprensa ou participante geral.',
+        desc: 'Diferencie acessos por perfil, palestrante, VIP, imprensa ou participante geral.',
       },
       {
         title: 'Relatórios executivos',
@@ -137,7 +137,7 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsEn: [
       {
         title: 'Role-based credentialing',
-        desc: 'Differentiate access by profile — speaker, VIP, press or general attendee.',
+        desc: 'Differentiate access by profile, speaker, VIP, press or general attendee.',
       },
       {
         title: 'Executive reports',
@@ -169,7 +169,7 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsPt: [
       {
         title: 'Credenciamento por cargo',
-        desc: 'Diferencie acessos por perfil — palestrante, VIP, imprensa ou participante geral.',
+        desc: 'Diferencie acessos por perfil, palestrante, VIP, imprensa ou participante geral.',
       },
       {
         title: 'Relatórios executivos',
@@ -183,7 +183,7 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsEn: [
       {
         title: 'Role-based credentialing',
-        desc: 'Differentiate access by profile — speaker, VIP, press or general attendee.',
+        desc: 'Differentiate access by profile, speaker, VIP, press or general attendee.',
       },
       {
         title: 'Executive reports',

@@ -315,7 +315,7 @@ async function processJob(
 ): Promise<{ processed: number; failed: number; error?: string }> {
   const nowIso = new Date().toISOString()
 
-  // Atomic claim — UPDATE WHERE status='pending' prevents concurrent double-claim
+  // Atomic claim, UPDATE WHERE status='pending' prevents concurrent double-claim
   const { data: claimed } = await admin
     .from('notification_jobs')
     .update({ status: 'running' as JobStatus, started_at: nowIso })
@@ -325,7 +325,7 @@ async function processJob(
     .maybeSingle()
 
   if (!claimed) {
-    console.warn('[process-notification-jobs] Job ' + job.id + ' already claimed — skipping')
+    console.warn('[process-notification-jobs] Job ' + job.id + ' already claimed, skipping')
     return { processed: 0, failed: 0 }
   }
 
@@ -496,7 +496,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     return jsonResponse({ message: 'No pending jobs', jobs_processed: 0, reset_stuck: resetCount })
   }
 
-  // 2. Process each job sequentially (jobs can have large audiences — avoid timeout)
+  // 2. Process each job sequentially (jobs can have large audiences, avoid timeout)
   const results: Array<{ job_id: string; processed: number; failed: number; error?: string }> = []
 
   for (const job of pendingJobs) {

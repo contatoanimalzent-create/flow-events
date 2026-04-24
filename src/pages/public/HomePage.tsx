@@ -1,5 +1,5 @@
 /**
- * Pulse — HomePage premium (world-class marketing)
+ * Pulse, HomePage premium (world-class marketing)
  * Referência: Rolls-Royce Whispers, NIO, Ferrari, Aston Martin, Pagani
  * Stack: React 18 · TypeScript · Framer Motion ^12 · GSAP 3.15
  */
@@ -278,7 +278,7 @@ export function HomePage({ onLogin }: HomePageProps) {
         <div style={{ background: '#060B18', color: '#F0E8D6' }}>
 
           {/* ══════════════════════════════════════════════════════════════════
-               SEÇÃO 1 — Video Hero (100vh)
+               SEÇÃO 1, Video Hero (100vh)
           ══════════════════════════════════════════════════════════════════ */}
           <section
             ref={heroRef}
@@ -440,7 +440,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                   lineHeight: 1.75,
                 }}
               >
-                Check-in, staff, ingressos e supervisão em tempo real — tudo em uma operação conectada e sem fricção.
+                Check-in, staff, ingressos e supervisão em tempo real, tudo em uma operação conectada e sem fricção.
               </motion.p>
 
               {/* CTA Buttons */}
@@ -541,7 +541,7 @@ export function HomePage({ onLogin }: HomePageProps) {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════
-               SEÇÃO 2 — Ticker / Marquee infinito
+               SEÇÃO 2, Ticker / Marquee infinito
           ══════════════════════════════════════════════════════════════════ */}
           <section
             style={{
@@ -578,7 +578,7 @@ export function HomePage({ onLogin }: HomePageProps) {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════
-               SEÇÃO 3 — Números que impressionam
+               SEÇÃO 3, Números que impressionam
           ══════════════════════════════════════════════════════════════════ */}
           <section
             ref={numbersRef}
@@ -723,7 +723,7 @@ export function HomePage({ onLogin }: HomePageProps) {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════
-               SEÇÃO 4 — Features com scroll horizontal sticky
+               SEÇÃO 4, Features com scroll horizontal sticky
           ══════════════════════════════════════════════════════════════════ */}
           <section
             ref={featuresSectionRef}
@@ -733,7 +733,7 @@ export function HomePage({ onLogin }: HomePageProps) {
               position: 'relative',
             }}
           >
-            {/* Section header — visible before the pin */}
+            {/* Section header, visible before the pin */}
             <div
               style={{
                 padding: 'clamp(4rem, 8vw, 7rem) 1.5rem 2rem',
@@ -887,7 +887,7 @@ export function HomePage({ onLogin }: HomePageProps) {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════
-               SEÇÃO 5 — Manifesto / Statement bold
+               SEÇÃO 5, Manifesto / Statement bold
           ══════════════════════════════════════════════════════════════════ */}
           <section
             style={{
@@ -975,7 +975,7 @@ export function HomePage({ onLogin }: HomePageProps) {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════
-               SEÇÃO 6 — Preview do App (mockup + parallax)
+               SEÇÃO 6, Preview do App (mockup + parallax)
           ══════════════════════════════════════════════════════════════════ */}
           <section
             ref={phoneSectionRef}
@@ -1010,7 +1010,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                 zIndex: 1,
               }}
             >
-              {/* Left — Text */}
+              {/* Left, Text */}
               <motion.div
                 initial={{ opacity: 0, x: -40 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -1079,7 +1079,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                 </ul>
               </motion.div>
 
-              {/* Right — Phone mockup with parallax */}
+              {/* Right, Phone mockup with parallax */}
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <motion.div
                   ref={phoneRef}
@@ -1239,7 +1239,7 @@ export function HomePage({ onLogin }: HomePageProps) {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════
-               SEÇÃO 7 — CTA Final
+               SEÇÃO 7, CTA Final
           ══════════════════════════════════════════════════════════════════ */}
           <section
             style={{
@@ -1357,7 +1357,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                   flexWrap: 'wrap',
                 }}
               >
-                {/* Primary CTA — gold glow */}
+                {/* Primary CTA, gold glow */}
                 <div style={{ position: 'relative' }}>
                   <div
                     style={{
@@ -1394,7 +1394,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                   </motion.a>
                 </div>
 
-                {/* Secondary CTA — WhatsApp */}
+                {/* Secondary CTA, WhatsApp */}
                 <motion.a
                   href="https://wa.me/14698629040"
                   target="_blank"

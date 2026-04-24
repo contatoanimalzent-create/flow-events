@@ -95,7 +95,7 @@ export function OperatorScannerView({ eventId, eventName, onReset }: OperatorSca
         eventId={eventId}
         gateId={selectedGateId !== 'all' ? selectedGateId : null}
         onScan={handleScan}
-        onClose={() => { /* operator mode — camera always on */ }}
+        onClose={() => { /* operator mode, camera always on */ }}
         scanResult={scanResult}
         processing={processing}
         onClearResult={clearScanResult}
@@ -124,7 +124,7 @@ export function OperatorScannerView({ eventId, eventName, onReset }: OperatorSca
                 >
                   <app.icon className={cn('h-3.5 w-3.5 shrink-0', app.color)} />
                   <span className="flex-1 truncate font-mono text-xs text-text-primary">
-                    {item.digital_ticket?.holder_name ?? '—'}
+                    {item.digital_ticket?.holder_name ?? '-'}
                   </span>
                   <span className={cn('font-mono text-[10px] uppercase tracking-wider', app.color)}>
                     {app.label}

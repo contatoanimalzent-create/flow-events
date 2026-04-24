@@ -111,7 +111,7 @@ const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatDateTimePT(iso?: string | null): string {
-  if (!iso) return '—'
+  if (!iso) return '-'
   try {
     return new Intl.DateTimeFormat('pt-BR', {
       day: '2-digit',
@@ -195,7 +195,7 @@ function CredentialQR({ app }: { app: StaffApplication }) {
       </div>
       <img
         src={app.credential_qr}
-        alt={`QR Code — ${app.full_name}`}
+        alt={`QR Code, ${app.full_name}`}
         className="h-36 w-36 rounded-xl border border-white/10"
       />
       {app.credential_issued_at && (
@@ -308,7 +308,7 @@ function ApplicationCard({
             {app.emergency_contact_name && (
               <DetailItem
                 label="Contato emergência"
-                value={`${app.emergency_contact_name}${app.emergency_contact_phone ? ` — ${app.emergency_contact_phone}` : ''}`}
+                value={`${app.emergency_contact_name}${app.emergency_contact_phone ? `, ${app.emergency_contact_phone}` : ''}`}
               />
             )}
           </div>
@@ -521,7 +521,7 @@ export function StaffApplicationsPanel({ eventId }: Props) {
     )
   }
 
-  // Approve — calls generate-credential edge function
+  // Approve, calls generate-credential edge function
   async function handleApprove(app: StaffApplication) {
     setActionLoading(app.id)
     try {
@@ -554,7 +554,7 @@ export function StaffApplicationsPanel({ eventId }: Props) {
           )
         }
       }
-      // Not a fatal error if credential generation fails — status is already approved
+      // Not a fatal error if credential generation fails, status is already approved
     } catch (err: unknown) {
       console.error('Error approving application:', err)
     } finally {
@@ -711,10 +711,10 @@ export function StaffApplicationsPanel({ eventId }: Props) {
               onToggle={() => setExpandedId((prev) => (prev === app.id ? null : app.id))}
               onApprove={() => void handleApprove(app)}
               onReject={() =>
-                openNotesModal(app, 'rejected', `Reprovar — ${app.full_name}`)
+                openNotesModal(app, 'rejected', `Reprovar, ${app.full_name}`)
               }
               onRequestAdjustment={() =>
-                openNotesModal(app, 'adjustment_requested', `Solicitar ajuste — ${app.full_name}`)
+                openNotesModal(app, 'adjustment_requested', `Solicitar ajuste, ${app.full_name}`)
               }
               actionLoading={actionLoading}
             />

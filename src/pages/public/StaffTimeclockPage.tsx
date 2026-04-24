@@ -139,7 +139,7 @@ function calcWorkedSeconds(timeline: TimelineItem[]): number {
       clockInAt = null
     }
   }
-  // Still active — count up to now
+  // Still active, count up to now
   if (clockInAt) {
     total += (Date.now() - clockInAt.getTime()) / 1000
   }
@@ -341,7 +341,7 @@ export function StaffTimeclockPage() {
       if (!currentSession || status === 'idle' || status === 'completed') return
 
       if (!inside) {
-        // Started going outside — record timestamp
+        // Started going outside, record timestamp
         if (outsideSinceRef.current === null) {
           outsideSinceRef.current = Date.now()
         }
@@ -627,7 +627,7 @@ export function StaffTimeclockPage() {
             <p className="text-xs font-semibold uppercase tracking-widest text-white/40">
               Flow Events
             </p>
-            <h1 className="text-lg font-bold text-white">{staff?.name ?? '—'}</h1>
+            <h1 className="text-lg font-bold text-white">{staff?.name ?? '-'}</h1>
             <p className="text-sm text-white/50">{staff?.role}</p>
           </div>
           <div className="flex flex-col items-end gap-1">
@@ -653,7 +653,7 @@ export function StaffTimeclockPage() {
         <div className="flex items-start gap-2">
           <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-yellow" />
           <div>
-            <p className="text-sm font-semibold text-white">{event?.name ?? '—'}</p>
+            <p className="text-sm font-semibold text-white">{event?.name ?? '-'}</p>
             {event?.venue_name && (
               <p className="text-xs text-white/40">{event.venue_name}</p>
             )}
@@ -775,7 +775,7 @@ export function StaffTimeclockPage() {
             <div className="mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4 text-white/40" />
               <h2 className="text-sm font-semibold uppercase tracking-wider text-white/40">
-                Linha do tempo — hoje
+                Linha do tempo, hoje
               </h2>
             </div>
             <div className="space-y-2">

@@ -40,8 +40,8 @@ const FEATURES = [
     icon: BarChart3,
     titlePt: 'Dashboard executivo',
     titleEn: 'Executive dashboard',
-    descPt: 'Receita, conversao, ticket medio, ranking de eventos e clientes — tudo consolidado em um cockpit visual.',
-    descEn: 'Revenue, conversion, average ticket, event and customer rankings — all consolidated in a visual cockpit.',
+    descPt: 'Receita, conversao, ticket medio, ranking de eventos e clientes, tudo consolidado em um cockpit visual.',
+    descEn: 'Revenue, conversion, average ticket, event and customer rankings, all consolidated in a visual cockpit.',
   },
   {
     icon: CreditCard,
@@ -107,8 +107,8 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/58">
               {isPortuguese
-                ? 'Venda, credenciamento, check-in, equipe, financeiro e inteligencia — uma plataforma completa para produtores que exigem controle total.'
-                : 'Sales, credentialing, check-in, staff, finance and intelligence — a complete platform for producers who demand total control.'}
+                ? 'Venda, credenciamento, check-in, equipe, financeiro e inteligencia, uma plataforma completa para produtores que exigem controle total.'
+                : 'Sales, credentialing, check-in, staff, finance and intelligence, a complete platform for producers who demand total control.'}
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <button
@@ -258,7 +258,7 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
             <div className="grid gap-3">
               {(isPortuguese
                 ? [
-                    'Zero custo para comecar — pague apenas quando vender',
+                    'Zero custo para comecar, pague apenas quando vender',
                     'Checkout com taxa de conversao superior a 94%',
                     'Check-in por QR Code em menos de 2 segundos',
                     'Controle financeiro com conciliacao automatica',
@@ -270,7 +270,7 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
                     'Relatorios exportaveis para contabilidade',
                   ]
                 : [
-                    'Zero cost to start — pay only when you sell',
+                    'Zero cost to start, pay only when you sell',
                     'Checkout with 94%+ conversion rate',
                     'QR Code check-in in under 2 seconds',
                     'Financial control with automatic reconciliation',

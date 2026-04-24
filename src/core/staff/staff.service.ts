@@ -68,7 +68,7 @@ export const staffService = {
     return {
       id: data.id,
       eventId: data.event_id,
-      eventName: (data.events as any)?.name ?? '—',
+      eventName: (data.events as any)?.name ?? '-',
       role: data.role ?? 'staff_member',
       supervisorName: (data.profiles as any)?.full_name ?? null,
       zone: data.zone ?? null,
@@ -212,7 +212,7 @@ export const staffService = {
     return (data as any[]).map((d) => ({
       id: d.id,
       eventId: d.event_id,
-      eventName: d.events?.name ?? '—',
+      eventName: d.events?.name ?? '-',
       role: d.role ?? 'staff_member',
       supervisorName: null,
       zone: d.zone ?? null,

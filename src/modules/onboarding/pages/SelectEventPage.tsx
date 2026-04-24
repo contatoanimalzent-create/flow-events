@@ -53,7 +53,7 @@ export default function SelectEventPage({ onNavigate }: PulsePageProps) {
       onNavigate('/pulse/select-mode')
     } catch (err) {
       console.error('[SelectEventPage] handleSelect error', err)
-      // Still navigate — permissions can load lazily
+      // Still navigate, permissions can load lazily
       onNavigate('/pulse/select-mode')
     }
   }

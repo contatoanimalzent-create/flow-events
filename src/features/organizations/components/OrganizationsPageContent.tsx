@@ -124,9 +124,9 @@ export function OrganizationsPageContent() {
             <div className="space-y-4">
               {[
                 { label: 'Nome fantasia', value: organization.name, icon: Building2 },
-                { label: 'E-mail', value: organization.email ?? '—', icon: Mail },
-                { label: 'Telefone', value: organization.phone ?? '—', icon: Phone },
-                { label: 'Website', value: '—', icon: Globe },
+                { label: 'E-mail', value: organization.email ?? '-', icon: Mail },
+                { label: 'Telefone', value: organization.phone ?? '-', icon: Phone },
+                { label: 'Website', value: '-', icon: Globe },
               ].map((field) => (
                 <div key={field.label} className="flex items-center gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5">
@@ -214,7 +214,7 @@ export function OrganizationsPageContent() {
                         {(profile?.first_name ?? 'U')[0].toUpperCase()}
                       </div>
                       <div>
-                        <div className="font-medium text-text-primary">{profile?.first_name ?? '—'}</div>
+                        <div className="font-medium text-text-primary">{profile?.first_name ?? '-'}</div>
                         <div className="text-xs text-text-muted">Admin da conta</div>
                       </div>
                     </div>
@@ -254,7 +254,7 @@ export function OrganizationsPageContent() {
           <div className="card p-6 space-y-5">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-text-primary capitalize">
-                Permissões — <span className="text-brand-blue">{selectedRole}</span>
+                Permissões, <span className="text-brand-blue">{selectedRole}</span>
               </h3>
               <span className="text-xs text-text-muted">{permsForRole.length} permissões ativas</span>
             </div>

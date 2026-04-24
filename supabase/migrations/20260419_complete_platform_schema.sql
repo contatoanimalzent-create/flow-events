@@ -1,12 +1,12 @@
 -- =============================================================================
--- FLOW EVENTS — COMPLETE PLATFORM SCHEMA
+-- FLOW EVENTS, COMPLETE PLATFORM SCHEMA
 -- 20260419_complete_platform_schema.sql
 -- Adds all missing tables from the full platform specification.
 -- Skips tables that already exist (roles, events, profiles, organizations, etc.)
 -- =============================================================================
 
 -- ============================================================
--- 1. RBAC — Roles, Permissions & Overrides
+-- 1. RBAC, Roles, Permissions & Overrides
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS roles (
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS member_permission_overrides (
 );
 
 -- ============================================================
--- 2. EVENTS — Extended Tables
+-- 2. EVENTS, Extended Tables
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS event_status_history (
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS event_sessions (
 );
 
 -- ============================================================
--- 3. TICKETING — Extended Tables
+-- 3. TICKETING, Extended Tables
 -- ============================================================
 
 -- promoters / embaixadores
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS ticket_transfers (
 );
 
 -- ============================================================
--- 4. CHECK-IN — Extended Tables
+-- 4. CHECK-IN, Extended Tables
 -- ============================================================
 
 -- checkin_devices: authorized scanner devices
@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS checkin_attempts (
 );
 
 -- ============================================================
--- 5. STAFF — Extended Tables
+-- 5. STAFF, Extended Tables
 -- ============================================================
 
 -- staff_roles: operational function catalog per org
@@ -660,7 +660,7 @@ CREATE TRIGGER set_staff_updated_at
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- ============================================================
--- RLS — Enable
+-- RLS, Enable
 -- ============================================================
 
 ALTER TABLE roles                     ENABLE ROW LEVEL SECURITY;
@@ -711,7 +711,7 @@ ALTER TABLE security_events           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE webhook_logs              ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================
--- RLS — Policies
+-- RLS, Policies
 -- ============================================================
 
 -- RBAC: public read (no sensitive data)
@@ -880,11 +880,11 @@ CREATE POLICY "webhook_logs_deny_public"    ON webhook_logs
   USING (false);
 
 -- ============================================================
--- SEED — Default Roles & Permissions
+-- SEED, Default Roles & Permissions
 -- ============================================================
 
 INSERT INTO roles (code, name, description) VALUES
-  ('owner',     'Owner',         'Full access — organization owner'),
+  ('owner',     'Owner',         'Full access, organization owner'),
   ('admin',     'Administrator', 'Full administrative access'),
   ('manager',   'Event Manager', 'Manage events, staff and reports'),
   ('operator',  'Operator',      'Operational access during live events'),

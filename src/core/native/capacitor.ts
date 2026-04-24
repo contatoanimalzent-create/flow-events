@@ -1,6 +1,6 @@
 /**
  * Capacitor native bridge utilities.
- * Safe to import in web — all calls are no-ops when not in native context.
+ * Safe to import in web, all calls are no-ops when not in native context.
  */
 
 export const isNative = () => {

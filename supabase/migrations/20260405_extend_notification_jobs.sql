@@ -5,16 +5,16 @@
 --
 -- Extends notification_jobs with the columns needed by the
 -- process-notification-jobs Edge Function:
---   channel       — which provider to use (email | whatsapp)
---   event_id      — optional scope for audience resolution
---   variables     — JSONB placeholder values merged into template
---   started_at    — set when status changes to 'running'
---   completed_at  — set when status changes to 'completed' or 'failed'
---   error_message — details when status = 'failed'
---   processed_count / failed_count — per-run stats
+--   channel, which provider to use (email | whatsapp)
+--   event_id, optional scope for audience resolution
+--   variables, JSONB placeholder values merged into template
+--   started_at, set when status changes to 'running'
+--   completed_at, set when status changes to 'completed' or 'failed'
+--   error_message, details when status = 'failed'
+--   processed_count / failed_count, per-run stats
 --
 -- Extends communications_log with:
---   notification_job_id — links a log row back to its job (idempotency key)
+--   notification_job_id, links a log row back to its job (idempotency key)
 -- ============================================================
 
 -- ── 1. notification_jobs additions ───────────────────────────────────────────

@@ -53,7 +53,7 @@ export default function TicketQrPage({ onNavigate, ticketId }: TicketQrPageProps
 
   useEffect(() => { load() }, [load])
 
-  // Countdown timer — QR refreshes every 30s to prevent screenshot abuse
+  // Countdown timer, QR refreshes every 30s to prevent screenshot abuse
   useEffect(() => {
     if (!ticket || ticket.status === 'used') return
     const interval = setInterval(() => {
@@ -169,7 +169,7 @@ export default function TicketQrPage({ onNavigate, ticketId }: TicketQrPageProps
             {/* Security indicator */}
             <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2.5 mb-4">
               <Shield size={14} className="text-green-400 shrink-0" />
-              <p className="text-green-300 text-xs">QR dinâmico — atualiza a cada {REFRESH_INTERVAL}s</p>
+              <p className="text-green-300 text-xs">QR dinâmico, atualiza a cada {REFRESH_INTERVAL}s</p>
             </div>
 
             <p className="text-slate-600 text-xs text-center">

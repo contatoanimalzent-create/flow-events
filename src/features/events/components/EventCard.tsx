@@ -114,7 +114,7 @@ export function EventCard({
         {event.event_code && (
           <button
             type="button"
-            title="Código do scanner — clique para copiar"
+            title="Código do scanner, clique para copiar"
             onClick={(e) => {
               e.stopPropagation()
               void navigator.clipboard.writeText(event.event_code!)

@@ -51,7 +51,7 @@ const SECOES = [
     conteudo: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>Crie múltiplos tipos de ingresso (ex: Pista, VIP, Camarote) com preços e capacidades independentes.</p>
-        <p>Para cada tipo, crie lotes com preços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida — você define o gatilho.</p>
+        <p>Para cada tipo, crie lotes com preços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida, você define o gatilho.</p>
         <p>Configure cupons de desconto (percentual ou valor fixo) e cortesias (ingressos gratuitos com código).</p>
         <p>Ingressos podem ser nominais (nome do comprador obrigatório) ou não-nominais. Você escolhe.</p>
       </div>
@@ -59,7 +59,7 @@ const SECOES = [
     conteudoEn: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>Create multiple ticket types (e.g., Floor, VIP, Box) with independent prices and capacities.</p>
-        <p>For each type, create batches with different prices. Batch turnover happens automatically by date or sold quantity — you set the trigger.</p>
+        <p>For each type, create batches with different prices. Batch turnover happens automatically by date or sold quantity, you set the trigger.</p>
         <p>Configure discount coupons (percentage or fixed value) and complimentary tickets (free tickets with code).</p>
         <p>Tickets can be nominal (buyer name required) or non-nominal. You choose.</p>
       </div>
@@ -73,7 +73,7 @@ const SECOES = [
         <p>Na aba Staff do seu evento, clique em "Convidar" e envie o link de acesso para cada membro da equipe.</p>
         <p>Defina a função de cada pessoa: operador de check-in, supervisor, promoter ou coordenador. Cada função tem permissões específicas.</p>
         <p>Acompanhe quem está de pé, horário de entrada e saída, e registros de ponto em tempo real.</p>
-        <p>Comunique mudanças de escala pelo próprio app — sem precisar de grupo de WhatsApp.</p>
+        <p>Comunique mudanças de escala pelo próprio app, sem precisar de grupo de WhatsApp.</p>
       </div>
     ),
     conteudoEn: (
@@ -81,7 +81,7 @@ const SECOES = [
         <p>In the Staff tab of your event, click "Invite" and send the access link to each team member.</p>
         <p>Set each person's role: check-in operator, supervisor, promoter or coordinator. Each role has specific permissions.</p>
         <p>Track who is on duty, entry and exit times, and time records in real time.</p>
-        <p>Communicate schedule changes through the app itself — no WhatsApp group needed.</p>
+        <p>Communicate schedule changes through the app itself, no WhatsApp group needed.</p>
       </div>
     ),
   },
@@ -92,7 +92,7 @@ const SECOES = [
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>Baixe o app Pulse (iOS ou Android) e faça login com as credenciais de operador.</p>
         <p>Escaneie o QR code do ingresso com a câmera do celular. O resultado é exibido em menos de 1 segundo.</p>
-        <p>O modo kiosk bloqueia o app em tela de check-in — ideal para tablets fixos nas entradas.</p>
+        <p>O modo kiosk bloqueia o app em tela de check-in, ideal para tablets fixos nas entradas.</p>
         <p>O modo offline sincroniza a lista de ingressos antes do evento. Em caso de queda de internet, o check-in continua funcionando normalmente.</p>
       </div>
     ),
@@ -100,7 +100,7 @@ const SECOES = [
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>Download the Pulse app (iOS or Android) and log in with operator credentials.</p>
         <p>Scan the ticket QR code with your phone camera. Result is displayed in under 1 second.</p>
-        <p>Kiosk mode locks the app on the check-in screen — ideal for fixed tablets at entrances.</p>
+        <p>Kiosk mode locks the app on the check-in screen, ideal for fixed tablets at entrances.</p>
         <p>Offline mode syncs the ticket list before the event. If internet goes down, check-in continues working normally.</p>
       </div>
     ),
@@ -112,7 +112,7 @@ const SECOES = [
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>O dashboard mostra em tempo real: receita total, ticket médio, taxa de conversão, ingressos vendidos por lote e presença por hora.</p>
         <p>Exporte os dados em CSV para análise externa ou integração com planilhas.</p>
-        <p>O repasse financeiro é processado automaticamente após o encerramento do evento. O prazo padrão é D+15 — verifique as condições do seu plano.</p>
+        <p>O repasse financeiro é processado automaticamente após o encerramento do evento. O prazo padrão é D+15, verifique as condições do seu plano.</p>
         <p>Você acompanha o status do repasse (pendente, em processamento, concluído) diretamente no painel financeiro.</p>
       </div>
     ),
@@ -120,7 +120,7 @@ const SECOES = [
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>The dashboard shows in real time: total revenue, average ticket, conversion rate, tickets sold per batch and hourly attendance.</p>
         <p>Export data as CSV for external analysis or spreadsheet integration.</p>
-        <p>Financial transfer is processed automatically after the event closes. Standard timeframe is D+15 — check your plan conditions.</p>
+        <p>Financial transfer is processed automatically after the event closes. Standard timeframe is D+15, check your plan conditions.</p>
         <p>Track transfer status (pending, processing, completed) directly in the financial panel.</p>
       </div>
     ),

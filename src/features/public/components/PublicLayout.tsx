@@ -35,7 +35,7 @@ export function PublicLayout({
       <div className={cn('min-h-screen bg-[#060B18] text-[#F0E8D6]', className)}>
         {hasFineMouse && <MagneticCursor />}
 
-        {/* Header fixo — flutua sobre o conteúdo, transparente no topo */}
+        {/* Header fixo, flutua sobre o conteúdo, transparente no topo */}
         <PublicHeader onLogin={onLogin} actionSlot={headerActionSlot} compact={compactHeader} />
 
         <MotionPage>

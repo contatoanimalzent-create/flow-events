@@ -447,7 +447,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     })
   }
 
-  // ── 10. All checks passed — commit check-in ────────────────────────────────
+  // ── 10. All checks passed, commit check-in ────────────────────────────────
 
   // Increment QR token used_count (non-fatal)
   if (qrToken) {

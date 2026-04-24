@@ -34,7 +34,7 @@ const CASES = [
     nome: 'Noite Gastronômica SP',
     tipo: 'Evento gastronômico',
     depoimento:
-      'Vendemos 300 ingressos em 48h com virada de lote automática. Não precisei monitorar nada — o sistema fez tudo. O repasse chegou em D+2 sem burocracia.',
+      'Vendemos 300 ingressos em 48h com virada de lote automática. Não precisei monitorar nada, o sistema fez tudo. O repasse chegou em D+2 sem burocracia.',
     metricas: [
       { valor: '300', label: 'ingressos vendidos' },
       { valor: 'R$ 42k', label: 'em vendas' },

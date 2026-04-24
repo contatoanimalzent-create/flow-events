@@ -19,7 +19,7 @@ const VALORES = [
   {
     icon: Zap,
     titulo: 'Autonomia',
-    desc: 'Você decide como fazer. Confiamos na sua expertise e não microgerenciamos o processo — só o resultado.',
+    desc: 'Você decide como fazer. Confiamos na sua expertise e não microgerenciamos o processo, só o resultado.',
   },
   {
     icon: TrendingUp,
@@ -34,7 +34,7 @@ const VALORES = [
   {
     icon: TrendingUp,
     titulo: 'Crescimento rápido',
-    desc: 'Startup early-stage com tração real. Quem entra agora cresce junto com o produto — e tem equity na mesa.',
+    desc: 'Startup early-stage com tração real. Quem entra agora cresce junto com o produto, e tem equity na mesa.',
   },
 ]
 
@@ -50,19 +50,19 @@ const VAGAS = [
   {
     titulo: 'Desenvolvedor Full-Stack Sênior',
     stack: 'React + TypeScript + Supabase',
-    modelo: 'Remoto — PJ',
+    modelo: 'Remoto, PJ',
     desc: 'Construa os pilares do produto: API, dashboard de gestão, app de check-in e integrações de pagamento. Você terá autonomia total sobre as decisões técnicas da sua stack.',
   },
   {
     titulo: 'Designer de Produto',
     stack: 'Figma, design systems, mobile-first',
-    modelo: 'Remoto — PJ',
-    desc: 'Defina como a Pulse parece e se comporta. Do fluxo de compra do ingresso ao painel do supervisor em tempo real — cada pixel importa.',
+    modelo: 'Remoto, PJ',
+    desc: 'Defina como a Pulse parece e se comporta. Do fluxo de compra do ingresso ao painel do supervisor em tempo real, cada pixel importa.',
   },
   {
     titulo: 'Especialista em Sucesso do Cliente',
     stack: 'Onboarding de produtores, suporte',
-    modelo: 'Remoto — CLT/PJ',
+    modelo: 'Remoto, CLT/PJ',
     desc: 'Seja a ponte entre produtores e o produto. Você garante que novos clientes entrem com sucesso e extraiam o máximo da plataforma desde o primeiro evento.',
   },
 ]
@@ -93,8 +93,8 @@ export function CarreirasPage({ onLogin }: { onLogin: () => void }) {
           </h1>
           <p className="mt-5 max-w-xl text-lg text-[#9a9088]">
             {isPortuguese
-              ? 'A Pulse é pequena, rápida e obcecada com qualidade. Se você quer ter impacto real e crescer numa empresa que está criando algo novo — este é o lugar.'
-              : 'Pulse is small, fast and obsessed with quality. If you want real impact and growth — this is the place.'}
+              ? 'A Pulse é pequena, rápida e obcecada com qualidade. Se você quer ter impacto real e crescer numa empresa que está criando algo novo, este é o lugar.'
+              : 'Pulse is small, fast and obsessed with quality. If you want real impact and growth, this is the place.'}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a

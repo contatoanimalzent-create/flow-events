@@ -48,7 +48,7 @@ function FeaturedEventTile({
             loading={index === 0 ? 'eager' : 'lazy'}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
-          {/* Photo overlay — dark bottom for text legibility */}
+          {/* Photo overlay, dark bottom for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
 

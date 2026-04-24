@@ -24,7 +24,7 @@ const TABS = [
 
 const MOCK_USER = { id: 'u1', name: 'João Silva', email: 'joao@email.com' }
 
-const MOCK_EVENT = { name: 'Flow Fest 2026', date: '20 de Abril de 2026', time: '14:00 – 23:00', venue: 'Arena São Paulo' }
+const MOCK_EVENT = { name: 'Flow Fest 2026', date: '20 de Abril de 2026', time: '14:00, 23:00', venue: 'Arena São Paulo' }
 
 const MOCK_TICKETS = [
   { id: 't1', type: 'Pista', holder: 'João Silva', token: 'FLW-2026-A1B2C3', used: false, sector: 'Geral' },
@@ -262,7 +262,7 @@ function AgendaScreen({ liked, onLike, onSession, onTabChange }: {
 
   return (
     <MobileShell accent="blue">
-      <MobileHeader title={`Agenda – ${MOCK_EVENT.name}`} />
+      <MobileHeader title={`Agenda, ${MOCK_EVENT.name}`} />
       <MobileScreen className="px-4 py-4 space-y-4">
         <div className="flex gap-2 overflow-x-auto pb-1">
           {stages.map((s) => (
@@ -501,7 +501,7 @@ function UpgradeDetailScreen({ upgrade, onBack }: { upgrade: typeof MOCK_UPGRADE
         <div className="text-sm text-white/80">{upgrade.description}</div>
       </div>
       <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-4 text-sm text-blue-300">
-        Pagamento via Pagar.me — integração em breve.
+        Pagamento via Pagar.me, integração em breve.
       </div>
       <button className="h-14 w-full rounded-xl font-bold text-white" style={{ backgroundColor: ACCENT }}>
         Finalizar Compra

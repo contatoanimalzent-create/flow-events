@@ -64,7 +64,7 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
           }
         }
       } catch {
-        // shift load failure — leave shift as null (shows empty state)
+        // shift load failure, leave shift as null (shows empty state)
       } finally {
         setLoading(false)
       }
@@ -79,7 +79,7 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
       {/* Hero */}
       <div className="px-4 pt-5 pb-4">
         <p className="text-slate-400 text-sm">Bem-vindo, Staff</p>
-        <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '—'}</h2>
+        <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '-'}</h2>
       </div>
 
       {/* Shift status card */}

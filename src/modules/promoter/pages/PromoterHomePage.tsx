@@ -52,7 +52,7 @@ export default function PromoterHomePage({ onNavigate }: PulsePageProps) {
       {/* Header */}
       <div className="px-4 pt-5 pb-3">
         <p className="text-slate-400 text-xs">Promoter</p>
-        <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '—'}</h2>
+        <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '-'}</h2>
       </div>
 
       {loading ? (

@@ -14,7 +14,7 @@ const STATUS_CONFIG = {
 }
 
 function formatSessionTime(startedAt: string | null): string {
-  if (!startedAt) return '—'
+  if (!startedAt) return '-'
   const diff = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)
   const h = Math.floor(diff / 3600)
   const m = Math.floor((diff % 3600) / 60)

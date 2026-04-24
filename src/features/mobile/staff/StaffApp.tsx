@@ -245,7 +245,7 @@ function PresenceScreen({ status, elapsed, inZone, onStart, onEnd }: {
       </div>
       <div className="text-center">
         <div className="text-lg font-bold text-white">Iniciar Presença</div>
-        <div className="text-sm text-white/50 mt-1">Turno {MOCK_SHIFT.start}–{MOCK_SHIFT.end}</div>
+        <div className="text-sm text-white/50 mt-1">Turno {MOCK_SHIFT.start}-{MOCK_SHIFT.end}</div>
         <div className="text-xs text-white/40 mt-0.5">{MOCK_STAFF.area}</div>
       </div>
       <div className="flex items-center gap-2 rounded-full bg-green-500/15 px-4 py-2 text-xs text-green-400">
@@ -326,7 +326,7 @@ function InstructionsScreen({ onBack }: { onBack: () => void }) {
   const [open, setOpen] = useState<string | null>('geral')
   const sections = [
     { id: 'geral', title: 'Instruções Gerais', content: 'Mantenha-se no posto designado durante todo o turno. Comunique qualquer intercorrência imediatamente ao supervisor. Use o rádio canal 3 para comunicações internas. Em caso de emergência, acione o protocolo de evacuação.' },
-    { id: 'area', title: `Área: ${MOCK_STAFF.area}`, content: 'Verifique todos os ingressos na entrada. Não permita reentrada sem autorização do supervisor. Mantenha a fila organizada. Monitore a capacidade da área — máximo 500 pessoas.' },
+    { id: 'area', title: `Área: ${MOCK_STAFF.area}`, content: 'Verifique todos os ingressos na entrada. Não permita reentrada sem autorização do supervisor. Mantenha a fila organizada. Monitore a capacidade da área, máximo 500 pessoas.' },
     { id: 'emergencia', title: 'Emergência', content: 'Polícia: 190 | SAMU: 192 | Bombeiros: 193 | Coordenação interna: ramal 9999. Em caso de evacuação, guie o público para as saídas sinalizadas em verde.' },
   ]
   return (

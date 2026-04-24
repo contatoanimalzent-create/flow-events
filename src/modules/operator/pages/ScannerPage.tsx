@@ -70,7 +70,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       },
       (err: string) => {
         if (!err.includes('No MultiFormat')) {
-          setCameraError('Câmera não disponível — use entrada manual')
+          setCameraError('Câmera não disponível, use entrada manual')
         }
       }
     )
@@ -103,7 +103,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
         } else {
           res = {
             valid: false,
-            name: '—',
+            name: '-',
             ticketLabel: token.slice(0, 16),
             message: validation.message,
           }
@@ -118,7 +118,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
         res = {
           valid: true,
           name: 'Participante',
-          ticketLabel: 'Offline — pendente sync',
+          ticketLabel: 'Offline, pendente sync',
           message: 'Registrado offline. Será sincronizado.',
         }
         setScanCount((c) => c + 1)
@@ -127,7 +127,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       setResult(res)
       setScanState(res.valid ? 'valid' : 'invalid')
     } catch (err) {
-      setResult({ valid: false, name: '—', ticketLabel: token.slice(0, 16), message: 'Erro na validação' })
+      setResult({ valid: false, name: '-', ticketLabel: token.slice(0, 16), message: 'Erro na validação' })
       setScanState('invalid')
     }
 
@@ -156,7 +156,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
         <div className="bg-black/70 backdrop-blur-sm rounded-xl px-3 py-1.5">
           <p className="text-white text-xs font-semibold">{context?.eventName ?? 'Scanner'}</p>
           {!isOnline && (
-            <p className="text-amber-400 text-[10px]">⚡ Offline — gravando localmente</p>
+            <p className="text-amber-400 text-[10px]">⚡ Offline, gravando localmente</p>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -319,7 +319,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' }}
       >
         <p className="text-slate-600 text-xs text-center">
-          {isOnline ? `${scanCount} validado${scanCount !== 1 ? 's' : ''} nesta sessão` : `⚡ Offline — ${scanCount} salvo${scanCount !== 1 ? 's' : ''} localmente`}
+          {isOnline ? `${scanCount} validado${scanCount !== 1 ? 's' : ''} nesta sessão` : `⚡ Offline, ${scanCount} salvo${scanCount !== 1 ? 's' : ''} localmente`}
         </p>
       </div>
     </div>

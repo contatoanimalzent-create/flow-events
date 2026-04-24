@@ -333,7 +333,7 @@ async function sendTransactionalEmails(
     ? [venueAddr.street, venueAddr.city, venueAddr.state].filter(Boolean).join(', ')
     : ''
   const eventLocation = event?.venue_name
-    ? `${event.venue_name}${addressParts ? ' — ' + addressParts : ''}`
+    ? `${event.venue_name}${addressParts ? ', ' + addressParts : ''}`
     : undefined
 
   const settings = event?.settings as Record<string, unknown> | null | undefined

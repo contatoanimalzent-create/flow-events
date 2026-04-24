@@ -87,8 +87,8 @@ export function EventsPublicHeader({
               alt="Pulse"
               className={cn(
                 'w-auto object-contain transition-all duration-300 group-hover:scale-[1.02]',
-                compact ? 'h-10 md:h-11' : 'h-12 md:h-14',
-                /* sempre branca — header agora é sempre dark */
+                compact ? 'h-11 md:h-12' : 'h-14 md:h-16',
+                /* sempre branca, header agora é sempre dark */
                 'brightness-0 invert',
               )}
             />

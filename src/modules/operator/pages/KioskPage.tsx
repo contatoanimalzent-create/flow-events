@@ -72,7 +72,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
             res = { valid: true, name: validation.name, message: validation.message }
             setScanCount((c) => c + 1)
           } else {
-            res = { valid: false, name: '—', message: validation.message }
+            res = { valid: false, name: '-', message: validation.message }
           }
         } else {
           // Offline: enqueue for later sync
@@ -98,7 +98,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
           res.valid ? 3_000 : 2_000
         )
       } catch {
-        setResult({ valid: false, name: '—', message: 'Erro na validação' })
+        setResult({ valid: false, name: '-', message: 'Erro na validação' })
         setKioskState('invalid')
         resetTimerRef.current = setTimeout(resetToScanning, 2_000)
       }
@@ -131,7 +131,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
       scanner.clear().catch(() => {})
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // mount once — handleScan captured via ref below
+  }, []) // mount once, handleScan captured via ref below
 
   // Keep handleScan ref in sync so the scanner callback always uses the latest
   const handleScanRef = useRef(handleScan)
@@ -156,7 +156,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
         <p className="text-white text-lg font-bold tracking-wide text-center">
           {context?.eventName ?? 'Evento'}
         </p>
-        {/* Sair do kiosk — small, top-right, not prominent */}
+        {/* Sair do kiosk, small, top-right, not prominent */}
         <button
           onClick={() => onNavigate('/pulse/operator')}
           className="absolute right-4 top-8 text-slate-600 text-xs px-2 py-1 rounded-lg border border-slate-700/50 hover:border-slate-500/50 hover:text-slate-400 transition-all"
@@ -178,7 +178,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
       <div className="flex-1 flex flex-col items-center justify-center gap-8">
         {/* Pulsing ring + scan frame */}
         <div className="relative flex items-center justify-center">
-          {/* Outer pulsing ring — green when scanning, hidden when result shown */}
+          {/* Outer pulsing ring, green when scanning, hidden when result shown */}
           {!isShowingResult && kioskState !== 'processing' && (
             <>
               <div
@@ -297,7 +297,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
       {/* Bottom status bar */}
       <div className="pb-8 flex justify-center">
         <p className="text-slate-700 text-xs">
-          {isOnline ? 'Modo online — validação em tempo real' : 'Modo offline — sincronizará ao reconectar'}
+          {isOnline ? 'Modo online, validação em tempo real' : 'Modo offline, sincronizará ao reconectar'}
         </p>
       </div>
     </div>

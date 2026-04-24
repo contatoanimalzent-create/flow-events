@@ -139,8 +139,8 @@ export function HelpPage() {
 
         <div className="rounded-[14px] border border-status-warning/20 bg-status-warning/6 px-4 py-3 text-[11px] text-status-warning leading-relaxed">
           💡 {t(
-            'All images are automatically compressed for the web. Use original high-resolution files — the platform handles optimization.',
-            'Todas as imagens sao comprimidas automaticamente para web. Envie os arquivos originais em alta resolucao — a plataforma faz a otimizacao.',
+            'All images are automatically compressed for the web. Use original high-resolution files, the platform handles optimization.',
+            'Todas as imagens sao comprimidas automaticamente para web. Envie os arquivos originais em alta resolucao, a plataforma faz a otimizacao.',
           )}
         </div>
       </div>

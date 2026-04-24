@@ -69,7 +69,7 @@ function MemberCard({ m, onTap }: { m: StaffMember; onTap: (m: StaffMember) => v
         <div className="text-xs font-semibold" style={{ color: statusColor(m) }}>
           {m.status === 'absent' ? 'AUSENTE' : m.status === 'late' ? 'ATRASADO' : m.inZone ? 'ATIVO' : 'FORA DA ZONA'}
         </div>
-        <div className="text-[10px] font-mono text-white/30">{m.checkInTime ?? '—'}</div>
+        <div className="text-[10px] font-mono text-white/30">{m.checkInTime ?? '-'}</div>
       </div>
     </button>
   )

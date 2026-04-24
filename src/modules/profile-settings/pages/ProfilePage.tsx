@@ -52,7 +52,7 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
 
       setProfile({
         fullName: (data as any)?.full_name ?? user.user_metadata?.full_name ?? 'Usuário',
-        email: user.email ?? '—',
+        email: user.email ?? '-',
         avatarUrl: (data as any)?.avatar_url ?? null,
       })
       setLoadingProfile(false)
@@ -86,9 +86,9 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
       action: () => { setProfileToast(true); setTimeout(() => setProfileToast(false), 3000) },
     },
     { icon: Bell, label: 'Notificações', subtitle: 'Configurar alertas', action: () => onNavigate('/pulse/notifications') },
-    { icon: ToggleLeft, label: 'Trocar modo', subtitle: mode ? `Modo atual: ${buildModeLabel(mode)}` : '—', action: () => onNavigate('/pulse/select-mode') },
-    { icon: Building2, label: 'Trocar organização', subtitle: context?.organizationName ?? '—', action: () => onNavigate('/pulse/select-organization') },
-    { icon: Calendar, label: 'Trocar evento', subtitle: context?.eventName ?? '—', action: () => onNavigate('/pulse/select-event') },
+    { icon: ToggleLeft, label: 'Trocar modo', subtitle: mode ? `Modo atual: ${buildModeLabel(mode)}` : '-', action: () => onNavigate('/pulse/select-mode') },
+    { icon: Building2, label: 'Trocar organização', subtitle: context?.organizationName ?? '-', action: () => onNavigate('/pulse/select-organization') },
+    { icon: Calendar, label: 'Trocar evento', subtitle: context?.eventName ?? '-', action: () => onNavigate('/pulse/select-event') },
     {
       icon: Globe,
       label: locale === 'pt-BR' ? 'Idioma: Português' : 'Language: English',
@@ -110,8 +110,8 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
         'https://wa.me/14698629040?text=' +
         encodeURIComponent(
           '👋 Olá! Vim pelo *Pulse* e preciso de ajuda.\n\n' +
-          'Evento: ' + (context?.eventName ?? '—') + '\n' +
-          'Organização: ' + (context?.organizationName ?? '—')
+          'Evento: ' + (context?.eventName ?? '-') + '\n' +
+          'Organização: ' + (context?.organizationName ?? '-')
         ),
         '_blank',
       ),
@@ -152,8 +152,8 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
             </span>
           </div>
         )}
-        <p className="text-white font-bold text-lg">{profile?.fullName ?? '—'}</p>
-        <p className="text-slate-400 text-sm">{profile?.email ?? '—'}</p>
+        <p className="text-white font-bold text-lg">{profile?.fullName ?? '-'}</p>
+        <p className="text-slate-400 text-sm">{profile?.email ?? '-'}</p>
 
         {/* Mode badges */}
         {availableModes.length > 0 && (

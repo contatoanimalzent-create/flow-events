@@ -89,14 +89,14 @@ const SECOES = [
     conteudo: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>Seu QR code é enviado por email assim que o pagamento é confirmado. Salve o email ou faça uma captura de tela.</p>
-        <p>No dia do evento, apresente o QR code na tela do seu celular ao operador de check-in — não é necessário imprimir.</p>
+        <p>No dia do evento, apresente o QR code na tela do seu celular ao operador de check-in, não é necessário imprimir.</p>
         <p>Perdeu o email? Acesse o link de reenvio que está na confirmação de compra, ou entre em contato pelo WhatsApp informando seu CPF e email de cadastro.</p>
       </div>
     ),
     conteudoEn: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
         <p>Your QR code is sent by email as soon as payment is confirmed. Save the email or take a screenshot.</p>
-        <p>On the day of the event, show the QR code on your phone screen to the check-in operator — no printing needed.</p>
+        <p>On the day of the event, show the QR code on your phone screen to the check-in operator, no printing needed.</p>
         <p>Lost the email? Use the resend link in your purchase confirmation, or contact us on WhatsApp with your ID and registered email.</p>
       </div>
     ),
@@ -213,8 +213,8 @@ export function AjudaCompradoresPage({ onLogin }: { onLogin: () => void }) {
             </h2>
             <p className="text-[#9a9088] mb-6 text-sm">
               {isPortuguese
-                ? 'Fale com a gente pelo WhatsApp — resposta em minutos.'
-                : 'Talk to us on WhatsApp — response in minutes.'}
+                ? 'Fale com a gente pelo WhatsApp, resposta em minutos.'
+                : 'Talk to us on WhatsApp, response in minutes.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a

@@ -116,7 +116,7 @@ export function MagneticCursor() {
 
   return (
     <>
-      {/* Small dot — instant follow */}
+      {/* Small dot, instant follow */}
       <div
         ref={dotRef}
         className="pointer-events-none fixed left-0 top-0 z-[9999] -translate-x-1/2 -translate-y-1/2"
@@ -129,7 +129,7 @@ export function MagneticCursor() {
         }}
       />
 
-      {/* Large ring — smooth lag follow via GSAP */}
+      {/* Large ring, smooth lag follow via GSAP */}
       <div
         ref={ringRef}
         className="pointer-events-none fixed left-0 top-0 z-[9998] flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"

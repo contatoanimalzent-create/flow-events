@@ -74,7 +74,7 @@ export function QRScannerAdvanced({ eventId, gateId, operatorId }: QRScannerAdva
       setJsQRLoaded(true)
     }
     script.onerror = () => {
-      console.warn('jsQR failed to load — manual input only')
+      console.warn('jsQR failed to load, manual input only')
       setJsQRLoaded(false)
     }
     document.head.appendChild(script)

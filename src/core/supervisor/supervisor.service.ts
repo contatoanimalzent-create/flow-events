@@ -125,7 +125,7 @@ export const supervisorService = {
     return (data as any[]).map((a) => ({
       id: a.id,
       type: a.type,
-      staffName: a.staff_members?.profiles?.full_name ?? '—',
+      staffName: a.staff_members?.profiles?.full_name ?? '-',
       reason: a.reason ?? '',
       requestedAt: a.requested_at,
       status: a.status ?? 'pending',
@@ -159,7 +159,7 @@ export const supervisorService = {
 
     return (data as any[]).map((o) => ({
       id: o.id,
-      staffName: o.staff_members?.profiles?.full_name ?? '—',
+      staffName: o.staff_members?.profiles?.full_name ?? '-',
       type: o.type,
       description: o.description,
       zone: o.staff_members?.zone ?? null,

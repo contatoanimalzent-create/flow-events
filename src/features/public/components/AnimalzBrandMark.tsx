@@ -7,7 +7,7 @@ interface AnimalzBrandMarkProps {
 }
 
 /**
- * PulseBrandMark — Logo principal da Pulse.
+ * PulseBrandMark, Logo principal da Pulse.
  * inverse=false → logo preta (para fundos claros)
  * inverse=true  → logo invertida via CSS filter (para fundos escuros)
  */

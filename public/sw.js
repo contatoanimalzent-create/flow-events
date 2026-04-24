@@ -1,4 +1,4 @@
-// Flow Events — Service Worker v1
+// Flow Events, Service Worker v1
 // Handles: push notifications, offline cache, background sync
 
 const CACHE_NAME = 'flow-events-v1'

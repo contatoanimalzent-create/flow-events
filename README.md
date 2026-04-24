@@ -2,7 +2,7 @@
 
 > Create, sell, operate and scale events beautifully.
 
-Plataforma operacional completa para gestão de eventos — venda de ingressos, credenciamento, check-in, staff, fornecedores, PDV, comunicação e analytics.
+Plataforma operacional completa para gestão de eventos, venda de ingressos, credenciamento, check-in, staff, fornecedores, PDV, comunicação e analytics.
 
 ## Stack
 
@@ -64,10 +64,10 @@ src/
 
 ## Fases de desenvolvimento
 
-- [x] **Fase 0** — Banco de dados (Supabase, 80+ tabelas, RLS, triggers)
-- [x] **Fase 1a** — Autenticação, layout, dashboard
-- [ ] **Fase 1b** — Eventos, landing page builder, ingressos, checkout
-- [ ] **Fase 1c** — Ticket premium + QR, check-in multi-dispositivo
-- [ ] **Fase 2** — Credenciamento, staff, ponto, fornecedores
-- [ ] **Fase 3** — PDV, estoque, financeiro
-- [ ] **Fase 4** — Growth services, ajuda, analytics avançado
+- [x] **Fase 0**, Banco de dados (Supabase, 80+ tabelas, RLS, triggers)
+- [x] **Fase 1a**, Autenticação, layout, dashboard
+- [ ] **Fase 1b**, Eventos, landing page builder, ingressos, checkout
+- [ ] **Fase 1c**, Ticket premium + QR, check-in multi-dispositivo
+- [ ] **Fase 2**, Credenciamento, staff, ponto, fornecedores
+- [ ] **Fase 3**, PDV, estoque, financeiro
+- [ ] **Fase 4**, Growth services, ajuda, analytics avançado

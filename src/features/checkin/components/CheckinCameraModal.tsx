@@ -72,7 +72,7 @@ export function CheckinCameraModal({
       setJsQRLoaded(true)
     }
     script.onerror = () => {
-      console.warn('jsQR failed to load — manual input only')
+      console.warn('jsQR failed to load, manual input only')
     }
     document.head.appendChild(script)
     return () => {

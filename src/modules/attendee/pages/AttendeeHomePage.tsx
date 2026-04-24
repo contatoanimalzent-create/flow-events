@@ -40,7 +40,7 @@ export default function AttendeeHomePage({ onNavigate }: PulsePageProps) {
         }}
       >
         <p className="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-1">Bem-vindo</p>
-        <h2 className="text-2xl font-bold text-white">{context.eventName ?? '—'}</h2>
+        <h2 className="text-2xl font-bold text-white">{context.eventName ?? '-'}</h2>
         <p className="text-slate-400 text-sm mt-0.5">
           {context.eventDate
             ? new Date(context.eventDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })

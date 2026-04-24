@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
       ? [venueAddr.street, venueAddr.city, venueAddr.state].filter(Boolean).join(', ')
       : ''
     const eventLocation = event?.venue_name
-      ? `${event.venue_name}${addressParts ? ' — ' + addressParts : ''}`
+      ? `${event.venue_name}${addressParts ? ', ' + addressParts : ''}`
       : undefined
 
     // Extract exercise type and email theme from settings if available

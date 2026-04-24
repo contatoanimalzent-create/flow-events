@@ -39,7 +39,7 @@ const ParticipantApp = lazy(() => import('@/features/mobile/participant/Particip
 const PromoterApp = lazy(() => import('@/features/mobile/promoter/PromoterApp').then((m) => ({ default: m.PromoterApp })))
 const OperatorApp = lazy(() => import('@/features/mobile/operator/OperatorApp').then((m) => ({ default: m.OperatorApp })))
 
-// Unified Pulse app — single app, single auth, multi-role
+// Unified Pulse app, single app, single auth, multi-role
 const PulseApp = lazy(() => import('@/features/pulse/PulseApp').then((m) => ({ default: m.PulseApp })))
 
 function PublicFallback() {
@@ -64,7 +64,7 @@ interface PublicRouteViewProps {
 export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: PublicRouteViewProps) {
   const user = useAuthStore((state) => state.user)
 
-  // ── Unified Pulse app (NEW — replaces individual profile apps) ──
+  // ── Unified Pulse app (NEW, replaces individual profile apps) ──
   if (route === 'pulse-app') return <Suspense fallback={<MobileLoader />}><PulseApp /></Suspense>
 
   // Legacy individual mobile apps (kept for backward compat at /op, /staff, /supervisor, /app, /promoter)

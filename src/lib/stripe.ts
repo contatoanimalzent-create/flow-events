@@ -1,23 +1,23 @@
 import { loadStripe } from '@stripe/stripe-js'
 
-// Publishable key — safe to expose in frontend
+// Publishable key, safe to expose in frontend
 const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 
 if (!STRIPE_PK) {
-  console.warn('[Stripe] VITE_STRIPE_PUBLISHABLE_KEY not set — payments disabled')
+  console.warn('[Stripe] VITE_STRIPE_PUBLISHABLE_KEY not set, payments disabled')
 }
 
 // Singleton promise so Stripe loads once
 export const stripePromise = STRIPE_PK ? loadStripe(STRIPE_PK) : null
 
 // ── Fee calculation (all-in pricing) ─────────────────────────
-// Everything passed to buyer — producer always gets net amount
+// Everything passed to buyer, producer always gets net amount
 
 export interface FeeBreakdown {
   faceValue: number         // what producer wants to receive
-  adminFee: number          // 5% — Pulse revenue
-  processingFee: number     // 1.8% — Pulse revenue (from producer's net)
-  cardFee: number           // 0% PIX | card % — passed to buyer
+  adminFee: number          // 5%, Pulse revenue
+  processingFee: number     // 1.8%, Pulse revenue (from producer's net)
+  cardFee: number           // 0% PIX | card %, passed to buyer
   totalBuyer: number        // what buyer pays
   producerNet: number       // what producer receives after processing fee
   flowRevenue: number       // total Pulse earns
@@ -41,7 +41,7 @@ export const CARD_RATES: Record<number, number> = {
 
 export const ADMIN_FEE_RATE   = 0.05   // 5% from buyer
 export const PROCESSING_RATE  = 0.018  // 1.8% from producer
-export const PIX_RATE         = 0.0    // passed as 0 — Stripe PIX is low flat fee absorbed in admin
+export const PIX_RATE         = 0.0    // passed as 0, Stripe PIX is low flat fee absorbed in admin
 
 export function calculateFees(faceValue: number, installments: number = 0): FeeBreakdown {
   // installments = 0 means PIX

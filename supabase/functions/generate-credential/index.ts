@@ -99,7 +99,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   const userJwt = authHeader.replace('Bearer ', '')
 
-  // User-scoped client — respects RLS, resolves auth.uid()
+  // User-scoped client, respects RLS, resolves auth.uid()
   const userClient = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_ANON_KEY')!,
@@ -132,7 +132,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     )
   }
 
-  // ── Admin client — bypasses RLS for writes ─────────────────────────────────
+  // ── Admin client, bypasses RLS for writes ─────────────────────────────────
   const admin = createSupabaseAdminClient()
 
   // ── Verify staff member exists and belongs to caller's org ─────────────────
@@ -215,8 +215,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
     .from('credentials')
     .insert({
       staff_id:  staffId,
-      type:      'staff',    // credential_type enum — staff category
-      format:    type,       // credential_format enum — badge | qrcode (new)
+      type:      'staff',    // credential_type enum, staff category
+      format:    type,       // credential_format enum, badge | qrcode (new)
       status:    'active',
       issued_at: issuedAt,
       expires_at: null,

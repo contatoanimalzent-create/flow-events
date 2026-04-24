@@ -378,3 +378,4 @@ export function RegistrationsPage() {
     </div>
   )
 }
+}

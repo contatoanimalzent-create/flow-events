@@ -4,7 +4,7 @@ import { cn } from '@/shared/lib'
 
 interface ParallaxSectionProps {
   children: ReactNode
-  /** Movement intensity — 0.1 (subtle) to 0.5 (strong). Default 0.3 */
+  /** Movement intensity, 0.1 (subtle) to 0.5 (strong). Default 0.3 */
   speed?: number
   className?: string
 }

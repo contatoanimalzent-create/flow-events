@@ -39,7 +39,7 @@ export function DashboardInscricoesPanel() {
   return (
     <div className="card p-5">
       <div className="mb-4 flex items-center justify-between">
-        <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted">Capital Strike — A Origem</div>
+        <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted">Capital Strike, A Origem</div>
         <span className="rounded-full border border-bg-border px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-text-muted">
           Inscricoes externas
         </span>

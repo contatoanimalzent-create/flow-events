@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════
-   BASE — Light admin theme + Dark auth override
+   BASE, Light admin theme + Dark auth override
 ═══════════════════════════════════════════════════ */
 @layer base {
   :root {
@@ -130,7 +130,7 @@
     --pulse-font-size-caption: 0.875rem;
   }
 
-  /* Dark override — applied to auth pages via explicit color classes (no class needed) */
+  /* Dark override, applied to auth pages via explicit color classes (no class needed) */
   .dark-shell {
     --ds-bg-primary:       7 6 7;
     --ds-bg-secondary:     13 11 10;
@@ -154,7 +154,7 @@
     text-size-adjust: 100%;
   }
 
-  /* Admin body — Midnight Luxury */
+  /* Admin body, Midnight Luxury */
   body {
     background-color: #060B18;
     color: #F0E8D6;
@@ -166,7 +166,7 @@
     touch-action: manipulation;
   }
 
-  /* Imagens fluidas por padrao — nunca estouram o container */
+  /* Imagens fluidas por padrao, nunca estouram o container */
   img, video, canvas, svg { max-width: 100%; height: auto; }
 
   /* iOS/Android: impede auto-zoom quando input tem fonte < 16px */
@@ -176,7 +176,7 @@
     }
   }
 
-  /* Scrollbar — subtle on dark bg */
+  /* Scrollbar, subtle on dark bg */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: #060B18; }
   ::-webkit-scrollbar-thumb { background: rgba(240,232,214,0.14); border-radius: 999px; }
@@ -186,11 +186,11 @@
 }
 
 /* ═══════════════════════════════════════════════════
-   MATERIAL SYSTEM — textures & surfaces
+   MATERIAL SYSTEM, textures & surfaces
 ═══════════════════════════════════════════════════ */
 @layer components {
 
-  /* Carbon fiber — for dark panels / sidebar */
+  /* Carbon fiber, for dark panels / sidebar */
   .material-carbon {
     background-image:
       repeating-linear-gradient(0deg,
@@ -203,7 +203,7 @@
     background-size: 2px 2px, 2px 2px, 100% 100%;
   }
 
-  /* Navy carbon — sidebar base */
+  /* Navy carbon, sidebar base */
   .material-navy {
     background-image:
       repeating-linear-gradient(0deg,
@@ -236,7 +236,7 @@
     box-shadow: 0 4px 24px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,1);
   }
 
-  /* Dark frosted glass — for overlays on dark */
+  /* Dark frosted glass, for overlays on dark */
   .material-glass-dark {
     backdrop-filter: blur(24px) saturate(180%);
     background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
@@ -276,7 +276,7 @@
       0 2px 8px rgba(15,23,42,0.08);
   }
 
-  /* Dark raised — for elements on dark bg */
+  /* Dark raised, for elements on dark bg */
   .depth-raised-dark {
     box-shadow:
       0 1px 0 rgba(255,255,255,0.08) inset,
@@ -285,7 +285,7 @@
       0 1px 3px rgba(0,0,0,0.4);
   }
 
-  /* Dark inset — for elements on dark bg */
+  /* Dark inset, for elements on dark bg */
   .depth-inset-dark {
     box-shadow:
       0 2px 6px rgba(0,0,0,0.5) inset,
@@ -302,7 +302,7 @@
     background: #060B18;
   }
 
-  /* Main content area — Midnight Luxury */
+  /* Main content area, Midnight Luxury */
   .main-grid-bg {
     background-color: #060B18 !important;
   }
@@ -391,7 +391,7 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   }
 
-  /* Dark card — for admin pages */
+  /* Dark card, for admin pages */
   .card-dark {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.07);
@@ -458,7 +458,7 @@
   }
 
 /* ═══════════════════════════════════════════════════
-   BUTTONS — skeuo physical states
+   BUTTONS, skeuo physical states
 ═══════════════════════════════════════════════════ */
 
   .btn-primary {
@@ -549,7 +549,7 @@
   .premium-button-lg      { @apply px-6 py-3.5; }
 
 /* ═══════════════════════════════════════════════════
-   INPUTS — recessed / inset skeuo
+   INPUTS, recessed / inset skeuo
 ═══════════════════════════════════════════════════ */
 
   .input {
@@ -590,7 +590,7 @@
   .premium-textarea { @apply min-h-[120px] resize-y; }
 
 /* ═══════════════════════════════════════════════════
-   NAVIGATION — sidebar items
+   NAVIGATION, sidebar items
 ═══════════════════════════════════════════════════ */
 
   .nav-item {
@@ -870,7 +870,7 @@
   }
 
 /* ═══════════════════════════════════════════════════
-   AUTH PAGES — keep dark (login, signup)
+   AUTH PAGES, keep dark (login, signup)
 ═══════════════════════════════════════════════════ */
 
   /* These classes are used in auth/public pages */
@@ -1006,10 +1006,10 @@
   .premium-card  { @apply rounded-[1.5rem] p-6; }
 
 /* ═══════════════════════════════════════════════════
-   CAPACITOR / NATIVE — safe area & touch overrides
+   CAPACITOR / NATIVE, safe area & touch overrides
 ═══════════════════════════════════════════════════ */
 
-  /* Safe area utilities — aplique em headers fixos, bottom bars, etc. */
+  /* Safe area utilities, aplique em headers fixos, bottom bars, etc. */
   .safe-top    { padding-top: env(safe-area-inset-top); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
   .safe-left   { padding-left: env(safe-area-inset-left); }
@@ -1041,13 +1041,13 @@
   .cap-native .app-safe-top { padding-top: calc(env(safe-area-inset-top, 0px)) !important; }
   .cap-native .app-safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom, 0px)) !important; }
 
-  /* Toques com area minima de 44x44 — alvo recomendado pelo iOS/Android */
+  /* Toques com area minima de 44x44, alvo recomendado pelo iOS/Android */
   .cap-native button, .cap-native [role="button"], .cap-native a {
     min-height: 40px;
   }
 
 /* ═══════════════════════════════════════════════════
-   TABELAS RESPONSIVAS — wrapper com scroll horizontal
+   TABELAS RESPONSIVAS, wrapper com scroll horizontal
 ═══════════════════════════════════════════════════ */
 
   /* Aplica em qualquer .card/.surface-panel que contenha <table> */
@@ -1072,10 +1072,10 @@
   }
 
 /* ═══════════════════════════════════════════════════
-   MOBILE FINE-TUNING — overrides para < 768px
+   MOBILE FINE-TUNING, overrides para < 768px
 ═══════════════════════════════════════════════════ */
   @media (max-width: 767px) {
-    /* Home publica / landings com padding estatico — reduzir */
+    /* Home publica / landings com padding estatico, reduzir */
     .public-editorial-shell section,
     .section-dark,
     .section-ink {

@@ -40,7 +40,7 @@ function buildAutoText(data: SummaryData): string {
   } else if (data.healthScore >= 60) {
     parts.push(`O evento apresenta pontos de atenção com ${activePercent}% da equipe ativa.`)
   } else {
-    parts.push(`O evento requer ação imediata — apenas ${activePercent}% da equipe está ativa.`)
+    parts.push(`O evento requer ação imediata, apenas ${activePercent}% da equipe está ativa.`)
   }
 
   if (data.openOccurrences > 0) {
@@ -67,7 +67,7 @@ function buildTimeline(data: SummaryData): TimelineEntry[] {
     ...data.approvals.map((a) => ({
       id: a.id,
       kind: 'approval' as const,
-      description: `[Aprovação] ${a.type} — ${a.staffName}`,
+      description: `[Aprovação] ${a.type}, ${a.staffName}`,
       date: a.requestedAt,
     })),
   ]
@@ -135,7 +135,7 @@ export default function EventSummaryPage({ onNavigate }: PulsePageProps) {
 
   const handleShare = async () => {
     if (!data) return
-    const title = `Resumo do Evento — ${context?.eventName ?? 'Evento'}`
+    const title = `Resumo do Evento, ${context?.eventName ?? 'Evento'}`
     const text = buildAutoText(data)
 
     if (navigator.share) {
@@ -219,7 +219,7 @@ export default function EventSummaryPage({ onNavigate }: PulsePageProps) {
                 {data.healthScore}
                 <span className="text-base font-normal text-slate-400 ml-1">/ 100</span>
               </p>
-              <p className="text-slate-400 text-xs mt-1">{context?.eventName ?? '—'}</p>
+              <p className="text-slate-400 text-xs mt-1">{context?.eventName ?? '-'}</p>
             </div>
           </div>
 

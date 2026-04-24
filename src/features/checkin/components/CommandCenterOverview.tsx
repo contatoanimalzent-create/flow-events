@@ -101,7 +101,7 @@ export function CommandCenterOverview({ snapshot }: CommandCenterOverviewProps) 
               </div>
               <div className="rounded-sm border border-bg-border bg-bg-surface/60 p-2">
                 <div className="text-text-muted">Capacidade/h</div>
-                <div className="mt-1 font-semibold text-text-primary">{summary.gate.throughput_per_hour || '—'}</div>
+                <div className="mt-1 font-semibold text-text-primary">{summary.gate.throughput_per_hour || '-'}</div>
               </div>
             </div>
 

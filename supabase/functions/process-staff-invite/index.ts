@@ -101,7 +101,7 @@ function buildInviteEmailHtml(params: {
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Convite para Staff – ${eventName}</title>
+<title>Convite para Staff, ${eventName}</title>
 </head>
 <body style="margin:0;padding:0;background:#050507;font-family:'Manrope',Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#050507;padding:40px 16px;">
@@ -322,7 +322,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
     await admin.from('communications_log').insert({
       channel:          'email',
       recipient_email:  link.target_email,
-      subject:          `Convite para equipe – ${eventName}`,
+      subject:          `Convite para equipe, ${eventName}`,
       status:           sendSuccess ? 'sent' : 'failed',
       error_message:    sendError,
       metadata: {
@@ -360,7 +360,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const admin = createSupabaseAdminClient()
 
   // =========================================================================
-  // GET — retrieve invite info OR trigger batch via cron webhook
+  // GET, retrieve invite info OR trigger batch via cron webhook
   // =========================================================================
   if (req.method === 'GET') {
     const url = new URL(req.url)
@@ -484,7 +484,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         return jsonResponse({ error: 'Failed to update invite link', details: patchError.message }, 500)
       }
 
-      // Run single-link batch (re-use runBatch — the link will be the only pending one with this email)
+      // Run single-link batch (re-use runBatch, the link will be the only pending one with this email)
       // For simplicity, just run the full batch; idempotency prevents double-sends
       return await runBatch(admin)
     }

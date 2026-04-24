@@ -155,8 +155,8 @@ export function ComoFuncionaPage({ onLogin }: { onLogin: () => void }) {
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-white/58">
             {isPortuguese
-              ? 'A Pulse cobre todo o ciclo de vida do seu evento — da configuracao inicial ao repasse financeiro pos-evento.'
-              : 'Pulse covers your entire event lifecycle — from initial setup to post-event financial transfer.'}
+              ? 'A Pulse cobre todo o ciclo de vida do seu evento, da configuracao inicial ao repasse financeiro pos-evento.'
+              : 'Pulse covers your entire event lifecycle, from initial setup to post-event financial transfer.'}
           </p>
         </div>
       </section>

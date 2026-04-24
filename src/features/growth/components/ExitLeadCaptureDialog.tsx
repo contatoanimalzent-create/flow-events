@@ -112,7 +112,7 @@ export function ExitLeadCaptureDialog({
   if (!open) return null
 
   return (
-    /* Overlay — solid dark, sem blur */
+    /* Overlay, solid dark, sem blur */
     <div
       className="fixed inset-0 z-[80] flex items-end justify-center px-3 pb-3 sm:items-center sm:px-4 sm:pb-0"
       style={{ background: 'rgba(0,0,0,0.82)' }}
@@ -140,7 +140,7 @@ export function ExitLeadCaptureDialog({
         </button>
 
         <div className="grid md:grid-cols-[1fr_1fr]">
-          {/* Lado esquerdo — oculto em mobile, visivel a partir de md */}
+          {/* Lado esquerdo, oculto em mobile, visivel a partir de md */}
           <div
             className="hidden overflow-hidden px-9 py-10 md:block"
             style={{
@@ -166,7 +166,7 @@ export function ExitLeadCaptureDialog({
             </div>
           </div>
 
-          {/* Lado direito — formulario (unico coluna em mobile) */}
+          {/* Lado direito, formulario (unico coluna em mobile) */}
           <div className="px-5 py-8 sm:px-8 sm:py-10 md:px-9">
             {/* Eyebrow visivel so em mobile (no desktop esta no painel esquerdo) */}
             <div className="mb-4 flex items-center gap-2 md:hidden">

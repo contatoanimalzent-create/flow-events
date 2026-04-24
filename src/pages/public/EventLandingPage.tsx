@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Eye, EyeOff, Lock } from 'lucide-react'
+import { Eye, EyeOff, Lock } from 'lucide-react'
 import type { EventAsset } from '@/lib/supabase'
 import { PublicLayout, usePublicEvent } from '@/features/public'
 import { formatPublicCurrency, formatPublicDate, formatPublicTime, usePublicLocale, type PublicLocale } from '@/features/public/lib/public-locale'
@@ -451,15 +451,7 @@ export function EventLandingPage({ slug }: EventLandingPageProps) {
   }
 
   return (
-    <PublicLayout showFooter={false}>
-      <a
-        href="/events"
-        className="fixed left-5 top-5 z-30 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/30 md:left-8 md:top-8"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {isPortuguese ? 'Eventos' : 'Events'}
-      </a>
-
+    <PublicLayout showFooter={false} heroPage>
       <EventHero
         title={eventRecord.name}
         subtitle={eventRecord.subtitle || eventRecord.short_description || eventRecord.full_description || ''}

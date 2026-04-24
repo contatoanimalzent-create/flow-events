@@ -76,7 +76,7 @@ export default function OperatorAlertsPage({ onNavigate }: PulsePageProps) {
     try {
       await supabase.from('checkin_attempts').update({ resolved: true }).eq('id', id)
     } catch {
-      // Optimistic — revert if needed
+      // Optimistic, revert if needed
       setResolvedIds((s) => { const next = new Set(s); next.delete(id); return next })
     }
   }

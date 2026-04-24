@@ -121,7 +121,7 @@ export function generateConfirmationEmailHTML(data: EmailTemplateData): string {
 
     <!-- Footer -->
     <div class="footer">
-      <p><strong>CAPITAL STRIKE — A ORIGEM</strong></p>
+      <p><strong>CAPITAL STRIKE, A ORIGEM</strong></p>
       <p>A experiência tática definitiva</p>
       <p style="margin-top: 15px; font-size: 11px;">© 2026 Capital Strike. Todos os direitos reservados.</p>
     </div>

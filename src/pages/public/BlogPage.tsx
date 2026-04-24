@@ -50,7 +50,7 @@ const ARTIGOS = [
     data: '14 Mar 2026',
     titulo: 'Pix, cartão ou boleto: qual meio de pagamento converte mais em eventos?',
     resumo:
-      'Dados reais de eventos operados pela Pulse mostram diferenças significativas de conversão por meio de pagamento — e elas variam muito por perfil de público e tipo de evento.',
+      'Dados reais de eventos operados pela Pulse mostram diferenças significativas de conversão por meio de pagamento, e elas variam muito por perfil de público e tipo de evento.',
     cor: 'bg-rose-500/15 text-rose-400',
   },
 ]
@@ -90,8 +90,8 @@ export function BlogPage({ onLogin }: { onLogin: () => void }) {
           </h1>
           <p className="mt-5 max-w-xl text-lg text-[#9a9088]">
             {isPortuguese
-              ? 'Estratégias, operação e produto — escritos por quem opera eventos de verdade.'
-              : 'Strategy, operations and product — written by people who actually run events.'}
+              ? 'Estratégias, operação e produto, escritos por quem opera eventos de verdade.'
+              : 'Strategy, operations and product, written by people who actually run events.'}
           </p>
         </div>
       </section>

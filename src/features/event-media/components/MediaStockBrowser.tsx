@@ -216,7 +216,7 @@ export function MediaStockBrowser({ defaultType = 'image', onSelect }: MediaStoc
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <span className="text-[11px] text-text-muted">
-                {total.toLocaleString('pt-BR')} resultados — página {page} de {totalPages}
+                {total.toLocaleString('pt-BR')} resultados, página {page} de {totalPages}
               </span>
               <div className="flex items-center gap-1">
                 <button

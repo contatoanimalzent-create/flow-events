@@ -265,7 +265,7 @@ export default function PresencePage({ onNavigate }: PulsePageProps) {
 
             {!isOnline && (
               <p className="text-amber-400 text-xs mt-4 text-center">
-                Offline — ações sincronizadas ao reconectar
+                Offline, ações sincronizadas ao reconectar
               </p>
             )}
           </>

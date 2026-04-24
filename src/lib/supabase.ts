@@ -929,7 +929,7 @@ export interface ExecutiveDashboardSnapshot {
   returning_customers: number
   campaigns_sent: number
   emails_delivered: number
-  campaign_open_rate?: number | null  // 0.0000–1.0000
+  campaign_open_rate?: number | null  // 0.0000-1.0000
   revenue_by_event: Record<string, unknown>[]
   revenue_by_day: Record<string, unknown>[]
   top_ticket_types: Record<string, unknown>[]
@@ -1098,7 +1098,7 @@ export interface EventAsset {
   updated_at: string
 }
 
-// ─── Inscricoes (External Registrations — Capital Strike) ────────────────────
+// ─── Inscricoes (External Registrations, Capital Strike) ────────────────────
 
 export type CapitalStrikeArmy = 'coalizao' | 'alianca'
 

@@ -19,7 +19,7 @@ function formatTime(iso: string) {
   try {
     return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
   } catch {
-    return '—'
+    return '-'
   }
 }
 
@@ -76,7 +76,7 @@ export default function AgendaPage({ onNavigate }: PulsePageProps) {
       await attendeeService.toggleFavorite(session.id, context.eventId, userId, session.isFavorite)
       setSessions((prev) => prev.map((s) => s.id === session.id ? { ...s, isFavorite: !s.isFavorite } : s))
     } catch {
-      // Silently fail — optimistic update not applied
+      // Silently fail, optimistic update not applied
     }
   }
 
@@ -163,7 +163,7 @@ export default function AgendaPage({ onNavigate }: PulsePageProps) {
                           <div className="flex gap-3 mt-2">
                             <div className="flex items-center gap-1 text-slate-500 text-xs">
                               <Clock size={10} />
-                              {formatTime(s.startsAt)}{s.endsAt ? ` – ${formatTime(s.endsAt)}` : ''}
+                              {formatTime(s.startsAt)}{s.endsAt ? `, ${formatTime(s.endsAt)}` : ''}
                             </div>
                             {s.stage && (
                               <div className="flex items-center gap-1 text-slate-500 text-xs">

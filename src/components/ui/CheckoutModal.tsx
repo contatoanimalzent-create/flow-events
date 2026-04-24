@@ -108,7 +108,7 @@ function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Stripe Payment Element — parece campo nativo */}
+      {/* Stripe Payment Element, parece campo nativo */}
       <div>
         <div className="text-[10px] font-mono tracking-widest text-text-muted uppercase mb-2">
           Dados do pagamento
@@ -176,7 +176,7 @@ export function CheckoutModal({ eventId, eventName, ticketType, onClose }: Check
     setStep('payment')
   }
 
-  // Stripe Elements appearance — matches Pulse light theme
+  // Stripe Elements appearance, matches Pulse light theme
   const appearance: Parameters<typeof Elements>[0]['options'] = {
     appearance: {
       theme: 'stripe',

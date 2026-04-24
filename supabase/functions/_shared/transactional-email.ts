@@ -101,7 +101,7 @@ export function buildOrderConfirmationEmail(payload: OrderEmailPayload) {
         </div>
       </div>
     `,
-    text: `Pulse — Pedido confirmado para ${payload.eventName}. Total pago: ${formatCurrency(payload.totalAmount)}.`,
+    text: `Pulse, Pedido confirmado para ${payload.eventName}. Total pago: ${formatCurrency(payload.totalAmount)}.`,
   }
 }
 
@@ -134,14 +134,14 @@ export function buildTicketsEmail(payload: OrderEmailPayload) {
           <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Seus ingressos digitais</h1>
           <p style="margin: 4px 0 0; font-size: 12px; color: #4285F4; text-transform: uppercase; letter-spacing: 1px;">Pulse Events</p>
         </div>
-        <p>Pedido <strong style="color: #4285F4;">#${payload.orderId.slice(0, 8).toUpperCase()}</strong> — ${payload.eventName}</p>
+        <p>Pedido <strong style="color: #4285F4;">#${payload.orderId.slice(0, 8).toUpperCase()}</strong>, ${payload.eventName}</p>
         <div style="margin-top: 20px;">${ticketsHtml}</div>
         <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: rgba(255,255,255,0.38);">
           &copy; 2026 Pulse. Todos os direitos reservados.
         </div>
       </div>
     `,
-    text: `Pulse — Ingressos digitais de ${payload.eventName}\n${ticketsText}`,
+    text: `Pulse, Ingressos digitais de ${payload.eventName}\n${ticketsText}`,
   }
 }
 
@@ -174,7 +174,7 @@ export async function buildOrderConfirmationWithQREmail(
   const accentSoft = accent + '33'
   const cover = payload.coverUrl || ''
 
-  // Generate QR codes for each ticket — uploaded to Supabase Storage for real HTTPS URLs
+  // Generate QR codes for each ticket, uploaded to Supabase Storage for real HTTPS URLs
   const ticketQRCodes: { ticketNumber: string; qrUrl: string | null; qrToken: string; holderName: string | null }[] = []
   for (const ticket of payload.tickets) {
     const url = await generateQRCodeUrl(ticket.qrToken)
@@ -186,7 +186,7 @@ export async function buildOrderConfirmationWithQREmail(
     })
   }
 
-  // Build QR section — poster-style: QR on the left, info on the right
+  // Build QR section, poster-style: QR on the left, info on the right
   const qrBlocksHtml = ticketQRCodes.map((tqr, index) => {
     const qrImage = tqr.qrUrl
       ? `<img src="${tqr.qrUrl}" alt="QR Code" width="160" height="160" style="display: block; border-radius: 8px;" />`
@@ -228,7 +228,7 @@ export async function buildOrderConfirmationWithQREmail(
   const dateDisplay = payload.eventDate || ''
 
   return {
-    subject: `Ingresso Confirmado — ${payload.eventName}`,
+    subject: `Ingresso Confirmado, ${payload.eventName}`,
     html: `
       <!DOCTYPE html>
       <html lang="pt-BR">
@@ -373,7 +373,7 @@ export async function buildOrderConfirmationWithQREmail(
       </body>
       </html>
     `,
-    text: `PULSE — Ingresso Confirmado\n\nOla ${payload.recipientName || payload.buyerName},\n\nSua compra para o evento foi confirmada com sucesso!\n${payload.totalAmount > 0 ? `Total pago: ${formatCurrency(payload.totalAmount)}\n` : ''}\n=== ${payload.eventName.toUpperCase()} ===\n${payload.eventDate ? `Data: ${payload.eventDate}\n` : ''}${payload.eventLocation ? `Local: ${payload.eventLocation}\n` : ''}${payload.exerciseType ? `Modalidade: ${payload.exerciseType}\n` : ''}Pedido: #${payload.orderId.slice(0, 8).toUpperCase()}\nIngressos: ${payload.tickets.length}\n\n=== SEU QR CODE ===\nAcesse a versao HTML deste email para ver o QR code.\nTokens: ${payload.tickets.map((t) => t.qrToken.slice(0, 8).toUpperCase()).join(', ')}\n\n=== NO DIA DO EVENTO ===\n1. Chegue com antecedencia\n2. Abra este email no celular\n3. Apresente o QR code no check-in\n4. Aproveite!\n\nQR code pessoal e intransferivel.\n\npulse.events`,
+    text: `PULSE, Ingresso Confirmado\n\nOla ${payload.recipientName || payload.buyerName},\n\nSua compra para o evento foi confirmada com sucesso!\n${payload.totalAmount > 0 ? `Total pago: ${formatCurrency(payload.totalAmount)}\n` : ''}\n=== ${payload.eventName.toUpperCase()} ===\n${payload.eventDate ? `Data: ${payload.eventDate}\n` : ''}${payload.eventLocation ? `Local: ${payload.eventLocation}\n` : ''}${payload.exerciseType ? `Modalidade: ${payload.exerciseType}\n` : ''}Pedido: #${payload.orderId.slice(0, 8).toUpperCase()}\nIngressos: ${payload.tickets.length}\n\n=== SEU QR CODE ===\nAcesse a versao HTML deste email para ver o QR code.\nTokens: ${payload.tickets.map((t) => t.qrToken.slice(0, 8).toUpperCase()).join(', ')}\n\n=== NO DIA DO EVENTO ===\n1. Chegue com antecedencia\n2. Abra este email no celular\n3. Apresente o QR code no check-in\n4. Aproveite!\n\nQR code pessoal e intransferivel.\n\npulse.events`,
   }
 }
 

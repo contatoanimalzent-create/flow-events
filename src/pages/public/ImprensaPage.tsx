@@ -32,7 +32,7 @@ const KIT_MIDIA = [
 
 const FATOS = [
   { label: 'Fundação', valor: '2024' },
-  { label: 'HQ', valor: 'Brasil — operação 100% remota' },
+  { label: 'HQ', valor: 'Brasil, operação 100% remota' },
   { label: 'Foco', valor: 'Plataforma B2B para produtores de eventos' },
   { label: 'Tecnologia', valor: 'React, TypeScript, Supabase' },
 ]
@@ -75,8 +75,8 @@ export function ImprensaPage({ onLogin }: { onLogin: () => void }) {
             </h2>
             <p className="text-[#9a9088] leading-relaxed max-w-3xl">
               {isPortuguese
-                ? 'Pulse é uma plataforma SaaS brasileira para gestão completa de eventos. Fundada em 2024, conecta produtores, staff e participantes em um único ecossistema digital — do ingresso ao encerramento. A plataforma cobre todo o ciclo operacional: venda de ingressos, controle de lotes, check-in por QR code, gestão de staff, supervisão em tempo real e repasse financeiro automático.'
-                : 'Pulse is a Brazilian SaaS platform for complete event management. Founded in 2024, it connects producers, staff and attendees in a single digital ecosystem — from ticketing to closing. The platform covers the full operational cycle: ticket sales, batch control, QR code check-in, staff management, real-time supervision and automatic financial transfer.'}
+                ? 'Pulse é uma plataforma SaaS brasileira para gestão completa de eventos. Fundada em 2024, conecta produtores, staff e participantes em um único ecossistema digital, do ingresso ao encerramento. A plataforma cobre todo o ciclo operacional: venda de ingressos, controle de lotes, check-in por QR code, gestão de staff, supervisão em tempo real e repasse financeiro automático.'
+                : 'Pulse is a Brazilian SaaS platform for complete event management. Founded in 2024, it connects producers, staff and attendees in a single digital ecosystem, from ticketing to closing. The platform covers the full operational cycle: ticket sales, batch control, QR code check-in, staff management, real-time supervision and automatic financial transfer.'}
             </p>
           </div>
         </div>

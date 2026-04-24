@@ -205,7 +205,7 @@ export function SettingsPage() {
       status: 'pending',
     })
     if (err) {
-      // table may not exist yet — show fallback
+      // table may not exist yet, show fallback
       setInviteSuccess(`Convite gerado! Envie este link para ${inviteEmail}: ${window.location.origin}/invite?org=${organization!.id}&role=${inviteRole}`)
     } else {
       setInviteSuccess(`Convite enviado para ${inviteEmail}! Eles receberão um e-mail em breve.`)
@@ -392,7 +392,7 @@ export function SettingsPage() {
                   <div>
                     <h3 className="text-sm font-semibold text-text-primary">Marca branca completa</h3>
                     <p className="text-xs text-text-secondary mt-1">
-                      Com o plano Business ou Enterprise, seu comprador nunca vê a marca Pulse — vê apenas a sua.
+                      Com o plano Business ou Enterprise, seu comprador nunca vê a marca Pulse, vê apenas a sua.
                       Domínio próprio, e-mail próprio, cores e logo personalizados.
                     </p>
                     {(planKey === 'starter' || planKey === 'pro') && (
@@ -498,9 +498,9 @@ export function SettingsPage() {
                 </h3>
                 <div className="space-y-3">
                   {[
-                    { name: 'PIX (nativo)', desc: 'Integrado nativamente — sem configuração necessária', status: 'active' },
+                    { name: 'PIX (nativo)', desc: 'Integrado nativamente, sem configuração necessária', status: 'active' },
                     { name: 'Pagar.me', desc: 'Cartão de crédito, débito e boleto', status: 'pending', hasConfig: true },
-                    { name: 'Stripe', desc: 'Pagamentos internacionais — USD, EUR', status: 'inactive', hasConfig: true },
+                    { name: 'Stripe', desc: 'Pagamentos internacionais, USD, EUR', status: 'inactive', hasConfig: true },
                     { name: 'Mercado Pago', desc: 'Cartão, PIX e parcelamento', status: 'inactive', hasConfig: true },
                   ].map((p, i) => (
                     <div key={i} className="flex items-center gap-4 p-3 bg-bg-surface rounded-sm border border-bg-border">
@@ -554,14 +554,14 @@ export function SettingsPage() {
           {tab === 'billing' && (
             <div className="space-y-5 reveal">
 
-              {/* How it works — two fee types explained */}
+              {/* How it works, two fee types explained */}
               <div className="card p-5 border-brand-acid/15 bg-brand-acid/3">
                 <div className="flex items-start gap-3">
                   <Percent className="w-5 h-5 text-brand-acid shrink-0 mt-0.5" />
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold text-text-primary">Modelo de taxas Pulse</h3>
                     <p className="text-xs text-text-secondary leading-relaxed">
-                      Usamos <strong className="text-text-primary">dois tipos de taxa</strong> por transação — igual ao padrão do mercado (Sympla, Ingresse):
+                      Usamos <strong className="text-text-primary">dois tipos de taxa</strong> por transação, igual ao padrão do mercado (Sympla, Ingresse):
                     </p>
                     <div className="grid grid-cols-2 gap-3 mt-2">
                       <div className="bg-bg-card rounded-sm p-3 border border-bg-border">
@@ -581,7 +581,7 @@ export function SettingsPage() {
                     </div>
                     <p className="text-[11px] text-text-muted pt-1">
                       Planos pagos reduzem ambas as taxas e desbloqueiam recursos premium.
-                      Comparable: Sympla cobra 10% + 2,5% · Ingresse cobra 5–10% · Ticket360 cobra até 18%.
+                      Comparable: Sympla cobra 10% + 2,5% · Ingresse cobra 5-10% · Ticket360 cobra até 18%.
                     </p>
                   </div>
                 </div>
@@ -671,7 +671,7 @@ export function SettingsPage() {
                 <h3 className="text-sm font-semibold text-text-primary mb-1 flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-brand-acid" /> Tabela de taxas por plano
                 </h3>
-                <p className="text-xs text-text-muted mb-4">Referência de mercado: Sympla 10%+2,5% · Ingresse 5–10% · Ticket360 até 18%</p>
+                <p className="text-xs text-text-muted mb-4">Referência de mercado: Sympla 10%+2,5% · Ingresse 5-10% · Ticket360 até 18%</p>
                 <div className="overflow-hidden rounded-sm border border-bg-border">
                   <table className="w-full">
                     <thead>
@@ -688,7 +688,7 @@ export function SettingsPage() {
                         { label: 'Serviço (ingressos)',  who: 'Comprador', values: ['10%', '7%', '5%', 'Neg.'], highlight: true },
                         { label: 'Processamento',        who: 'Produtor',  values: ['2,5%', '1,5%', '1%', 'Neg.'], highlight: false },
                         { label: 'Serviço (PDV)',        who: 'Produtor',  values: ['3%', '2%', '1%', 'Neg.'], highlight: false },
-                        { label: 'Eventos gratuitos',    who: '—',         values: ['Grátis', 'Grátis', 'Grátis', 'Grátis'], highlight: false },
+                        { label: 'Eventos gratuitos',    who: '-',         values: ['Grátis', 'Grátis', 'Grátis', 'Grátis'], highlight: false },
                       ].map((row, i) => (
                         <tr key={i} className="table-row">
                           <td className="table-cell font-medium text-xs">{row.label}</td>
@@ -781,12 +781,12 @@ export function SettingsPage() {
                 <h4 className="text-sm font-semibold text-text-primary mb-3">Perfis de acesso disponíveis</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {[
-                    { role: 'Administrador', desc: 'Acesso total — todas as funcionalidades' },
+                    { role: 'Administrador', desc: 'Acesso total, todas as funcionalidades' },
                     { role: 'Gerente', desc: 'Acesso a eventos, vendas, staff e relatórios' },
                     { role: 'Credenciamento', desc: 'Apenas operação de portarias e QR Code' },
                     { role: 'PDV', desc: 'Apenas ponto de venda e caixa' },
                     { role: 'Financeiro', desc: 'Apenas módulo financeiro e relatórios' },
-                    { role: 'Visualização', desc: 'Somente leitura — sem edições' },
+                    { role: 'Visualização', desc: 'Somente leitura, sem edições' },
                   ].map((r, i) => (
                     <div key={i} className="flex items-start gap-2 text-xs p-2 rounded-sm bg-bg-surface">
                       <ShieldCheck className="w-3.5 h-3.5 text-brand-acid shrink-0 mt-0.5" />

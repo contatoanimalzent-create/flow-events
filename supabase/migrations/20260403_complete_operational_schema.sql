@@ -1,6 +1,6 @@
 -- ============================================================
 -- Migration: 20260403_complete_operational_schema.sql
--- Descrição: Schema operacional completo — multi-tenant com RLS
+-- Descrição: Schema operacional completo, multi-tenant com RLS
 -- Autor: Flow Events Platform
 -- ⚠️  NÃO modifica nada relacionado à Capital Strike
 -- ============================================================
@@ -212,7 +212,7 @@ CREATE INDEX IF NOT EXISTS idx_stages_zone_id ON stages(zone_id);
 ALTER TABLE stages ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================
--- 7. vendors  (antes de stands — FK depende desta tabela)
+-- 7. vendors  (antes de stands, FK depende desta tabela)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS vendors (
@@ -577,7 +577,7 @@ CREATE INDEX IF NOT EXISTS idx_person_event_profiles_role      ON person_event_p
 ALTER TABLE person_event_profiles ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================
--- ROW LEVEL SECURITY — POLÍTICAS
+-- ROW LEVEL SECURITY, POLÍTICAS
 -- ============================================================
 
 -- ── event_editions ──────────────────────────────────────────

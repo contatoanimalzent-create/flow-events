@@ -389,7 +389,7 @@ export function StaffJoinPage() {
               <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/38">Turno</p>
                 <p className="mt-1 text-sm font-semibold text-[#f5f0e8]">
-                  {info.shift ?? `${shiftStart} – ${shiftEnd}`}
+                  {info.shift ?? `${shiftStart}, ${shiftEnd}`}
                 </p>
               </div>
             )}
@@ -486,7 +486,7 @@ export function StaffJoinPage() {
 
                 <InputField
                   label="Experiência / Apresentação"
-                  hint="Opcional — Conte um pouco sobre sua experiência com eventos"
+                  hint="Opcional, Conte um pouco sobre sua experiência com eventos"
                   error={fieldErrors.bio}
                 >
                   <textarea

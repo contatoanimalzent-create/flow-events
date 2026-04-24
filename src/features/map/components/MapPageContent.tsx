@@ -210,7 +210,7 @@ export function MapPageContent() {
                     stroke="rgba(0,0,0,0.5)" strokeWidth="0.4"
                     className="cursor-pointer"
                   />
-                  <title>{s.name} — {s.role}</title>
+                  <title>{s.name}, {s.role}</title>
                 </g>
               ))}
 

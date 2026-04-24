@@ -1,4 +1,4 @@
-// Supabase Edge Function — stripe-checkout
+// Supabase Edge Function, stripe-checkout
 // Deploy: supabase functions deploy stripe-checkout
 // Env vars needed (set via Supabase Dashboard → Edge Functions → Secrets):
 //   STRIPE_SECRET_KEY   → sk_live_... or sk_test_...
@@ -119,10 +119,10 @@ Deno.serve(async (req) => {
             currency,
             unit_amount: unitAmount,
             product_data: {
-              name: `${ticketType.name} — ${event.name}`,
+              name: `${ticketType.name}, ${event.name}`,
               description: installments > 1
                 ? `${installments}x de R$ ${(unitAmount / installments / 100).toFixed(2)} (juros de parcelamento inclusos)`
-                : 'Ingresso — preço total sem taxas surpresa',
+                : 'Ingresso, preço total sem taxas surpresa',
               images: event.cover_url ? [event.cover_url] : [],
             },
           },

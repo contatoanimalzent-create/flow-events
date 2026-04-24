@@ -14,7 +14,7 @@ const STATUS_COLOR: Record<string, string> = {
   offline: '#64748b',
 }
 
-// Static zone layout for visualization — real coords come from pings
+// Static zone layout for visualization, real coords come from pings
 const ZONE_BOXES = [
   { id: 'a', label: 'Portaria Principal', x: 10, y: 10, w: 35, h: 25, color: '#0057E733' },
   { id: 'b', label: 'Portaria Lateral', x: 55, y: 10, w: 35, h: 25, color: '#0057E733' },

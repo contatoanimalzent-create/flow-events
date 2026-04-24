@@ -1,5 +1,5 @@
 -- ============================================================
--- ANIMALZ EVENTS — Novos módulos: cost_entries e campaigns
+-- ANIMALZ EVENTS, Novos módulos: cost_entries e campaigns
 -- Migration: 2026-03-22
 -- Executar no Supabase SQL Editor
 -- ============================================================

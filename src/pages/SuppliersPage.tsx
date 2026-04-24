@@ -311,7 +311,7 @@ export function SuppliersPage() {
                           <Tag className="w-3 h-3 text-brand-acid" />
                           {s.service_type}
                         </span>
-                      ) : <span className="text-xs text-text-muted">—</span>}
+                      ) : <span className="text-xs text-text-muted">-</span>}
                     </td>
                     <td className="table-cell">
                       <select value={s.status}
@@ -336,7 +336,7 @@ export function SuppliersPage() {
                             <div className="text-[11px] text-text-muted">{s.payment_terms}</div>
                           )}
                         </div>
-                      ) : <span className="text-xs text-text-muted">—</span>}
+                      ) : <span className="text-xs text-text-muted">-</span>}
                     </td>
                     <td className="table-cell">
                       {docCfg ? (
@@ -344,7 +344,7 @@ export function SuppliersPage() {
                           <ShieldCheck className="w-3 h-3" />
                           {docCfg.label}
                         </span>
-                      ) : <span className="text-xs text-text-muted">—</span>}
+                      ) : <span className="text-xs text-text-muted">-</span>}
                     </td>
                     <td className="table-cell">
                       {s.rating ? (
@@ -353,7 +353,7 @@ export function SuppliersPage() {
                             <Star key={i} className={cn('w-3 h-3', i <= s.rating! ? 'text-brand-acid fill-brand-acid' : 'text-bg-border')} />
                           ))}
                         </div>
-                      ) : <span className="text-xs text-text-muted">—</span>}
+                      ) : <span className="text-xs text-text-muted">-</span>}
                     </td>
                     <td className="table-cell">
                       <div className="flex items-center gap-1 relative">

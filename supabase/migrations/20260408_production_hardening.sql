@@ -127,9 +127,9 @@ BEGIN
 END;
 $$;
 
--- ─── FIX 3: RLS hardening — cross-tenant data isolation ───────────────
+-- ─── FIX 3: RLS hardening, cross-tenant data isolation ───────────────
 
--- 3a) capital_strike_registrations — add organization_id and scope SELECT
+-- 3a) capital_strike_registrations, add organization_id and scope SELECT
 ALTER TABLE public.capital_strike_registrations
   ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES public.organizations(id) ON DELETE SET NULL;
 
@@ -146,7 +146,7 @@ CREATE POLICY "org_read_capital_strike_registrations"
 -- Keep the public INSERT policy (external registrations from anon/authenticated)
 -- already exists as "public_insert_capital_strike_registrations"
 
--- 3b) growth_leads — scope to organization members
+-- 3b) growth_leads, scope to organization members
 DROP POLICY IF EXISTS "authenticated_manage_growth_leads" ON public.growth_leads;
 CREATE POLICY "org_manage_growth_leads"
   ON public.growth_leads
@@ -158,7 +158,7 @@ CREATE POLICY "org_manage_growth_leads"
 -- Keep the anon INSERT policy for public lead capture
 -- already exists as "anon_insert_growth_leads"
 
--- 3c) referral_links — scope to organization members
+-- 3c) referral_links, scope to organization members
 DROP POLICY IF EXISTS "authenticated_manage_referral_links" ON public.referral_links;
 CREATE POLICY "org_manage_referral_links"
   ON public.referral_links
@@ -170,7 +170,7 @@ CREATE POLICY "org_manage_referral_links"
 -- Keep the anon SELECT policy for public referral link resolution
 -- already exists as "anon_read_public_referral_links"
 
--- 3d) referral_conversions — scope to organization members
+-- 3d) referral_conversions, scope to organization members
 DROP POLICY IF EXISTS "authenticated_manage_referral_conversions" ON public.referral_conversions;
 CREATE POLICY "org_manage_referral_conversions"
   ON public.referral_conversions

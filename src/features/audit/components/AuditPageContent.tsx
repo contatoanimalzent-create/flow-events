@@ -214,7 +214,7 @@ export function AuditPageContent() {
                       <span className="rounded-md bg-white/5 px-2 py-0.5 text-xs font-mono text-text-secondary">{log.entity_type}</span>
                     </td>
                     <td className="px-5 py-3 text-xs font-medium text-text-primary">{log.action}</td>
-                    <td className="px-5 py-3 text-xs font-mono text-text-muted">{log.ip_address ?? '—'}</td>
+                    <td className="px-5 py-3 text-xs font-mono text-text-muted">{log.ip_address ?? '-'}</td>
                     <td className="px-5 py-3 text-xs text-text-muted">{formatRelative(log.created_at)}</td>
                   </tr>
                 ))}
@@ -310,4 +310,5 @@ export function AuditPageContent() {
       )}
     </div>
   )
+}
 }

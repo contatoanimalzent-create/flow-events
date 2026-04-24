@@ -21,7 +21,7 @@ export async function initPush(userId: string, eventId: string): Promise<boolean
   }
 
   if (!VAPID_PUBLIC_KEY) {
-    console.warn('[push] VITE_VAPID_PUBLIC_KEY not set — push disabled')
+    console.warn('[push] VITE_VAPID_PUBLIC_KEY not set, push disabled')
     return false
   }
 

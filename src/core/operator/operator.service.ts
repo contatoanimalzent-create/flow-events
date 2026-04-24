@@ -139,8 +139,8 @@ export const operatorService = {
       .map((t) => ({
         ticketId: t.id,
         attendeeId: t.attendee_id,
-        name: t.profiles?.full_name ?? '—',
-        email: t.profiles?.email ?? '—',
+        name: t.profiles?.full_name ?? '-',
+        email: t.profiles?.email ?? '-',
         ticketType: t.ticket_types?.name ?? 'Ingresso',
         status: t.status,
       }))

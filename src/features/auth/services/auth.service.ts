@@ -47,31 +47,19 @@ export const authService = {
       .update({ must_change_password: false })
       .eq('id', profileId)
   },
-  createOrganizationForUser: async (userId: string, orgName: string, userEmail?: string) => {
-    const base = orgName
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-    const slug = `${base}-${Date.now().toString(36)}`
+  createOrganizationForUser: async (_userId: string, orgName: string, userEmail?: string) => {
+    // Usa RPC SECURITY DEFINER — contorna RLS e executa tudo atomicamente:
+    // 1) cria a org  2) adiciona em organization_members  3) atualiza profile
+    const { data, error } = await supabase
+      .rpc('create_organization', {
+        org_name:  orgName,
+        org_email: userEmail ?? null,
+        org_plan:  'starter',
+        org_slug:  null,
+      })
 
-    const { data: org, error: orgError } = await supabase
-      .from('organizations')
-      .insert({ name: orgName, slug, plan: 'starter', is_active: true, email: userEmail })
-      .select()
-      .single()
+    if (error) return { error: error.message }
 
-    if (orgError) return { error: orgError.message }
-
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({ organization_id: org.id, role: 'org_admin' })
-      .eq('id', userId)
-
-    if (profileError) return { error: profileError.message }
-
-    return { org: org as Organization }
+    return { org: data as unknown as Organization }
   },
 }

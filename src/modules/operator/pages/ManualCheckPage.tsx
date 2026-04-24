@@ -20,6 +20,7 @@ export default function ManualCheckPage({ onNavigate }: PulsePageProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Attendee[]>([])
   const [loading, setLoading] = useState(false)
+  const [searchError, setSearchError] = useState(false)
   const [checkResult, setCheckResult] = useState<CheckResult | null>(null)
   const [checkingId, setCheckingId] = useState<string | null>(null)
 
@@ -28,11 +29,13 @@ export default function ManualCheckPage({ onNavigate }: PulsePageProps) {
     setLoading(true)
     setResults([])
     setCheckResult(null)
+    setSearchError(false)
     try {
       const data = await operatorService.searchAttendee(query, context.eventId)
       setResults(data)
     } catch {
       setResults([])
+      setSearchError(true)
     } finally {
       setLoading(false)
     }
@@ -43,9 +46,13 @@ export default function ManualCheckPage({ onNavigate }: PulsePageProps) {
       setCheckResult({ success: false, message: 'Ingresso já utilizado' })
       return
     }
+    if (!context?.eventId) {
+      setCheckResult({ success: false, message: 'Nenhum evento selecionado' })
+      return
+    }
     setCheckingId(attendee.ticketId)
     try {
-      const res = await operatorService.validateToken(attendee.ticketId, context?.eventId ?? '', 'manual')
+      const res = await operatorService.validateToken(attendee.ticketId, context.eventId, 'manual')
       setCheckResult(
         res.valid
           ? { success: true, name: res.name }

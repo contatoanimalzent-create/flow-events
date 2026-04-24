@@ -11,6 +11,7 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [posts, setPosts] = useState<FeedPost[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [liked, setLiked] = useState<Set<string>>(new Set())
   const [composing, setComposing] = useState('')
   const [posting, setPosting] = useState(false)
@@ -20,9 +21,12 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
 
   const loadFeed = async () => {
     if (!context?.eventId) { setLoading(false); return }
+    setLoadError(false)
     try {
       const data = await attendeeService.getFeed(context.eventId)
       setPosts(data)
+    } catch {
+      setLoadError(true)
     } finally {
       setLoading(false)
     }
@@ -38,32 +42,36 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
   })
 
   const toggleLike = async (post: FeedPost) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-    const isLiked = liked.has(post.id)
-    setLiked((s) => {
-      const ns = new Set(s)
-      isLiked ? ns.delete(post.id) : ns.add(post.id)
-      return ns
-    })
+      const isLiked = liked.has(post.id)
+      setLiked((s) => {
+        const ns = new Set(s)
+        isLiked ? ns.delete(post.id) : ns.add(post.id)
+        return ns
+      })
 
-    // Optimistically update count
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === post.id
-          ? { ...p, likesCount: p.likesCount + (isLiked ? -1 : 1) }
-          : p
+      // Optimistically update count
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === post.id
+            ? { ...p, likesCount: p.likesCount + (isLiked ? -1 : 1) }
+            : p
+        )
       )
-    )
 
-    // Persist like
-    if (isLiked) {
-      await supabase.from('feed_likes').delete().eq('post_id', post.id).eq('user_id', user.id)
-      await supabase.from('event_feed_posts').update({ likes_count: Math.max(0, post.likesCount - 1) }).eq('id', post.id)
-    } else {
-      await supabase.from('feed_likes').upsert({ post_id: post.id, user_id: user.id, event_id: context?.eventId })
-      await supabase.from('event_feed_posts').update({ likes_count: post.likesCount + 1 }).eq('id', post.id)
+      // Persist like
+      if (isLiked) {
+        await supabase.from('feed_likes').delete().eq('post_id', post.id).eq('user_id', user.id)
+        await supabase.from('event_feed_posts').update({ likes_count: Math.max(0, post.likesCount - 1) }).eq('id', post.id)
+      } else {
+        await supabase.from('feed_likes').upsert({ post_id: post.id, user_id: user.id, event_id: context?.eventId })
+        await supabase.from('event_feed_posts').update({ likes_count: post.likesCount + 1 }).eq('id', post.id)
+      }
+    } catch {
+      // Revert optimistic update silently
     }
   }
 
@@ -92,42 +100,46 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
     setPosting(true)
     setPostError(null)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setPosting(false); return }
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setPosting(false); return }
 
-    const authorName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? 'Eu'
+      const authorName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? 'Eu'
 
-    const optimisticPost: FeedPost = {
-      id: `optimistic-${Date.now()}`,
-      authorName,
-      authorAvatar: (user.user_metadata?.avatar_url as string | undefined) ?? null,
-      body,
-      imageUrl: null,
-      likesCount: 0,
-      createdAt: new Date().toISOString(),
-    }
+      const optimisticPost: FeedPost = {
+        id: `optimistic-${Date.now()}`,
+        authorName,
+        authorAvatar: (user.user_metadata?.avatar_url as string | undefined) ?? null,
+        body,
+        imageUrl: null,
+        likesCount: 0,
+        createdAt: new Date().toISOString(),
+      }
 
-    setPosts((prev) => [optimisticPost, ...prev])
-    setComposing('')
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-    }
-    setLastPostAt(now)
+      setPosts((prev) => [optimisticPost, ...prev])
+      setComposing('')
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto'
+      }
+      setLastPostAt(now)
 
-    const { error } = await supabase.from('event_feed_posts').insert({
-      event_id: context.eventId,
-      author_id: user.id,
-      body,
-      likes_count: 0,
-      created_at: new Date().toISOString(),
-    })
+      const { error } = await supabase.from('event_feed_posts').insert({
+        event_id: context.eventId,
+        author_id: user.id,
+        body,
+        likes_count: 0,
+        created_at: new Date().toISOString(),
+      })
 
-    if (error) {
+      if (error) {
+        setPostError('Erro ao publicar. Tente novamente.')
+        setPosts((prev) => prev.filter((p) => p.id !== optimisticPost.id))
+      }
+    } catch {
       setPostError('Erro ao publicar. Tente novamente.')
-      setPosts((prev) => prev.filter((p) => p.id !== optimisticPost.id))
+    } finally {
+      setPosting(false)
     }
-
-    setPosting(false)
   }
 
   const cooldownSeconds = (() => {
@@ -136,14 +148,21 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
     return remaining > 0 ? remaining : 0
   })()
 
-  const fmtTime = (s: string) =>
-    new Date(s).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  const fmtTime = (s: string) => {
+    try {
+      return new Date(s).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    } catch {
+      return '—'
+    }
+  }
 
   const isOfficial = (post: FeedPost) =>
     post.authorName === 'Organizador' || post.authorName?.toLowerCase().includes('organiz')
 
-  const initials = (name: string) =>
-    name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+  const initials = (name: string) => {
+    if (!name) return '??'
+    return name.split(' ').map((w) => w[0] ?? '').join('').slice(0, 2).toUpperCase() || '??'
+  }
 
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
@@ -191,6 +210,11 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-blue-400 animate-spin" />
         </div>
+      ) : loadError ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <p className="text-slate-400 text-sm">Erro ao carregar dados.</p>
+          <button onClick={loadFeed} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
+        </div>
       ) : posts.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-center px-6">
           <Rss size={36} className="text-slate-700 mb-3" />
@@ -199,7 +223,7 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
         </div>
       ) : (
         <div className="flex-1 px-4 space-y-3">
-          {posts.map((post) => {
+          {(posts ?? []).map((post) => {
             const official = isOfficial(post)
             const isLiked = liked.has(post.id)
 
@@ -214,6 +238,7 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
                       src={post.authorAvatar}
                       alt={post.authorName}
                       className="w-8 h-8 rounded-full object-cover shrink-0"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                     />
                   ) : (
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${official ? 'bg-blue-600/40 text-blue-300' : 'bg-slate-700 text-white'}`}>
@@ -236,6 +261,7 @@ export default function FeedPage({ onNavigate }: PulsePageProps) {
                     src={post.imageUrl}
                     alt=""
                     className="w-full rounded-xl mb-3 object-cover max-h-48"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
                 )}
 

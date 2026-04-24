@@ -28,36 +28,42 @@ export default function MyShiftPage({ onNavigate }: PulsePageProps) {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user || !context?.eventId) { setLoading(false); return }
-
       try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        if (authError || !user || !context?.eventId) { setLoading(false); return }
+
         const s = await staffService.getCurrentShift(user.id, context.eventId)
         setShift(s)
 
         if (s?.zone) {
           // Load teammates in the same zone
-          const { data: members } = await supabase
-            .from('staff_members')
-            .select(`
-              id, role, zone, status, user_id,
-              profiles!user_id(full_name),
-              staff_sessions(status)
-            `)
-            .eq('event_id', context.eventId)
-            .eq('zone', s.zone)
-            .neq('user_id', user.id)
-            .limit(10)
+          try {
+            const { data: members } = await supabase
+              .from('staff_members')
+              .select(`
+                id, role, zone, status, user_id,
+                profiles!user_id(full_name),
+                staff_sessions(status)
+              `)
+              .eq('event_id', context.eventId)
+              .eq('zone', s.zone)
+              .neq('user_id', user.id)
+              .limit(10)
 
-          if (members) {
-            setTeammates((members as any[]).map((m) => ({
-              name: (m.profiles as any)?.full_name ?? 'Membro',
-              role: m.role ?? 'staff_member',
-              zone: m.zone ?? null,
-              isActive: (m.staff_sessions ?? []).some((ss: any) => ss.status === 'active'),
-            })))
+            if (members) {
+              setTeammates((members as any[]).map((m) => ({
+                name: (m.profiles as any)?.full_name ?? 'Membro',
+                role: m.role ?? 'staff_member',
+                zone: m.zone ?? null,
+                isActive: ((m.staff_sessions as any[]) ?? []).some((ss: any) => ss.status === 'active'),
+              })))
+            }
+          } catch {
+            // Teammates load failure is non-critical — show shift info without team
           }
         }
+      } catch (err) {
+        console.error('[my-shift] load error', err)
       } finally {
         setLoading(false)
       }

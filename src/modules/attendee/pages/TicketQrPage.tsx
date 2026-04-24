@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { ChevronLeft, RefreshCw, Loader2, Shield, CheckCircle } from 'lucide-react'
+import { ChevronLeft, RefreshCw, Loader2, Shield, CheckCircle, AlertCircle } from 'lucide-react'
 import { attendeeService } from '@/core/attendee/attendee.service'
 import type { AttendeeTicket } from '@/core/attendee/attendee.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
@@ -10,6 +10,7 @@ interface TicketQrPageProps extends PulsePageProps {
 
 // Render QR using a URL-based approach (no native lib needed)
 function QRDisplay({ value, size = 200 }: { value: string; size?: number }) {
+  if (!value) return null
   const url = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&bgcolor=060d1f&color=ffffff&margin=12`
   return (
     <img
@@ -19,6 +20,10 @@ function QRDisplay({ value, size = 200 }: { value: string; size?: number }) {
       height={size}
       className="rounded-2xl"
       style={{ imageRendering: 'pixelated' }}
+      onError={(e) => {
+        // If external QR service fails, hide the broken image
+        (e.target as HTMLImageElement).style.display = 'none'
+      }}
     />
   )
 }
@@ -28,13 +33,17 @@ const REFRESH_INTERVAL = 30 // seconds
 export default function TicketQrPage({ onNavigate, ticketId }: TicketQrPageProps) {
   const [ticket, setTicket] = useState<AttendeeTicket | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL)
   const [refreshing, setRefreshing] = useState(false)
 
   const load = useCallback(async () => {
+    setError(false)
     try {
       const data = await attendeeService.getTicketById(ticketId)
       setTicket(data)
+    } catch {
+      setError(true)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -64,6 +73,21 @@ export default function TicketQrPage({ onNavigate, ticketId }: TicketQrPageProps
     return (
       <div className="flex h-full items-center justify-center bg-[#060d1f]">
         <Loader2 size={28} className="text-blue-400 animate-spin" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center bg-[#060d1f] px-6 text-center">
+        <AlertCircle size={36} className="text-slate-600 mb-3" />
+        <p className="text-slate-400 text-sm">Erro ao carregar ingresso.</p>
+        <button onClick={() => { setLoading(true); load() }} className="mt-3 text-blue-400 text-sm">
+          Tentar novamente
+        </button>
+        <button onClick={() => onNavigate('/pulse/attendee/tickets')} className="text-slate-500 text-sm mt-2">
+          Voltar
+        </button>
       </div>
     )
   }
@@ -122,12 +146,17 @@ export default function TicketQrPage({ onNavigate, ticketId }: TicketQrPageProps
                 <div className="w-[200px] h-[200px] flex items-center justify-center">
                   <Loader2 size={32} className="text-blue-400 animate-spin" />
                 </div>
-              ) : (
+              ) : ticket.qrToken ? (
                 <QRDisplay value={ticket.qrToken} size={200} />
+              ) : (
+                <div className="w-[200px] h-[200px] flex flex-col items-center justify-center gap-2">
+                  <AlertCircle size={32} className="text-slate-600" />
+                  <p className="text-slate-500 text-xs text-center">QR não disponível</p>
+                </div>
               )}
 
               {/* Countdown ring */}
-              {!refreshing && (
+              {!refreshing && ticket.qrToken && (
                 <div
                   className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#060d1f] border-2 flex items-center justify-center text-xs font-bold"
                   style={{ borderColor: countdown <= 5 ? '#EF4444' : '#22C55E', color: countdown <= 5 ? '#EF4444' : '#22C55E' }}

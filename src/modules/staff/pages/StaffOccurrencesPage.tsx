@@ -28,15 +28,20 @@ export default function StaffOccurrencesPage({ onNavigate }: PulsePageProps) {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user || !context?.eventId) { setLoading(false); return }
-      const shift = await staffService.getCurrentShift(user.id, context.eventId)
-      if (shift) {
-        setStaffMemberId(shift.id)
-        const data = await staffService.getOccurrences(shift.id, context.eventId)
-        setOccurrences(data)
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        if (authError || !user || !context?.eventId) { setLoading(false); return }
+        const shift = await staffService.getCurrentShift(user.id, context.eventId)
+        if (shift) {
+          setStaffMemberId(shift.id)
+          const data = await staffService.getOccurrences(shift.id, context.eventId)
+          setOccurrences(data)
+        }
+      } catch (err) {
+        console.error('[occurrences] init error', err)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     init()
   }, [context?.eventId])

@@ -16,37 +16,68 @@ function groupByDay(sessions: AgendaSession[]): Record<string, AgendaSession[]> 
 }
 
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  try {
+    return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  } catch {
+    return '—'
+  }
 }
 
 function formatDay(iso: string) {
-  return new Date(iso + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
+  try {
+    return new Date(iso + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
+  } catch {
+    return iso
+  }
 }
 
 export default function AgendaPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [sessions, setSessions] = useState<AgendaSession[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [filter, setFilter] = useState<'all' | 'favorites'>('all')
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) setUserId(user.id)
+    }).catch(() => {
+      // ignore auth error, will show empty state
     })
   }, [])
 
+  const load = async () => {
+    if (!context?.eventId || !userId) {
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    setError(false)
+    try {
+      const data = await attendeeService.getAgenda(context.eventId, userId)
+      setSessions(data)
+    } catch {
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    if (!context?.eventId || !userId) return
-    attendeeService.getAgenda(context.eventId, userId)
-      .then(setSessions)
-      .finally(() => setLoading(false))
+    if (userId !== null) {
+      load()
+    }
   }, [context?.eventId, userId])
 
   const toggleFavorite = async (session: AgendaSession) => {
     if (!context?.eventId || !userId) return
-    await attendeeService.toggleFavorite(session.id, context.eventId, userId, session.isFavorite)
-    setSessions((prev) => prev.map((s) => s.id === session.id ? { ...s, isFavorite: !s.isFavorite } : s))
+    try {
+      await attendeeService.toggleFavorite(session.id, context.eventId, userId, session.isFavorite)
+      setSessions((prev) => prev.map((s) => s.id === session.id ? { ...s, isFavorite: !s.isFavorite } : s))
+    } catch {
+      // Silently fail — optimistic update not applied
+    }
   }
 
   const visible = filter === 'favorites' ? sessions.filter((s) => s.isFavorite) : sessions
@@ -85,6 +116,16 @@ export default function AgendaPage({ onNavigate }: PulsePageProps) {
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-blue-400 animate-spin" />
         </div>
+      ) : error ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <p className="text-slate-400 text-sm">Erro ao carregar agenda.</p>
+          <button onClick={load} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
+        </div>
+      ) : !context?.eventId ? (
+        <div className="flex flex-col items-center py-20 text-center">
+          <Calendar size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Nenhum evento selecionado</p>
+        </div>
       ) : visible.length === 0 ? (
         <div className="flex flex-col items-center py-20 text-center">
           <Calendar size={36} className="text-slate-700 mb-3" />
@@ -98,7 +139,7 @@ export default function AgendaPage({ onNavigate }: PulsePageProps) {
                 {formatDay(day)}
               </p>
               <div className="space-y-3">
-                {grouped[day].map((s) => {
+                {(grouped[day] ?? []).map((s) => {
                   const live = isLive(s)
                   return (
                     <div

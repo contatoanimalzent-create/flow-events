@@ -18,22 +18,26 @@ export default function MyTicketsPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [tickets, setTickets] = useState<AttendeeTicket[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-  useEffect(() => {
-    const load = async () => {
+  const load = async () => {
+    setLoading(true)
+    setError(false)
+    try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
-      try {
-        const data = await attendeeService.getMyTickets(user.id)
-        // Show only tickets for active event if context is set
-        const filtered = context?.eventId ? data.filter((t) => t.eventId === context.eventId) : data
-        setTickets(filtered)
-      } finally {
-        setLoading(false)
-      }
+      const data = await attendeeService.getMyTickets(user.id)
+      // Show only tickets for active event if context is set
+      const filtered = context?.eventId ? data.filter((t) => t.eventId === context.eventId) : data
+      setTickets(filtered)
+    } catch {
+      setError(true)
+    } finally {
+      setLoading(false)
     }
-    load()
-  }, [context?.eventId])
+  }
+
+  useEffect(() => { load() }, [context?.eventId])
 
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
@@ -48,6 +52,11 @@ export default function MyTicketsPage({ onNavigate }: PulsePageProps) {
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-blue-400 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <p className="text-slate-400 text-sm">Erro ao carregar ingressos.</p>
+          <button onClick={load} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
         </div>
       ) : tickets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center px-6">

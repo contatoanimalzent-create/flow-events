@@ -42,14 +42,20 @@ export default function SelectEventPage({ onNavigate }: PulsePageProps) {
   }, [isLoading, events])
 
   const handleSelect = async (event: UserEvent) => {
-    setActive(event)
+    try {
+      setActive(event)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user && activeOrganization) {
-      await loadPermissions(user.id, activeOrganization.id, event.id)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user && activeOrganization) {
+        await loadPermissions(user.id, activeOrganization.id, event.id)
+      }
+
+      onNavigate('/pulse/select-mode')
+    } catch (err) {
+      console.error('[SelectEventPage] handleSelect error', err)
+      // Still navigate — permissions can load lazily
+      onNavigate('/pulse/select-mode')
     }
-
-    onNavigate('/pulse/select-mode')
   }
 
   if (isLoading) {
@@ -128,14 +134,14 @@ export default function SelectEventPage({ onNavigate }: PulsePageProps) {
                 )}
                 {/* Mode chips */}
                 <div className="flex flex-wrap gap-1 mt-2">
-                  {event.availableModes.slice(0, 3).map((m) => (
+                  {(event.availableModes ?? []).slice(0, 3).map((m) => (
                     <span key={m} className="text-[10px] px-1.5 py-0.5 rounded bg-white/8 text-slate-300 capitalize">
                       {m}
                     </span>
                   ))}
-                  {event.availableModes.length > 3 && (
+                  {(event.availableModes ?? []).length > 3 && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/8 text-slate-400">
-                      +{event.availableModes.length - 3}
+                      +{(event.availableModes ?? []).length - 3}
                     </span>
                   )}
                 </div>

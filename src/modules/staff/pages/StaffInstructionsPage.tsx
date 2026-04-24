@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronDown, ChevronUp, FileText, AlertTriangle, Loader2 } from 'lucide-react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { ChevronLeft, ChevronDown, ChevronUp, FileText, AlertTriangle, Loader2, AlertCircle } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import { staffService } from '@/core/staff/staff.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
@@ -15,17 +15,27 @@ export default function StaffInstructionsPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [instructions, setInstructions] = useState<StaffInstruction[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!context?.eventId) { setLoading(false); return }
-    staffService.getInstructions(context.eventId).then((data) => {
+    setLoading(true)
+    setError(false)
+    try {
+      const data = await staffService.getInstructions(context.eventId)
       setInstructions(data)
       // Auto-expand critical ones
       const critical = data.find((i) => i.priority === 'critical')
       if (critical) setExpanded(critical.id)
-    }).finally(() => setLoading(false))
+    } catch {
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
   }, [context?.eventId])
+
+  useEffect(() => { load() }, [load])
 
   const toggle = (id: string) => setExpanded((prev) => (prev === id ? null : id))
 
@@ -42,6 +52,17 @@ export default function StaffInstructionsPage({ onNavigate }: PulsePageProps) {
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-blue-400 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+          <AlertCircle size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Erro ao carregar dados.</p>
+          <button onClick={load} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
+        </div>
+      ) : !context?.eventId ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+          <AlertCircle size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Nenhum evento selecionado</p>
         </div>
       ) : instructions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center px-6">

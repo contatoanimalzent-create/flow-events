@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { ChevronLeft, AlertTriangle, XCircle, ShieldAlert, CheckCircle, Loader2 } from 'lucide-react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { ChevronLeft, AlertTriangle, XCircle, ShieldAlert, CheckCircle, Loader2, AlertCircle } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import { supabase } from '@/lib/supabase'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
@@ -13,61 +13,72 @@ interface CheckinAttempt {
   resolved: boolean
 }
 
+const reasonLabel = (r: string): string => {
+  const map: Record<string, string> = {
+    not_found: 'Token não encontrado',
+    already_used: 'Ingresso já utilizado',
+    wrong_event: 'Ingresso de outro evento',
+    invalid_token: 'Token inválido',
+    gate_mismatch: 'Portaria incorreta',
+    unauthorized: 'Acesso não autorizado',
+  }
+  return map[r] ?? r
+}
+
 export default function OperatorAlertsPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [alerts, setAlerts] = useState<CheckinAttempt[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [resolvedIds, setResolvedIds] = useState<Set<string>>(new Set())
 
-  useEffect(() => {
-    const load = async () => {
-      if (!context?.eventId) { setLoading(false); return }
-      try {
-        const { data } = await supabase
-          .from('checkin_attempts')
-          .select('id, qr_token, reason, gate, attempted_at, resolved')
-          .eq('event_id', context.eventId)
-          .eq('valid', false)
-          .order('attempted_at', { ascending: false })
-          .limit(50)
+  const load = useCallback(async () => {
+    if (!context?.eventId) { setLoading(false); return }
+    setLoading(true)
+    setError(false)
+    try {
+      const { data, error: queryError } = await supabase
+        .from('checkin_attempts')
+        .select('id, qr_token, reason, gate, attempted_at, resolved')
+        .eq('event_id', context.eventId)
+        .eq('valid', false)
+        .order('attempted_at', { ascending: false })
+        .limit(50)
 
-        if (data) {
-          const parsed = (data as any[]).map((a) => ({
-            id: a.id,
-            token: a.qr_token ?? null,
-            reason: reasonLabel(a.reason ?? 'invalid_token'),
-            gate: a.gate ?? null,
-            attemptedAt: a.attempted_at,
-            resolved: a.resolved ?? false,
-          }))
-          setAlerts(parsed)
-          setResolvedIds(new Set(parsed.filter((a) => a.resolved).map((a) => a.id)))
-        }
-      } finally {
-        setLoading(false)
+      if (queryError) throw queryError
+
+      if (data) {
+        const parsed = (data as any[]).map((a) => ({
+          id: a.id,
+          token: a.qr_token ?? null,
+          reason: reasonLabel(a.reason ?? 'invalid_token'),
+          gate: a.gate ?? null,
+          attemptedAt: a.attempted_at,
+          resolved: a.resolved ?? false,
+        }))
+        setAlerts(parsed)
+        setResolvedIds(new Set(parsed.filter((a) => a.resolved).map((a) => a.id)))
       }
+    } catch {
+      setError(true)
+    } finally {
+      setLoading(false)
     }
-    load()
   }, [context?.eventId])
 
-  const reasonLabel = (r: string) => {
-    const map: Record<string, string> = {
-      not_found: 'Token não encontrado',
-      already_used: 'Ingresso já utilizado',
-      wrong_event: 'Ingresso de outro evento',
-      invalid_token: 'Token inválido',
-      gate_mismatch: 'Portaria incorreta',
-      unauthorized: 'Acesso não autorizado',
-    }
-    return map[r] ?? r
-  }
+  useEffect(() => { load() }, [load])
 
   const isSuspect = (a: CheckinAttempt) =>
     a.reason.includes('não autorizado') || a.reason.includes('portaria')
 
   const handleResolve = async (id: string) => {
     setResolvedIds((s) => new Set([...s, id]))
-    await supabase.from('checkin_attempts').update({ resolved: true }).eq('id', id)
+    try {
+      await supabase.from('checkin_attempts').update({ resolved: true }).eq('id', id)
+    } catch {
+      // Optimistic — revert if needed
+      setResolvedIds((s) => { const next = new Set(s); next.delete(id); return next })
+    }
   }
 
   const fmtTime = (s: string) =>
@@ -90,9 +101,20 @@ export default function OperatorAlertsPage({ onNavigate }: PulsePageProps) {
         )}
       </div>
 
-      {loading ? (
+      {!context?.eventId ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <AlertCircle size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Nenhum evento selecionado</p>
+        </div>
+      ) : loading ? (
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-orange-400 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <AlertCircle size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Erro ao carregar alertas.</p>
+          <button onClick={load} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
         </div>
       ) : alerts.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-center px-6">

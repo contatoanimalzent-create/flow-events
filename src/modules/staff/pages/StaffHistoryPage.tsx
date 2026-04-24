@@ -30,11 +30,19 @@ export default function StaffHistoryPage({ onNavigate }: PulsePageProps) {
     load()
   }, [])
 
-  const fmtTime = (s: string) =>
-    new Date(s).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  const fmtTime = (s: string) => {
+    if (!s) return '--:--'
+    const d = new Date(s)
+    if (isNaN(d.getTime())) return '--:--'
+    return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  }
 
-  const fmtDate = (s: string) =>
-    new Date(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+  const fmtDate = (s: string) => {
+    if (!s) return '--/--'
+    const d = new Date(s)
+    if (isNaN(d.getTime())) return '--/--'
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+  }
 
   const calcHours = (start: string, end: string | null) => {
     if (!end) return null

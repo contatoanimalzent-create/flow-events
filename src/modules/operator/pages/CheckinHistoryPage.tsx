@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { ChevronLeft, CheckCircle, Search, Loader2, RefreshCw } from 'lucide-react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { ChevronLeft, CheckCircle, Search, Loader2, RefreshCw, AlertCircle } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import { operatorService } from '@/core/operator/operator.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
@@ -9,29 +9,35 @@ export default function CheckinHistoryPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [records, setRecords] = useState<CheckinRecord[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [search, setSearch] = useState('')
 
-  const loadHistory = async () => {
-    if (!context?.eventId) return
+  const loadHistory = useCallback(async () => {
+    if (!context?.eventId) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
+    setError(false)
     try {
       const data = await operatorService.getCheckinHistory(context.eventId, 100)
       setRecords(data)
     } catch (err) {
       console.error('[history]', err)
+      setError(true)
     } finally {
       setLoading(false)
     }
-  }
+  }, [context?.eventId])
 
-  useEffect(() => { loadHistory() }, [context?.eventId])
+  useEffect(() => { loadHistory() }, [loadHistory])
 
   const filtered = search
-    ? records.filter((r) =>
+    ? (records ?? []).filter((r) =>
         r.attendeeName.toLowerCase().includes(search.toLowerCase()) ||
         r.ticketLabel.toLowerCase().includes(search.toLowerCase())
       )
-    : records
+    : (records ?? [])
 
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
@@ -73,6 +79,17 @@ export default function CheckinHistoryPage({ onNavigate }: PulsePageProps) {
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-blue-400 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <AlertCircle size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Erro ao carregar dados.</p>
+          <button onClick={loadHistory} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
+        </div>
+      ) : !context?.eventId ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <AlertCircle size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Nenhum evento selecionado</p>
         </div>
       ) : (
         <div className="px-4 space-y-2">

@@ -41,8 +41,9 @@ export default function NotificationsCenterPage({ onNavigate }: PulsePageProps) 
         </div>
       ) : (
         <div className="flex-1 px-4 space-y-2">
-          {notifications.map((notif) => {
-            const { icon: Icon, color } = TYPE_CONFIG[notif.type]
+          {(notifications ?? []).map((notif) => {
+            const cfg = TYPE_CONFIG[notif.type] ?? TYPE_CONFIG.info
+            const { icon: Icon, color } = cfg
             return (
               <div
                 key={notif.id}

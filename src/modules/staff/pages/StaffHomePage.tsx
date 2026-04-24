@@ -38,22 +38,37 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setUserId(user.id)
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      if (!error && user) setUserId(user.id)
+      else setLoading(false)
     })
   }, [])
 
   useEffect(() => {
-    if (!userId || !context?.eventId) return
+    if (!userId || !context?.eventId) {
+      if (!userId) return // wait for auth
+      setLoading(false)
+      return
+    }
     setLoading(true)
-    Promise.all([
-      staffService.getCurrentShift(userId, context.eventId),
-    ]).then(([s]) => {
-      setShift(s)
-      if (s) {
-        staffService.getActiveSession(s.id).then(setSession)
+    ;(async () => {
+      try {
+        const s = await staffService.getCurrentShift(userId, context.eventId)
+        setShift(s)
+        if (s) {
+          try {
+            const sess = await staffService.getActiveSession(s.id)
+            setSession(sess)
+          } catch {
+            // session load failure is non-critical
+          }
+        }
+      } catch {
+        // shift load failure — leave shift as null (shows empty state)
+      } finally {
+        setLoading(false)
       }
-    }).finally(() => setLoading(false))
+    })()
   }, [userId, context?.eventId])
 
   const progress = shift ? shiftProgress(shift.startTime, shift.endTime) : 0

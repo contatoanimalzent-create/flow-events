@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { ChevronLeft, TrendingUp, Users, Clock, RefreshCw, Loader2 } from 'lucide-react'
+import { ChevronLeft, TrendingUp, Users, Clock, RefreshCw, Loader2, AlertCircle } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import { operatorService } from '@/core/operator/operator.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
@@ -9,13 +9,20 @@ export default function FlowPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [metrics, setMetrics] = useState<FlowMetrics | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   const load = useCallback(async () => {
-    if (!context?.eventId) return
+    if (!context?.eventId) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
+    setError(false)
     try {
       const m = await operatorService.getFlowMetrics(context.eventId)
       setMetrics(m)
+    } catch {
+      setError(true)
     } finally {
       setLoading(false)
     }
@@ -29,8 +36,10 @@ export default function FlowPage({ onNavigate }: PulsePageProps) {
     return () => clearInterval(interval)
   }, [load])
 
-  const total = (metrics?.totalValid ?? 0) + (metrics?.totalInvalid ?? 0)
-  const rate = total > 0 ? ((metrics!.totalValid / total) * 100).toFixed(1) : '0'
+  const totalValid = metrics?.totalValid ?? 0
+  const totalInvalid = metrics?.totalInvalid ?? 0
+  const total = totalValid + totalInvalid
+  const rate = total > 0 ? ((totalValid / total) * 100).toFixed(1) : '0'
 
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
@@ -45,17 +54,28 @@ export default function FlowPage({ onNavigate }: PulsePageProps) {
         </button>
       </div>
 
-      {loading ? (
+      {!context?.eventId ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <AlertCircle size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Nenhum evento selecionado</p>
+        </div>
+      ) : loading ? (
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-blue-400 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <AlertCircle size={36} className="text-slate-700 mb-3" />
+          <p className="text-slate-400 text-sm">Erro ao carregar métricas.</p>
+          <button onClick={load} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
         </div>
       ) : metrics ? (
         <div className="px-4 space-y-4">
           {/* Main KPIs */}
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'Check-ins válidos', value: metrics.totalValid.toLocaleString('pt-BR'), color: '#22C55E', Icon: Users },
-              { label: 'Tentativas inválidas', value: metrics.totalInvalid.toLocaleString('pt-BR'), color: '#EF4444', Icon: TrendingUp },
+              { label: 'Check-ins válidos', value: totalValid.toLocaleString('pt-BR'), color: '#22C55E', Icon: Users },
+              { label: 'Tentativas inválidas', value: totalInvalid.toLocaleString('pt-BR'), color: '#EF4444', Icon: TrendingUp },
               { label: 'Por minuto (agora)', value: metrics.perMinute.toString(), color: '#0057E7', Icon: Clock },
               { label: 'Taxa de sucesso', value: `${rate}%`, color: metrics.totalInvalid > 5 ? '#d97706' : '#22C55E', Icon: TrendingUp },
             ].map(({ label, value, color, Icon }) => (
@@ -85,8 +105,8 @@ export default function FlowPage({ onNavigate }: PulsePageProps) {
               />
             </div>
             <div className="flex justify-between mt-2">
-              <span className="text-slate-500 text-xs">{metrics.totalValid} válidos</span>
-              <span className="text-slate-500 text-xs">{metrics.totalInvalid} inválidos</span>
+              <span className="text-slate-500 text-xs">{totalValid} válidos</span>
+              <span className="text-slate-500 text-xs">{totalInvalid} inválidos</span>
             </div>
           </div>
 

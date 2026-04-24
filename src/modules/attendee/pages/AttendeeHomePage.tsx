@@ -1,5 +1,5 @@
 import React from 'react'
-import { Ticket, Calendar, Map, Rss, Users, Sparkles } from 'lucide-react'
+import { Ticket, Calendar, Map, Rss, Users, Sparkles, CalendarX } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
@@ -18,21 +18,33 @@ const CARDS: Card[] = [
 export default function AttendeeHomePage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
 
+  if (!context?.eventId) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-full py-24 px-6 text-center">
+        <CalendarX size={40} className="text-slate-700 mb-3" />
+        <p className="text-slate-400 text-sm">Nenhum evento selecionado</p>
+        <p className="text-slate-600 text-xs mt-1">Acesse via link do evento</p>
+      </div>
+    )
+  }
+
   return (
     <div className="pb-6">
       {/* Hero */}
       <div
         className="relative px-4 pt-6 pb-6 mb-2"
         style={{
-          background: context?.eventCover
+          background: context.eventCover
             ? `linear-gradient(to bottom, #060d1f00, #060d1f), url(${context.eventCover}) center/cover`
             : 'linear-gradient(135deg, #0f172a, #1e3a5f)',
         }}
       >
         <p className="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-1">Bem-vindo</p>
-        <h2 className="text-2xl font-bold text-white">{context?.eventName}</h2>
+        <h2 className="text-2xl font-bold text-white">{context.eventName ?? '—'}</h2>
         <p className="text-slate-400 text-sm mt-0.5">
-          {context?.eventDate ? new Date(context.eventDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' }) : ''}
+          {context.eventDate
+            ? new Date(context.eventDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
+            : ''}
         </p>
       </div>
 

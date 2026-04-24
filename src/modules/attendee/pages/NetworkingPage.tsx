@@ -15,12 +15,16 @@ export default function NetworkingPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [people, setPeople] = useState<PersonItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [connected, setConnected] = useState<Set<string>>(new Set())
   const [query, setQuery] = useState('')
 
   const storageKey = `pulse-connections-${context?.eventId ?? 'unknown'}`
 
-  useEffect(() => {
+  const load = async () => {
+    setLoading(true)
+    setError(false)
+
     // Load persisted connections from localStorage
     try {
       const raw = localStorage.getItem(storageKey)
@@ -32,18 +36,20 @@ export default function NetworkingPage({ onNavigate }: PulsePageProps) {
       // ignore parse errors
     }
 
-    const load = async () => {
-      if (!context?.eventId) { setLoading(false); return }
+    if (!context?.eventId) { setLoading(false); return }
 
+    try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
 
-      const { data } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('digital_tickets')
         .select('attendee_id, profiles!attendee_id(full_name, avatar_url)')
         .eq('event_id', context.eventId)
         .neq('attendee_id', user.id)
         .limit(50)
+
+      if (fetchError) throw fetchError
 
       if (data) {
         type TicketRow = {
@@ -59,7 +65,7 @@ export default function NetworkingPage({ onNavigate }: PulsePageProps) {
               .map((w: string) => w[0] ?? '')
               .join('')
               .slice(0, 2)
-              .toUpperCase()
+              .toUpperCase() || '?'
             return {
               id: row.attendee_id,
               name,
@@ -67,14 +73,18 @@ export default function NetworkingPage({ onNavigate }: PulsePageProps) {
               avatarUrl: profile?.avatar_url ?? null,
             }
           })
-          .filter((p: PersonItem) => p.id)
+          .filter((p: PersonItem) => Boolean(p.id))
 
         setPeople(mapped)
       }
-
+    } catch {
+      setError(true)
+    } finally {
       setLoading(false)
     }
+  }
 
+  useEffect(() => {
     load()
   }, [context?.eventId])
 
@@ -128,6 +138,11 @@ export default function NetworkingPage({ onNavigate }: PulsePageProps) {
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-blue-400 animate-spin" />
         </div>
+      ) : error ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <p className="text-slate-400 text-sm">Erro ao carregar dados.</p>
+          <button onClick={load} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
+        </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-center px-6">
           <Users size={36} className="text-slate-700 mb-3" />
@@ -150,6 +165,7 @@ export default function NetworkingPage({ onNavigate }: PulsePageProps) {
                     src={person.avatarUrl}
                     alt={person.name}
                     className="w-12 h-12 rounded-full object-cover shrink-0"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-blue-600/30 border border-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-300 shrink-0">

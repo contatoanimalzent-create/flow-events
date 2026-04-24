@@ -88,7 +88,7 @@ export default function SelectModePage({ onNavigate }: PulsePageProps) {
 
       {/* Mode list */}
       <div className="px-4 space-y-3 pb-10">
-        {availableModes.map((mode) => {
+        {(availableModes ?? []).map((mode) => {
           const Icon = MODE_ICONS[mode]
           const accent = buildModeAccent(mode)
 
@@ -121,7 +121,7 @@ export default function SelectModePage({ onNavigate }: PulsePageProps) {
           )
         })}
 
-        {availableModes.length === 0 && (
+        {(availableModes ?? []).length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-slate-400 text-sm">Nenhum modo disponível</p>
             <p className="text-slate-600 text-xs mt-1">

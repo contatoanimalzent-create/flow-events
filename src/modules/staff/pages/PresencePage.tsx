@@ -35,22 +35,27 @@ export default function PresencePage({ onNavigate }: PulsePageProps) {
   // Load current user + shift + active session
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user || !context?.eventId) { setStatus('idle'); return }
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        if (authError || !user || !context?.eventId) { setStatus('idle'); return }
 
-      const shift = await staffService.getCurrentShift(user.id, context.eventId)
-      if (!shift) { setStatus('idle'); return }
+        const shift = await staffService.getCurrentShift(user.id, context.eventId)
+        if (!shift) { setStatus('idle'); return }
 
-      setStaffMemberId(shift.id)
+        setStaffMemberId(shift.id)
 
-      const session = await staffService.getActiveSession(shift.id)
-      if (session) {
-        setSessionId(session.id)
-        setStartTime(session.startedAt)
-        const secondsElapsed = Math.floor((Date.now() - new Date(session.startedAt).getTime()) / 1000)
-        setElapsed(secondsElapsed)
-        setStatus('active')
-      } else {
+        const session = await staffService.getActiveSession(shift.id)
+        if (session) {
+          setSessionId(session.id)
+          setStartTime(session.startedAt)
+          const secondsElapsed = Math.floor((Date.now() - new Date(session.startedAt).getTime()) / 1000)
+          setElapsed(secondsElapsed)
+          setStatus('active')
+        } else {
+          setStatus('idle')
+        }
+      } catch (err) {
+        console.error('[presence] init error', err)
         setStatus('idle')
       }
     }

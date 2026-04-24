@@ -9,13 +9,23 @@ export default function AttendeeMapPage({ onNavigate }: PulsePageProps) {
   const context = useAppContext((s) => s.context)
   const [map, setMap] = useState<VenueMap | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-  useEffect(() => {
+  const load = async () => {
     if (!context?.eventId) { setLoading(false); return }
-    venueMapService.getMap(context.eventId)
-      .then(setMap)
-      .finally(() => setLoading(false))
-  }, [context?.eventId])
+    setLoading(true)
+    setError(false)
+    try {
+      const data = await venueMapService.getMap(context.eventId)
+      setMap(data)
+    } catch {
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [context?.eventId])
 
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
@@ -30,6 +40,11 @@ export default function AttendeeMapPage({ onNavigate }: PulsePageProps) {
         <div className="flex-1 flex items-center justify-center">
           <Loader2 size={24} className="text-blue-400 animate-spin" />
         </div>
+      ) : error ? (
+        <div className="flex flex-col items-center py-16 px-6 text-center">
+          <p className="text-slate-400 text-sm">Erro ao carregar dados.</p>
+          <button onClick={load} className="mt-3 text-blue-400 text-sm">Tentar novamente</button>
+        </div>
       ) : !map ? (
         <div className="flex flex-col items-center py-16 text-center px-6">
           <Map size={36} className="text-slate-700 mb-3" />
@@ -41,10 +56,15 @@ export default function AttendeeMapPage({ onNavigate }: PulsePageProps) {
             <div className="bg-[#0f172a] border border-white/10 rounded-2xl overflow-hidden relative">
               {map.imageUrl ? (
                 <div className="relative">
-                  <img src={map.imageUrl} alt="Mapa do evento" className="w-full block" />
+                  <img
+                    src={map.imageUrl}
+                    alt="Mapa do evento"
+                    className="w-full block"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
                   {/* SVG zone overlay */}
                   <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    {map.zones.map((zone) => (
+                    {(map.zones ?? []).map((zone) => (
                       <g key={zone.id}>
                         <rect
                           x={zone.x} y={zone.y} width={zone.width} height={zone.height}
@@ -64,7 +84,7 @@ export default function AttendeeMapPage({ onNavigate }: PulsePageProps) {
               ) : (
                 <svg viewBox="0 0 100 100" className="w-full" style={{ aspectRatio: '1' }}>
                   <rect width="100" height="100" fill="#080f1e" />
-                  {map.zones.map((zone) => (
+                  {(map.zones ?? []).map((zone) => (
                     <g key={zone.id}>
                       <rect
                         x={zone.x} y={zone.y} width={zone.width} height={zone.height}
@@ -81,15 +101,17 @@ export default function AttendeeMapPage({ onNavigate }: PulsePageProps) {
             </div>
           </div>
 
-          <div className="px-4 space-y-2">
-            {map.zones.map((zone) => (
-              <div key={zone.id} className="flex items-center gap-3 bg-white/4 border border-white/6 rounded-xl px-4 py-3">
-                <MapPin size={14} style={{ color: zone.color }} className="shrink-0" />
-                <p className="text-white text-sm font-medium">{zone.name}</p>
-                {zone.description && <p className="text-slate-500 text-xs ml-auto">{zone.description}</p>}
-              </div>
-            ))}
-          </div>
+          {(map.zones ?? []).length > 0 && (
+            <div className="px-4 space-y-2">
+              {map.zones.map((zone) => (
+                <div key={zone.id} className="flex items-center gap-3 bg-white/4 border border-white/6 rounded-xl px-4 py-3">
+                  <MapPin size={14} style={{ color: zone.color }} className="shrink-0" />
+                  <p className="text-white text-sm font-medium">{zone.name}</p>
+                  {zone.description && <p className="text-slate-500 text-xs ml-auto">{zone.description}</p>}
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>

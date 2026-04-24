@@ -4,19 +4,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* ── Pulse dark theme ── */
+        /* ── Midnight Luxury dark theme ── */
         bg: {
-          primary:   '#0A0A0A',
-          secondary: '#111111',
-          card:      '#111111',
-          surface:   '#161616',
-          border:    'rgba(255,255,255,0.10)',
-          elevated:  '#1A1A1A',
+          primary:   '#060B18',   /* midnight navy */
+          secondary: '#0A1020',
+          card:      '#0D1525',
+          surface:   '#111A2E',
+          border:    'rgba(240,232,214,0.08)',
+          elevated:  '#14203A',
         },
         text: {
-          primary:   'rgba(255,255,255,0.92)',
-          secondary: 'rgba(255,255,255,0.60)',
-          muted:     'rgba(255,255,255,0.38)',
+          primary:   '#F0E8D6',   /* cream */
+          secondary: 'rgba(240,232,214,0.66)',
+          muted:     'rgba(240,232,214,0.42)',
         },
         /* ── Brand ── */
         brand: {
@@ -24,8 +24,10 @@ export default {
           blue:   '#0057E7',
           sky:    '#4285F4',
           acid:   '#0A1AFF',
-          yellow: '#0057E7',   /* mapped to primary for consistency */
-          teal:   '#4285F4',   /* mapped to primaryLight */
+          gold:   '#C9A84C',   /* Midnight Luxury gold accent */
+          cream:  '#F0E8D6',
+          yellow: '#C9A84C',   /* legacy → gold */
+          teal:   '#4285F4',
           purple: '#0057E7',
         },
         /* ── Ink scale (blue-based) ── */
@@ -110,8 +112,10 @@ export default {
         'gradient-navy':  'linear-gradient(135deg, #0057E7 0%, #4285F4 100%)',
         'gradient-acid':  'linear-gradient(135deg, #0057E7 0%, #0A1AFF 100%)',
         'gradient-sky':   'linear-gradient(135deg, #0057E7 0%, #4285F4 100%)',
-        'gradient-light': 'linear-gradient(180deg, #0A0A0A 0%, #111111 100%)',
-        'gradient-card':  'linear-gradient(180deg, #111111 0%, #161616 100%)',
+        'gradient-light': 'linear-gradient(180deg, #060B18 0%, #0A1020 100%)',
+        'gradient-card':  'linear-gradient(180deg, #0D1525 0%, #111A2E 100%)',
+        'gradient-gold':  'linear-gradient(135deg, #C9A84C 0%, #E8D08A 100%)',
+        'gradient-midnight': 'radial-gradient(1200px 600px at 20% 0%, rgba(0,87,231,0.12), transparent 60%), radial-gradient(900px 500px at 85% 10%, rgba(201,168,76,0.08), transparent 55%), #060B18',
       },
     },
   },

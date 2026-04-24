@@ -43,12 +43,14 @@
 
     --color-primary: #0057E7;
     --color-primary-light: #4285F4;
-    --color-background: #0A0A0A;
-    --color-surface: #111111;
-    --color-text-primary: rgba(255,255,255,0.92);
-    --color-text-secondary: rgba(255,255,255,0.60);
-    --color-border: rgba(255,255,255,0.10);
-    --color-highlight: #0A1AFF;
+    --color-gold: #C9A84C;
+    --color-cream: #F0E8D6;
+    --color-background: #060B18;
+    --color-surface: #0D1525;
+    --color-text-primary: #F0E8D6;
+    --color-text-secondary: rgba(240,232,214,0.66);
+    --color-border: rgba(240,232,214,0.08);
+    --color-highlight: #C9A84C;
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 16px;
@@ -66,22 +68,23 @@
     --pulse-color-primary: #0057E7;
     --pulse-color-primary-soft: #4285F4;
     --pulse-color-primary-light: #4285F4;
-    --pulse-color-background: #0A0A0A;
-    --pulse-color-surface: rgba(255,255,255,0.04);
-    --pulse-color-text-primary: rgba(255,255,255,0.9);
-    --pulse-color-text-secondary: rgba(255,255,255,0.50);
-    --pulse-color-border: rgba(255,255,255,0.07);
+    --pulse-color-background: #060B18;
+    --pulse-color-surface: rgba(240,232,214,0.04);
+    --pulse-color-text-primary: #F0E8D6;
+    --pulse-color-text-secondary: rgba(240,232,214,0.58);
+    --pulse-color-border: rgba(240,232,214,0.08);
     --pulse-color-primary-base: var(--pulse-color-primary);
     --pulse-color-primary-accent: var(--pulse-color-primary-soft);
-    --pulse-surface-base: #111111;
+    --pulse-color-gold: #C9A84C;
+    --pulse-surface-base: #0D1525;
     --pulse-surface-muted: var(--pulse-color-surface);
-    --pulse-surface-accent: rgba(66, 133, 244, 0.08);
-    --pulse-surface-elevated: #1A1A1A;
+    --pulse-surface-accent: rgba(201, 168, 76, 0.08);
+    --pulse-surface-elevated: #14203A;
     --pulse-overlay-soft: rgba(66, 133, 244, 0.14);
     --pulse-overlay-backdrop: rgba(0, 87, 231, 0.72);
-    --pulse-color-text: rgba(255,255,255,0.9);
-    --pulse-color-text-inverse: #FFFFFF;
-    --pulse-color-text-muted: rgba(255,255,255,0.38);
+    --pulse-color-text: #F0E8D6;
+    --pulse-color-text-inverse: #060B18;
+    --pulse-color-text-muted: rgba(240,232,214,0.42);
     --pulse-color-text-on-accent: #FFFFFF;
     --pulse-input-background: rgba(255,255,255,0.04);
     --pulse-input-muted: var(--pulse-color-surface);
@@ -151,10 +154,10 @@
     text-size-adjust: 100%;
   }
 
-  /* Admin body — dark */
+  /* Admin body — Midnight Luxury */
   body {
-    background-color: #0A0A0A;
-    color: rgba(255,255,255,0.9);
+    background-color: #060B18;
+    color: #F0E8D6;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -175,9 +178,9 @@
 
   /* Scrollbar — subtle on dark bg */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: #0A0A0A; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+  ::-webkit-scrollbar-track { background: #060B18; }
+  ::-webkit-scrollbar-thumb { background: rgba(240,232,214,0.14); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.42); }
 
   ::selection { background: rgba(0,87,231,0.35); color: #FFFFFF; }
 }
@@ -296,12 +299,12 @@
 
   .admin-shell-foundation {
     @apply relative flex min-h-screen overflow-hidden;
-    background: #0A0A0A;
+    background: #060B18;
   }
 
-  /* Main content area — dark */
+  /* Main content area — Midnight Luxury */
   .main-grid-bg {
-    background-color: #0A0A0A !important;
+    background-color: #060B18 !important;
   }
 
   .admin-page-layout { @apply mx-auto max-w-[1720px] space-y-6 px-3 py-5 sm:space-y-8 sm:px-5 sm:py-8 md:px-8 lg:px-10 lg:py-10 lg:space-y-10; }
@@ -871,14 +874,14 @@
 ═══════════════════════════════════════════════════ */
 
   /* These classes are used in auth/public pages */
-  .public-editorial-shell { background: #050505; }
+  .public-editorial-shell { background: #060B18; }
   .section-dark {
-    background: linear-gradient(160deg, #050505 0%, #0A0A0A 60%, #111111 100%);
-    color: #FFFFFF;
+    background: linear-gradient(160deg, #060B18 0%, #0A1020 60%, #0D1525 100%);
+    color: #F0E8D6;
   }
   .section-ink {
-    background: linear-gradient(160deg, #050505 0%, #0A0A0A 60%, #050505 100%);
-    color: #FFFFFF;
+    background: linear-gradient(160deg, #060B18 0%, #0A1020 60%, #060B18 100%);
+    color: #F0E8D6;
   }
   .luxury-canvas {
     background:

@@ -1079,152 +1079,223 @@ export function HomePage({ onLogin }: HomePageProps) {
                 </ul>
               </motion.div>
 
-              {/* Right, Phone mockup with parallax */}
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <motion.div
-                  ref={phoneRef}
-                  style={{ y: phoneY }}
-                >
-                  {/* Phone outer shell */}
+              {/* Right — iPhone 15 Pro mockup com parallax */}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <motion.div ref={phoneRef} style={{ y: phoneY, position: 'relative' }}>
+
+                  {/* ── Botões laterais esquerda (volume) ── */}
+                  <div style={{ position: 'absolute', left: '-3px', top: '22%', display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 0 }}>
+                    {/* mute */}
+                    <div style={{ width: 3, height: 28, borderRadius: '2px 0 0 2px', background: 'linear-gradient(180deg,#4a4a4a,#2a2a2a)', boxShadow: '-1px 0 2px rgba(0,0,0,0.6)' }} />
+                    {/* vol+ */}
+                    <div style={{ width: 3, height: 52, borderRadius: '2px 0 0 2px', background: 'linear-gradient(180deg,#4a4a4a,#2a2a2a)', boxShadow: '-1px 0 2px rgba(0,0,0,0.6)' }} />
+                    {/* vol- */}
+                    <div style={{ width: 3, height: 52, borderRadius: '2px 0 0 2px', background: 'linear-gradient(180deg,#4a4a4a,#2a2a2a)', boxShadow: '-1px 0 2px rgba(0,0,0,0.6)' }} />
+                  </div>
+
+                  {/* ── Botão power direita ── */}
+                  <div style={{ position: 'absolute', right: '-3px', top: '28%', zIndex: 0 }}>
+                    <div style={{ width: 3, height: 72, borderRadius: '0 2px 2px 0', background: 'linear-gradient(180deg,#4a4a4a,#2a2a2a)', boxShadow: '1px 0 2px rgba(0,0,0,0.6)' }} />
+                  </div>
+
+                  {/* ── Frame externo (titânio) ── */}
                   <div
                     style={{
-                      width: 'clamp(220px, 25vw, 300px)',
-                      aspectRatio: '9/19',
-                      borderRadius: '2.5rem',
-                      border: '2px solid rgba(201,168,76,0.30)',
-                      background: '#0D1525',
+                      width: 'clamp(230px, 26vw, 310px)',
+                      aspectRatio: '9 / 19.5',
+                      borderRadius: '3rem',
+                      padding: '3px',
+                      background: 'linear-gradient(145deg, #6b6b6b 0%, #2e2e2e 30%, #1a1a1a 60%, #3d3d3d 100%)',
+                      boxShadow: [
+                        '0 60px 120px rgba(0,0,0,0.8)',
+                        '0 20px 40px rgba(0,0,0,0.5)',
+                        '0 0 0 0.5px rgba(255,255,255,0.12)',
+                        'inset 0 1px 0 rgba(255,255,255,0.15)',
+                        '0 0 60px rgba(201,168,76,0.12)',
+                      ].join(', '),
                       position: 'relative',
-                      overflow: 'hidden',
-                      boxShadow:
-                        '0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.08), inset 0 1px 0 rgba(255,255,255,0.05)',
+                      zIndex: 1,
                     }}
                   >
-                    {/* Notch */}
+                    {/* Frame interno lustre */}
                     <div
                       style={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: 'calc(3rem - 3px)',
+                        background: '#08080A',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {/* ── Reflexo de luz no canto superior ── */}
+                      <div style={{
                         position: 'absolute',
-                        top: '1rem',
+                        top: 0, left: 0, right: 0,
+                        height: '35%',
+                        background: 'linear-gradient(160deg, rgba(255,255,255,0.04) 0%, transparent 60%)',
+                        pointerEvents: 'none',
+                        zIndex: 20,
+                        borderRadius: 'inherit',
+                      }} />
+
+                      {/* ── Dynamic Island ── */}
+                      <div style={{
+                        position: 'absolute',
+                        top: '14px',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        width: '5rem',
-                        height: '1.25rem',
+                        width: '95px',
+                        height: '30px',
                         borderRadius: '999px',
-                        background: '#060B18',
-                        zIndex: 10,
-                      }}
-                    />
+                        background: '#000000',
+                        zIndex: 15,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        paddingRight: '10px',
+                        gap: '5px',
+                        boxShadow: '0 0 0 1px rgba(255,255,255,0.06)',
+                      }}>
+                        {/* câmera dot */}
+                        <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.10)', position: 'relative' }}>
+                          <div style={{ position: 'absolute', inset: 2, borderRadius: '50%', background: '#1a3a5c', opacity: 0.8 }} />
+                          <div style={{ position: 'absolute', top: 1, left: 1, width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
+                        </div>
+                        {/* face id dot */}
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+                      </div>
 
-                    {/* Screen content */}
-                    <div style={{ padding: '3.5rem 1rem 1.5rem', height: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {/* Status bar sim */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 0.25rem' }}>
-                        <span style={{ fontSize: '0.55rem', color: 'rgba(240,232,214,0.4)', fontWeight: 700 }}>9:41</span>
-                        <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                          {[...Array(4)].map((_, i) => (
-                            <div key={i} style={{ width: 3, height: `${4 + i * 2}px`, background: 'rgba(240,232,214,0.5)', borderRadius: 1 }} />
+                      {/* ── Tela / conteúdo do app ── */}
+                      <div style={{
+                        flex: 1,
+                        background: 'linear-gradient(160deg, #0D1525 0%, #060B18 100%)',
+                        padding: '58px 14px 14px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                        overflowY: 'hidden',
+                      }}>
+                        {/* Status bar */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '2px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#F0E8D6', fontFamily: 'SF Pro Text, system-ui, sans-serif' }}>9:41</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            {/* signal bars */}
+                            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.5px' }}>
+                              {[6, 9, 12, 15].map((h, i) => (
+                                <div key={i} style={{ width: 3, height: h, borderRadius: '1px', background: i < 3 ? '#F0E8D6' : 'rgba(240,232,214,0.3)' }} />
+                              ))}
+                            </div>
+                            {/* wifi */}
+                            <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
+                              <path d="M6.5 7.5a1 1 0 110 2 1 1 0 010-2z" fill="#F0E8D6"/>
+                              <path d="M3.5 5.5C4.5 4.2 5.4 3.8 6.5 3.8s2 .4 3 1.7" stroke="#F0E8D6" strokeWidth="1.2" strokeLinecap="round" fill="none"/>
+                              <path d="M1 3C2.8 1.1 4.5.5 6.5.5S10.2 1.1 12 3" stroke="#F0E8D6" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity=".6"/>
+                            </svg>
+                            {/* battery */}
+                            <div style={{ position: 'relative', width: 20, height: 10, border: '1px solid rgba(240,232,214,0.5)', borderRadius: '2px' }}>
+                              <div style={{ position: 'absolute', right: '-4px', top: '50%', transform: 'translateY(-50%)', width: 2, height: 5, background: 'rgba(240,232,214,0.5)', borderRadius: '0 1px 1px 0' }} />
+                              <div style={{ position: 'absolute', inset: '1px', borderRadius: '1px', background: '#22C55E', width: '90%' }} />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* CHECK-IN card principal */}
+                        <div style={{
+                          background: 'linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%)',
+                          border: '1px solid rgba(201,168,76,0.30)',
+                          borderRadius: '16px',
+                          padding: '14px',
+                        }}>
+                          <div style={{ fontSize: '8px', color: '#C9A84C', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                            CHECK-IN AO VIVO
+                          </div>
+                          <div style={{ fontSize: '30px', fontWeight: 900, color: '#F0E8D6', letterSpacing: '-0.04em', lineHeight: 1, fontFamily: 'system-ui' }}>
+                            2.847
+                          </div>
+                          <div style={{ fontSize: '9px', color: 'rgba(240,232,214,0.45)', marginTop: '3px' }}>
+                            Ingressos validados hoje
+                          </div>
+                        </div>
+
+                        {/* Stats row */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                          {[{ label: 'ATIVOS', value: '14' }, { label: 'PORTÕES', value: '6/6' }].map((s) => (
+                            <div key={s.label} style={{
+                              background: 'rgba(240,232,214,0.04)',
+                              border: '1px solid rgba(240,232,214,0.07)',
+                              borderRadius: '12px',
+                              padding: '10px',
+                            }}>
+                              <div style={{ fontSize: '7px', color: 'rgba(240,232,214,0.38)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{s.label}</div>
+                              <div style={{ fontSize: '18px', fontWeight: 800, color: '#F0E8D6', marginTop: '2px', lineHeight: 1 }}>{s.value}</div>
+                            </div>
                           ))}
                         </div>
-                      </div>
 
-                      {/* Header card */}
-                      <div
-                        style={{
-                          background: 'rgba(201,168,76,0.10)',
-                          border: '1px solid rgba(201,168,76,0.25)',
-                          borderRadius: '0.875rem',
-                          padding: '0.875rem',
-                        }}
-                      >
-                        <div style={{ fontSize: '0.55rem', color: '#C9A84C', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                          CHECK-IN AO VIVO
+                        {/* Lista portões */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                          {[
+                            { name: 'Portão A', status: 'OK', time: '21:34' },
+                            { name: 'VIP Sul',  status: 'OK', time: '21:33' },
+                            { name: 'Backstage', status: '!', time: '21:31' },
+                          ].map((row, i, arr) => (
+                            <div key={row.name} style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: '8px 0',
+                              borderBottom: i < arr.length - 1 ? '1px solid rgba(240,232,214,0.05)' : 'none',
+                            }}>
+                              <span style={{ fontSize: '11px', color: 'rgba(240,232,214,0.75)', fontWeight: 500 }}>{row.name}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '10px', color: 'rgba(240,232,214,0.3)' }}>{row.time}</span>
+                                <span style={{
+                                  fontSize: '9px',
+                                  fontWeight: 700,
+                                  padding: '2px 7px',
+                                  borderRadius: '999px',
+                                  background: row.status === 'OK' ? 'rgba(34,197,94,0.15)' : 'rgba(234,179,8,0.18)',
+                                  color:       row.status === 'OK' ? '#22C55E'             : '#EAB308',
+                                  border:      `1px solid ${row.status === 'OK' ? 'rgba(34,197,94,0.2)' : 'rgba(234,179,8,0.25)'}`,
+                                }}>
+                                  {row.status}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#F0E8D6', letterSpacing: '-0.03em', lineHeight: 1 }}>
-                          2.847
-                        </div>
-                        <div style={{ fontSize: '0.55rem', color: 'rgba(240,232,214,0.4)', marginTop: '0.2rem' }}>
-                          ingressos validados hoje
-                        </div>
-                      </div>
 
-                      {/* Mini stat row */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                        {[
-                          { label: 'Ativos', value: '14' },
-                          { label: 'Portões', value: '6/6' },
-                        ].map((s) => (
-                          <div
-                            key={s.label}
-                            style={{
-                              background: 'rgba(255,255,255,0.04)',
-                              borderRadius: '0.6rem',
-                              padding: '0.6rem',
-                              border: '1px solid rgba(255,255,255,0.06)',
-                            }}
-                          >
-                            <div style={{ fontSize: '0.55rem', color: 'rgba(240,232,214,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{s.label}</div>
-                            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#F0E8D6', marginTop: '0.2rem' }}>{s.value}</div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Activity list */}
-                      {[
-                        { name: 'Portão A', status: 'OK', time: '21:34' },
-                        { name: 'VIP Sul', status: 'OK', time: '21:33' },
-                        { name: 'Backstage', status: '!', time: '21:31' },
-                      ].map((row) => (
-                        <div
-                          key={row.name}
-                          style={{
+                        {/* Botão Escanear */}
+                        <div style={{ marginTop: 'auto' }}>
+                          <div style={{
+                            background: 'linear-gradient(135deg, #C9A84C 0%, #E8D080 50%, #C9A84C 100%)',
+                            borderRadius: '14px',
+                            padding: '12px',
                             display: 'flex',
-                            justifyContent: 'space-between',
                             alignItems: 'center',
-                            padding: '0.4rem 0',
-                            borderBottom: '1px solid rgba(255,255,255,0.04)',
-                          }}
-                        >
-                          <span style={{ fontSize: '0.6rem', color: 'rgba(240,232,214,0.6)' }}>{row.name}</span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            <span style={{ fontSize: '0.55rem', color: 'rgba(240,232,214,0.3)' }}>{row.time}</span>
-                            <span
-                              style={{
-                                fontSize: '0.5rem',
-                                fontWeight: 700,
-                                padding: '0.15rem 0.4rem',
-                                borderRadius: '999px',
-                                background: row.status === 'OK' ? 'rgba(34,197,94,0.15)' : 'rgba(234,179,8,0.15)',
-                                color: row.status === 'OK' ? '#22C55E' : '#EAB308',
-                              }}
-                            >
-                              {row.status}
+                            justifyContent: 'center',
+                            gap: '6px',
+                            boxShadow: '0 4px 20px rgba(201,168,76,0.35)',
+                          }}>
+                            <QrCode size={13} style={{ color: '#060B18' }} />
+                            <span style={{ fontSize: '10px', fontWeight: 800, color: '#060B18', letterSpacing: '0.12em' }}>
+                              ESCANEAR INGRESSO
                             </span>
                           </div>
-                        </div>
-                      ))}
 
-                      {/* QR scan button */}
-                      <div
-                        style={{
-                          marginTop: 'auto',
-                          background: '#C9A84C',
-                          borderRadius: '0.875rem',
-                          padding: '0.75rem',
-                          textAlign: 'center',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.4rem',
-                        }}
-                      >
-                        <QrCode size={14} style={{ color: '#060B18' }} />
-                        <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#060B18', letterSpacing: '0.08em' }}>
-                          ESCANEAR INGRESSO
-                        </span>
+                          {/* Home indicator */}
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                            <div style={{ width: '36%', height: '4px', borderRadius: '999px', background: 'rgba(240,232,214,0.28)' }} />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Phone glow reflection */}
+                  {/* ── Reflexo/sombra no chão ── */}
                   <div
                     style={{
                       marginTop: '-1rem',

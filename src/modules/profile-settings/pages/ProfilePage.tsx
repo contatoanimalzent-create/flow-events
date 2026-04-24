@@ -102,7 +102,20 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
       action: () => toggle(),
     },
     { icon: Shield, label: 'Segurança', subtitle: 'Senha e sessões', action: handleResetPassword },
-    { icon: HelpCircle, label: 'Ajuda', subtitle: 'Central de suporte', action: () => window.open('https://wa.me/5511999999999', '_blank') },
+    {
+      icon: HelpCircle,
+      label: 'Ajuda',
+      subtitle: 'Falar com o suporte Pulse',
+      action: () => window.open(
+        'https://wa.me/14698629040?text=' +
+        encodeURIComponent(
+          '👋 Olá! Vim pelo *Pulse* e preciso de ajuda.\n\n' +
+          'Evento: ' + (context?.eventName ?? '—') + '\n' +
+          'Organização: ' + (context?.organizationName ?? '—')
+        ),
+        '_blank',
+      ),
+    },
     { icon: LogOut, label: 'Sair da conta', action: handleLogout, danger: true },
   ]
 
@@ -211,6 +224,17 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
             {!danger && <ChevronRight size={16} className="text-slate-600 shrink-0" />}
           </button>
         ))}
+      </div>
+
+      {/* Footer contact */}
+      <div className="px-4 pt-4 pb-2 text-center">
+        <p className="text-slate-600 text-xs">Suporte por email</p>
+        <a
+          href="mailto:contatopulse@animalzgroup.com"
+          className="text-slate-400 text-xs underline-offset-2 hover:text-slate-300 transition-colors"
+        >
+          contatopulse@animalzgroup.com
+        </a>
       </div>
     </div>
   )

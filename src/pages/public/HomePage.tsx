@@ -246,7 +246,7 @@ export function HomePage({ onLogin }: HomePageProps) {
     title: 'Pulse | Plataforma de Eventos Premium',
     description:
       'Gestão completa de eventos: check-in, staff, ingressos e supervisão em tempo real. A plataforma que opera como uma marca de supercarros.',
-    image: '/hero-poster.jpg',
+    image: '/PULSE-LOGO-PRINCIPAL-FUNDO-PRETO.png',
     url: typeof window !== 'undefined' ? window.location.href : '/',
   })
 
@@ -301,7 +301,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                 muted
                 loop
                 playsInline
-                poster="/hero-poster.jpg"
+                poster="/PULSE-LOGO-PRINCIPAL-FUNDO-PRETO.png"
                 style={{
                   width: '100%',
                   height: '110%',
@@ -309,7 +309,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                   display: 'block',
                 }}
               >
-                <source src="/hero-video.mp4" type="video/mp4" />
+                <source src="/videos/video.mp4" type="video/mp4" />
               </video>
             </motion.div>
 

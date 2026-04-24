@@ -1,4 +1,4 @@
-import { ArrowRight, Globe, Mail, Phone } from 'lucide-react'
+import { ArrowRight, Globe, Mail, Phone, Instagram, Linkedin, Youtube, Twitter } from 'lucide-react'
 import { useState } from 'react'
 import { usePublicLocale } from '../lib/public-locale'
 
@@ -6,6 +6,10 @@ interface EventsPublicFooterProps {
   categories?: string[]
   onCategoryClick?: (category: string) => void
 }
+
+const WHATSAPP_URL =
+  'https://wa.me/14698629040?text=' +
+  encodeURIComponent('👋 Olá! Vim pelo site da Pulse e preciso de ajuda.')
 
 export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsPublicFooterProps) {
   const { isPortuguese } = usePublicLocale()
@@ -20,10 +24,140 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
     window.setTimeout(() => setSubscribed(false), 3000)
   }
 
+  const columns = isPortuguese
+    ? [
+        {
+          title: 'Para Produtores',
+          links: [
+            { label: 'Como funciona', href: '/como-funciona' },
+            { label: 'Crie seu evento', href: '/criar-evento' },
+            { label: 'Quanto custa', href: '/precos' },
+            { label: 'Demonstração', href: '/demo' },
+            { label: 'API & Integrações', href: '/api' },
+            { label: 'App organizador', href: '/pulse' },
+            { label: 'Fale com vendas', href: WHATSAPP_URL },
+          ],
+        },
+        {
+          title: 'Funcionalidades',
+          links: [
+            { label: 'Check-in mobile', href: '/funcionalidades/checkin' },
+            { label: 'Credenciamento', href: '/funcionalidades/credenciamento' },
+            { label: 'Gestão de staff', href: '/funcionalidades/staff' },
+            { label: 'Controle de fluxo', href: '/funcionalidades/fluxo' },
+            { label: 'Relatórios ao vivo', href: '/funcionalidades/relatorios' },
+            { label: 'Virada de lote', href: '/funcionalidades/lotes' },
+            { label: 'Pagamento antecipado', href: '/funcionalidades/pagamento' },
+            { label: 'Ver todas', href: '/funcionalidades' },
+          ],
+        },
+        {
+          title: 'Tipos de Evento',
+          links: [
+            { label: 'Festas e shows', href: '/eventos/festas' },
+            { label: 'Corporativos', href: '/eventos/corporativos' },
+            { label: 'Eventos esportivos', href: '/eventos/esportivos' },
+            { label: 'Gastronômicos', href: '/eventos/gastronomicos' },
+            { label: 'Teatros e cultura', href: '/eventos/cultura' },
+            { label: 'Eventos infantis', href: '/eventos/infantis' },
+            { label: 'Religiosos', href: '/eventos/religiosos' },
+            { label: 'Ver todos', href: '/eventos' },
+          ],
+        },
+        {
+          title: 'Empresa',
+          links: [
+            { label: 'Sobre a Pulse', href: '/sobre' },
+            { label: 'Carreiras', href: '/carreiras' },
+            { label: 'Blog', href: '/blog' },
+            { label: 'Cases de sucesso', href: '/cases' },
+            { label: 'Imprensa', href: '/imprensa' },
+            { label: 'Contato', href: `mailto:contatopulse@animalzgroup.com` },
+          ],
+        },
+        {
+          title: 'Ajuda',
+          links: [
+            { label: 'Central de Ajuda', href: '/ajuda' },
+            { label: 'Para compradores', href: '/ajuda/compradores' },
+            { label: 'Para produtores', href: '/ajuda/produtores' },
+            { label: 'WhatsApp suporte', href: WHATSAPP_URL },
+            { label: 'Status do sistema', href: '/status' },
+            { label: 'Privacidade', href: '/privacidade' },
+            { label: 'Termos de uso', href: '/termos' },
+          ],
+        },
+      ]
+    : [
+        {
+          title: 'For Producers',
+          links: [
+            { label: 'How it works', href: '/how-it-works' },
+            { label: 'Create event', href: '/create-event' },
+            { label: 'Pricing', href: '/pricing' },
+            { label: 'Demo', href: '/demo' },
+            { label: 'API & Integrations', href: '/api' },
+            { label: 'Organizer app', href: '/pulse' },
+            { label: 'Talk to sales', href: WHATSAPP_URL },
+          ],
+        },
+        {
+          title: 'Features',
+          links: [
+            { label: 'Mobile check-in', href: '/features/checkin' },
+            { label: 'Accreditation', href: '/features/accreditation' },
+            { label: 'Staff management', href: '/features/staff' },
+            { label: 'Flow control', href: '/features/flow' },
+            { label: 'Live reports', href: '/features/reports' },
+            { label: 'Ticket phases', href: '/features/tickets' },
+            { label: 'Early payout', href: '/features/payout' },
+            { label: 'View all', href: '/features' },
+          ],
+        },
+        {
+          title: 'Event Types',
+          links: [
+            { label: 'Parties & shows', href: '/events/parties' },
+            { label: 'Corporate events', href: '/events/corporate' },
+            { label: 'Sports events', href: '/events/sports' },
+            { label: 'Food & drink', href: '/events/food' },
+            { label: 'Arts & culture', href: '/events/culture' },
+            { label: "Children's events", href: '/events/kids' },
+            { label: 'Religious events', href: '/events/religious' },
+            { label: 'View all', href: '/events' },
+          ],
+        },
+        {
+          title: 'Company',
+          links: [
+            { label: 'About Pulse', href: '/about' },
+            { label: 'Careers', href: '/careers' },
+            { label: 'Blog', href: '/blog' },
+            { label: 'Success stories', href: '/cases' },
+            { label: 'Press', href: '/press' },
+            { label: 'Contact', href: `mailto:contatopulse@animalzgroup.com` },
+          ],
+        },
+        {
+          title: 'Help',
+          links: [
+            { label: 'Help center', href: '/help' },
+            { label: 'For buyers', href: '/help/buyers' },
+            { label: 'For producers', href: '/help/producers' },
+            { label: 'WhatsApp support', href: WHATSAPP_URL },
+            { label: 'System status', href: '/status' },
+            { label: 'Privacy policy', href: '/privacy' },
+            { label: 'Terms of service', href: '/terms' },
+          ],
+        },
+      ]
+
   return (
     <footer className="border-t border-white/8 bg-[#050505]">
       <div className="px-5 py-16 md:px-8 lg:px-10">
         <div className="mx-auto max-w-[1540px]">
+
+          {/* ── Newsletter banner ── */}
           <div className="rounded-2xl border border-white/8 bg-[linear-gradient(135deg,rgba(0,87,231,0.16)_0%,rgba(10,10,10,0.96)_40%,rgba(10,26,255,0.08)_100%)] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.32)] lg:p-10">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
@@ -32,16 +166,15 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                 </div>
                 <h3 className="mt-4 text-[clamp(2rem,3vw,3rem)] font-bold leading-[0.9] tracking-[-0.03em] text-white">
                   {isPortuguese
-                    ? 'Receba proximos eventos e aberturas de acesso.'
+                    ? 'Receba próximos eventos e aberturas de acesso.'
                     : 'Get upcoming events and access openings.'}
                 </h3>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-white/58">
                   {isPortuguese
-                    ? 'Novidades publicas, experiencias em destaque e avisos de lancamento em uma camada mais seletiva.'
+                    ? 'Novidades públicas, experiências em destaque e avisos de lançamento em uma camada mais seletiva.'
                     : 'Public launches, featured experiences and release alerts in a more selective layer.'}
                 </p>
               </div>
-
               <form onSubmit={handleSubscribe} className="flex gap-3">
                 <input
                   type="email"
@@ -61,7 +194,8 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
             </div>
           </div>
 
-          {categories.length > 0 ? (
+          {/* ── Category pills (optional) ── */}
+          {categories.length > 0 && (
             <div className="mt-10">
               <div className="text-[10px] uppercase tracking-[0.3em] text-[#4285F4]">
                 {isPortuguese ? 'Categorias' : 'Categories'}
@@ -79,84 +213,131 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                 ))}
               </div>
             </div>
-          ) : null}
+          )}
 
-          <div className="mt-12 grid gap-8 border-t border-white/8 pt-10 lg:grid-cols-[1fr_0.6fr_0.6fr_0.6fr]">
-            <div>
-              <a href="/" className="inline-flex items-center">
-                {/* footer é sempre escuro → inverte a logo preta para branca */}
-                <img src="/logo.png" alt="Pulse" className="h-12 w-auto brightness-0 invert" />
-              </a>
-              <p className="mt-4 max-w-sm text-sm leading-7 text-white/56">
-                {isPortuguese
-                  ? 'Plataforma premium para descoberta, venda, operacao e governanca de eventos.'
-                  : 'Premium platform for discovery, sales, operations and governance in events.'}
-              </p>
-              <div className="mt-5 space-y-2 text-sm text-white/44">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-3.5 w-3.5" /> pulse.events
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="h-3.5 w-3.5" /> +55 11 99999-0000
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5" /> contato@pulse.events
-                </div>
-              </div>
-            </div>
+          {/* ── Main link grid ── */}
+          <div className="mt-12 border-t border-white/8 pt-10">
+            <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(5,_1fr)]">
 
-            {[
-              {
-                title: isPortuguese ? 'Plataforma' : 'Platform',
-                links: [
-                  { label: isPortuguese ? 'Inicio' : 'Home', href: '/' },
-                  { label: isPortuguese ? 'Eventos' : 'Events', href: '/events' },
-                  { label: isPortuguese ? 'Minha conta' : 'My account', href: '/me' },
-                ],
-              },
-              {
-                title: isPortuguese ? 'Produtor' : 'Producer',
-                links: [
-                  { label: isPortuguese ? 'Beneficios' : 'Benefits', href: '/producer' },
-                  { label: isPortuguese ? 'Login' : 'Login', href: '/login' },
-                  { label: isPortuguese ? 'Criar evento' : 'Create event', href: '/create-event' },
-                ],
-              },
-              {
-                title: isPortuguese ? 'Legal' : 'Legal',
-                links: [
-                  { label: isPortuguese ? 'Privacidade' : 'Privacy', href: '/privacy' },
-                  { label: isPortuguese ? 'Termos' : 'Terms', href: '/terms' },
-                ],
-              },
-            ].map((section) => (
-              <div key={section.title}>
-                <div className="text-[10px] uppercase tracking-[0.3em] text-[#4285F4]">{section.title}</div>
-                <div className="mt-4 grid gap-3">
-                  {section.links.map((link) => (
+              {/* Brand column */}
+              <div>
+                <a href="/" className="inline-flex items-center">
+                  <img src="/logo.png" alt="Pulse" className="h-10 w-auto brightness-0 invert" />
+                </a>
+                <p className="mt-4 max-w-[200px] text-sm leading-7 text-white/50">
+                  {isPortuguese
+                    ? 'Plataforma premium para descoberta, venda, operação e governança de eventos.'
+                    : 'Premium platform for event discovery, sales, operations and governance.'}
+                </p>
+
+                {/* Contact info */}
+                <div className="mt-5 space-y-2 text-xs text-white/40">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-3.5 w-3.5 shrink-0" />
+                    <span>pulse.animalzgroup.com</span>
+                  </div>
+                  <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-white/70 transition-colors">
+                    <Phone className="h-3.5 w-3.5 shrink-0" />
+                    <span>+1 (469) 862-9040</span>
+                  </a>
+                  <a href="mailto:contatopulse@animalzgroup.com" className="flex items-center gap-2 hover:text-white/70 transition-colors">
+                    <Mail className="h-3.5 w-3.5 shrink-0" />
+                    <span>contatopulse@animalzgroup.com</span>
+                  </a>
+                </div>
+
+                {/* Social links */}
+                <div className="mt-5 flex gap-3">
+                  {[
+                    { icon: Instagram, href: 'https://instagram.com/pulseeventsapp', label: 'Instagram' },
+                    { icon: Linkedin, href: 'https://linkedin.com/company/pulse-events', label: 'LinkedIn' },
+                    { icon: Youtube, href: 'https://youtube.com/@pulseeventsapp', label: 'YouTube' },
+                    { icon: Twitter, href: 'https://twitter.com/pulseeventsapp', label: 'X / Twitter' },
+                  ].map(({ icon: Icon, href, label }) => (
                     <a
-                      key={link.label}
-                      href={link.href}
-                      className="text-sm text-white/56 transition-colors hover:text-white"
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={label}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-white/40 transition-all hover:border-[#4285F4]/30 hover:text-white"
                     >
-                      {link.label}
+                      <Icon className="h-3.5 w-3.5" />
                     </a>
                   ))}
                 </div>
+
+                {/* App badges */}
+                <div className="mt-5 flex flex-col gap-2">
+                  <a
+                    href="https://apps.apple.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs text-white/70 transition-all hover:border-white/20 hover:text-white"
+                  >
+                    <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                    </svg>
+                    {isPortuguese ? 'Disponível na App Store' : 'Download on App Store'}
+                  </a>
+                  <a
+                    href="https://play.google.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs text-white/70 transition-all hover:border-white/20 hover:text-white"
+                  >
+                    <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l14 8.5c.6.37.6 1.23 0 1.6l-14 8.5c-.66.5-1.6.03-1.6-.8z" />
+                    </svg>
+                    {isPortuguese ? 'Disponível no Google Play' : 'Get it on Google Play'}
+                  </a>
+                </div>
               </div>
-            ))}
+
+              {/* Link columns */}
+              {columns.map((col) => (
+                <div key={col.title}>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#4285F4]">
+                    {col.title}
+                  </div>
+                  <div className="mt-4 grid gap-2.5">
+                    {col.links.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target={link.href.startsWith('http') || link.href.startsWith('mailto') ? '_blank' : undefined}
+                        rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
+                        className="text-sm text-white/50 transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-10 flex flex-col gap-3 border-t border-white/8 pt-6 text-xs text-white/38 md:flex-row md:items-center md:justify-between">
+          {/* ── Copyright bar ── */}
+          <div className="mt-10 flex flex-col gap-3 border-t border-white/8 pt-6 text-xs text-white/30 md:flex-row md:items-center md:justify-between">
             <p>
-              &copy; {new Date().getFullYear()} Pulse.{' '}
+              &copy; {new Date().getFullYear()} Pulse by Animalz Group.{' '}
               {isPortuguese ? 'Todos os direitos reservados.' : 'All rights reserved.'}
             </p>
-            <p className="flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#0057E7]" />
-              {isPortuguese ? 'Operacao premium de eventos' : 'Premium event operations'}
-            </p>
+            <div className="flex items-center gap-4">
+              <a href={isPortuguese ? '/privacidade' : '/privacy'} className="hover:text-white/60 transition-colors">
+                {isPortuguese ? 'Privacidade' : 'Privacy'}
+              </a>
+              <a href={isPortuguese ? '/termos' : '/terms'} className="hover:text-white/60 transition-colors">
+                {isPortuguese ? 'Termos' : 'Terms'}
+              </a>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#0057E7]" />
+                {isPortuguese ? 'Operação premium de eventos' : 'Premium event operations'}
+              </span>
+            </div>
           </div>
+
         </div>
       </div>
     </footer>

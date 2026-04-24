@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Building2, ChevronRight, Loader2 } from 'lucide-react'
+import { Building2, ChevronRight, Loader2, Lock, RefreshCw, LogOut } from 'lucide-react'
 import { useOrganizations } from '@/core/organizations/organizations.store'
 import { useEvents } from '@/core/events/events.store'
 import { useAppContext } from '@/core/context/app-context.store'
@@ -102,10 +102,28 @@ export default function SelectOrganizationPage({ onNavigate }: PulsePageProps) {
         ))}
 
         {organizations.length === 0 && !isLoading && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Building2 size={40} className="text-slate-700 mb-3" />
-            <p className="text-slate-400 text-sm">Nenhuma organização encontrada</p>
-            <p className="text-slate-600 text-xs mt-1">Contate o administrador do seu evento</p>
+          <div className="flex flex-col items-center py-12 px-6 text-center bg-white/5 border border-white/8 rounded-2xl">
+            <div className="w-14 h-14 rounded-full bg-white/8 flex items-center justify-center mb-4">
+              <Lock size={26} className="text-slate-400" />
+            </div>
+            <p className="text-white font-bold text-base mb-2">Acesso pendente</p>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Você ainda não foi adicionado a nenhuma organização. Peça ao seu supervisor ou organizador para te convidar pelo e-mail cadastrado.
+            </p>
+            <button
+              onClick={() => supabase.auth.getUser().then(({ data: { user } }) => { if (user) load(user.id) })}
+              className="mt-6 flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl active:opacity-80 transition-opacity"
+            >
+              <RefreshCw size={14} />
+              Atualizar
+            </button>
+            <button
+              onClick={() => supabase.auth.signOut().then(() => window.location.replace('/login'))}
+              className="mt-3 flex items-center gap-2 text-slate-400 text-sm px-5 py-2.5 rounded-xl active:opacity-70 transition-opacity"
+            >
+              <LogOut size={14} />
+              Sair da conta
+            </button>
           </div>
         )}
       </div>

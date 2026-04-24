@@ -28,6 +28,7 @@ import { initPush, handleServiceWorkerMessages } from '@/core/push/push.service'
 import { useTheme, applyTheme } from '@/core/theme/theme.store'
 
 const AccessDeniedPage = lazy(() => import('@/modules/shared-shell/pages/AccessDeniedPage'))
+const NotFoundPage = lazy(() => import('@/modules/shared-shell/pages/NotFoundPage'))
 
 // ─── lazy-loaded screen groups ───────────────────────────────────────────────
 
@@ -178,8 +179,8 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
   if (is('/pulse/promoter/ranking')) return <RankingPage onNavigate={navigate} />
   if (is('/pulse/promoter/goals')) return <GoalsPage onNavigate={navigate} />
 
-  // Fallback
-  return null
+  // Fallback — 404
+  return <NotFoundPage onNavigate={navigate} />
 }
 
 // ─── main component ───────────────────────────────────────────────────────────

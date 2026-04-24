@@ -6,6 +6,9 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
+    // In production native builds, load from the live domain
+    // url: 'https://pulse.animalzgroup.com', // uncomment when building for stores
+    cleartext: false,
   },
   android: {
     allowMixedContent: true,

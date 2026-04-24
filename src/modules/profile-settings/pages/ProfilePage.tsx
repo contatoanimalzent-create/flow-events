@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import {
   ChevronLeft, ChevronRight, User, Bell, Shield, HelpCircle,
   LogOut, Building2, Calendar, ToggleLeft, Loader2, Globe, Moon, Sun,
+  CheckCircle,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
@@ -33,6 +34,9 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
   const { theme, toggle } = useTheme()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loadingProfile, setLoadingProfile] = useState(true)
+  const [resetSent, setResetSent] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
+  const [profileToast, setProfileToast] = useState(false)
 
   // Load real user data
   useEffect(() => {
@@ -56,6 +60,14 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
     load()
   }, [])
 
+  const handleResetPassword = async () => {
+    if (!profile?.email || resetLoading) return
+    setResetLoading(true)
+    await supabase.auth.resetPasswordForEmail(profile.email)
+    setResetLoading(false)
+    setResetSent(true)
+  }
+
   const handleLogout = async () => {
     clearContext()
     clearPerms()
@@ -67,7 +79,12 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
   const accent = mode ? buildModeAccent(mode) : '#4285F4'
 
   const menuItems: MenuItem[] = [
-    { icon: User, label: 'Meu perfil', subtitle: 'Nome, foto, preferências', action: () => {} },
+    {
+      icon: User,
+      label: 'Meu perfil',
+      subtitle: 'Nome, foto, preferências',
+      action: () => { setProfileToast(true); setTimeout(() => setProfileToast(false), 3000) },
+    },
     { icon: Bell, label: 'Notificações', subtitle: 'Configurar alertas', action: () => onNavigate('/pulse/notifications') },
     { icon: ToggleLeft, label: 'Trocar modo', subtitle: mode ? `Modo atual: ${buildModeLabel(mode)}` : '—', action: () => onNavigate('/pulse/select-mode') },
     { icon: Building2, label: 'Trocar organização', subtitle: context?.organizationName ?? '—', action: () => onNavigate('/pulse/select-organization') },
@@ -84,8 +101,8 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
       subtitle: 'Toque para alternar',
       action: () => toggle(),
     },
-    { icon: Shield, label: 'Segurança', subtitle: 'Senha e sessões', action: () => {} },
-    { icon: HelpCircle, label: 'Ajuda', subtitle: 'Central de suporte', action: () => {} },
+    { icon: Shield, label: 'Segurança', subtitle: 'Senha e sessões', action: handleResetPassword },
+    { icon: HelpCircle, label: 'Ajuda', subtitle: 'Central de suporte', action: () => window.open('https://wa.me/5511999999999', '_blank') },
     { icon: LogOut, label: 'Sair da conta', action: handleLogout, danger: true },
   ]
 
@@ -157,6 +174,22 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Profile edit coming soon banner */}
+      {profileToast && (
+        <div className="mx-4 mb-3 flex items-center gap-3 bg-white/8 border border-white/12 rounded-2xl px-4 py-3">
+          <User size={16} className="text-slate-300 shrink-0" />
+          <p className="text-slate-200 text-sm">Edição de perfil em breve</p>
+        </div>
+      )}
+
+      {/* Security / reset password feedback */}
+      {resetSent && (
+        <div className="mx-4 mb-3 flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-2xl px-4 py-3">
+          <CheckCircle size={16} className="text-green-400 shrink-0" />
+          <p className="text-green-300 text-sm">Email de redefinição enviado!</p>
         </div>
       )}
 

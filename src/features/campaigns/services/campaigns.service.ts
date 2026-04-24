@@ -205,7 +205,7 @@ export const campaignsService = {
   async updateSegment(input: UpsertAudienceSegmentInput) {
     return campaignsApi.mutation('update_segment', async () => {
       if (!input.segmentId) {
-        throw new CampaignsServiceError('Segmento invalido para atualizacao', 'segment_update_invalid')
+        throw new CampaignsServiceError('Segmento inválido para atualizacao', 'segment_update_invalid')
       }
 
       const preview = await this.previewSegmentAudience(input.organizationId, buildAudienceSegmentRules(input.values))
@@ -255,7 +255,7 @@ export const campaignsService = {
   async updateCampaignDraft(input: UpsertCampaignDraftInput) {
     return campaignsApi.mutation('update_campaign_draft', async () => {
       if (!input.draftId) {
-        throw new CampaignsServiceError('Draft invalido para atualizacao', 'campaign_draft_update_invalid')
+        throw new CampaignsServiceError('Draft inválido para atualizacao', 'campaign_draft_update_invalid')
       }
 
       const segment = input.values.segment_id ? await this.getSegmentById(input.values.segment_id) : null
@@ -285,7 +285,7 @@ export const campaignsService = {
       const draft = await getCampaignDraftById(input.draftId)
 
       if (!draft || draft.organization_id !== input.organizationId) {
-        throw new CampaignsServiceError('Draft invalido para lancamento', 'campaign_launch_invalid_draft')
+        throw new CampaignsServiceError('Draft inválido para lancamento', 'campaign_launch_invalid_draft')
       }
 
       const segment = draft.segment_id ? await this.getSegmentById(draft.segment_id) : null

@@ -22,7 +22,7 @@ export function IntelligenceConsistencyPanel({ issues }: IntelligenceConsistency
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">SEM ISSUES DE CONSISTENCIA</div>
-        <p className="mt-2 text-sm text-text-muted">Nenhuma divergencia relevante encontrada para o filtro atual.</p>
+        <p className="mt-2 text-sm text-text-muted">Nenhuma divergência relevante encontrada para o filtro atual.</p>
       </div>
     )
   }

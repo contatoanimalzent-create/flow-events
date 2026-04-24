@@ -315,7 +315,7 @@ export function SponsorsPage() {
         open={Boolean(pendingDelete)}
         title="Remover patrocinador"
         description={pendingDelete ? `O cadastro de ${pendingDelete.company_name} sera removido.` : undefined}
-        impact="Historico de investimento, contatos e entregas deixam de estar disponiveis para a equipe."
+        impact="Histórico de investimento, contatos e entregas deixam de estar disponíveis para a equipe."
         confirmLabel="Excluir patrocinador"
         onCancel={() => setPendingDelete(null)}
         onConfirm={async () => {

@@ -136,7 +136,7 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
       label: labels.business,
       items: [
         createItem('crm', 'CRM', 'CRM',
-          isPortuguese ? 'Relacionamento com público e recorrencia.' : 'Audience relationship and retention.', labels.business, UsersRound),
+          isPortuguese ? 'Relacionamento com público e recorrência.' : 'Audience relationship and retention.', labels.business, UsersRound),
         createItem('community', isPortuguese ? 'Comunidade' : 'Community', isPortuguese ? 'Comunidade' : 'Community',
           isPortuguese ? 'Feed, posts, reacoes e networking pós-evento.' : 'Feed, posts, reactions and post-event networking.', labels.business, Globe),
         createItem('monetization', isPortuguese ? 'Monetizacao' : 'Monetization', isPortuguese ? 'Monetizacao' : 'Monetization',
@@ -154,7 +154,7 @@ export function createAppNavigation(isPortuguese: boolean): AppNavGroup[] {
       label: labels2.intelligence,
       items: [
         createItem('intelligence', isPortuguese ? 'IA Operacional' : 'AI Operational', isPortuguese ? 'IA' : 'AI',
-          isPortuguese ? 'Alertas, recomendações e previsoes em tempo real.' : 'Real-time alerts, recommendations and forecasts.', labels2.intelligence, BrainCircuit),
+          isPortuguese ? 'Alertas, recomendações e previsões em tempo real.' : 'Real-time alerts, recommendations and forecasts.', labels2.intelligence, BrainCircuit),
         createItem('audit', isPortuguese ? 'Auditoria' : 'Audit', isPortuguese ? 'Auditoria' : 'Audit',
           isPortuguese ? 'Logs, segurança, webhooks e histórico de ações.' : 'Logs, security, webhooks and action history.', labels2.intelligence, ClipboardList),
       ],

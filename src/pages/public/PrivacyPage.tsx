@@ -10,7 +10,7 @@ export function PrivacyPage() {
   const sections = isPortuguese
     ? [
         {
-          title: '1. Sobre esta política',
+          title: '1. Sobre está política',
           content: [
             'Esta Política de Privacidade descreve como a Pulse coleta, usa, armazena e protege suas informações pessoais quando você utiliza nossa plataforma.',
           ],
@@ -59,7 +59,7 @@ export function PrivacyPage() {
         {
           title: '8. Seus direitos',
           content: [
-            'Você pode solicitar acesso, correcao, exclusao, portabilidade e revisao do uso de seus dados, além de revogar consentimentos quando aplicável.',
+            'Você pode solicitar acesso, correcao, exclusao, portabilidade e revisão do uso de seus dados, além de revogar consentimentos quando aplicável.',
             'Para exercer esses direitos, escreva para privacy@animalz.events.',
           ],
         },

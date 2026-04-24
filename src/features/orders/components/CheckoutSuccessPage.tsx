@@ -41,10 +41,10 @@ export function CheckoutSuccessPage({
           <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-white/66">
             {isFreeOrder
               ? isPortuguese
-                ? 'O QR code e a confirmação chegam por e-mail em instantes. A experiência já esta reservada para você.'
+                ? 'O QR code e a confirmação chegam por e-mail em instantes. A experiência já está reservada para você.'
                 : 'Your QR code and confirmation will arrive by email shortly. The experience is already reserved for you.'
               : isPortuguese
-                ? 'Os ingressos digitais serao enviados assim que o pagamento for confirmado pelo gateway.'
+                ? 'Os ingressos digitais serão enviados assim que o pagamento for confirmado pelo gateway.'
                 : 'Digital tickets will be sent as soon as the payment is confirmed by the gateway.'}
           </p>
 

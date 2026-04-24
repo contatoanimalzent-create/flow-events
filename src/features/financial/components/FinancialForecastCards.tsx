@@ -32,7 +32,7 @@ export function FinancialForecastCards({ overview }: FinancialForecastCardsProps
     {
       label: 'Eventos em risco',
       value: String(overview.events_at_risk_count),
-      sublabel: 'Monitorar receita, custo e divergencias',
+      sublabel: 'Monitorar receita, custo e divergências',
       icon: AlertTriangle,
       color: overview.events_at_risk_count > 0 ? 'text-status-error' : 'text-status-success',
     },

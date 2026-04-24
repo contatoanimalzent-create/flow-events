@@ -95,7 +95,7 @@ function buildPerformanceItems(params: {
   const items: DashboardPerformanceItem[] = [
     { id: 'events', label: 'Eventos ativos', value: `${params.activeEvents}`, tone: params.activeEvents > 0 ? 'success' : 'warning' },
     { id: 'campaigns', label: 'Campanhas rodando', value: `${params.runningCampaigns}`, tone: params.runningCampaigns > 0 ? 'default' : 'warning' },
-    { id: 'alerts', label: 'Alertas criticos', value: `${params.criticalAlerts}`, tone: params.criticalAlerts > 0 ? 'danger' : 'success' },
+    { id: 'alerts', label: 'Alertas críticos', value: `${params.criticalAlerts}`, tone: params.criticalAlerts > 0 ? 'danger' : 'success' },
     { id: 'customers', label: 'Base de clientes', value: `${params.totalCustomers}`, tone: params.totalCustomers > 0 ? 'default' : 'warning' },
     { id: 'checkins', label: 'Check-ins confirmados', value: `${params.totalCheckins}`, tone: params.totalCheckins > 0 ? 'success' : 'default' },
   ]

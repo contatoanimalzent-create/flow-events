@@ -35,7 +35,7 @@ export function CustomerMetricsGrid({ summary }: CustomerMetricsGridProps) {
               </div>
             </div>
             <div className={`metric-value text-[1.85rem] ${card.color}`}>{card.value}</div>
-            <div className="mt-3 text-[11px] text-text-muted">Base viva de relacionamento e recorrencia.</div>
+            <div className="mt-3 text-[11px] text-text-muted">Base viva de relacionamento e recorrência.</div>
           </div>
         )
       })}

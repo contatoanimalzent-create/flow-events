@@ -130,7 +130,7 @@ export function FeaturedEventsSection({ events }: FeaturedEventsSectionProps) {
             </h3>
             <p className="mx-auto mt-2 max-w-md text-sm text-text-secondary">
               {isPortuguese
-                ? 'Quando novos eventos entrarem na plataforma, eles aparecerao aqui automaticamente.'
+                ? 'Quando novos eventos entrarem na plataforma, eles aparecerão aqui automaticamente.'
                 : 'As new events enter the platform, they will appear here automatically.'}
             </p>
             <a

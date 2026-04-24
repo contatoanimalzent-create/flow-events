@@ -2,7 +2,7 @@
 
 ## Objetivo Arquitetural
 
-O Animalz Events precisa operar como um produto de missao crítica para empresas que executam multiplos eventos, com multiplas equipes, canais de venda e fluxos financeiros simultaneos. A arquitetura frontend não pode ser apenas organizada; ela precisa suportar escala operacional, velocidade de time e confiabilidade de negócio.
+O Animalz Events precisa operar como um produto de missão crítica para empresas que executam múltiplos eventos, com múltiplas equipes, canais de venda e fluxos financeiros simultâneos. A arquitetura frontend não pode ser apenas organizada; ela precisa suportar escala operacional, velocidade de time e confiabilidade de negócio.
 
 A direção oficial da V2 é:
 
@@ -11,18 +11,18 @@ A direção oficial da V2 é:
 - estado global enxuto com Zustand;
 - Supabase isolado em camada de integração e service layer;
 - rotas, providers e shell concentrados em uma camada `app`;
-- capacidade de crescer para novos domínios sem reorganizacao estrutural.
+- capacidade de crescer para novos domínios sem reorganização estrutural.
 
 ## Arquitetura Ideal Frontend
 
-### Principios
+### Princípios
 
 - Cada feature representa uma capacidade real do produto: eventos, ingressos, check-in, staff, financeiro e growth.
 - Componentes de página orquestram experiência; regra de negócio não vive dentro da UI.
 - O frontend consome casos de uso por hooks e services, não por chamadas diretas ao banco.
 - O schema do Supabase não deve vazar para toda a aplicacao.
 - Dados de backend pertencem ao cache do React Query; sessão e preferencia pertencem ao estado global.
-- Fluxos criticos como checkout, emissão e check-in devem ser desenhados para idempotencia, observabilidade e recuperacao de falha.
+- Fluxos críticos como checkout, emissão e check-in devem ser desenhados para idempotencia, observabilidade e recuperação de falha.
 
 ### Camadas Oficiais
 
@@ -36,7 +36,7 @@ Capacidades de negócio. Cada domínio contem sua própria UI, hooks, services, 
 Design system, utilitarios, contratos e componentes realmente reutilizaveis.
 
 4. `integrations`
-Conexao com Supabase, Stripe, analytics, notificacoes e observabilidade.
+Conexao com Supabase, Stripe, analytics, notificações e observabilidade.
 
 5. `infra`
 Query client, env, auth helpers, feature flags, error handling e concerns transversais.
@@ -47,7 +47,7 @@ O projeto hoje ainda carrega uma estrutura mais centrada em `pages`, `components
 
 - novas entregas entram no modelo por domínio;
 - código existente migra por módulo quando houver alteração relevante;
-- `src/pages/*` vira camada temporaria até cada domínio ganhar sua própria `pages/`;
+- `src/pages/*` vira camada temporária até cada domínio ganhar sua própria `pages/`;
 - `src/lib/supabase.ts` e stores atuais permanecem como ponte até a camada `integrations/` estar consolidada.
 
 ## Organização Por Domínio
@@ -67,7 +67,7 @@ Opera leitura de QR, válidação de acesso, histórico de entradas, exceções,
 Gerencia equipe operacional, cargos, permissões de campo, escalas, alocacoes e trilha de responsabilidade.
 
 - `financial`
-Consolida receita, taxas, custos, repasses, DRE operacional, conciliacao, chargeback e caixa por evento.
+Consolida receita, taxas, custos, repasses, DRE operacional, conciliação, chargeback e caixa por evento.
 
 - `growth`
 Conecta campanhas, canais, cupons, afiliacao, funis, automações, segmentação e inteligência comercial.
@@ -76,7 +76,7 @@ Conecta campanhas, canais, cupons, afiliacao, funis, automações, segmentação
 
 - `app` pode depender de `features`, `shared`, `integrations` e `infra`;
 - `features` podem depender de `shared`, `integrations` e `infra`;
-- uma feature não importa implementacao interna de outra feature;
+- uma feature não importa implementação interna de outra feature;
 - contratos compartilhados entre domínios sobem para `shared/contracts` ou `shared/types`;
 - `shared` não conhece regra de negócio de domínio;
 - `integrations` não conhece experiência de UI nem regra de produto de alto nivel.
@@ -98,7 +98,7 @@ React Query e a camada oficial para leitura, mutacao, cache, sincronização e i
 - filtros, página, busca e tenant entram na query key;
 - mutacoes invalidam apenas o conjunto mínimo de dados afetado;
 - `select` e usado para adaptar payload para a UI quando isso simplifica consumo;
-- prefetch deve ser usado em rotas e fluxos de alta recorrencia;
+- prefetch deve ser usado em rotas e fluxos de alta recorrência;
 - realtime atualiza cache com invalidacao dirigida ou patch controlado, nunca com refetch global.
 
 ### Convencao De Query Keys
@@ -128,9 +128,9 @@ export function useEventSummaryQuery(eventId: string | null) {
 
 ### Padrão Para Fluxos Criticos
 
-- checkout: mutacoes idempotentes, polling controlado ou reconciliacao por webhook;
+- checkout: mutacoes idempotentes, polling controlado ou reconciliação por webhook;
 - emissão: invalidacao atomica de pedidos, tickets e inventory;
-- check-in: estado otimista apenas onde houver garantia de reconciliacao;
+- check-in: estado otimista apenas onde houver garantia de reconciliação;
 - dashboards operacionais: refresh curto ou realtime por canal especifico.
 
 ## Padrão De Services
@@ -143,7 +143,7 @@ Services são a fronteira oficial entre regra de interface e acesso a dados.
 - montar filtros, joins, ordenacao e página;
 - normalizar erros técnicos em erros de negócio;
 - mapear linhas do banco para modelos de uso do frontend;
-- concentrar lógica de integração com Stripe, notificacoes e analytics quando o caso de uso exigir.
+- concentrar lógica de integração com Stripe, notificações e analytics quando o caso de uso exigir.
 
 ### Contrato Recomendado
 
@@ -164,7 +164,7 @@ Cada domínio deve expor services orientados a caso de uso:
 - service não conhece componente;
 - service não deve misturar side effects de UI;
 - operações sensiveis vao para Edge Functions ou RPC, não para mutacao direta no cliente;
-- service pode compor multiplas fontes, mas expoe uma interface única para a feature.
+- service pode compor múltiplas fontes, mas expoe uma interface única para a feature.
 
 ## Padrão De Estado Global
 
@@ -191,7 +191,7 @@ Zustand continua na stack, mas com papel restrito. O objetivo é impedir que est
 ### Stores Oficiais
 
 - `authStore`
-Autenticacao, profile, organization, permissão efetiva e bootstrap de sessão.
+Autenticação, profile, organization, permissão efetiva e bootstrap de sessão.
 
 - `uiStore`
 Shell, overlays, preferências locais e estados de experiência.
@@ -210,7 +210,7 @@ Supabase e o backend operacional do Animalz Events e precisa ser tratado como pl
 ### Camadas Do Supabase
 
 1. `Auth`
-Login, sessão, recovery, convite, troca obrigatoria de senha, roles basicas e identidade do usuário.
+Login, sessão, recovery, convite, troca obrigatória de senha, roles basicas e identidade do usuário.
 
 2. `Postgres + RLS`
 Fonte de verdade de organizações, eventos, tickets, pedidos, check-ins, staff, financeiro, campanhas e auditoria.
@@ -226,8 +226,8 @@ Canal dedicado para operação ao vivo, quando houver beneficio concreto em chec
 - multi-tenant por organização desde a raiz do schema;
 - RLS como barreira primaria de segurança;
 - policies baseadas em organização, papel e escopo operacional;
-- trilha auditavel para mudancas financeiras e operacionais;
-- funcoes atomicas para reserva de estoque, confirmação de pagamento, emissão e reconciliacao;
+- trilha auditável para mudancas financeiras e operacionais;
+- funções atomicas para reserva de estoque, confirmação de pagamento, emissão e reconciliação;
 - tipos do banco gerados e versionados para consumo no frontend.
 
 ### Estrutura Recomendada
@@ -266,7 +266,7 @@ As features usam services. Os services usam repositories ou clients de integraç
 
 - tipos de domínio ficam perto da feature;
 - contratos compartilhados sobem para `shared/types`;
-- payloads criticos devem usar schema validation;
+- payloads críticos devem usar schema validation;
 - respostas de service devem ser normalizadas antes de chegar na UI.
 
 ### UI E Composicao
@@ -274,7 +274,7 @@ As features usam services. Os services usam repositories ou clients de integraç
 - páginas finas e containers pequenos;
 - componentes compartilhados em `shared/ui`;
 - estados de loading, empty e erro padronizados por feature;
-- acessibilidade obrigatoria em login, checkout e check-in;
+- acessibilidade obrigatória em login, checkout e check-in;
 - design system com tokens e variaveis globais, não estilos arbitrarios por tela.
 
 ### Observabilidade
@@ -282,7 +282,7 @@ As features usam services. Os services usam repositories ou clients de integraç
 - tracking de eventos de produto por domínio;
 - logs para operações financeiras e de acesso;
 - monitoramento de erro por ambiente;
-- correlation id para fluxos criticos de compra e check-in.
+- correlation id para fluxos críticos de compra e check-in.
 
 ## Fluxos Criticos
 
@@ -297,7 +297,7 @@ As features usam services. Os services usam repositories ou clients de integraç
 
 - evento nasce em `draft`;
 - configuração de agenda, capacidade e venda acontece por etapas;
-- publicação depende de válidação de consistencia;
+- publicação depende de válidação de consistência;
 - mutacao invalida dashboards, páginas internas e páginas públicas relevantes.
 
 ### 3. Checkout E Emissão
@@ -305,14 +305,14 @@ As features usam services. Os services usam repositories ou clients de integraç
 - inventory e reservado com segurança;
 - pedido nasce em estado intermediario;
 - webhook ou confirmação transacional finaliza pagamento;
-- emissão atualiza pedidos, tickets e indicadores sem divergencia.
+- emissão atualiza pedidos, tickets e indicadores sem divergência.
 
 ### 4. Check-in Ao Vivo
 
 - leitura precisa responder em sub-segundo no caso ideal;
-- o sistema diferencia ticket valido, duplicado, cancelado e fora da regra;
+- o sistema diferencia ticket válido, duplicado, cancelado e fora da regra;
 - falhas de conectividade precisam de estratégia de degradacao controlada;
-- auditoria registra dispositivo, operador, gate e horario.
+- auditoria registra dispositivo, operador, gate e horário.
 
 ### 5. Financeiro Consolidado
 
@@ -323,7 +323,7 @@ As features usam services. Os services usam repositories ou clients de integraç
 ### 6. Growth E Inteligência
 
 - eventos de compra, abandono e presença alimentam analytics;
-- campanhas conversam com receita real, não so com clique;
+- campanhas conversam com receita real, não só com clique;
 - futuras automações e IA consomem a mesma base de verdade do produto.
 
 ## Resultado Esperado

@@ -160,7 +160,7 @@ function ProductFormModal({ organizationId, events, product, defaultEventId, onC
   const setField = <K extends keyof ProductForm,>(field: K, value: ProductForm[K]) => setForm((current) => ({ ...current, [field]: value }))
   async function handleSave() {
     if (!form.name.trim()) return setError('Nome do item e obrigatorio.')
-    if (!form.price || Number.isNaN(Number(form.price))) return setError('Preço invalido.')
+    if (!form.price || Number.isNaN(Number(form.price))) return setError('Preço inválido.')
     setSaving(true); setError('')
     const payload = { organization_id: organizationId, event_id: eventId || null, name: form.name.trim(), sku: form.sku || null, description: form.description || null, category: form.category, price: Number(form.price), cost_price: form.cost_price ? Number(form.cost_price) : null, stock_quantity: Number(form.stock_quantity || 0), stock_alert_threshold: form.stock_alert_threshold ? Number(form.stock_alert_threshold) : null, is_active: isActive }
     const { error: saveError } = product ? await supabase.from('products').update(payload).eq('id', product.id) : await supabase.from('products').insert(payload)

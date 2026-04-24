@@ -56,7 +56,7 @@ export function TicketSelector({ ticketTypes, cart, onAdd, onRemove }: TicketSel
                             <div className="text-sm font-semibold text-white">{batch.name}</div>
                           </div>
                           <div className="mt-2 flex flex-wrap gap-3 text-xs text-white/50">
-                            <span>{formatPublicNumber(available, locale)} {isPortuguese ? 'disponiveis' : 'available'}</span>
+                            <span>{formatPublicNumber(available, locale)} {isPortuguese ? 'disponíveis' : 'available'}</span>
                             <span>{isPortuguese ? 'limite' : 'max'} {maxPerOrder} {isPortuguese ? 'por pedido' : 'per order'}</span>
                             {batch.ends_at ? <span>{isPortuguese ? 'encerra em' : 'ends on'} {formatPublicDate(batch.ends_at, locale)}</span> : null}
                           </div>

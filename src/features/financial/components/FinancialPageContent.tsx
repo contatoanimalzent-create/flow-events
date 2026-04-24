@@ -160,7 +160,7 @@ export function FinancialPageContent() {
       </div>
 
       {dashboard.loading ? (
-        <PageLoadingState title={t('Loading financials', 'Carregando financeiro')} description={t('Updating forecasts, reconciliation and closure by event.', 'Atualizando previsoes, conciliacao e fechamento por evento.')} />
+        <PageLoadingState title={t('Loading financials', 'Carregando financeiro')} description={t('Updating forecasts, reconciliation and closure by event.', 'Atualizando previsões, conciliação e fechamento por evento.')} />
       ) : dashboard.error ? (
         <PageErrorState title={t('Unable to load financials', 'Erro ao carregar financeiro')} description={dashboard.error} icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />} />
       ) : !dashboard.overview ? (
@@ -538,7 +538,7 @@ export function FinancialPageContent() {
       <ActionConfirmationDialog
         open={Boolean(pendingDeleteCostEntry)}
         title="Remover lancamento financeiro"
-        description={pendingDeleteCostEntry ? `O custo ${pendingDeleteCostEntry.description} sera retirado desta conciliacao.` : undefined}
+        description={pendingDeleteCostEntry ? `O custo ${pendingDeleteCostEntry.description} sera retirado desta conciliação.` : undefined}
         impact="Os totais de custo, margem e fechamento podem mudar assim que o lancamento for removido."
         confirmLabel="Excluir lancamento"
         confirming={mutations.deletingCostEntry}

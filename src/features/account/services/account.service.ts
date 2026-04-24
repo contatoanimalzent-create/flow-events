@@ -67,7 +67,7 @@ function getFallbackImage(category: string) {
   if (
     normalizedCategory.includes('festival') ||
     normalizedCategory.includes('show') ||
-    normalizedCategory.includes('musica')
+    normalizedCategory.includes('música')
   ) {
     return 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80&fit=crop'
   }

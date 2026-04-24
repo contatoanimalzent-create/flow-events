@@ -30,7 +30,7 @@ function assertUploadResult(asset: {
   }
 
   if (assetType === 'image' && asset.duration) {
-    throw new Error('Upload invalido: imagens não devem registrar duracao')
+    throw new Error('Upload inválido: imagens não devem registrar duracao')
   }
 }
 

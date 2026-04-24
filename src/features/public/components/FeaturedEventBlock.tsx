@@ -23,7 +23,7 @@ export function FeaturedEventBlock({ primaryEvent, secondaryEvents }: FeaturedEv
     return (
       <EmptyState
         title="Nenhuma experiência pronta para destaque"
-        description="Assim que o calendario público tiver eventos ativos, esta curadoria editorial aparecera aqui automaticamente."
+        description="Assim que o calendário público tiver eventos ativos, está curadoria editorial aparecerá aqui automaticamente."
         className="min-h-[20rem]"
       />
     )

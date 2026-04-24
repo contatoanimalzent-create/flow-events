@@ -211,7 +211,7 @@ function New-SkillMarkdown {
     "xquads"
   }
 
-  $taskBlock = New-BulletBlock -Values $ComponentMap["tasks"] -Fallback "Consulte references/manifest.md para os materiais disponiveis."
+  $taskBlock = New-BulletBlock -Values $ComponentMap["tasks"] -Fallback "Consulte references/manifest.md para os materiais disponíveis."
   $workflowBlock = New-BulletBlock -Values $ComponentMap["workflows"] -Fallback "Nenhum workflow estruturado foi empacotado neste squad."
 
   return @"
@@ -234,7 +234,7 @@ Comece por references/manifest.md. Depois leia apenas os arquivos realmente rele
 2. Escolha uma linha principal de trabalho em vez de tentar imitar todos os especialistas ao mesmo tempo.
 3. Abra a task ou workflow mais proximo do pedido.
 4. Leia apenas os agentes que agregam contexto real para essa execucao.
-5. Converta o material em saidas nativas do Codex: decisoes, planos, copy, design direction, implementacao ou revisao.
+5. Converta o material em saídas nativas do Codex: decisões, planos, copy, design direction, implementação ou revisão.
 
 ## Quick Routing
 

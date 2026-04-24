@@ -76,7 +76,7 @@ export function TermsPage() {
         {
           title: '11. Lei aplicável',
           content: [
-            'Estes termos são regidos pela legislação aplicável ao serviço e as disputas serao tratadas no foro competente, conforme permitido por lei.',
+            'Estes termos são regidos pela legislação aplicável ao serviço e as disputas serão tratadas no foro competente, conforme permitido por lei.',
           ],
         },
         {

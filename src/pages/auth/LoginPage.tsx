@@ -61,7 +61,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
       setRecoveryMessage(
         t(
           'Recovery instructions sent. Check your inbox.',
-          'Instruções de recuperacao enviadas. Verifique sua caixa de entrada.',
+          'Instruções de recuperação enviadas. Verifique sua caixa de entrada.',
         ),
       )
     }
@@ -160,14 +160,14 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.34em] text-[#4285F4]">
-                  {recoveryMode ? t('Recovery flow', 'Fluxo de recuperacao') : t('Secure sign in', 'Entrada segura')}
+                  {recoveryMode ? t('Recovery flow', 'Fluxo de recuperação') : t('Secure sign in', 'Entrada segura')}
                 </div>
                 <div className="mt-3 text-3xl font-black leading-[0.92] tracking-[-0.03em] text-white">
                   {recoveryMode ? t('Recover access', 'Recuperar acesso') : t('Sign in', 'Entrar')}
                 </div>
                 <div className="mt-2 text-sm text-white/42">
                   {recoveryMode
-                    ? t('Enter your email to receive a recovery link.', 'Digite seu email para receber um link de recuperacao.')
+                    ? t('Enter your email to receive a recovery link.', 'Digite seu email para receber um link de recuperação.')
                     : t('Welcome back. Enter your credentials.', 'Bem-vindo de volta. Digite suas credenciais.')}
                 </div>
               </div>
@@ -296,7 +296,7 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
                   className="mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#0057E7] text-base font-bold text-white shadow-[0_16px_40px_rgba(0,87,231,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#4285F4] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {recoveryLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>
-                    <span>{t('Send recovery link', 'Enviar link de recuperacao')}</span>
+                    <span>{t('Send recovery link', 'Enviar link de recuperação')}</span>
                     <ArrowRight className="h-4 w-4" />
                   </>}
                 </button>

@@ -10,7 +10,7 @@ Cada fase precisa entregar valor utilizável e, ao mesmo tempo, fortalecer o efe
 
 ### Objetivo
 
-Criar a fundação técnica e de produto que sustenta um SaaS multi-tenant, seguro, auditavel e pronto para crescimento sem retrabalho estrutural.
+Criar a fundação técnica e de produto que sustenta um SaaS multi-tenant, seguro, auditável e pronto para crescimento sem retrabalho estrutural.
 
 ### Capacidades
 
@@ -23,7 +23,7 @@ Criar a fundação técnica e de produto que sustenta um SaaS multi-tenant, segu
 
 ### Entregaveis
 
-- auth com login, sessão persistida, troca obrigatoria de senha e recovery;
+- auth com login, sessão persistida, troca obrigatória de senha e recovery;
 - modelo multi-tenant por organização;
 - permissões para `admin`, `manager`, `operator`, `finance`, `staff`;
 - arquitetura V2 implementada como direção oficial;
@@ -31,7 +31,7 @@ Criar a fundação técnica e de produto que sustenta um SaaS multi-tenant, segu
 - query client, providers globais, guards e design system inicial;
 - monitoramento de erro e eventos operacionais básicos.
 
-### Dependencias
+### Dependências
 
 - definicao do posicionamento oficial do produto;
 - convencoes de arquitetura e estrutura de pastas;
@@ -44,7 +44,7 @@ Criar a fundação técnica e de produto que sustenta um SaaS multi-tenant, segu
 - 100% das rotas privadas protegidas;
 - tempo de bootstrap autenticado menor que 3 segundos;
 - deploy continuo funcional com preview por ambiente;
-- base pronta para evolucao dos domínios core sem reorganizacao.
+- base pronta para evolução dos domínios core sem reorganização.
 
 ### Riscos
 
@@ -73,13 +73,13 @@ Entregar a maquina comercial do produto: criacao de eventos, estruturacao de ing
 - backoffice de eventos com status, agenda, local e branding;
 - gestão de ingressos, preços, lotes, cotas e cupons;
 - página pública do evento com CTA e conteúdo comercial;
-- reserva temporaria de inventory no checkout;
-- integração de pagamento e reconciliacao de status;
+- reserva temporária de inventory no checkout;
+- integração de pagamento e reconciliação de status;
 - pedido, comprovante e área do comprador;
 - emissão segura de QR e serial de ingresso;
 - eventos de analytics no funil de compra.
 
-### Dependencias
+### Dependências
 
 - fundação de auth, tenant e permissão;
 - arquitetura frontend orientada por domínio;
@@ -91,14 +91,14 @@ Entregar a maquina comercial do produto: criacao de eventos, estruturacao de ing
 - conversão de checkout acima de 60% em trafego qualificado;
 - menos de 1% de falha na emissão de ingresso;
 - tempo de carregamento da página pública abaixo de 2 segundos;
-- divergencia de inventory próxima de zero;
+- divergência de inventory próxima de zero;
 - instrumentacao completa das etapas do funil.
 
 ### Riscos
 
 - overselling por reserva mal desenhada;
 - pedido pago sem emissão consistente;
-- QR replicavel ou pouco auditavel;
+- QR replicável ou pouco auditável;
 - experiência pública lenta e com baixa conversão.
 
 ## Fase 3: Operação
@@ -121,17 +121,17 @@ Transformar o Animalz Events em software de execução ao vivo, com check-in, st
 - módulo de check-in com leitura de QR;
 - painel ao vivo por evento;
 - válidação por tipo de acesso, status e regra operacional;
-- registro de acesso duplicado, invalido, cancelado e bloqueado;
+- registro de acesso duplicado, inválido, cancelado e bloqueado;
 - gestão de equipe, cargos e alocacoes;
-- logs por operador, gate e horario;
+- logs por operador, gate e horário;
 - estratégia de sincronização para ambientes com conectividade limitada.
 
-### Dependencias
+### Dependências
 
 - tickets e emissão totalmente estáveis;
 - modelo de permissão mais refinado;
 - canais de realtime ou refresh controlado;
-- trilha auditavel de mutacoes.
+- trilha auditável de mutacoes.
 
 ### Métricas De Sucesso
 
@@ -157,7 +157,7 @@ Tornar o produto o centro de comando administrativo e financeiro do evento, cone
 ### Capacidades
 
 - resumo financeiro por evento e organização;
-- conciliacao e fechamento;
+- conciliação e fechamento;
 - repasses, taxas e chargebacks;
 - PDV integrado;
 - estoque operacional;
@@ -168,13 +168,13 @@ Tornar o produto o centro de comando administrativo e financeiro do evento, cone
 
 - dashboard financeiro com receita, taxa, custo e margem;
 - DRE operacional por evento;
-- conciliacao entre venda, pagamento e repasse;
+- conciliação entre venda, pagamento e repasse;
 - módulo de PDV conectado ao ecossistema do evento;
 - controle de estoque e consumo operacional;
 - cadastro de fornecedores, contratos e centros de custo;
 - relatórios executivos por periodo, marca, cidade e unidade.
 
-### Dependencias
+### Dependências
 
 - dados comerciais confiaveis;
 - modelo financeiro consistente;
@@ -183,11 +183,11 @@ Tornar o produto o centro de comando administrativo e financeiro do evento, cone
 
 ### Métricas De Sucesso
 
-- conciliacao acima de 99%;
+- conciliação acima de 99%;
 - visibilidade de margem em D+1;
 - redução do tempo de fechamento operacional;
 - adesao do financeiro e da gestão como usuários recorrentes;
-- menor divergencia entre operação e caixa.
+- menor divergência entre operação e caixa.
 
 ### Riscos
 
@@ -205,7 +205,7 @@ Converter o Animalz Events em camada de decisão e automação, usando dados e I
 ### Capacidades
 
 - analytics por evento, organização e portfolio;
-- previsao de demanda e ritmo de venda;
+- previsão de demanda e ritmo de venda;
 - recomendação de preço, lote e capacidade;
 - automações baseadas em gatilho;
 - alertas operacionais e financeiros;
@@ -214,7 +214,7 @@ Converter o Animalz Events em camada de decisão e automação, usando dados e I
 
 ### Entregaveis
 
-- dashboards de cohort, funil, presença e recorrencia;
+- dashboards de cohort, funil, presença e recorrência;
 - alertas de anomalia em venda, check-in e caixa;
 - automações para follow-up, campanha e remediacao operacional;
 - consulta em linguagem natural sobre o negócio do evento;
@@ -222,7 +222,7 @@ Converter o Animalz Events em camada de decisão e automação, usando dados e I
 - biblioteca padronizada de métricas de negócio;
 - camada analítica que cruza aquisição, receita, presença e margem.
 
-### Dependencias
+### Dependências
 
 - instrumentacao de eventos desde as fases anteriores;
 - histórico confiável de dados;
@@ -246,7 +246,7 @@ Converter o Animalz Events em camada de decisão e automação, usando dados e I
 
 ## Sequenciamento Estrategico
 
-O roadmap deve obedecer a esta lógica:
+O roadmap deve obedecer a está lógica:
 
 - primeiro, construir confiabilidade estrutural;
 - depois, capturar a transação central;

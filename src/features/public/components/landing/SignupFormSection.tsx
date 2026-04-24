@@ -174,8 +174,8 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
                 <label className="text-sm font-medium text-[var(--pulse-color-text-primary)]">E-mail</label>
                 <input
                   {...register('email', {
-                    required: isPortuguese ? 'Informe um e-mail valido.' : 'Enter a valid email.',
-                    validate: (value) => validateEmail(value) || (isPortuguese ? 'E-mail invalido.' : 'Invalid email.'),
+                    required: isPortuguese ? 'Informe um e-mail válido.' : 'Enter a valid email.',
+                    validate: (value) => validateEmail(value) || (isPortuguese ? 'E-mail inválido.' : 'Invalid email.'),
                   })}
                   className={inputClassName}
                   placeholder="você@email.com"
@@ -189,7 +189,7 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
                 name="phone"
                 rules={{
                   required: isPortuguese ? 'Informe seu telefone.' : 'Enter your phone number.',
-                  validate: (value) => validatePhone(value) || (isPortuguese ? 'Telefone invalido.' : 'Invalid phone number.'),
+                  validate: (value) => validatePhone(value) || (isPortuguese ? 'Telefone inválido.' : 'Invalid phone number.'),
                 }}
                 render={({ field }) => (
                   <div>
@@ -239,7 +239,7 @@ export function SignupFormSection({ ticketOptions, defaultTicketOptionId, onSubm
                 name="cpf"
                 rules={{
                   validate: (value) =>
-                    !value || validateCPF(value) || (isPortuguese ? 'CPF invalido.' : 'Invalid CPF.'),
+                    !value || validateCPF(value) || (isPortuguese ? 'CPF inválido.' : 'Invalid CPF.'),
                 }}
                 render={({ field }) => (
                   <div>

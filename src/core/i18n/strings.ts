@@ -3,7 +3,7 @@ import type { Locale } from './locale.store'
 export type LocaleStrings = Record<string, { 'pt-BR': string; 'en-US': string }>
 
 const STRINGS: LocaleStrings = {
-  // ── Common ──────────────────────────────────────────────────────────────────
+  // Common
   loading:   { 'pt-BR': 'Carregando...',          'en-US': 'Loading...' },
   back:      { 'pt-BR': 'Voltar',                 'en-US': 'Back' },
   save:      { 'pt-BR': 'Salvar',                 'en-US': 'Save' },
@@ -12,7 +12,7 @@ const STRINGS: LocaleStrings = {
   retry:     { 'pt-BR': 'Tentar novamente',       'en-US': 'Try again' },
   noData:    { 'pt-BR': 'Nenhum dado encontrado', 'en-US': 'No data found' },
 
-  // ── Operator ─────────────────────────────────────────────────────────────────
+  // Operator
   scanner:          { 'pt-BR': 'Scanner QR',                 'en-US': 'QR Scanner' },
   manualCheck:      { 'pt-BR': 'Busca manual',               'en-US': 'Manual check' },
   history:          { 'pt-BR': 'Histórico',                  'en-US': 'History' },
@@ -23,33 +23,33 @@ const STRINGS: LocaleStrings = {
   duplicateTicket:  { 'pt-BR': 'Ingresso já utilizado',      'en-US': 'Ticket already used' },
   wrongEvent:       { 'pt-BR': 'Ingresso de outro evento',   'en-US': 'Ticket for another event' },
 
-  // ── Staff ─────────────────────────────────────────────────────────────────
+  // Staff
   presence:       { 'pt-BR': 'Presença',          'en-US': 'Presence' },
   startShift:     { 'pt-BR': 'Iniciar turno',     'en-US': 'Start shift' },
   endShift:       { 'pt-BR': 'Encerrar turno',    'en-US': 'End shift' },
   occurrences:    { 'pt-BR': 'Ocorrências',       'en-US': 'Occurrences' },
   instructions:   { 'pt-BR': 'Instruções',        'en-US': 'Instructions' },
 
-  // ── Supervisor ────────────────────────────────────────────────────────────
+  // Supervisor
   teamLive:     { 'pt-BR': 'Equipe ao vivo',     'en-US': 'Team live' },
   approvals:    { 'pt-BR': 'Aprovações',          'en-US': 'Approvals' },
   map:          { 'pt-BR': 'Mapa',               'en-US': 'Map' },
   healthScore:  { 'pt-BR': 'Saúde da operação',  'en-US': 'Health score' },
 
-  // ── Attendee ──────────────────────────────────────────────────────────────
+  // Attendee
   myTickets:    { 'pt-BR': 'Meus ingressos', 'en-US': 'My tickets' },
   agenda:       { 'pt-BR': 'Programação',    'en-US': 'Agenda' },
   feed:         { 'pt-BR': 'Feed',           'en-US': 'Feed' },
   networking:   { 'pt-BR': 'Networking',     'en-US': 'Networking' },
   upgrades:     { 'pt-BR': 'Upgrades',       'en-US': 'Upgrades' },
 
-  // ── Promoter ──────────────────────────────────────────────────────────────
+  // Promoter
   sales:       { 'pt-BR': 'Vendas',     'en-US': 'Sales' },
   commission:  { 'pt-BR': 'Comissão',   'en-US': 'Commission' },
   ranking:     { 'pt-BR': 'Ranking',    'en-US': 'Ranking' },
   goals:       { 'pt-BR': 'Metas',      'en-US': 'Goals' },
 
-  // ── Profile ───────────────────────────────────────────────────────────────
+  // Profile
   profile:        { 'pt-BR': 'Perfil',                     'en-US': 'Profile' },
   logout:         { 'pt-BR': 'Sair da conta',              'en-US': 'Log out' },
   switchMode:     { 'pt-BR': 'Trocar modo',                'en-US': 'Switch mode' },

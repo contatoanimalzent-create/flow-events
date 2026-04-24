@@ -268,12 +268,12 @@ export function buildCampaignRecipientPayload(params: {
 
   if (channel === 'email' && !email) {
     status = 'skipped'
-    errorMessage = 'Cliente sem e-mail valido para envio'
+    errorMessage = 'Cliente sem e-mail válido para envio'
   }
 
   if ((channel === 'whatsapp' || channel === 'sms') && !phone) {
     status = 'skipped'
-    errorMessage = 'Cliente sem telefone valido para o canal selecionado'
+    errorMessage = 'Cliente sem telefone válido para o canal selecionado'
   }
 
   if (channel === 'whatsapp' || channel === 'sms' || channel === 'push') {

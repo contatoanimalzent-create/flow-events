@@ -56,7 +56,7 @@ const BENEFITS = [
     icon: MessageCircle,
     labelPt: 'Com especialista',
     labelEn: 'With a specialist',
-    descPt: 'Alguem que entende de eventos, não so de software.',
+    descPt: 'Alguém que entende de eventos, não só de software.',
     descEn: 'Someone who understands events, not just software.',
   },
 ]

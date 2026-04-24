@@ -16,7 +16,7 @@ export function IntelligenceHealthScoreGrid({ healthScores }: IntelligenceHealth
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">SEM HEALTH SCORE</div>
-        <p className="mt-2 text-sm text-text-muted">Assim que os eventos gerarem sinais, a health layer aparecera aqui.</p>
+        <p className="mt-2 text-sm text-text-muted">Assim que os eventos gerarem sinais, a health layer aparecerá aqui.</p>
       </div>
     )
   }
@@ -49,7 +49,7 @@ export function IntelligenceHealthScoreGrid({ healthScores }: IntelligenceHealth
 
           <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-text-muted">
             <span className="rounded-sm border border-bg-border px-2 py-1">{health.active_alert_count} alertas ativos</span>
-            <span className="rounded-sm border border-bg-border px-2 py-1">{health.critical_alert_count} criticos</span>
+            <span className="rounded-sm border border-bg-border px-2 py-1">{health.critical_alert_count} críticos</span>
             <span className="rounded-sm border border-bg-border px-2 py-1">{health.recommendation_count} recomendacoes</span>
           </div>
 

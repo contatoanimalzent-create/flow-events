@@ -15,7 +15,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
   useSeoMeta({
     title: isPortuguese ? 'Sobre | Pulse' : 'About | Pulse',
     description: isPortuguese
-      ? 'Pulse conecta compradores a eventos de cultura, gastronomia, musica e lifestyle, com compra simples e acesso garantido.'
+      ? 'Pulse conecta compradores a eventos de cultura, gastronomia, música e lifestyle, com compra simples e acesso garantido.'
       : 'Pulse connects buyers to culture, food, music and lifestyle events with simple purchase and guaranteed access.',
     image: events[0]?.mediaPresentation.coverAsset?.secure_url ?? events[0]?.cover_url ?? null,
     url: typeof window !== 'undefined' ? window.location.href : '/about',
@@ -38,7 +38,7 @@ export function AboutPage({ onLogin }: { onLogin: () => void }) {
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-[#9a9088] md:text-lg">
                 {isPortuguese
-                  ? 'Pulse conecta compradores aos melhores eventos de cultura, gastronomia, musica e lifestyle. Compre ingressos com facilidade, receba seu QR code e aproveite cada momento.'
+                  ? 'Pulse conecta compradores aos melhores eventos de cultura, gastronomia, música e lifestyle. Compre ingressos com facilidade, receba seu QR code e aproveite cada momento.'
                   : 'Pulse connects buyers to the best culture, food, music and lifestyle events. Buy tickets easily, receive your QR code and enjoy every moment.'}
               </p>
             </div>

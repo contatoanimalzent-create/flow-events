@@ -88,7 +88,7 @@ export function ReferralDashboard({ overview, isLoading = false }: ReferralDashb
         <div className="rounded-[2.2rem] border border-[#e6dac9] bg-white/92 p-7 shadow-[0_18px_55px_rgba(66,48,24,0.06)]">
           <div className="text-[11px] uppercase tracking-[0.28em] text-[#8b7c69]">{t('Recent signals', 'Sinais recentes')}</div>
           <h2 className="mt-3 font-display text-[2.2rem] font-semibold leading-[0.94] tracking-[-0.04em] text-[#1f1a15]">
-            {t('The growth loop is active and leaves a clear trail.', 'O ciclo de crescimento esta ativo e deixa rastro claro.')}
+            {t('The growth loop is active and leaves a clear trail.', 'O ciclo de crescimento está ativo e deixa rastro claro.')}
           </h2>
 
           <div className="mt-8 space-y-4">

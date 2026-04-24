@@ -114,7 +114,7 @@ export const notificationsService = {
             organization_id: organizationId,
             type: 'financial',
             priority: String(row.status) === 'divergent' ? 'high' : 'medium',
-            title: String(row.status) === 'divergent' ? 'Divergencia financeira detectada' : 'Repasse requer revisao',
+            title: String(row.status) === 'divergent' ? 'Divergencia financeira detectada' : 'Repasse requer revisão',
             description: `Payout ${String(row.status ?? '').toUpperCase()} para o evento ${String(row.event_id ?? '')}`,
             created_at: String(row.created_at ?? row.scheduled_at ?? new Date().toISOString()),
             read: readIds.has(`financial-${String(row.id)}`),

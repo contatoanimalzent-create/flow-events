@@ -49,12 +49,12 @@ export function CostEntryModal({
 
   async function handleSave() {
     if (!values.description.trim()) {
-      setError('Descrição e obrigatoria.')
+      setError('Descrição e obrigatória.')
       return
     }
 
     if (!values.amount || Number.isNaN(Number(values.amount))) {
-      setError('Informe um valor valido.')
+      setError('Informe um valor válido.')
       return
     }
 

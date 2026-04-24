@@ -91,7 +91,7 @@ export function StaffPageContent() {
         {[
           {
             title: '1. Identificacao',
-            description: 'Nome, contato e documento para o time saber exatamente quem esta entrando na operação.',
+            description: 'Nome, contato e documento para o time saber exatamente quem está entrando na operação.',
           },
           {
             title: '2. Alocacao',

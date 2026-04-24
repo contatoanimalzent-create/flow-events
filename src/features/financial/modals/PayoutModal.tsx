@@ -44,7 +44,7 @@ export function PayoutModal({ organizationId, events, initialReport, defaultEven
 
     for (const field of ['gross_sales', 'platform_fees', 'retained_amount', 'payable_amount'] as const) {
       if (Number.isNaN(Number(values[field]))) {
-        setError('Preencha os valores financeiros com números validos.')
+        setError('Preencha os valores financeiros com números válidos.')
         return
       }
     }
@@ -68,7 +68,7 @@ export function PayoutModal({ organizationId, events, initialReport, defaultEven
             <span className="admin-title-accent">.</span>
           </>
         }
-        subtitle="Consolide base recebivel, retencoes e agenda de payout com leitura mais executiva."
+        subtitle="Consolide base recebivel, retenções e agenda de payout com leitura mais executiva."
         onClose={onClose}
       />
 

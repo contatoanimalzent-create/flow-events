@@ -144,7 +144,7 @@ async function uploadToSupabaseStorage(input: UploadProviderInput): Promise<Uplo
 
 function mapExternalUrlAsset(input: UploadProviderInput): UploadedProviderAsset {
   if (!input.externalUrl) {
-    throw new Error('URL externa obrigatoria')
+    throw new Error('URL externa obrigatória')
   }
 
   return {

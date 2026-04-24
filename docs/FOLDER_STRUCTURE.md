@@ -152,7 +152,7 @@ Responsável pela operação comercial:
 - estoque e regras de venda;
 - vouchers, desconto e upsell;
 - pedido, emissão, transferência e cancelamento;
-- checkout e conciliacao do funil de compra.
+- checkout e conciliação do funil de compra.
 
 ### `/features/checkin`
 
@@ -161,7 +161,7 @@ Responsável pela operação de acesso:
 - leitura de QR;
 - válidação de ingresso;
 - gate, fila e status de entrada;
-- auditoria de operador, dispositivo e horario;
+- auditoria de operador, dispositivo e horário;
 - tratamento de exceção operacional.
 
 ### `/features/staff`
@@ -179,7 +179,7 @@ Responsável pela unidade econômica do evento:
 
 - resumo financeiro por evento e organização;
 - taxas, repasses, custos e margem;
-- conciliacao;
+- conciliação;
 - chargeback, reembolso e fechamento;
 - caixa, PDV e visão gerencial.
 
@@ -286,13 +286,13 @@ features/<domain>/
 
 ## Mapa De Migracao Da Estrutura Atual
 
-Hoje o projeto ainda esta mais próximo deste desenho:
+Hoje o projeto ainda está mais próximo deste desenho:
 
 - `src/pages`
 - `src/components`
 - `src/lib`
 
-A migracao recomendada e:
+A migração recomendada e:
 
 1. manter a estrutura atual funcionando sem ruptura;
 2. criar `src/app`, `src/features`, `src/shared`, `src/integrations` e `src/infra`;

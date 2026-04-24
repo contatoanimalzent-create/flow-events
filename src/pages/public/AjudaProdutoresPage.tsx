@@ -50,8 +50,8 @@ const SECOES = [
     tituloEn: 'Configure tickets and batches',
     conteudo: (
       <div className="space-y-3 text-sm text-[#9a9088] leading-relaxed">
-        <p>Crie múltiplos tipos de ingresso (ex: Pista, VIP, Camarote) com préços e capacidades independentes.</p>
-        <p>Para cada tipo, crie lotes com préços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida, você define o gatilho.</p>
+        <p>Crie múltiplos tipos de ingresso (ex: Pista, VIP, Camarote) com preços e capacidades independentes.</p>
+        <p>Para cada tipo, crie lotes com preços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida, você define o gatilho.</p>
         <p>Configure cupons de desconto (percentual ou valor fixo) e cortesias (ingressos gratuitos com código).</p>
         <p>Ingressos podem ser nominais (nome do comprador obrigatório) ou não-nominais. Você escolhe.</p>
       </div>

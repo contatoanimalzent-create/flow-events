@@ -60,7 +60,7 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
                   href="/events"
                   className="inline-flex items-center gap-2 rounded-full bg-brand-acid px-6 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-[0_4px_16px_rgba(214,42,11,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e14425]"
                 >
-                  {isPortuguese ? 'Ver calendario completo' : 'View full calendar'}
+                  {isPortuguese ? 'Ver calendário completo' : 'View full calendar'}
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a

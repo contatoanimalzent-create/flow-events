@@ -121,7 +121,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
               </h2>
               <p className="mt-5 text-sm leading-7 text-white/50">
                 {isPortuguese
-                  ? 'Todos os recursos da plataforma expostos via REST. Autenticacao Bearer token, respostas em JSON, documentacao OpenAPI disponível.'
+                  ? 'Todos os recursos da plataforma expostos via REST. Autenticação Bearer token, respostas em JSON, documentação OpenAPI disponível.'
                   : 'All platform resources exposed via REST. Bearer token authentication, JSON responses, OpenAPI documentation available.'}
               </p>
             </div>
@@ -168,7 +168,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-white/50">
                   {isPortuguese
-                    ? 'Configure endpoints para receber notificacoes instantaneas quando algo acontece na plataforma. Ideal para integrações customizadas e automações.'
+                    ? 'Configure endpoints para receber notificações instantâneas quando algo acontece na plataforma. Ideal para integrações customizadas e automações.'
                     : 'Configure endpoints to receive instant notifications when something happens on the platform. Ideal for custom integrations and automations.'}
                 </p>
               </div>
@@ -205,7 +205,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-base leading-8 text-white/50">
                 {isPortuguese
-                  ? 'Acesse a documentacao completa ou fale diretamente com o time técnico.'
+                  ? 'Acesse a documentação completa ou fale diretamente com o time técnico.'
                   : 'Access the full documentation or talk directly to the technical team.'}
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
@@ -213,7 +213,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
                   href="/api/docs"
                   className="inline-flex items-center gap-2 rounded-full bg-[#0057E7] px-7 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-[0_16px_40px_rgba(0,87,231,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#4285F4]"
                 >
-                  {isPortuguese ? 'Ver documentacao' : 'View documentation'}
+                  {isPortuguese ? 'Ver documentação' : 'View documentation'}
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a

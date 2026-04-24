@@ -128,7 +128,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
             ) : null}
 
             {step === 2 ? (
-              <FormSection title="Agenda e local" description="Configure horario, abertura de portas e formato presencial ou online.">
+              <FormSection title="Agenda e local" description="Configure horário, abertura de portas e formato presencial ou online.">
                 <FormGrid>
                   <FormField label="Inicio" required>
                     <input type="datetime-local" className="input" value={form.starts_at} onChange={(event) => setField('starts_at', event.target.value)} />
@@ -294,7 +294,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
                     ))}
                   </div>
                   <p className="text-[10px] text-text-muted leading-relaxed">
-                    Use arquivos otimizados para carregamento rápido na página pública. Arquivos acima do limite serao rejeitados automaticamente.
+                    Use arquivos otimizados para carregamento rápido na página pública. Arquivos acima do limite serão rejeitados automaticamente.
                   </p>
                 </div>
 

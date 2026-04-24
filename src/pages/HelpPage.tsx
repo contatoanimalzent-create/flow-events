@@ -140,7 +140,7 @@ export function HelpPage() {
         <div className="rounded-[14px] border border-status-warning/20 bg-status-warning/6 px-4 py-3 text-[11px] text-status-warning leading-relaxed">
           💡 {t(
             'All images are automatically compressed for the web. Use original high-resolution files, the platform handles optimization.',
-            'Todas as imagens são comprimidas automaticamente para web. Envie os arquivos originais em alta resolucao, a plataforma faz a otimizacao.',
+            'Todas as imagens são comprimidas automaticamente para web. Envie os arquivos originais em alta resolução, a plataforma faz a otimização.',
           )}
         </div>
       </div>
@@ -150,7 +150,7 @@ export function HelpPage() {
         <p className="mb-6 text-text-secondary">
           {t(
             'Our support team is here to help. Send your question or open the full documentation library.',
-            'Nosso time de suporte esta aqui para ajudar. Envie sua pergunta ou abra a biblioteca completa de documentacao.',
+            'Nosso time de suporte está aqui para ajudar. Envie sua pergunta ou abra a biblioteca completa de documentação.',
           )}
         </p>
         <div className="flex flex-wrap gap-3">

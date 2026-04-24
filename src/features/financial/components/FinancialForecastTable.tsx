@@ -24,7 +24,7 @@ export function FinancialForecastTable({ reports, onEditForecast }: FinancialFor
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">NENHUM FORECAST</div>
-        <p className="mt-2 text-sm text-text-muted">Selecione um evento ou lance uma previsao para comparar realizado x projetado.</p>
+        <p className="mt-2 text-sm text-text-muted">Selecione um evento ou lance uma previsão para comparar realizado x projetado.</p>
       </div>
     )
   }

@@ -140,7 +140,7 @@ export function ExitLeadCaptureDialog({
         </button>
 
         <div className="grid md:grid-cols-[1fr_1fr]">
-          {/* Lado esquerdo, oculto em mobile, visivel a partir de md */}
+          {/* Lado esquerdo, oculto em mobile, visível a partir de md */}
           <div
             className="hidden overflow-hidden px-9 py-10 md:block"
             style={{
@@ -168,7 +168,7 @@ export function ExitLeadCaptureDialog({
 
           {/* Lado direito, formulário (único coluna em mobile) */}
           <div className="px-5 py-8 sm:px-8 sm:py-10 md:px-9">
-            {/* Eyebrow visivel so em mobile (no desktop esta no painel esquerdo) */}
+            {/* Eyebrow visível só em mobile (no desktop está no painel esquerdo) */}
             <div className="mb-4 flex items-center gap-2 md:hidden">
               <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-[10px] uppercase tracking-[0.3em] text-[#4285F4]">
                 <Mail className="h-3 w-3" />

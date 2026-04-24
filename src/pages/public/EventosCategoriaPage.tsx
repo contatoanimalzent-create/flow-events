@@ -35,7 +35,7 @@ const categoryMap: Record<string, CategoryInfo> = {
       },
       {
         title: 'Virada de lote automática',
-        desc: 'Configure lotes com préços progressivos. A virada acontece automaticamente por data ou quantidade vendida.',
+        desc: 'Configure lotes com preços progressivos. A virada acontece automaticamente por data ou quantidade vendida.',
       },
       {
         title: 'Dashboard ao vivo',
@@ -57,7 +57,7 @@ const categoryMap: Record<string, CategoryInfo> = {
       },
     ],
     stepsPt: [
-      { number: '01', title: 'Crie o evento e os lotes', desc: 'Configure nome, data, local, capacidade e préços em minutos.' },
+      { number: '01', title: 'Crie o evento e os lotes', desc: 'Configure nome, data, local, capacidade e preços em minutos.' },
       { number: '02', title: 'Divulgue sua página pública', desc: 'Link personalizado com galeria, mapa e botão de compra.' },
       { number: '03', title: 'Opere com o app Pulse', desc: 'Check-in por QR code, controle de filas e supervisão em tempo real.' },
     ],
@@ -81,7 +81,7 @@ const categoryMap: Record<string, CategoryInfo> = {
       },
       {
         title: 'Virada de lote automática',
-        desc: 'Configure lotes com préços progressivos. A virada acontece automaticamente por data ou quantidade vendida.',
+        desc: 'Configure lotes com preços progressivos. A virada acontece automaticamente por data ou quantidade vendida.',
       },
       {
         title: 'Dashboard ao vivo',
@@ -103,7 +103,7 @@ const categoryMap: Record<string, CategoryInfo> = {
       },
     ],
     stepsPt: [
-      { number: '01', title: 'Crie o evento e os lotes', desc: 'Configure nome, data, local, capacidade e préços em minutos.' },
+      { number: '01', title: 'Crie o evento e os lotes', desc: 'Configure nome, data, local, capacidade e preços em minutos.' },
       { number: '02', title: 'Divulgue sua página pública', desc: 'Link personalizado com galeria, mapa e botão de compra.' },
       { number: '03', title: 'Opere com o app Pulse', desc: 'Check-in por QR code, controle de filas e supervisão em tempo real.' },
     ],
@@ -491,7 +491,7 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsPt: [
       {
         title: 'Ingresso por faixa etária',
-        desc: 'Crie categorias separadas para bebês, crianças e acompanhantes com préços diferenciados.',
+        desc: 'Crie categorias separadas para bebês, crianças e acompanhantes com preços diferenciados.',
       },
       {
         title: 'Controle de acompanhantes',
@@ -537,7 +537,7 @@ const categoryMap: Record<string, CategoryInfo> = {
     benefitsPt: [
       {
         title: 'Ingresso por faixa etária',
-        desc: 'Crie categorias separadas para bebês, crianças e acompanhantes com préços diferenciados.',
+        desc: 'Crie categorias separadas para bebês, crianças e acompanhantes com preços diferenciados.',
       },
       {
         title: 'Controle de acompanhantes',

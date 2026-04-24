@@ -1,7 +1,7 @@
 -- ============================================================
 -- ANIMALZ EVENTS - Checkout foundation
 -- Migration: 2026-03-23
--- Base transacional para drafts, reserva de inventario e expiracao
+-- Base transacional para drafts, reserva de inventário e expiração
 -- ============================================================
 
 ALTER TABLE public.ticket_batches

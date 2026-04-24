@@ -79,14 +79,14 @@ export function PaymentSection({
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/66">
           {phase === 'review'
             ? isPortuguese
-              ? 'Seu pedido já esta reservado temporariamente. Agora e so escolher como deseja concluir.'
+              ? 'Seu pedido já está reservado temporariamente. Agora é só escolher como deseja concluir.'
               : 'Your order is already temporarily reserved. Now choose how you want to complete it.'
             : phase === 'payment'
               ? isPortuguese
                 ? 'A etapa de pagamento foi simplificada para aumentar confiança, reduzir atrito e manter a leitura limpa.'
                 : 'The payment step has been simplified to increase trust, reduce friction and keep the reading clean.'
               : isPortuguese
-                ? 'O gateway esta processando a transação. Assim que a aprovação chegar, o pedido avanca para emissão automática.'
+                ? 'O gateway está processando a transação. Assim que a aprovação chegar, o pedido avanca para emissão automática.'
                 : 'The gateway is processing the transaction. As soon as approval arrives, the order moves into automatic issuance.'}
         </p>
 
@@ -141,7 +141,7 @@ export function PaymentSection({
 
       {draftStatus === 'cancelled' ? (
         <div className="flex items-center gap-2 rounded-[1.5rem] border border-[#ddd1bf] bg-white/82 px-5 py-4 text-sm text-[#5f5549]">
-          <XCircle className="h-4 w-4 shrink-0" /> {isPortuguese ? 'A reserva foi cancelada e o inventario voltou para o lote.' : 'The reservation was cancelled and inventory returned to the batch.'}
+          <XCircle className="h-4 w-4 shrink-0" /> {isPortuguese ? 'A reserva foi cancelada e o inventário voltou para o lote.' : 'The reservation was cancelled and inventory returned to the batch.'}
         </div>
       ) : null}
 
@@ -199,7 +199,7 @@ export function PaymentSection({
               </div>
               <div className="mt-2 text-sm leading-6 text-white/66">
                 {isPortuguese
-                  ? 'O pagamento já foi enviado ao provedor. Assim que o webhook confirmar a transação, o pedido avancara automaticamente.'
+                  ? 'O pagamento já foi enviado ao provedor. Assim que o webhook confirmar a transação, o pedido avançará automaticamente.'
                   : 'The payment has already been sent to the provider. As soon as the webhook confirms the transaction, the order will advance automatically.'}
               </div>
             </div>

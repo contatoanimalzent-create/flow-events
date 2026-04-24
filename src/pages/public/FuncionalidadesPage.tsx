@@ -28,7 +28,7 @@ const FEATURES = [
     icon: Users,
     titlePt: 'Gestão de Staff',
     titleEn: 'Staff Management',
-    descPt: 'Convide por link, defina funcoes e permissões, registre ponto e acompanhe presença em tempo real.',
+    descPt: 'Convide por link, defina funções e permissões, registre ponto e acompanhe presença em tempo real.',
     descEn: 'Invite via link, set roles and permissions, clock in/out and track presence in real time.',
   },
   {
@@ -63,7 +63,7 @@ const FEATURES = [
     icon: CreditCard,
     titlePt: 'Pagamento Antecipado',
     titleEn: 'Early Payment',
-    descPt: 'Repasse em D+2, conciliacao automática de transações e exportacao contabil pronta para uso.',
+    descPt: 'Repasse em D+2, conciliação automática de transações e exportacao contábil pronta para uso.',
     descEn: 'Transfer in D+2, automatic transaction reconciliation and accounting exports ready to use.',
   },
   {
@@ -224,7 +224,7 @@ export function FuncionalidadesPage({ onLogin }: { onLogin: () => void }) {
                   href="/create-event"
                   className="inline-flex items-center gap-2 rounded-full bg-[#0057E7] px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-[0_16px_40px_rgba(0,87,231,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#4285F4]"
                 >
-                  {isPortuguese ? 'Criar evento gratis' : 'Create free event'}
+                  {isPortuguese ? 'Criar evento grátis' : 'Create free event'}
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a

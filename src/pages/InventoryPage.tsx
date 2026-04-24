@@ -146,7 +146,7 @@ export function InventoryPage() {
             <div className="text-[11px] uppercase tracking-[0.32em] text-[#0057E7]">Papel do módulo</div>
             <div className="mt-4 font-display text-[2rem] leading-none text-text-primary">Disponibilidade real.</div>
             <p className="mt-4 text-sm leading-7 text-text-muted">
-              Leia o que precisa de reposicao, o que já travou a operação e quanto capital esta parado no estoque.
+              Leia o que precisa de reposicao, o que já travou a operação e quanto capital está parado no estoque.
             </p>
           </div>
           <div className="card p-5">

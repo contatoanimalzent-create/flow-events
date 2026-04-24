@@ -30,7 +30,7 @@ const STEPS = [
     icon: Tag,
     titlePt: 'Configure ingressos e lotes',
     titleEn: 'Set up tickets and batches',
-    descPt: 'Crie multiplos lotes com preços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida.',
+    descPt: 'Crie múltiplos lotes com preços diferentes. A virada de lote acontece automaticamente por data ou por quantidade vendida.',
     descEn: 'Create multiple batches with different prices. Batch turnover happens automatically by date or sold quantity.',
   },
   {
@@ -73,7 +73,7 @@ const ROLES = [
     titleEn: 'Supervisor',
     bulletsPt: [
       'Ve o health score do evento ao vivo',
-      'Aprova ocorrências e decisões criticas',
+      'Aprova ocorrências e decisões críticas',
       'Acompanha mapa e posição da equipe',
     ],
     bulletsEn: [
@@ -246,7 +246,7 @@ export function ComoFuncionaPage({ onLogin }: { onLogin: () => void }) {
                 <QrCode className="h-8 w-8 text-[#4285F4]" />
               </div>
               <h2 className="text-[clamp(2.6rem,5vw,4.8rem)] font-bold leading-[0.88] tracking-[-0.04em] text-white">
-                {isPortuguese ? 'Crie seu primeiro evento gratis.' : 'Create your first event for free.'}
+                {isPortuguese ? 'Crie seu primeiro evento grátis.' : 'Create your first event for free.'}
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-base leading-8 text-white/50">
                 {isPortuguese
@@ -258,7 +258,7 @@ export function ComoFuncionaPage({ onLogin }: { onLogin: () => void }) {
                   href="/create-event"
                   className="inline-flex items-center gap-2 rounded-full bg-[#0057E7] px-7 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-[0_16px_40px_rgba(0,87,231,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#4285F4]"
                 >
-                  {isPortuguese ? 'Criar evento gratis' : 'Create free event'}
+                  {isPortuguese ? 'Criar evento grátis' : 'Create free event'}
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a

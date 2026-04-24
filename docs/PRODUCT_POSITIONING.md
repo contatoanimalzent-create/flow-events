@@ -4,7 +4,7 @@
 
 Animalz Events é um Event Operating System: a plataforma que conecta venda, operação, gestão, financeiro, growth e inteligência em uma única camada de execução para empresas que vivem de eventos.
 
-Ele não foi desenhado para apenas emitir ingressos. Foi desenhado para operar a cadeia completa do negócio de eventos, da configuração comercial do evento até a análise de margem, performance e repetibilidade operacional. A proposta central e transformar eventos em uma operação coordenada, auditavel e escalavel, com uma única fonte de verdade.
+Ele não foi desenhado para apenas emitir ingressos. Foi desenhado para operar a cadeia completa do negócio de eventos, da configuração comercial do evento até a análise de margem, performance e repetibilidade operacional. A proposta central e transformar eventos em uma operação coordenada, auditável e escalável, com uma única fonte de verdade.
 
 ## Categoria Do Produto
 
@@ -25,7 +25,7 @@ O Animalz Events e para operadores profissionais de eventos, não para o organiz
 - produtoras e promotoras com portfolio de eventos recorrentes;
 - grupos com várias marcas, unidades de negócio ou cidades;
 - festivais, feiras, congressos, experiências proprietarias e eventos corporativos de alta complexidade;
-- operações com multiplas equipes: comercial, operação, financeiro, growth e atendimento;
+- operações com múltiplas equipes: comercial, operação, financeiro, growth e atendimento;
 - empresas que já sentem o limite de trabalhar com planilha e ferramentas desconectadas.
 
 ### Compradores E Usuários-Chave
@@ -34,12 +34,12 @@ O Animalz Events e para operadores profissionais de eventos, não para o organiz
 - head de eventos ou gerente de produção que precisa padronizacao operacional;
 - financeiro que precisa previsibilidade de receita, taxa, repasse e margem;
 - growth e marketing que precisam conectar campanha a receita e presença real;
-- time de campo que precisa check-in rápido, confiável e auditavel.
+- time de campo que precisa check-in rápido, confiável e auditável.
 
 ### Perfil De Cliente Ideal
 
 - opera mais de um evento por ano;
-- possui recorrencia ou ambicao clara de escalar;
+- possui recorrência ou ambição clara de escalar;
 - precisa governança, rastreabilidade e dado confiável;
 - valoriza ganho operacional e margem, não apenas volume bruto de venda.
 
@@ -73,7 +73,7 @@ Enquanto o mercado costuma vender ferramentas separadas, o Animalz Events entreg
 - o ingresso vendido já nasce conectado ao participante, ao canal, ao evento e a receita;
 - o check-in não e apenas leitura de QR, e confirmação de presença com impacto operacional e analitico;
 - o financeiro não fecha no escuro, ele acompanha taxa, repasse, custo e margem sobre a operação real;
-- growth não mede so topo de funil, mede conversão em receita e comparecimento;
+- growth não mede só topo de funil, mede conversão em receita e comparecimento;
 - a gestão não consulta dashboards desconectados, ela decide sobre uma verdade única.
 
 Isso cria quatro vantagens competitivas:
@@ -81,7 +81,7 @@ Isso cria quatro vantagens competitivas:
 - menor friccao operacional;
 - maior confiabilidade de dado;
 - aumento de margem por controle e automação;
-- custo de troca alto, porque o valor esta na integração profunda da operação.
+- custo de troca alto, porque o valor está na integração profunda da operação.
 
 ## Tese Estrategica
 
@@ -89,7 +89,7 @@ Isso cria quatro vantagens competitivas:
 
 O futuro da industria de eventos pertence a quem controlar a operação inteira, não apenas a transação de compra.
 
-Ticketing isolado virou commodity. O ganho real esta em dominar o sistema que coordena a execução, protege margem, acelera decisão e melhora a qualidade da operação a cada novo evento.
+Ticketing isolado virou commodity. O ganho real está em dominar o sistema que coordena a execução, protege margem, acelera decisão e melhora a qualidade da operação a cada novo evento.
 
 ### O Que O Produto Precisa Ser
 
@@ -100,7 +100,7 @@ Ticketing isolado virou commodity. O ganho real esta em dominar o sistema que co
 
 ### Aposta Estrategica
 
-O Animalz Events deve nascer com ambicao global e postura de plataforma:
+O Animalz Events deve nascer com ambição global e postura de plataforma:
 
 - multi-tenant por organização;
 - multi-evento por portfolio;

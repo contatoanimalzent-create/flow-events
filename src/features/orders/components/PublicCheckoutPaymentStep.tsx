@@ -112,7 +112,7 @@ export function PublicCheckoutPaymentStep(props: PublicCheckoutPaymentStepProps)
   if (!stripePromise) {
     return (
       <div className="rounded-[24px] border border-[#eadaba] bg-[#faf4e7] px-5 py-4 text-sm text-[#6d5324]">
-        A chave pública do Stripe não esta configurada neste ambiente.
+        A chave pública do Stripe não está configurada neste ambiente.
       </div>
     )
   }

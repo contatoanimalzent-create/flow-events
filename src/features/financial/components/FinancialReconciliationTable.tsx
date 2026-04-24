@@ -13,7 +13,7 @@ export function FinancialReconciliationTable({ rows, selectedEventId }: Financia
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">SEM DIVERGENCIAS</div>
-        <p className="mt-2 text-sm text-text-muted">Nenhuma pendencia de conciliacao encontrada para o filtro atual.</p>
+        <p className="mt-2 text-sm text-text-muted">Nenhuma pendencia de conciliação encontrada para o filtro atual.</p>
       </div>
     )
   }

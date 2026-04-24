@@ -70,7 +70,7 @@ export function GrowthPage() {
           title={t('Unable to load growth', 'Não foi possível carregar crescimento')}
           description={t(
             'Review the growth migration or try again in a moment to recover the cockpit.',
-            'Revise a migracao de crescimento ou tente novamente em instantes para recuperar o painel.',
+            'Revise a migração de crescimento ou tente novamente em instantes para recuperar o painel.',
           )}
           className="mt-8"
         />
@@ -119,7 +119,7 @@ export function GrowthPage() {
           <p className="novare-stage-copy">
             {t(
               'Every share can become an attributed link, every exit can capture a lead, and every conversion can feed internal notifications and future automations.',
-              'Cada compartilhamento pode virar um link atribuido, cada saída pode capturar um contato e cada conversão pode alimentar notificacoes internas e automações futuras.',
+              'Cada compartilhamento pode virar um link atribuido, cada saída pode capturar um contato e cada conversão pode alimentar notificações internas e automações futuras.',
             )}
           </p>
         </div>
@@ -137,7 +137,7 @@ export function GrowthPage() {
           </div>
           <div className="novare-stage-copy">
             <p>{t('Shareable links carry referral attribution when an authenticated user generates an invite.', 'Links compartilhaveis levam atribuicao de indicação quando um usuário autenticado gera um convite.')}</p>
-            <p className="mt-3">{t('Leads captured by the public layer feed this cockpit and can trigger existing notifications and campaigns.', 'Contatos capturados pela camada pública alimentam este painel e podem disparar notificacoes e campanhas existentes.')}</p>
+            <p className="mt-3">{t('Leads captured by the public layer feed this cockpit and can trigger existing notifications and campaigns.', 'Contatos capturados pela camada pública alimentam este painel e podem disparar notificações e campanhas existentes.')}</p>
             <p className="mt-3">{t('Checkout conversions return to operations as attributable proof of growth.', 'Conversoes da compra retornam para a operação como prova atribuivel de crescimento.')}</p>
           </div>
         </div>

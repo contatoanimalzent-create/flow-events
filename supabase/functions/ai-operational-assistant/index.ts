@@ -38,7 +38,7 @@ const SECTION_GUIDES: Record<string, string> = {
   events: 'Módulo de eventos para agenda, portfolio, publicação e configuração geral do evento.',
   tickets: 'Módulo de ingressos para lotes, preços, ocupacao e configuração comercial do acesso.',
   sales: 'Módulo de vendas para pedidos, pagamentos, emissão e acompanhamento do caixa comercial.',
-  crm: 'Módulo de relacionamento para público, recorrencia, audiencia, histórico e acionamento.',
+  crm: 'Módulo de relacionamento para público, recorrência, audiencia, histórico e acionamento.',
   checkin: 'Módulo de credenciamento e acesso. Aqui entram filas, leitura de ingresso, válidação e exceções.',
   staff: 'Módulo de equipe operacional. Aqui entram cadastro, escala, turno, área, credencial e permissões.',
   suppliers: 'Módulo de fornecedores e parceiros externos da operação.',
@@ -108,7 +108,7 @@ function buildInstructions(section: string) {
     'Não invente funcionalidades inexistentes. Quando algo não estiver confirmado, diga que e uma recomendação operacional.',
     'Priorize orientar o usuário dentro do app: qual módulo usar, o próximo passo e o que evitar.',
     `Módulo atual: ${section}. Guia do módulo atual: ${SECTION_GUIDES[section] ?? 'Ajuda operacional geral do produto.'}`,
-    'Diferencas criticas do produto: PDV vende; Estoque controla saldo e ruptura; Staff cuida da equipe operacional; Credenciamento cuida do acesso do público.',
+    'Diferencas críticas do produto: PDV vende; Estoque controla saldo e ruptura; Staff cuida da equipe operacional; Credenciamento cuida do acesso do público.',
     'Se o usuário parecer irritado, mantenha calma e seja ainda mais objetiva.',
     'Responda em no máximo 6 frases curtas.',
   ].join('\n')

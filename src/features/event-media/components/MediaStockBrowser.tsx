@@ -14,7 +14,7 @@ const SUGGESTIONS = [
   'show ao vivo',
   'multidao',
   'palco',
-  'musica',
+  'música',
   'corporativo',
   'summit',
   'evento',

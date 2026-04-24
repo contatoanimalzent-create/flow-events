@@ -48,7 +48,7 @@ export function AuditFeedPanel() {
       </div>
 
       {audit.entries.length === 0 ? (
-        <div className="rounded-2xl border border-bg-border bg-white/80 p-5 text-center text-sm text-text-muted">Nenhuma atividade auditavel registrada ainda.</div>
+        <div className="rounded-2xl border border-bg-border bg-white/80 p-5 text-center text-sm text-text-muted">Nenhuma atividade auditável registrada ainda.</div>
       ) : (
         <div className="space-y-2">
           <div className="max-h-80 space-y-2 overflow-y-auto">

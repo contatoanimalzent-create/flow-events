@@ -178,8 +178,8 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
             <label className="text-sm font-medium text-[var(--pulse-color-text-primary)]">Email</label>
             <input
               {...register('email', {
-                required: 'Informe um email valido.',
-                validate: (value) => validateEmail(value) || 'Formato de email invalido.',
+                required: 'Informe um email válido.',
+                validate: (value) => validateEmail(value) || 'Formato de email inválido.',
               })}
               className={inputClassName}
               placeholder="você@email.com"
@@ -193,7 +193,7 @@ export function EventSignupForm({ eventId, availableTickets, className }: EventS
             name="phone"
             rules={{
               required: 'Informe seu telefone.',
-              validate: (value) => validatePhone(value) || 'Telefone invalido.',
+              validate: (value) => validatePhone(value) || 'Telefone inválido.',
             }}
             render={({ field }) => (
               <div>

@@ -57,7 +57,7 @@ export function BillingPage() {
           title={t('Loading monetization', 'Carregando monetização')}
           description={t(
             'We are consolidating plan, usage and revenue for this organization.',
-            'Estamos consolidando plano, uso e receita para esta organização.',
+            'Estamos consolidando plano, uso e receita para está organização.',
           )}
         />
       </AdminPageLayout>
@@ -225,7 +225,7 @@ export function BillingPage() {
             <div className="mt-6 rounded-[1.5rem] border border-dashed border-bg-border px-5 py-8 text-sm text-text-muted">
               {t(
                 'As soon as events are configured, this área will show the fee strategy used in each experience.',
-                'Assim que os eventos forem configurados, esta área passa a mostrar a estratégia de taxa usada em cada experiência.',
+                'Assim que os eventos forem configurados, está área passa a mostrar a estratégia de taxa usada em cada experiência.',
               )}
             </div>
           )}
@@ -238,7 +238,7 @@ export function BillingPage() {
           title={t('Producer plans', 'Planos de produtor')}
           description={t(
             'The subscription base is now structured in its own table, with limits and features already feeding the product.',
-            'A base de assinatura agora esta estruturada em tabela própria, com limites e recursos que já alimentam o produto.',
+            'A base de assinatura agora está estruturada em tabela própria, com limites e recursos que já alimentam o produto.',
           )}
         />
 
@@ -261,7 +261,7 @@ export function BillingPage() {
           title={t('Fee configuration by event', 'Configuração de taxas por evento')}
           description={t(
             'A single panel to quickly see who is passing the fee to the buyer and who is absorbing it in the payout.',
-            'Um painel único para ver rapidamente quem esta repassando taxa ao comprador e quem a absorve dentro do repasse.',
+            'Um painel único para ver rapidamente quem está repassando taxa ao comprador e quem a absorve dentro do repasse.',
           )}
         />
 

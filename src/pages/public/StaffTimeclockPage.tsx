@@ -681,7 +681,7 @@ export function StaffTimeclockPage() {
         <div className="flex items-center gap-3 border-b border-red-500/30 bg-red-500/10 px-5 py-3">
           <WifiOff className="h-5 w-5 shrink-0 text-red-400" />
           <p className="text-xs leading-snug text-red-300">
-            Localização bloqueada. Habilite o GPS nas configurações do navegador para usar esta página.
+            Localização bloqueada. Habilite o GPS nas configurações do navegador para usar está página.
           </p>
         </div>
       )}

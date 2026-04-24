@@ -43,7 +43,7 @@ export function CampaignDraftsTable({ drafts, onEdit, onDelete, onLaunch, launch
               <td className="table-cell text-xs text-text-secondary">{CAMPAIGN_CHANNEL_LABELS[draft.channel]}</td>
               <td className="table-cell text-xs text-text-secondary">{draft.segment?.name ?? 'Segmento livre'}</td>
               <td className="table-cell font-mono text-brand-acid">{draft.audience_count}</td>
-              <td className="table-cell text-[11px] text-text-muted">{draft.scheduled_at ? formatDate(draft.scheduled_at, 'dd/MM/yyyy HH:mm') : 'Sem horario definido'}</td>
+              <td className="table-cell text-[11px] text-text-muted">{draft.scheduled_at ? formatDate(draft.scheduled_at, 'dd/MM/yyyy HH:mm') : 'Sem horário definido'}</td>
               <td className="table-cell">
                 <div className="flex justify-end gap-2">
                   <button onClick={() => onLaunch(draft)} disabled={launchingDraftId === draft.id} className="btn-secondary text-xs">

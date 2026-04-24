@@ -119,7 +119,7 @@ export function AccountPage() {
                       events={overview.pastEvents}
                       activeEventId={selectedEventId}
                       onSelect={setSelectedEventId}
-                      emptyTitle={t('Your history is still empty', 'Seu histórico ainda esta vazio')}
+                      emptyTitle={t('Your history is still empty', 'Seu histórico ainda está vazio')}
                       emptyDescription={t(
                         'After your first event, this space becomes your memory of experiences already lived.',
                         'Depois do primeiro evento, este espaco vira sua memoria de experiências já vividas.',

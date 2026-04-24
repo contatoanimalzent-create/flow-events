@@ -224,7 +224,7 @@ export const intelligenceService = {
   async acknowledgeAlert(input: AcknowledgeIntelligenceAlertInput) {
     return intelligenceApi.request('acknowledge_alert', async () => {
       if (!input.alertId) {
-        throw new IntelligenceServiceError('Alerta invalido para acknowledgement.', 'alert_acknowledgement_invalid')
+        throw new IntelligenceServiceError('Alerta inválido para acknowledgement.', 'alert_acknowledgement_invalid')
       }
 
       const result = await supabase

@@ -1,7 +1,7 @@
 {
   "name": "Pulse",
   "short_name": "Pulse",
-  "description": "Ingressos para os melhores eventos de cultura, gastronomia, musica e lifestyle.",
+  "description": "Ingressos para os melhores eventos de cultura, gastronomia, música e lifestyle.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -34,7 +34,7 @@
       "name": "Ver eventos",
       "short_name": "Eventos",
       "url": "/events",
-      "description": "Explorar todos os eventos disponiveis"
+      "description": "Explorar todos os eventos disponíveis"
     },
     {
       "name": "Criar evento",

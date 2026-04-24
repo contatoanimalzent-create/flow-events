@@ -52,7 +52,7 @@ export function CheckoutForm({ buyer, setBuyerField }: CheckoutFormProps) {
           {isPortuguese ? 'Dados do comprador' : 'Buyer details'}
         </div>
         <div className="mt-4 font-display text-[2.4rem] font-semibold uppercase leading-[0.92] tracking-[-0.04em] text-white">
-          {isPortuguese ? 'Quem recebe esta experiência?' : 'Who receives this experience?'}
+          {isPortuguese ? 'Quem recebe está experiência?' : 'Who receives this experience?'}
         </div>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/66">
           {isPortuguese

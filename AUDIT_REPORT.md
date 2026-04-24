@@ -54,7 +54,7 @@ Foi realizada auditoria completa de **todas as 27 páginas** do produto Animalz 
 
 ### 3. ❌ LoadingState - CRÍTICO (Afeta múltiplas páginas)
 **Problema:**
-- Copy genérica e técnica: "Estamos preparando esta experiência"
+- Copy genérica e técnica: "Estamos preparando está experiência"
 - Afeta HomePage, EventsCatalogPage, AboutPage, CreateEventPage
 - Minava sensação premium
 
@@ -166,7 +166,7 @@ Foi realizada auditoria completa de **todas as 27 páginas** do produto Animalz 
 ### Melhorias Implementadas
 
 **Removido:**
-- ❌ "Estamos preparando esta experiência" (genérico)
+- ❌ "Estamos preparando está experiência" (genérico)
 - ❌ "Carregando eventos" (técnico)
 - ❌ "🚧 Em breve disponível" (unprofessional)
 - ❌ "Montando o cockpit de aquisição" (internal language)

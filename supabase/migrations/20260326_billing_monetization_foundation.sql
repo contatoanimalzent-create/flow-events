@@ -54,7 +54,7 @@ VALUES
   (
     'business',
     'Business',
-    'Suite para operacoes com white-label, integrações e governanca avancada.',
+    'Suite para operações com white-label, integrações e governanca avancada.',
     499,
     'monthly',
     '["standard_checkout","premium_checkout","advanced_analytics","campaign_automation","priority_support","white_label","api_access","custom_domain"]'::JSONB,

@@ -149,7 +149,7 @@
     /* Previne scroll horizontal em qualquer device (mobile/Capacitor) */
     overflow-x: hidden;
     max-width: 100vw;
-    /* iOS: evita ajuste automatico de tamanho de texto ao rotacionar */
+    /* iOS: evita ajuste automático de tamanho de texto ao rotacionar */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }

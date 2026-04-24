@@ -21,7 +21,7 @@ export function CheckinHistoryModal({ digitalTicketId, onClose }: CheckinHistory
             Histórico de acesso<span className="admin-title-accent">.</span>
           </>
         }
-        subtitle="Linha do tempo operacional do ingresso, com tentativas, saidas e motivos."
+        subtitle="Linha do tempo operacional do ingresso, com tentativas, saídas e motivos."
         onClose={onClose}
       />
 

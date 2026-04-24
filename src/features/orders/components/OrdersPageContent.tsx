@@ -200,7 +200,7 @@ export function OrdersPageContent() {
           description={
             search || statusFilter !== 'all' || methodFilter !== 'all'
               ? 'Nenhum resultado para os filtros aplicados.'
-              : 'Os pedidos aparecerao aqui quando as vendas iniciarem.'
+              : 'Os pedidos aparecerão aqui quando as vendas iniciarem.'
           }
           icon={<Ticket className="mb-3 h-10 w-10 text-text-muted" />}
         />

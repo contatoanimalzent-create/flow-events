@@ -12,7 +12,7 @@ export function CheckinStatsGrid({ stats }: CheckinStatsGridProps) {
       {[
         { label: 'Dentro agora', value: formatNumber(stats.currentOccupancy), icon: Users, color: 'text-brand-acid', big: true },
         { label: 'Total entradas', value: formatNumber(stats.totalIn), icon: DoorOpen, color: 'text-status-success' },
-        { label: 'Total saidas', value: formatNumber(stats.totalOut), icon: DoorOpen, color: 'text-brand-blue' },
+        { label: 'Total saídas', value: formatNumber(stats.totalOut), icon: DoorOpen, color: 'text-brand-blue' },
         { label: 'Taxa de sucesso', value: `${stats.successRate}%`, icon: Activity, color: 'text-status-success' },
         { label: 'Tentativas invalidas', value: formatNumber(stats.invalidAttempts), icon: AlertTriangle, color: 'text-status-error' },
       ].map((stat) => {

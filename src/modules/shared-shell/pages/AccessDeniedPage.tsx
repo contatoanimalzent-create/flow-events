@@ -46,7 +46,7 @@ export default function AccessDeniedPage({ onNavigate }: PulsePageProps) {
           maxWidth: '22rem',
         }}
       >
-        Você não tem permissão para acessar esta área.
+        Você não tem permissão para acessar está área.
       </p>
 
       <button

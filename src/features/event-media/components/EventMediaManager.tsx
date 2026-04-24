@@ -205,13 +205,13 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
           }
           onSetCover={(asset) =>
             void setCoverAsset(asset).then(
-              () => setFeedback({ type: 'success', message: 'A nova capa ativa do evento já esta publicada.' }),
+              () => setFeedback({ type: 'success', message: 'A nova capa ativa do evento já está publicada.' }),
               (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Não foi possível definir a capa principal.' }),
             )
           }
           onSetHero={(asset) =>
             void setHeroAsset(asset).then(
-              () => setFeedback({ type: 'success', message: 'O hero principal já esta ativo na landing pública.' }),
+              () => setFeedback({ type: 'success', message: 'O hero principal já está ativo na landing pública.' }),
               (error) => setFeedback({ type: 'error', message: error instanceof Error ? error.message : 'Não foi possível definir o hero principal.' }),
             )
           }

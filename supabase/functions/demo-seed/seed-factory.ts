@@ -515,7 +515,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
     organization_id: DEMO_ORGANIZATION_ID,
     name: 'Animalz Nocturne Sessions 2026',
     slug: DEMO_EVENT_SLUG,
-    subtitle: 'Uma experiência urbana premium com musica, gastronomia, hospitalidade e operação em escala.',
+    subtitle: 'Uma experiência urbana premium com música, gastronomia, hospitalidade e operação em escala.',
     short_description:
       'Um megaevento urbano de alta energia que combina show principal, arte imersiva, lounges premium, gastronomia curada e uma operação enterprise pensada para milhares de convidados.',
     full_description:
@@ -969,7 +969,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
         device_id: `scanner-exit-${(index % 4) + 1}`,
         reason_code: 'ticket_valid',
         was_offline: false,
-        notes: 'Saída temporaria liberada',
+        notes: 'Saída temporária liberada',
         metadata: { demo: true, flow: 'exit' },
         result: 'success',
         checked_in_at: exitAt,
@@ -1261,7 +1261,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       status: 'scheduled',
       scheduled_at: isoFromNow(185, 12, 0),
       paid_out_at: null,
-      notes: 'Repasse principal agendado após fechamento de divergencias menores.',
+      notes: 'Repasse principal agendado após fechamento de divergências menores.',
     },
   ]
 
@@ -1296,7 +1296,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
       divergences_resolved: false,
       result_validated: false,
       closed_at: null,
-      notes: 'Fechamento aguardando reconciliacao final do bar e catering.',
+      notes: 'Fechamento aguardando reconciliação final do bar e catering.',
     },
   ]
 
@@ -1489,7 +1489,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
 
   const campaignDrafts = [
     ['Early Access VIP', 0, 'email', 'Abertura antecipada para o lounge premium', 'Liberamos uma janela privada para upgrade VIP antes do próximo drop.'],
-    ['Final lote urgency', 3, 'email', 'Ultimas unidades premium do lineup', 'O último lote esta acelerando e a disponibilidade mudou nas ultimas horas.'],
+    ['Final lote urgency', 3, 'email', 'Ultimas unidades premium do lineup', 'O último lote está acelerando e a disponibilidade mudou nas ultimas horas.'],
     ['Post-event reengagement', 5, 'email', 'Priority list para a próxima experience', 'Queremos te colocar no topo da lista da próxima flagship.'],
     ['No-show recovery', 1, 'email', 'Sua energia merece uma nova chance', 'Preparamos uma oferta de retorno para reduzir friccao e reativar sua jornada.'],
     ['Hospitality offer', 2, 'email', 'Hospitality tables para convidados chave', 'Abrimos novas mesas corporativas com concierge e bottle service.'],
@@ -1554,7 +1554,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
         recipient_email: customer.email,
         recipient_phone: customer.phone,
         status,
-        error_message: status === 'failed' ? 'Bounce simulado para o ambiente demo.' : status === 'skipped' ? 'Cliente sem canal priorizado para esta etapa.' : null,
+        error_message: status === 'failed' ? 'Bounce simulado para o ambiente demo.' : status === 'skipped' ? 'Cliente sem canal priorizado para está etapa.' : null,
         provider_message_id: status === 'pending' ? null : `mail_demo_${runIndex}_${index}`,
         payload_snapshot: {
           demo: true,
@@ -1616,7 +1616,7 @@ export function buildDemoSeedData(params: DemoSeedParams = {}): SeedCollection {
     ['payment.refund', 'payment', payments.find((payment) => payment.status === 'refunded')?.id, 'Reembolso parcial processado no lote de Arena', 'warning'],
     ['staff.credentials_issued', 'staff', staffMembers[4].id, 'Credenciais emitidas para time de acessos', 'info'],
     ['campaign.launched', 'campaign', campaignRuns[1].id, 'Campanha Final lote urgency colocada em execução', 'info'],
-    ['financial.forecast_updated', 'financial', financialForecasts[0].id, 'Forecast ajustado após revisao de catering', 'warning'],
+    ['financial.forecast_updated', 'financial', financialForecasts[0].id, 'Forecast ajustado após revisão de catering', 'warning'],
     ['event_media.updated', 'event_media_asset', eventAssets[1].id, 'Hero video atualizado para a landing pública', 'info'],
   ].map(([action, entityType, entityId, description, severity], index) => ({
     id: stableUuid(`audit-log-${index}`),

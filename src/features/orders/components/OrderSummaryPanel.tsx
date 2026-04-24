@@ -132,7 +132,7 @@ export function OrderSummaryPanel({
 
         <div className="mt-6 space-y-3">
           {[
-            { icon: Lock, text: isPortuguese ? 'Reserva com expiracao automática' : 'Reservation with automatic expiration' },
+            { icon: Lock, text: isPortuguese ? 'Reserva com expiração automática' : 'Reservation with automatic expiration' },
             { icon: Ticket, text: isPortuguese ? 'Inventario controlado por lote' : 'Batch-controlled inventory' },
             { icon: Check, text: isPortuguese ? 'Emissão automática após confirmação' : 'Automatic issuance after confirmation' },
           ].map((item) => {

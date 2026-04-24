@@ -18,7 +18,7 @@ export function CreateEventLanding({ onLogin, events }: CreateEventLandingProps)
   useSeoMeta({
     title: isPortuguese ? 'Criar evento | Pulse' : 'Create event | Pulse',
     description: isPortuguese
-      ? 'Publique seu evento, venda ingressos e gerencie tudo em um lugar so. Pagamento, credenciamento, financeiro e dados do seu público.'
+      ? 'Publique seu evento, venda ingressos e gerencie tudo em um lugar só. Pagamento, credenciamento, financeiro e dados do seu público.'
       : 'Publish your event, sell tickets and manage everything in one place. Checkout, check-in, finance and audience data together.',
     image: events[0]?.mediaPresentation.coverAsset?.secure_url ?? events[0]?.cover_url ?? null,
     url: typeof window !== 'undefined' ? window.location.href : '/create-event',

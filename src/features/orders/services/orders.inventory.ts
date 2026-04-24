@@ -102,7 +102,7 @@ async function reserveBatchInventoryFallback(batchId: string, quantity: number) 
       const available = batch.quantity - batch.sold_count - batch.reserved_count
 
       if (!batch.is_active) {
-        throw new OrdersServiceError('O lote selecionado esta inativo', 'ticket_batch_inactive')
+        throw new OrdersServiceError('O lote selecionado está inativo', 'ticket_batch_inactive')
       }
 
       if (available < quantity) {
@@ -124,7 +124,7 @@ async function reserveBatchInventoryFallback(batchId: string, quantity: number) 
       }
     }
 
-    throw new OrdersServiceError('Falha ao reservar inventario do lote', 'ticket_batch_reservation_failed')
+    throw new OrdersServiceError('Falha ao reservar inventário do lote', 'ticket_batch_reservation_failed')
   }, { batchId, quantity })
 }
 
@@ -148,7 +148,7 @@ async function releaseBatchInventoryFallback(batchId: string, quantity: number) 
       }
     }
 
-    throw new OrdersServiceError('Falha ao liberar inventario reservado', 'ticket_batch_release_failed')
+    throw new OrdersServiceError('Falha ao liberar inventário reservado', 'ticket_batch_release_failed')
   }, { batchId, quantity })
 }
 
@@ -158,7 +158,7 @@ async function captureBatchInventoryFallback(batchId: string, quantity: number) 
       const batch = await getBatchInventory(batchId)
 
       if (batch.reserved_count < quantity) {
-        throw new OrdersServiceError('A reserva do lote não esta mais disponível para confirmação', 'ticket_batch_reservation_missing')
+        throw new OrdersServiceError('A reserva do lote não está mais disponível para confirmação', 'ticket_batch_reservation_missing')
       }
 
       const result = await supabase
@@ -179,7 +179,7 @@ async function captureBatchInventoryFallback(batchId: string, quantity: number) 
       }
     }
 
-    throw new OrdersServiceError('Falha ao capturar o inventario reservado', 'ticket_batch_capture_failed')
+    throw new OrdersServiceError('Falha ao capturar o inventário reservado', 'ticket_batch_capture_failed')
   }, { batchId, quantity })
 }
 

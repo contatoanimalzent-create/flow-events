@@ -28,7 +28,7 @@ export function FinancialPayoutsTable({ reports, onEditPayout }: FinancialPayout
     return (
       <div className="card p-16 text-center">
         <div className="font-display text-2xl text-text-primary">NENHUM REPASSE</div>
-        <p className="mt-2 text-sm text-text-muted">Assim que os eventos venderem, os repasses aparecerao aqui para revisao.</p>
+        <p className="mt-2 text-sm text-text-muted">Assim que os eventos venderem, os repasses aparecerão aqui para revisão.</p>
       </div>
     )
   }

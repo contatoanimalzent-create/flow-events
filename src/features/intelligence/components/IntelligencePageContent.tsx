@@ -44,7 +44,7 @@ export function IntelligencePageContent() {
           { label: 'Alertas ativos', value: dashboard.overview?.summary.active_alerts_count ?? 0, sublabel: 'sinais abertos', color: 'text-status-warning' },
           { label: 'Criticos', value: dashboard.overview?.summary.critical_alerts_count ?? 0, sublabel: 'exigem ação rápida', color: 'text-status-error' },
           { label: 'Eventos em risco', value: dashboard.overview?.summary.high_risk_events_count ?? 0, sublabel: 'overall health < 60', color: 'text-brand-acid' },
-          { label: 'Issues de dados', value: dashboard.overview?.summary.consistency_issues_count ?? 0, sublabel: 'consistencia operacional', color: 'text-brand-purple' },
+          { label: 'Issues de dados', value: dashboard.overview?.summary.consistency_issues_count ?? 0, sublabel: 'consistência operacional', color: 'text-brand-purple' },
           { label: 'Criticas de dados', value: dashboard.overview?.summary.critical_consistency_issues_count ?? 0, sublabel: 'impacto enterprise', color: 'text-status-error' },
         ].map((card) => (
           <div key={card.label} className="card p-4">

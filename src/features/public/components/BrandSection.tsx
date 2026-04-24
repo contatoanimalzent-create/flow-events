@@ -10,7 +10,7 @@ export function BrandSection() {
       icon: Compass,
       title: isPortuguese ? 'Eventos com critério' : 'Events with intent',
       description: isPortuguese
-        ? 'Eventos de cultura, gastronomia, musica e lifestyle com curadoria. So entra o que merece a sua presença.'
+        ? 'Eventos de cultura, gastronomia, música e lifestyle com curadoria. So entra o que merece a sua presença.'
         : 'Curated events across culture, gastronomy, music and lifestyle. Only what deserves your presence.',
     },
     {

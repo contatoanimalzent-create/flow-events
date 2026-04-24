@@ -84,7 +84,7 @@ export function TicketOptionCard({
             {batch.price === 0 ? (isPortuguese ? 'Gratuito' : 'Free') : formatPublicCurrency(batch.price, locale)}
           </div>
           <div className="mt-2 text-xs text-white/52">
-            {formatPublicNumber(available, locale)} {isPortuguese ? 'disponiveis' : 'available'} / {isPortuguese ? 'limite' : 'max'} {maxPerOrder} {isPortuguese ? 'por pedido' : 'per order'}
+            {formatPublicNumber(available, locale)} {isPortuguese ? 'disponíveis' : 'available'} / {isPortuguese ? 'limite' : 'max'} {maxPerOrder} {isPortuguese ? 'por pedido' : 'per order'}
           </div>
         </div>
 
@@ -205,7 +205,7 @@ export function EventTicketPanelPremium({
             </h2>
             <p className="mt-4 text-base leading-8 text-white/68 md:text-lg">
               {isPortuguese
-                ? 'Cada opcao abaixo reflete disponibilidade, regras e inventario reais. A apresentacao ficou premium; a operação continua precisa.'
+                ? 'Cada opcao abaixo reflete disponibilidade, regras e inventário reais. A apresentacao ficou premium; a operação continua precisa.'
                 : 'Each option below reflects real availability, rules and inventory. The presentation is premium; the operation remains precise.'}
             </p>
           </div>
@@ -269,10 +269,10 @@ export function EventTicketPanelPremium({
                 <p className="mt-5 text-sm leading-7 text-white/66">
                   {cartQty > 0
                     ? isPortuguese
-                      ? 'Revise a selecao e siga para a compra. A reserva de inventario acontece no passo seguinte.'
+                      ? 'Revise a selecao e siga para a compra. A reserva de inventário acontece no passo seguinte.'
                       : 'Review your selection and continue to checkout. Inventory reservation happens in the next step.'
                     : isPortuguese
-                      ? 'Adicione uma ou mais opcoes ao carrinho para liberar a compra e reservar o inventario no momento certo.'
+                      ? 'Adicione uma ou mais opcoes ao carrinho para liberar a compra e reservar o inventário no momento certo.'
                       : 'Add one or more options to unlock checkout and reserve inventory at the right moment.'}
                 </p>
 
@@ -326,7 +326,7 @@ export function EventTicketPanelPremium({
 
                 <div className="mt-6 space-y-3 text-sm leading-7 text-white/66">
                   {[
-                    isPortuguese ? 'Reserva temporaria de inventario durante a compra' : 'Temporary inventory reservation in checkout',
+                    isPortuguese ? 'Reserva temporária de inventário durante a compra' : 'Temporary inventory reservation in checkout',
                     isPortuguese ? 'Pagamento protegido e emissão automática do ticket digital' : 'Protected payment and automatic digital ticket issuance',
                     isFreeMode
                       ? isPortuguese ? 'Inscrição validada por QR code' : 'Registration validated by QR code'

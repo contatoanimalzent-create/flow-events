@@ -25,12 +25,12 @@
   front mais aspiracional,
   mobile mais imersivo,
   backoffice mais executivo.
-- Principios:
+- Princípios:
   sistema primeiro,
   precisao premium,
   poder editorial,
   calma operacional,
-  consistencia tematizavel.
+  consistência tematizavel.
 
 ## 3. Product architecture
 

@@ -32,7 +32,7 @@ export function FinancialExecutiveCards({ overview }: FinancialExecutiveCardsPro
     {
       label: 'Divergencias',
       value: String(overview.divergence_count),
-      sublabel: `${overview.pending_reconciliation_count} pendencias em conciliacao`,
+      sublabel: `${overview.pending_reconciliation_count} pendências em conciliação`,
       icon: AlertTriangle,
       color: overview.divergence_count > 0 ? 'text-status-warning' : 'text-brand-blue',
     },

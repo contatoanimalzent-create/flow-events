@@ -44,7 +44,7 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
   useSeoMeta({
     title: isPortuguese ? 'Planos e Preços | Pulse' : 'Plans & Pricing | Pulse',
     description: isPortuguese
-      ? 'Comece gratis. Pague so quando vender. Planos flexiveis para eventos de todos os tamanhos.'
+      ? 'Comece grátis. Pague só quando vender. Planos flexíveis para eventos de todos os tamanhos.'
       : 'Start free. Pay only when you sell. Flexible plans for events of all sizes.',
   })
 
@@ -62,7 +62,7 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-white/58">
             {isPortuguese
-              ? 'Comece gratis. Escale conforme seu evento cresce. So paga quando vender.'
+              ? 'Comece grátis. Escale conforme seu evento cresce. So paga quando vender.'
               : 'Start free. Scale as your event grows. Pay only when you sell.'}
           </p>
         </div>
@@ -83,7 +83,7 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
               <div className="mt-1 text-sm text-white/40">{isPortuguese ? 'por mes' : 'per month'}</div>
               <p className="mt-5 text-sm leading-7 text-white/50">
                 {isPortuguese
-                  ? 'Para quem esta comecando e quer testar a plataforma sem compromisso.'
+                  ? 'Para quem está comecando e quer testar a plataforma sem compromisso.'
                   : 'For those just starting out who want to test the platform without commitment.'}
               </p>
               <ul className="mt-7 space-y-3">
@@ -112,7 +112,7 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
                 onClick={onLogin}
                 className="mt-8 w-full rounded-full border border-white/18 py-3 text-sm font-medium text-white transition-all hover:bg-white/8"
               >
-                {isPortuguese ? 'Comecar gratis' : 'Start for free'}
+                {isPortuguese ? 'Comecar grátis' : 'Start for free'}
               </button>
             </div>
 
@@ -164,7 +164,7 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
                 href="/create-event"
                 className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#0057E7] py-3 text-sm font-bold text-white shadow-[0_10px_30px_rgba(0,87,231,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#4285F4]"
               >
-                {isPortuguese ? 'Comecar gratis' : 'Start for free'}
+                {isPortuguese ? 'Comecar grátis' : 'Start for free'}
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>

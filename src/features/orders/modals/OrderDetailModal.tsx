@@ -226,7 +226,7 @@ export function OrderDetailModal({
         open={confirmCancelOpen}
         title="Cancelar pedido"
         description={`O pedido #${order.id.slice(0, 8).toUpperCase()} deixara de seguir no fluxo comercial.`}
-        impact="Pagamentos, emissão digital e acompanhamento operacional deste comprador podem precisar de nova revisao após o cancelamento."
+        impact="Pagamentos, emissão digital e acompanhamento operacional deste comprador podem precisar de nova revisão após o cancelamento."
         confirmLabel="Cancelar pedido"
         confirming={cancelling}
         onCancel={() => setConfirmCancelOpen(false)}

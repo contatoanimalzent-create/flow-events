@@ -52,7 +52,7 @@ const SECTION_PROMPTS: Record<NavSection, string[]> = {
   events: ['Como publicar um evento?', 'Onde ajusto agenda e local?', 'Como revisar configuração?'],
   tickets: ['Como montar lotes?', 'Onde mexo em preços?', 'Como abrir novos ingressos?'],
   sales: ['Como acompanhar pagamentos?', 'Onde vejo pedidos?', 'Como agir em venda travada?'],
-  crm: ['Como organizar público?', 'Onde encontro recorrencia?', 'Como trabalhar relacionamento?'],
+  crm: ['Como organizar público?', 'Onde encontro recorrência?', 'Como trabalhar relacionamento?'],
   checkin: ['Como acompanhar filas?', 'Onde vejo leituras em tempo real?', 'Como tratar uma exceção no acesso?'],
   staff: ['Como cadastrar a equipe?', 'Onde aloco por turno?', 'Como emitir credencial?'],
   suppliers: ['Como organizar fornecedores?', 'Onde controlar parceiros?', 'Como registrar entregas?'],
@@ -69,7 +69,7 @@ const SECTION_PROMPTS: Record<NavSection, string[]> = {
   sponsors: ['Como organizar cotas?', 'Onde acompanho patrocinadores ativos?', 'Como registrar entregas de marca?'],
   coupons: ['Como criar um cupom?', 'Onde vejo usos por cupom?', 'Como limitar desconto por pedido?'],
   waitlist: ['Como notificar a lista de espera?', 'Onde vejo posicoes?', 'Como converter espera em venda?'],
-  map: ['Como ver a ocupacao ao vivo?', 'Onde monitoro o staff?', 'Como identificar zonas criticas?'],
+  map: ['Como ver a ocupacao ao vivo?', 'Onde monitoro o staff?', 'Como identificar zonas críticas?'],
   organizations: ['Como configurar a organização?', 'Onde gerencio membros?', 'Como rever permissões?'],
   community: ['Como moderar o feed?', 'Onde gerencio anuncios?', 'Como ativar networking?'],
   monetization: ['Como criar uma oferta?', 'Onde vejo receita interna?', 'Como ativar ativacoes de marca?'],
@@ -149,7 +149,7 @@ function buildFallbackReply(query: string, section: NavSection) {
   }
 
   if (normalized.includes('estoque') || normalized.includes('ruptura') || normalized.includes('repos')) {
-    return 'Estoque e o centro de controle dos itens. Ele mostra saldo, threshold, itens criticos e risco operacional. O time comercial continua vendendo no PDV, sem misturar a leitura.'
+    return 'Estoque e o centro de controle dos itens. Ele mostra saldo, threshold, itens críticos e risco operacional. O time comercial continua vendendo no PDV, sem misturar a leitura.'
   }
 
   if (normalized.includes('staff') || normalized.includes('equipe') || normalized.includes('cadastro') || normalized.includes('credencial')) {

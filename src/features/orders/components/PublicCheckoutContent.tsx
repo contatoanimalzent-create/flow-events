@@ -270,7 +270,7 @@ export function PublicCheckoutContent({
         void expireDraft()
           .then(() => {
       clearPaymentState()
-      setError(isPortuguese ? 'Sua reserva expirou e o inventario foi devolvido aos lotes disponíveis.' : 'Your reservation has expired and inventory has been returned to the available batches.')
+      setError(isPortuguese ? 'Sua reserva expirou e o inventário foi devolvido aos lotes disponíveis.' : 'Your reservation has expired and inventory has been returned to the available batches.')
             setPhase('form')
             setCurrentStep(2)
           })
@@ -332,7 +332,7 @@ export function PublicCheckoutContent({
     if (paymentStatus.isCancelled || paymentStatus.isExpired) {
       markPaymentStatus(paymentStatus.isCancelled ? 'cancelled' : null)
       clearPaymentState()
-      setError(isPortuguese ? 'O pagamento não foi concluido e a reserva não esta mais ativa.' : 'Payment was not completed and the reservation is no longer active.')
+      setError(isPortuguese ? 'O pagamento não foi concluido e a reserva não está mais ativa.' : 'Payment was not completed and the reservation is no longer active.')
       setPhase('form')
       setCurrentStep(2)
       return
@@ -487,14 +487,14 @@ export function PublicCheckoutContent({
           ? phase === 'payment'
             ? isPortuguese ? 'Finalize a compra.' : 'Complete your purchase.'
             : phase === 'processing'
-              ? isPortuguese ? 'Sua transação esta em processamento.' : 'Your transaction is being processed.'
-              : isPortuguese ? 'Sua reserva esta pronta.' : 'Your reservation is ready.'
+              ? isPortuguese ? 'Sua transação está em processamento.' : 'Your transaction is being processed.'
+              : isPortuguese ? 'Sua reserva está pronta.' : 'Your reservation is ready.'
           : isPortuguese ? 'Compra concluida.' : 'Purchase completed.'
 
   const introDescription =
     currentStep === 1
       ? isPortuguese
-        ? 'Compare acessos, disponibilidade e valor em um fluxo direto, com inventario validado em tempo real.'
+        ? 'Compare acessos, disponibilidade e valor em um fluxo direto, com inventário validado em tempo real.'
         : 'Compare access options, availability and pricing in a direct flow with real-time validated inventory.'
       : currentStep === 2
         ? isPortuguese
@@ -502,7 +502,7 @@ export function PublicCheckoutContent({
           : 'We kept only the essential fields to reserve, pay and issue tickets with confidence.'
       : phase === 'processing'
           ? isPortuguese
-            ? 'O processador esta tratando a transação. Assim que a confirmação chegar, os ingressos digitais serao emitidos automaticamente.'
+            ? 'O processador está tratando a transação. Assim que a confirmação chegar, os ingressos digitais serão emitidos automaticamente.'
             : 'The gateway is processing the transaction. As soon as confirmation arrives, digital tickets will be issued automatically.'
       : event.absorb_fee
             ? isPortuguese
@@ -566,7 +566,7 @@ export function PublicCheckoutContent({
                   <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-white/62">
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2">
                       <ShieldCheck className="h-4 w-4 text-[#ff6a5c]" />
-                      {isPortuguese ? 'Reserva protegida e inventario sincronizado por lote' : 'Protected reservation with batch-synced inventory'}
+                      {isPortuguese ? 'Reserva protegida e inventário sincronizado por lote' : 'Protected reservation with batch-synced inventory'}
                     </div>
                     {countdown && phase !== 'form' ? (
                       <div className="inline-flex items-center rounded-full border border-[#ff2d2d]/24 bg-[#ff2d2d]/10 px-4 py-2 text-white">

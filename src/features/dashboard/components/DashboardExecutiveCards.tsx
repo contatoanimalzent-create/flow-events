@@ -15,7 +15,7 @@ export function DashboardExecutiveCards({ summary }: DashboardExecutiveCardsProp
         { label: 'Margem', value: `${summary.marginPercent.toFixed(1)}%`, icon: Percent, color: summary.marginPercent >= 0 ? 'text-brand-blue' : 'text-status-error' },
         { label: 'Eventos ativos', value: formatNumber(summary.activeEvents), icon: Users, color: 'text-brand-purple' },
         { label: 'Campanhas rodando', value: formatNumber(summary.runningCampaigns), icon: Megaphone, color: 'text-brand-blue' },
-        { label: 'Alertas criticos', value: formatNumber(summary.criticalAlerts), icon: AlertTriangle, color: summary.criticalAlerts > 0 ? 'text-status-error' : 'text-status-success' },
+        { label: 'Alertas críticos', value: formatNumber(summary.criticalAlerts), icon: AlertTriangle, color: summary.criticalAlerts > 0 ? 'text-status-error' : 'text-status-success' },
         { label: 'Check-ins', value: formatNumber(summary.totalCheckins), icon: Activity, color: 'text-brand-teal' },
         { label: 'Clientes ativos', value: formatNumber(summary.totalCustomers), icon: Users, color: 'text-text-primary' },
       ].map((card) => {

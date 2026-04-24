@@ -62,7 +62,7 @@ function readAgendaItems(
           title: readString(item.title, isPortuguese ? `Momento ${index + 1}` : `Session ${index + 1}`),
           description: readString(
             item.description,
-            isPortuguese ? 'Mais detalhes desta etapa serao divulgados na abertura do evento.' : 'More details for this segment will be announced closer to the event.',
+            isPortuguese ? 'Mais detalhes desta etapa serão divulgados na abertura do evento.' : 'More details for this segment will be announced closer to the event.',
           ),
           category: readString(item.category, isPortuguese ? 'Destaque' : 'Featured'),
         }
@@ -107,7 +107,7 @@ function readAgendaItems(
       time: endsAt ? formatPublicTime(endsAt, locale) : isPortuguese ? 'Encerramento' : 'Closing',
       title: isPortuguese ? 'Fechamento da jornada' : 'Closing moment',
       description: isPortuguese
-        ? 'Último chamado, orientacoes finais e transicao elegante para a saída.'
+        ? 'Último chamado, orientações finais e transicao elegante para a saída.'
         : 'Final call, closing notes and an elegant transition into departure.',
       category: isPortuguese ? 'Final' : 'Finale',
     },
@@ -156,7 +156,7 @@ function readFaqItems(settings: Record<string, unknown>, isPortuguese: boolean):
     {
       question: isPortuguese ? 'Receberei informações de acesso antes do evento?' : 'Will I receive access details before the event?',
       answer: isPortuguese
-        ? 'Sim. Orientacoes de acesso, horario e documentos exigidos podem ser compartilhados por e-mail ou WhatsApp conforme configuração do produtor.'
+        ? 'Sim. Orientacoes de acesso, horário e documentos exigidos podem ser compartilhados por e-mail ou WhatsApp conforme configuração do produtor.'
         : 'Yes. Access guidance, timing and required documents can be shared by email or WhatsApp based on the producer setup.',
     },
   ]
@@ -227,7 +227,7 @@ function NotFoundState({ isPortuguese }: { isPortuguese: boolean }) {
           </h1>
           <p className="mt-4 text-base leading-8 text-[var(--pulse-color-text-secondary)]">
             {isPortuguese
-              ? 'O link pode ter expirado ou esta experiência não esta mais pública.'
+              ? 'O link pode ter expirado ou está experiência não está mais pública.'
               : 'This link may have expired or the experience is no longer public.'}
           </p>
           <a

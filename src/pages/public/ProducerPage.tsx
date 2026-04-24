@@ -33,7 +33,7 @@ const FEATURES = [
     icon: Users,
     titlePt: 'Gestão de equipe',
     titleEn: 'Team management',
-    descPt: 'Convide staff via link, defina funcoes e permissões, controle ponto e avalie performance após o evento.',
+    descPt: 'Convide staff via link, defina funções e permissões, controle ponto e avalie performance após o evento.',
     descEn: 'Invite staff via link, set roles and permissions, track attendance and evaluate performance after the event.',
   },
   {
@@ -47,7 +47,7 @@ const FEATURES = [
     icon: CreditCard,
     titlePt: 'Financeiro integrado',
     titleEn: 'Integrated finance',
-    descPt: 'Receita bruta, taxas, repasses e conciliacao automática. Exportacao contabil pronta para seu escritorio.',
+    descPt: 'Receita bruta, taxas, repasses e conciliação automática. Exportacao contábil pronta para seu escritório.',
     descEn: 'Gross revenue, fees, transfers and automatic reconciliation. Accounting exports ready for your office.',
   },
   {
@@ -73,7 +73,7 @@ const FEATURES = [
   },
   {
     icon: Zap,
-    titlePt: 'Comunicacao e notificacoes',
+    titlePt: 'Comunicacao e notificações',
     titleEn: 'Communication and notifications',
     descPt: 'Emails automáticos de confirmação, lembretes pré-evento e mensagens segmentadas para sua base.',
     descEn: 'Automatic confirmation emails, pre-event reminders and segmented messages to your audience.',
@@ -261,13 +261,13 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
                     'Zero custo para comecar, pague apenas quando vender',
                     'Checkout com taxa de conversão superior a 94%',
                     'Check-in por QR Code em menos de 2 segundos',
-                    'Controle financeiro com conciliacao automática',
+                    'Controle financeiro com conciliação automática',
                     'Gestão completa de equipe com convites por link',
                     'Dashboard executivo em tempo real',
                     'Página pública personalizada para cada evento',
                     'Suporte operacional 24/7 durante o evento',
                     'CRM com histórico completo de participantes',
-                    'Relatórios exportaveis para contabilidade',
+                    'Relatórios exportáveis para contabilidade',
                   ]
                 : [
                     'Zero cost to start, pay only when you sell',

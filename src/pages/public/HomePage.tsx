@@ -196,8 +196,8 @@ export function HomePage({ onLogin }: HomePageProps) {
     target: heroRef,
     offset: ['start start', 'end start'],
   })
-  const heroY = useTransform(heroProgress, [0, 1], ['0%', '28%'])
-  const heroOpacity = useTransform(heroProgress, [0, 0.7], [1, 0])
+  const heroY = useTransform(heroProgress, [0, 1], ['0%', '12%'])
+  const heroOpacity = useTransform(heroProgress, [0, 1], [1, 0.82])
 
   // Phone mockup parallax
   const phoneRef = useRef<HTMLDivElement>(null)
@@ -283,7 +283,7 @@ export function HomePage({ onLogin }: HomePageProps) {
             ref={heroRef}
             style={{
               position: 'relative',
-              height: '100vh',
+              height: 'min(880px, 92svh)',
               minHeight: '640px',
               overflow: 'hidden',
               display: 'flex',
@@ -318,7 +318,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                 position: 'absolute',
                 inset: 0,
                 background:
-                  'linear-gradient(to bottom, rgba(6,11,24,0.75) 0%, transparent 40%, rgba(6,11,24,0.95) 100%)',
+                  'linear-gradient(to bottom, rgba(6,11,24,0.72) 0%, rgba(6,11,24,0.18) 42%, rgba(6,11,24,0.72) 100%)',
                 zIndex: 1,
               }}
             />

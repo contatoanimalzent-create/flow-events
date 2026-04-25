@@ -72,17 +72,17 @@ export function slugify(text: string): string {
 
 export const eventStatusLabels: Record<string, { label: string; color: string }> = {
   draft:     { label: 'Rascunho',   color: 'muted'   },
-  review:    { label: 'Em revisão', color: 'warning'  },
-  published: { label: 'Publicado',  color: 'success'  },
-  ongoing:   { label: 'Em andamento', color: 'teal'   },
-  finished:  { label: 'Encerrado',  color: 'muted'    },
-  archived:  { label: 'Arquivado',  color: 'muted'    },
-  cancelled: { label: 'Cancelado',  color: 'error'    },
+  review:    { label: 'Em revisão', color: 'warning' },
+  published: { label: 'Publicado',  color: 'success' },
+  ongoing:   { label: 'Em andamento', color: 'teal'  },
+  finished:  { label: 'Encerrado',  color: 'muted'   },
+  archived:  { label: 'Arquivado',  color: 'muted'   },
+  cancelled: { label: 'Cancelado',  color: 'error'   },
 }
 
 export const orderStatusLabels: Record<string, { label: string; color: string }> = {
   pending:            { label: 'Pendente',   color: 'warning' },
-  processing:         { label: 'Processando', color: 'info'   },
+  processing:         { label: 'Processando', color: 'info'  },
   paid:               { label: 'Pago',       color: 'success' },
   failed:             { label: 'Falhou',     color: 'error'   },
   cancelled:          { label: 'Cancelado',  color: 'muted'   },
@@ -92,11 +92,11 @@ export const orderStatusLabels: Record<string, { label: string; color: string }>
 }
 
 export const ticketStatusLabels: Record<string, { label: string; color: string }> = {
-  pending:     { label: 'Pendente',     color: 'warning' },
-  confirmed:   { label: 'Confirmado',   color: 'success' },
-  cancelled:   { label: 'Cancelado',    color: 'muted'   },
-  refunded:    { label: 'Reembolsado',  color: 'purple'  },
-  used:        { label: 'Utilizado',    color: 'info'    },
-  transferred: { label: 'Transferido',  color: 'teal'    },
-  expired:     { label: 'Expirado',     color: 'error'   },
+  pending:     { label: 'Pendente',    color: 'warning' },
+  confirmed:   { label: 'Confirmado',  color: 'success' },
+  cancelled:   { label: 'Cancelado',   color: 'muted'   },
+  refunded:    { label: 'Reembolsado', color: 'purple'  },
+  used:        { label: 'Utilizado',   color: 'info'    },
+  transferred: { label: 'Transferido', color: 'teal'    },
+  expired:     { label: 'Expirado',    color: 'error'   },
 }

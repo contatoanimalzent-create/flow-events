@@ -80,31 +80,30 @@ export function EventsPublicHeader({
           className,
         )}
       >
-        <div className="relative mx-auto flex max-w-[1540px] items-center justify-between gap-4 px-6 py-3 md:px-8 lg:px-10 xl:px-14">
-          <a href="/" className="group relative z-10 inline-flex min-w-0 shrink-0 items-center" aria-label="Pulse">
-            <span className="pointer-events-none absolute -left-8 top-1/2 hidden h-24 w-44 -translate-y-1/2 rounded-full bg-[#0057E7]/12 blur-3xl transition-opacity duration-500 group-hover:opacity-90 md:block" />
+        <div className="mx-auto flex max-w-[1540px] items-center justify-between gap-5 px-5 py-4 md:px-8 lg:px-10">
+          <a href="/" className="group inline-flex items-center" aria-label="Pulse">
             <img
               src="/logo.png"
               alt="Pulse"
               className={cn(
-                'relative z-10 w-auto max-w-[138px] object-contain transition-all duration-500 group-hover:scale-[1.035] md:max-w-[160px]',
-                compact ? 'h-10 md:h-11 xl:h-12' : 'h-11 md:h-12 xl:h-14',
+                'w-auto object-contain transition-all duration-300 group-hover:scale-[1.02]',
+                compact ? 'h-11 md:h-12' : 'h-14 md:h-16',
                 /* sempre branca, header agora é sempre dark */
-                'brightness-0 invert drop-shadow-[0_0_22px_rgba(255,255,255,0.2)]',
+                'brightness-0 invert',
               )}
             />
           </a>
 
-          <nav className="absolute left-1/2 top-1/2 hidden max-w-[min(44vw,520px)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-white/[0.045] p-1 shadow-[0_18px_55px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl xl:flex">
+          <nav className="hidden items-center gap-1 xl:flex">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300',
+                  'rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-300',
                   isActive(link.href)
-                    ? 'bg-white/[0.11] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]'
-                    : 'text-white/66 hover:bg-white/[0.07] hover:text-white',
+                    ? 'bg-white/[0.08] text-white'
+                    : 'text-white/58 hover:bg-white/[0.05] hover:text-white',
                 )}
               >
                 {link.label}
@@ -112,7 +111,7 @@ export function EventsPublicHeader({
             ))}
           </nav>
 
-          <div className="relative z-10 flex shrink-0 items-center gap-2">
+          <div className="flex items-center gap-2">
             {actionSlot ? <div className="hidden xl:flex">{actionSlot}</div> : null}
 
             <div className="relative hidden md:block">

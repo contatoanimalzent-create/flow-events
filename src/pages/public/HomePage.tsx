@@ -8,7 +8,6 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
   CheckCircle2,
-  ChevronDown,
   QrCode,
   Users,
   Activity,
@@ -491,38 +490,6 @@ export function HomePage({ onLogin }: HomePageProps) {
                   Ver demonstração
                 </motion.button>
               </motion.div>
-            </motion.div>
-
-            {/* Scroll indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-              className="bounce-arrow"
-              style={{
-                position: 'absolute',
-                bottom: '2.5rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '0.3rem',
-              }}
-            >
-              <span
-                style={{
-                  fontSize: '0.6rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.25em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(240,232,214,0.35)',
-                }}
-              >
-                scroll
-              </span>
-              <ChevronDown size={18} style={{ color: 'rgba(240,232,214,0.4)' }} />
             </motion.div>
           </section>
 

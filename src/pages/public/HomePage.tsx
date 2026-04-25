@@ -290,7 +290,7 @@ export function HomePage({ onLogin }: HomePageProps) {
               alignItems: 'center',
               justifyContent: 'center',
               boxSizing: 'border-box',
-              paddingTop: 'clamp(5.5rem, 10vh, 7rem)',
+              padding: 'clamp(7.5rem, 13vh, 9.25rem) 1.5rem clamp(3rem, 7vh, 5rem)',
             }}
           >
             {/* Video background with parallax */}
@@ -351,10 +351,9 @@ export function HomePage({ onLogin }: HomePageProps) {
                 position: 'relative',
                 zIndex: 10,
                 textAlign: 'center',
-                padding: '0 1.5rem',
-                maxWidth: '900px',
+                width: '100%',
+                maxWidth: '1120px',
                 opacity: heroOpacity,
-                transform: 'translateY(1.2rem)',
               }}
             >
               {/* Eyebrow */}
@@ -393,10 +392,10 @@ export function HomePage({ onLogin }: HomePageProps) {
                 transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   margin: 0,
-                  fontSize: 'clamp(4rem, 9vw, 10rem)',
+                  fontSize: 'clamp(3.3rem, 7.3vw, 8.25rem)',
                   fontWeight: 900,
-                  lineHeight: 0.9,
-                  letterSpacing: '-0.04em',
+                  lineHeight: 0.92,
+                  letterSpacing: '-0.03em',
                   color: '#F0E8D6',
                 }}
               >

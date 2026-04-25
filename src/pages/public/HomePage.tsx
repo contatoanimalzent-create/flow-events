@@ -540,13 +540,53 @@ export function HomePage({ onLogin }: HomePageProps) {
           ══════════════════════════════════════════════════════════════════ */}
           <section
             style={{
+              position: 'relative',
               overflow: 'hidden',
-              padding: '1.1rem 0',
+              padding: '1.25rem 0',
               borderTop: '1px solid rgba(255,255,255,0.05)',
               borderBottom: '1px solid rgba(255,255,255,0.05)',
-              background: 'rgba(6,11,24,0.95)',
+              background:
+                'linear-gradient(180deg, rgba(6,11,24,0.98) 0%, rgba(4,8,18,0.96) 100%)',
             }}
           >
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '1px',
+                background:
+                  'linear-gradient(90deg, transparent 0%, rgba(201,168,76,0.28) 18%, rgba(255,226,138,0.95) 50%, rgba(201,168,76,0.28) 82%, transparent 100%)',
+                boxShadow: '0 0 18px rgba(232,208,138,0.34)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: 0,
+                width: 'min(72rem, 78vw)',
+                height: '1px',
+                transform: 'translateX(-50%)',
+                background:
+                  'linear-gradient(90deg, transparent 0%, rgba(201,168,76,0.22) 12%, rgba(255,226,138,0.88) 50%, rgba(201,168,76,0.22) 88%, transparent 100%)',
+                boxShadow: '0 -8px 28px rgba(201,168,76,0.16)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                width: 'min(34rem, 44vw)',
+                height: '5rem',
+                transform: 'translate(-50%, -50%)',
+                background:
+                  'radial-gradient(ellipse at center, rgba(201,168,76,0.10), transparent 68%)',
+                pointerEvents: 'none',
+              }}
+            />
             <div className="marquee-track">
               {Array.from({ length: 3 }).flatMap((_, i) =>
                 ['CHECK-IN', 'STAFF', 'INGRESSOS', 'SUPERVISOR', 'RELATÓRIOS', 'PULSE'].map(

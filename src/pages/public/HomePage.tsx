@@ -289,6 +289,8 @@ export function HomePage({ onLogin }: HomePageProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxSizing: 'border-box',
+              paddingTop: 'clamp(5.5rem, 10vh, 7rem)',
             }}
           >
             {/* Video background with parallax */}
@@ -352,6 +354,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                 padding: '0 1.5rem',
                 maxWidth: '900px',
                 opacity: heroOpacity,
+                transform: 'translateY(1.2rem)',
               }}
             >
               {/* Eyebrow */}

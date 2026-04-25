@@ -1,5 +1,5 @@
 /**
- * Pulse, HomePage premium (world-class marketing)
+ * Pulse, HomePage
  * Referência: Rolls-Royce Whispers, NIO, Ferrari, Aston Martin, Pagani
  * Stack: React 18 · TypeScript · Framer Motion ^12 · GSAP 3.15
  */
@@ -243,7 +243,7 @@ export function HomePage({ onLogin }: HomePageProps) {
   const numbersInView = useInView(numbersRef, { once: true, margin: '-100px' })
 
   useSeoMeta({
-    title: 'Pulse | Plataforma de Eventos Premium',
+    title: 'Pulse | Plataforma de Eventos',
     description:
       'Gestão completa de eventos: check-in, staff, ingressos e supervisão em tempo real. A plataforma que opera como uma marca de supercarros.',
     image: '/PULSE-LOGO-PRINCIPAL-FUNDO-PRETO.png',
@@ -380,7 +380,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                     textShadow: '0 12px 34px rgba(201,168,76,0.22)',
                   }}
                 >
-                  Operação premium para eventos ao vivo
+                  Do ingresso ao check-in, tudo no controle
                 </span>
               </motion.div>
 

@@ -355,47 +355,33 @@ export function HomePage({ onLogin }: HomePageProps) {
                 opacity: heroOpacity,
               }}
             >
-              {/* Badge */}
+              {/* Eyebrow */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.65rem' }}
               >
-                <div
+                <span
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.4rem 1.1rem',
-                    borderRadius: '999px',
-                    border: '1px solid rgba(201,168,76,0.35)',
-                    background: 'rgba(201,168,76,0.08)',
-                    backdropFilter: 'blur(12px)',
+                    width: 42,
+                    height: 1,
+                    background: 'linear-gradient(90deg, rgba(201,168,76,0), rgba(201,168,76,0.95))',
+                    display: 'inline-block',
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 650,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(232,208,138,0.92)',
+                    textShadow: '0 12px 34px rgba(201,168,76,0.22)',
                   }}
                 >
-                  <span
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      background: '#C9A84C',
-                      display: 'inline-block',
-                      boxShadow: '0 0 8px 2px rgba(201,168,76,0.6)',
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: '0.68rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.3em',
-                      textTransform: 'uppercase',
-                      color: '#C9A84C',
-                    }}
-                  >
-                    PULSE · PLATAFORMA DE EVENTOS
-                  </span>
-                </div>
+                  Operação premium para eventos ao vivo
+                </span>
               </motion.div>
 
               {/* H1 */}

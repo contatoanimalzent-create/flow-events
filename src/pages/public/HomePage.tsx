@@ -436,59 +436,101 @@ export function HomePage({ onLogin }: HomePageProps) {
                 style={{
                   marginTop: '2.5rem',
                   display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                   gap: '1rem',
-                  justifyContent: 'center',
-                  flexWrap: 'wrap',
                 }}
               >
-                <motion.a
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <motion.a
                   href="/create-event"
                   data-cursor="magnetic"
-                  data-cursor-text="Criar"
-                  whileHover={{ scale: 1.04, y: -2 }}
+                  data-cursor-text="Pulse"
+                  whileHover={{ scale: 1.045, y: -2 }}
                   whileTap={{ scale: 0.97 }}
-                  className="glow-btn"
+                  className="group"
                   style={{
+                    position: 'relative',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    background: '#C9A84C',
-                    color: '#060B18',
+                    justifyContent: 'center',
+                    minWidth: 250,
+                    overflow: 'hidden',
+                    background: 'linear-gradient(100deg, #D9B84F 0%, #F0BD4E 45%, #F7DC86 100%)',
+                    color: '#050814',
                     fontWeight: 800,
                     fontSize: '1rem',
                     padding: '1rem 2rem',
                     borderRadius: '999px',
+                    border: '1px solid rgba(255,238,172,0.45)',
                     textDecoration: 'none',
                     letterSpacing: '-0.01em',
+                    boxShadow: '0 18px 42px rgba(201,168,76,0.24), inset 0 1px 0 rgba(255,255,255,0.42)',
                   }}
                 >
-                  Crie seu evento
-                </motion.a>
-                <motion.button
+                  <span
+                    style={{
+                      position: 'absolute',
+                      inset: '-35%',
+                      background: 'radial-gradient(circle at 50% 50%, rgba(255,220,112,0.52), transparent 58%)',
+                      filter: 'blur(18px)',
+                      opacity: 0.42,
+                    }}
+                  />
+                  <span style={{ position: 'relative', zIndex: 1 }}>Iniciar no Pulse</span>
+                  </motion.a>
+                  <motion.button
                   type="button"
                   onClick={onLogin}
                   data-cursor="magnetic"
                   data-cursor-text="Demo"
-                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileHover={{ scale: 1.045, y: -2 }}
                   whileTap={{ scale: 0.97 }}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    background: 'rgba(240,232,214,0.05)',
+                    justifyContent: 'center',
+                    minWidth: 250,
+                    overflow: 'hidden',
+                    background: 'linear-gradient(135deg, rgba(240,232,214,0.11), rgba(240,232,214,0.035))',
                     color: '#F0E8D6',
-                    fontWeight: 700,
+                    fontWeight: 750,
                     fontSize: '1rem',
                     padding: '1rem 2rem',
                     borderRadius: '999px',
-                    border: '1px solid rgba(240,232,214,0.18)',
+                    border: '1px solid rgba(240,232,214,0.2)',
                     cursor: 'pointer',
-                    backdropFilter: 'blur(8px)',
+                    backdropFilter: 'blur(14px)',
                     letterSpacing: '-0.01em',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 16px 40px rgba(0,0,0,0.18)',
                   }}
                 >
-                  Ver demonstração
+                  Acessar demonstração
                 </motion.button>
+                </div>
+                <motion.p
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    margin: 0,
+                    color: 'rgba(240,232,214,0.46)',
+                    fontSize: '0.76rem',
+                    fontWeight: 650,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    textAlign: 'center',
+                  }}
+                >
+                  Gestão completa · Tempo real · Inteligência operacional
+                </motion.p>
               </motion.div>
             </motion.div>
           </section>

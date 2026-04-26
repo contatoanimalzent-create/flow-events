@@ -113,14 +113,13 @@ function NavButton({
         'group flex w-full items-start gap-3 rounded-lg border px-3 py-2.5 text-left transition-all duration-200',
         isActive
           ? [
-              'border-[rgba(0,87,231,0.18)]',
-              'bg-[rgba(0,87,231,0.06)]',
-              'shadow-sm',
+              'border-[rgba(0,87,231,0.22)]',
+              'bg-[rgba(0,87,231,0.10)]',
             ]
           : [
               'border-transparent',
-              'hover:border-[#E5E7EB]',
-              'hover:bg-[#F7F8FA]',
+              'hover:border-[rgba(240,232,214,0.07)]',
+              'hover:bg-[rgba(240,232,214,0.04)]',
             ],
       )}
     >
@@ -130,16 +129,16 @@ function NavButton({
           'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-all duration-200',
           isActive
             ? [
-                'border-[rgba(0,87,231,0.22)]',
-                'bg-[rgba(0,87,231,0.10)]',
-                'text-[#0057E7]',
+                'border-[rgba(0,87,231,0.28)]',
+                'bg-[rgba(0,87,231,0.14)]',
+                'text-[#4285F4]',
               ]
             : [
-                'border-[#E5E7EB]',
-                'bg-[#F7F8FA]',
-                'text-[#9CA3AF]',
-                'group-hover:border-[#D1D5DB]',
-                'group-hover:text-[#44475A]',
+                'border-[rgba(240,232,214,0.07)]',
+                'bg-[rgba(240,232,214,0.03)]',
+                'text-[rgba(240,232,214,0.35)]',
+                'group-hover:border-[rgba(240,232,214,0.12)]',
+                'group-hover:text-[rgba(240,232,214,0.70)]',
               ],
         )}
       >
@@ -151,7 +150,7 @@ function NavButton({
         <div
           className={cn(
             'text-sm font-semibold leading-none tracking-[-0.01em] transition-colors',
-            isActive ? 'text-[#0057E7]' : 'text-[#0A0A0A] group-hover:text-[#0A0A0A]',
+            isActive ? 'text-[#4285F4]' : 'text-[rgba(240,232,214,0.75)] group-hover:text-[#F0E8D6]',
           )}
         >
           {item.label}
@@ -160,7 +159,7 @@ function NavButton({
           <div
             className={cn(
               'mt-1.5 text-[11px] leading-4 transition-colors',
-              isActive ? 'text-[#44475A]' : 'text-[#9CA3AF] group-hover:text-[#44475A]',
+              isActive ? 'text-[rgba(240,232,214,0.55)]' : 'text-[rgba(240,232,214,0.35)] group-hover:text-[rgba(240,232,214,0.55)]',
             )}
           >
             {item.blurb}
@@ -188,7 +187,7 @@ function SidebarNav({
       {navGroups.map((group) => (
         <section key={group.label}>
           {/* Group label */}
-          <div className="mb-2 px-3 text-[9px] font-semibold uppercase tracking-[0.38em] text-[#9CA3AF]">
+          <div className="mb-2 px-3 text-[9px] font-semibold uppercase tracking-[0.38em] text-[rgba(240,232,214,0.30)]">
             {group.label}
           </div>
 
@@ -235,16 +234,16 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
 
   /* ── Shared header ── */
   const SidebarHeader = () => (
-    <div className="relative shrink-0 border-b border-[#E5E7EB] px-4 py-4">
+    <div className="relative shrink-0 border-b border-[rgba(240,232,214,0.07)] px-4 py-4">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg overflow-hidden bg-[#0057E7]">
-          <img src="/logo.png" alt="Pulse" className="h-9 w-auto object-contain" />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg overflow-hidden bg-[#060B18] border border-[rgba(201,168,76,0.18)]">
+          <img src="/logo.png" alt="Pulse" className="h-9 w-auto object-contain brightness-0 invert" />
         </div>
         <div className="min-w-0">
-          <div className="text-[9px] font-semibold uppercase tracking-[0.38em] text-[#9CA3AF]">
-            {isPortuguese ? 'Área do produtor' : 'Producer área'}
+          <div className="text-[9px] font-semibold uppercase tracking-[0.38em] text-[rgba(240,232,214,0.35)]">
+            {isPortuguese ? 'Área do produtor' : 'Producer area'}
           </div>
-          <div className="mt-0.5 text-lg font-bold leading-none tracking-[-0.02em] text-[#0A0A0A]">
+          <div className="mt-0.5 text-lg font-bold leading-none tracking-[-0.02em] text-[#F0E8D6]">
             Pulse
           </div>
         </div>
@@ -254,18 +253,18 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
 
   /* ── User card footer ── */
   const UserFooter = () => (
-    <div className="shrink-0 border-t border-[#E5E7EB] px-3 pb-3 pt-2">
-      <div className="flex items-center gap-3 rounded-lg border border-[#E5E7EB] bg-[#F7F8FA] p-3">
+    <div className="shrink-0 border-t border-[rgba(240,232,214,0.07)] px-3 pb-3 pt-2">
+      <div className="flex items-center gap-3 rounded-xl border border-[rgba(240,232,214,0.07)] bg-[rgba(240,232,214,0.03)] p-3">
         {/* Avatar */}
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0057E7] text-xs font-bold text-white">
           {initials || '?'}
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="truncate text-[13px] font-semibold text-[#0A0A0A]">
+          <div className="truncate text-[13px] font-semibold text-[#F0E8D6]">
             {profile?.first_name} {profile?.last_name}
           </div>
-          <div className="truncate text-[11px] text-[#9CA3AF]">
+          <div className="truncate text-[11px] text-[rgba(240,232,214,0.40)]">
             {organization?.name ?? (isPortuguese ? 'Operação principal' : 'Primary operation')}
           </div>
         </div>
@@ -275,7 +274,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
           type="button"
           onClick={() => signOut()}
           title={isPortuguese ? 'Sair' : 'Sign out'}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#9CA3AF] transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[rgba(240,232,214,0.10)] bg-[rgba(240,232,214,0.04)] text-[rgba(240,232,214,0.40)] transition-all hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-400"
         >
           <LogOut className="h-3.5 w-3.5" />
         </button>
@@ -286,7 +285,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
   return (
     <>
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden h-screen w-[300px] shrink-0 flex-col border-r border-[#E5E7EB] bg-white lg:flex">
+      <aside className="hidden h-screen w-[300px] shrink-0 flex-col border-r border-[rgba(240,232,214,0.07)] bg-[#060B18] lg:flex">
         <SidebarHeader />
         <SidebarNav
           activeSection={activeSection}
@@ -308,14 +307,14 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
           />
 
           {/* Drawer */}
-          <aside className="absolute left-0 top-0 flex h-screen w-[88vw] max-w-[320px] flex-col border-r border-[#E5E7EB] bg-white shadow-xl">
+          <aside className="absolute left-0 top-0 flex h-screen w-[88vw] max-w-[320px] flex-col border-r border-[rgba(240,232,214,0.07)] bg-[#060B18] shadow-2xl">
             {/* Mobile header */}
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
+            <div className="flex items-center justify-between border-b border-[rgba(240,232,214,0.07)] px-4 py-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden bg-[#0057E7]">
-                  <img src="/logo.png" alt="Pulse" className="h-8 w-auto object-contain" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden bg-[#060B18] border border-[rgba(201,168,76,0.18)]">
+                  <img src="/logo.png" alt="Pulse" className="h-8 w-auto object-contain brightness-0 invert" />
                 </div>
-                <div className="text-lg font-bold leading-none tracking-[-0.02em] text-[#0A0A0A]">
+                <div className="text-lg font-bold leading-none tracking-[-0.02em] text-[#F0E8D6]">
                   {isPortuguese ? 'Navegação' : 'Navigation'}
                 </div>
               </div>
@@ -323,7 +322,7 @@ export function Sidebar({ activeSection, onNavigate, isOpen, onClose }: SidebarP
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E5E7EB] bg-[#F7F8FA] text-[#44475A] transition-all hover:bg-[#E5E7EB]"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(240,232,214,0.10)] bg-[rgba(240,232,214,0.04)] text-[rgba(240,232,214,0.55)] transition-all hover:bg-[rgba(240,232,214,0.08)]"
               >
                 <X className="h-4 w-4" />
               </button>

@@ -1,7 +1,7 @@
-import { AlertTriangle, RefreshCw } from 'lucide-react'
+import { AlertTriangle, RefreshCw, TrendingUp, Zap } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useDashboardOverview } from '@/features/dashboard/hooks'
-import { PageEmptyState, PageErrorState, PageLoadingState } from '@/shared/components'
+import { PageErrorState, PageLoadingState } from '@/shared/components'
 import { cn, formatCurrency, formatNumber } from '@/shared/lib'
 import { DashboardConversionChart } from './DashboardConversionChart'
 import { DashboardCustomerRankingTable } from './DashboardCustomerRankingTable'
@@ -15,39 +15,51 @@ export function DashboardPageContent() {
   const organization = useAuthStore((state) => state.organization)
   const dashboard = useDashboardOverview(organization?.id)
 
-  if (!organization) {
-    return null
-  }
+  if (!organization) return null
 
   return (
     <div className="admin-page">
-      <div className="admin-header">
-        <div>
-          <div className="admin-eyebrow">Command center</div>
-          <h1 className="admin-title">
-            Dashboard<span className="admin-title-accent">.</span>
-          </h1>
-          <p className="admin-subtitle">Visão executiva de receita, operação, acesso, clientes e governança do evento.</p>
-        </div>
-        <div className="novare-stage-panel-dark">
-          <div className="novare-stage-label">Executive cockpit</div>
-          <div className="novare-stage-title">Receita, ocupacao, risco e ritmo operacional em uma única leitura.</div>
-          <div className="novare-stage-copy">
-            Painel premium para produtores que precisam enxergar caixa, conversão, check-in, alertas e saude da operação sem alternar entre módulos.
+
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div className="reveal border-b border-bg-border pb-8 lg:pb-10">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="admin-eyebrow mb-3">Command center</div>
+            <h1 className="admin-title">
+              Dashboard<span className="admin-title-accent">.</span>
+            </h1>
+            <p className="admin-subtitle mt-3">
+              Receita, operação, acesso e governança em tempo real.
+            </p>
           </div>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <button onClick={() => void dashboard.refresh()} className="btn-primary flex items-center gap-2 text-xs">
-              <RefreshCw className="h-3.5 w-3.5" /> Atualizar
-            </button>
-            <div className="rounded-full border border-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-[#8e847d]">
-              Org {organization.name}
+
+          {/* Ações rápidas */}
+          <div className="flex shrink-0 flex-wrap items-center gap-3">
+            <div
+              className="rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.28em]"
+              style={{ borderColor: 'rgba(240,232,214,0.12)', color: 'rgba(240,232,214,0.45)' }}
+            >
+              {organization.name}
             </div>
+            <button
+              onClick={() => void dashboard.refresh()}
+              className="flex items-center gap-2 rounded-full border px-5 py-2.5 text-xs font-semibold transition-all hover:-translate-y-0.5"
+              style={{
+                background: 'rgba(0,87,231,0.12)',
+                borderColor: 'rgba(0,87,231,0.28)',
+                color: '#4285F4',
+              }}
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Atualizar
+            </button>
           </div>
         </div>
       </div>
 
+      {/* ── Filtros ─────────────────────────────────────────────────────── */}
       <div className="admin-filterbar">
-        <span className="text-xs font-mono text-text-muted">PERIODO:</span>
+        <span className="text-xs font-mono text-text-muted">PERÍODO:</span>
         <div className="flex flex-wrap gap-2">
           {([
             ['7d', '7 dias'],
@@ -60,8 +72,10 @@ export function DashboardPageContent() {
               key={value}
               onClick={() => dashboard.setPeriod(value)}
               className={cn(
-              'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-                dashboard.period === value ? 'bg-brand-acid text-white' : 'border border-bg-border text-text-muted hover:text-text-primary',
+                'rounded-full px-3.5 py-1.5 text-xs font-medium transition-all',
+                dashboard.period === value
+                  ? 'bg-[#0057E7] text-white'
+                  : 'border border-bg-border text-text-muted hover:border-white/20 hover:text-text-primary',
               )}
             >
               {label}
@@ -71,23 +85,27 @@ export function DashboardPageContent() {
 
         <div className="flex-1" />
 
-        <select className="input h-9 w-auto pr-8 text-xs" value={dashboard.selectedEventId} onChange={(event) => dashboard.setSelectedEventId(event.target.value)}>
+        <select
+          className="input h-9 w-auto pr-8 text-xs"
+          value={dashboard.selectedEventId}
+          onChange={(e) => dashboard.setSelectedEventId(e.target.value)}
+        >
           <option value="all">Todos os eventos</option>
-          {dashboard.eventOptions.map((event) => (
-            <option key={event.id} value={event.id}>
-              {event.name}
-            </option>
+          {dashboard.eventOptions.map((ev) => (
+            <option key={ev.id} value={ev.id}>{ev.name}</option>
           ))}
         </select>
-
-        <div className="rounded-sm border border-bg-border px-3 py-2 text-[11px] font-mono text-text-muted">ORG - {organization.name}</div>
       </div>
 
+      {/* ── Estados ─────────────────────────────────────────────────────── */}
       {dashboard.loading ? (
-        <PageLoadingState title="Carregando dashboard executivo" description="Consolidando receita, campanhas, check-ins e clientes." />
+        <PageLoadingState
+          title="Carregando dashboard"
+          description="Consolidando receita, check-ins e clientes…"
+        />
       ) : dashboard.error ? (
         <PageErrorState
-          title="ERRO AO CARREGAR DASHBOARD"
+          title="Erro ao carregar"
           description={dashboard.error}
           icon={<AlertTriangle className="mb-3 h-10 w-10 text-status-error" />}
           action={
@@ -97,47 +115,99 @@ export function DashboardPageContent() {
           }
         />
       ) : dashboard.overview.events.length === 0 ? (
-        <PageEmptyState title="NENHUM EVENTO DISPONÍVEL" description="Crie ou publique eventos para liberar a visão executiva consolidada." />
+
+        /* ── Empty state elegante ── */
+        <div
+          className="flex flex-col items-center justify-center gap-6 rounded-2xl py-20 text-center"
+          style={{ background: 'rgba(240,232,214,0.02)', border: '1px solid rgba(240,232,214,0.06)' }}
+        >
+          <div
+            className="flex h-16 w-16 items-center justify-center rounded-2xl"
+            style={{ background: 'rgba(0,87,231,0.1)', border: '1px solid rgba(0,87,231,0.2)' }}
+          >
+            <Zap className="h-7 w-7 text-[#4285F4]" />
+          </div>
+          <div>
+            <p className="text-base font-semibold text-text-primary">Nenhum evento ainda</p>
+            <p className="mt-2 max-w-sm text-sm text-text-muted">
+              Crie e publique seu primeiro evento para liberar a visão executiva consolidada.
+            </p>
+          </div>
+        </div>
+
       ) : (
         <>
-          <section className="novare-stage">
-            <div className="novare-stage-panel">
-              <div className="novare-stage-label">Executive snapshot</div>
-              <div className="novare-stage-title">Cada evento publicado retorna para este cockpit como prova real de margem, tracao e capacidade.</div>
-              <div className="novare-stage-copy">
-                A camada principal concentra vendas, sinal comercial, clientes ativos e volume operacional com a mesma linguagem visual do restante do produto.
-              </div>
-            </div>
+          {/* ── KPI strip 3 métricas principais ── */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {[
+              {
+                label: 'Receita bruta',
+                value: formatCurrency(dashboard.overview.summary.grossRevenue),
+                note: 'Volume consolidado',
+                icon: TrendingUp,
+                accent: '#4285F4',
+                glow: 'rgba(0,87,231,0.15)',
+              },
+              {
+                label: 'Eventos ativos',
+                value: formatNumber(dashboard.overview.summary.activeEvents),
+                note: 'Em circulação hoje',
+                icon: Zap,
+                accent: '#C9A84C',
+                glow: 'rgba(201,168,76,0.12)',
+              },
+              {
+                label: 'Clientes ativos',
+                value: formatNumber(dashboard.overview.summary.totalCustomers),
+                note: 'Base respondendo',
+                icon: TrendingUp,
+                accent: '#22C55E',
+                glow: 'rgba(34,197,94,0.10)',
+              },
+            ].map((item) => {
+              const Icon = item.icon
+              return (
+                <div
+                  key={item.label}
+                  className="reveal flex flex-col gap-3 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-0.5"
+                  style={{
+                    background: `linear-gradient(160deg, #0D1525 0%, #111A2E 100%)`,
+                    border: `1px solid rgba(240,232,214,0.07)`,
+                    boxShadow: `0 4px 24px ${item.glow}`,
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="text-[10px] font-semibold uppercase tracking-[0.28em]"
+                      style={{ color: 'rgba(240,232,214,0.45)' }}
+                    >
+                      {item.label}
+                    </span>
+                    <div
+                      className="flex h-8 w-8 items-center justify-center rounded-xl"
+                      style={{ background: `${item.glow.replace('0.12', '0.18')}`, border: `1px solid ${item.accent}22` }}
+                    >
+                      <Icon className="h-4 w-4" style={{ color: item.accent }} />
+                    </div>
+                  </div>
+                  <div
+                    className="text-[2rem] font-black leading-none tracking-[-0.04em]"
+                    style={{ color: '#F0E8D6' }}
+                  >
+                    {item.value}
+                  </div>
+                  <div className="text-xs" style={{ color: 'rgba(240,232,214,0.38)' }}>
+                    {item.note}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
 
-            <div className="novare-stage-stack">
-              {[
-                {
-                  label: 'Receita bruta',
-                  value: formatCurrency(dashboard.overview.summary.grossRevenue),
-                  note: 'Volume consolidado entrando na operação.',
-                },
-                {
-                  label: 'Eventos ativos',
-                  value: formatNumber(dashboard.overview.summary.activeEvents),
-                  note: 'Portfolio hoje em circulacao e venda.',
-                },
-                {
-                  label: 'Clientes ativos',
-                  value: formatNumber(dashboard.overview.summary.totalCustomers),
-                  note: 'Base que segue respondendo ao produto.',
-                },
-              ].map((item) => (
-                <article key={item.label} className="novare-stage-metric">
-                  <div className="novare-stage-label">{item.label}</div>
-                  <div className="novare-stage-metric-value">{item.value}</div>
-                  <div className="novare-stage-metric-copy">{item.note}</div>
-                </article>
-              ))}
-            </div>
-          </section>
-
+          {/* ── Cards executivos (8 métricas) ── */}
           <DashboardExecutiveCards summary={dashboard.overview.summary} />
 
+          {/* ── Gráficos ── */}
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.5fr_1fr]">
             <DashboardRevenueChart data={dashboard.overview.revenueSeries} />
             <DashboardPerformancePanel items={dashboard.overview.performance} />

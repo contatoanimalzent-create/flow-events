@@ -53,7 +53,7 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
             <span className="admin-title-accent">.</span>
           </>
         }
-        subtitle={`Etapa ${step} de ${TOTAL_STEPS} para configurar posicionamento, agenda, operação e media.`}
+        subtitle={<span className="hidden sm:block">{`Etapa ${step} de ${TOTAL_STEPS} para configurar posicionamento, agenda, operação e media.`}</span>}
         onClose={onClose}
       />
 

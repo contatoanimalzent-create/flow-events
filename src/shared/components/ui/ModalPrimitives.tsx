@@ -22,10 +22,10 @@ const SIZE_CLASSNAME: Record<NonNullable<ModalShellProps['size']>, string> = {
 
 export function ModalShell({ children, size = 'lg', className, panelClassName }: ModalShellProps) {
   return (
-    <div className={cn('pulse-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4', className)}>
+    <div className={cn('pulse-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4', className)}>
       <div
         className={cn(
-          'pulse-modal-panel animate-slide-up flex w-full flex-col overflow-hidden rounded-[var(--pulse-radius-lg)]',
+          'pulse-modal-panel animate-slide-up flex w-full flex-col overflow-hidden rounded-[var(--pulse-radius-lg)] max-h-[88dvh] sm:max-h-[calc(100dvh-2rem)]',
           SIZE_CLASSNAME[size],
           panelClassName,
         )}
@@ -46,7 +46,7 @@ interface ModalHeaderProps {
 
 export function ModalHeader({ title, subtitle, eyebrow, onClose, className }: ModalHeaderProps) {
   return (
-    <div className={cn('pulse-modal-header flex items-start justify-between gap-4 border-b px-6 py-5', className)}>
+    <div className={cn('pulse-modal-header flex items-start justify-between gap-4 border-b px-4 py-3 sm:px-6 sm:py-5', className)}>
       <div className="min-w-0">
         {eyebrow ? <div className="pulse-modal-eyebrow text-[10px] uppercase tracking-[0.32em]">{eyebrow}</div> : null}
         <h2 className="pulse-modal-title mt-1 font-display leading-none tracking-[-0.04em]">{title}</h2>
@@ -70,7 +70,7 @@ interface ModalBodyProps {
 }
 
 export function ModalBody({ children, className }: ModalBodyProps) {
-  return <div className={cn('max-h-[72vh] space-y-5 overflow-y-auto px-6 py-6', className)}>{children}</div>
+  return <div className={cn('flex-1 min-h-0 space-y-5 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6', className)}>{children}</div>
 }
 
 interface ModalFooterProps {
@@ -79,7 +79,7 @@ interface ModalFooterProps {
 }
 
 export function ModalFooter({ children, className }: ModalFooterProps) {
-  return <div className={cn('pulse-modal-footer flex items-center justify-between gap-3 border-t px-6 py-5', className)}>{children}</div>
+  return <div className={cn('pulse-modal-footer flex items-center justify-between gap-3 border-t px-4 py-3 sm:px-6 sm:py-5', className)}>{children}</div>
 }
 
 interface FormSectionProps {

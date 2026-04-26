@@ -5,7 +5,6 @@
  */
 
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
   CheckCircle2,
   QrCode,
@@ -22,8 +21,6 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { PublicLayout } from '@/features/public'
 import { useSeoMeta } from '@/shared/lib'
-
-gsap.registerPlugin(ScrollTrigger)
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -207,35 +204,6 @@ export function HomePage({ onLogin }: HomePageProps) {
     offset: ['start end', 'end start'],
   })
   const phoneY = useTransform(phoneProgress, [0, 1], ['60px', '-60px'])
-
-  // Horizontal features scroll
-  const featuresSectionRef = useRef<HTMLElement>(null)
-  const featuresTrackRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const section = featuresSectionRef.current
-    const track = featuresTrackRef.current
-    if (!section || !track) return
-
-    const totalScroll = track.scrollWidth - track.clientWidth
-
-    const ctx = gsap.context(() => {
-      gsap.to(track, {
-        x: -totalScroll,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: () => `+=${totalScroll + 200}`,
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-        },
-      })
-    }, section)
-
-    return () => ctx.revert()
-  }, [])
 
   // Numbers counter section
   const numbersRef = useRef<HTMLElement>(null)
@@ -619,7 +587,7 @@ export function HomePage({ onLogin }: HomePageProps) {
             ref={numbersRef}
             style={{
               background: '#060B18',
-              padding: 'clamp(5rem, 10vw, 9rem) 1.5rem',
+              padding: 'clamp(4rem, 7vw, 6rem) 1.5rem clamp(1.75rem, 3vw, 2.5rem)',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -749,7 +717,7 @@ export function HomePage({ onLogin }: HomePageProps) {
               {/* Gold divider line */}
               <div
                 style={{
-                  marginTop: '3rem',
+                  marginTop: '1.75rem',
                   height: '1px',
                   background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)',
                 }}
@@ -758,20 +726,20 @@ export function HomePage({ onLogin }: HomePageProps) {
           </section>
 
           {/* ══════════════════════════════════════════════════════════════════
-               SEÇÃO 4, Features com scroll horizontal sticky
+               SEÇÃO 4, Features
           ══════════════════════════════════════════════════════════════════ */}
           <section
-            ref={featuresSectionRef}
             className="features-scroll"
             style={{
               background: '#0D1525',
               position: 'relative',
+              overflow: 'hidden',
             }}
           >
             {/* Section header, visible before the pin */}
             <div
               style={{
-                padding: 'clamp(4rem, 8vw, 7rem) 1.5rem 2rem',
+                padding: 'clamp(2.5rem, 5vw, 4rem) 1.5rem 2rem',
                 maxWidth: '72rem',
                 margin: '0 auto',
               }}
@@ -811,14 +779,15 @@ export function HomePage({ onLogin }: HomePageProps) {
               </motion.h2>
             </div>
 
-            {/* Pinned horizontal scroll track */}
+            {/* Feature cards */}
             <div
-              ref={featuresTrackRef}
               style={{
                 display: 'flex',
                 gap: '1.5rem',
                 padding: '2rem clamp(1.5rem, 4vw, 4rem) clamp(4rem, 8vw, 7rem)',
-                width: 'max-content',
+                overflowX: 'auto',
+                scrollSnapType: 'x mandatory',
+                scrollbarWidth: 'none',
               }}
             >
               {FEATURES.map((feat, i) => {
@@ -829,6 +798,7 @@ export function HomePage({ onLogin }: HomePageProps) {
                     style={{
                       width: 'clamp(300px, 30vw, 420px)',
                       flexShrink: 0,
+                      scrollSnapAlign: 'start',
                     }}
                   >
                     <motion.div

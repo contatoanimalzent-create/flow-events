@@ -302,6 +302,10 @@ export function getSectionMeta(section: NavSection, isPortuguese: boolean): AppN
 export function getSectionBreadcrumbs(section: NavSection, isPortuguese: boolean) {
   const sectionMeta = getSectionMeta(section, isPortuguese)
 
+  if (section === 'dashboard') {
+    return [{ label: sectionMeta.label, current: true }]
+  }
+
   return [
     { label: isPortuguese ? 'Dashboard' : 'Dashboard', current: false },
     { label: sectionMeta.label, current: true },

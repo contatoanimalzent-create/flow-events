@@ -161,32 +161,32 @@ export function EventCard({
 
           {menuOpen && (
             <div
-              className="absolute bottom-10 right-0 z-50 w-48 overflow-hidden rounded-2xl border border-bg-border bg-white shadow-card"
+              className="absolute bottom-10 right-0 z-50 w-48 overflow-hidden rounded-2xl border border-white/10 bg-[#13161f] shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 onClick={onEdit}
-                className="flex w-full items-center gap-2 px-4 py-3 text-xs text-text-secondary transition-all hover:bg-bg-surface hover:text-text-primary"
+                className="flex w-full items-center gap-2 px-4 py-3 text-xs text-white/70 transition-all hover:bg-white/[0.06] hover:text-white"
               >
                 <Edit2 className="h-3.5 w-3.5" /> Editar
               </button>
               <button
                 onClick={onPublish}
-                className="flex w-full items-center gap-2 px-4 py-3 text-xs text-text-secondary transition-all hover:bg-bg-surface hover:text-text-primary"
+                className="flex w-full items-center gap-2 px-4 py-3 text-xs text-white/70 transition-all hover:bg-white/[0.06] hover:text-white"
               >
                 <Globe className="h-3.5 w-3.5" />
                 {event.status === 'published' ? 'Despublicar' : 'Publicar'}
               </button>
               <button
                 onClick={onDuplicate}
-                className="flex w-full items-center gap-2 px-4 py-3 text-xs text-text-secondary transition-all hover:bg-bg-surface hover:text-text-primary"
+                className="flex w-full items-center gap-2 px-4 py-3 text-xs text-white/70 transition-all hover:bg-white/[0.06] hover:text-white"
               >
                 <Copy className="h-3.5 w-3.5" /> Duplicar
               </button>
-              <div className="border-t border-bg-border" />
+              <div className="border-t border-white/10" />
               <button
                 onClick={onDelete}
-                className="flex w-full items-center gap-2 px-4 py-3 text-xs text-status-error transition-all hover:bg-status-error/8"
+                className="flex w-full items-center gap-2 px-4 py-3 text-xs text-red-400 transition-all hover:bg-red-500/10"
               >
                 <Trash2 className="h-3.5 w-3.5" /> Excluir
               </button>

@@ -140,7 +140,7 @@ export function AppShell() {
       />
 
       <div className="min-w-0 min-h-screen lg:pl-[var(--pulse-app-sidebar-width)]">
-        <Header activeSection={activeSection} onOpenMobileMenu={() => setSidebarOpen(true)} />
+        <Header activeSection={activeSection} onOpenMobileMenu={() => setSidebarOpen(true)} onNavigate={handleNavigate} />
 
         <main className="min-w-0 min-h-[calc(100vh-var(--pulse-app-header-height))] bg-[var(--pulse-app-shell-bg)]">
           <PageContainer as="div" className="space-y-4 sm:space-y-6">

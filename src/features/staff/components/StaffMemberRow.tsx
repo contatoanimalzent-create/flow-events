@@ -60,7 +60,7 @@ export function StaffMemberTableRow({
             value={member.status}
             onChange={(event) => onStatusChange(event.target.value as StaffStatus)}
             className={cn(
-              'cursor-pointer rounded-full border border-bg-border bg-white px-3 py-1.5 text-xs font-medium outline-none',
+              'cursor-pointer rounded-full border border-bg-border bg-bg-card px-3 py-1.5 text-xs font-medium outline-none',
               STAFF_STATUS_CONFIG[member.status]?.color ?? 'text-text-muted',
             )}
           >

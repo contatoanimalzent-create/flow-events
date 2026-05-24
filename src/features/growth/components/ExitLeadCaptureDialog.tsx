@@ -254,7 +254,7 @@ export function ExitLeadCaptureDialog({
             ) : null}
 
             {/* Safe área para iPhones com notch */}
-            <div className="h-[env(safe-área-inset-bottom,0px)]" />
+            <div className="h-[env(safe-area-inset-bottom,0px)]" />
           </div>
         </div>
       </div>

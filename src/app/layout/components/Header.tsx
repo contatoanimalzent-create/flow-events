@@ -57,7 +57,7 @@ export function Header({ activeSection, onOpenMobileMenu, onNavigate }: HeaderPr
   return (
     <header
       className="app-safe-top sticky top-0 z-20 border-b border-[var(--pulse-app-header-border)] bg-[var(--pulse-app-header-bg)] backdrop-blur-xl"
-      style={{ paddingTop: 'env(safe-área-inset-top, 0px)' }}
+      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
       <div className="flex h-[var(--pulse-app-header-height)] items-center gap-3 px-3 sm:gap-4 sm:px-4 lg:px-6">
         <button

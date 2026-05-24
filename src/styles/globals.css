@@ -94,8 +94,8 @@
     --pulse-button-primary-hover: var(--pulse-color-primary-soft);
     --pulse-button-primary-active: var(--pulse-color-primary);
     --pulse-button-secondary-bg: var(--pulse-color-surface);
-    --pulse-button-secondary-hover: #EEF4FE;
-    --pulse-button-secondary-active: #E3EEFD;
+    --pulse-button-secondary-hover: rgba(66, 133, 244, 0.12);
+    --pulse-button-secondary-active: rgba(66, 133, 244, 0.18);
     --pulse-button-ghost-hover: rgba(66, 133, 244, 0.08);
     --pulse-button-ghost-active: rgba(66, 133, 244, 0.14);
     --pulse-shadow-soft: 0 1px 2px rgba(0,0,0,0.05);
@@ -567,6 +567,14 @@
     border-color: #0057E7 !important;
     box-shadow: 0 0 0 3px rgba(0,87,231,0.18);
   }
+
+  select option,
+  .input option,
+  .premium-input option,
+  .premium-select option {
+    background: #14203A;
+    color: rgba(255,255,255,0.9);
+  }
   .input-label { @apply block text-[11px] font-semibold mb-2 uppercase tracking-[0.2em]; color: var(--pulse-color-text-secondary); }
 
   .premium-input {
@@ -701,19 +709,19 @@
   .page-title-luxury {
     @apply mt-3 font-display leading-[0.92] tracking-[-0.05em];
     font-size: clamp(2rem, 8vw, 5.5rem);
-    color: #0f172a;
+    color: #FFFFFF;
     word-break: break-word;
     overflow-wrap: anywhere;
   }
-  .page-description { @apply mt-5 max-w-2xl text-sm leading-7 md:text-base md:leading-8; color: #64748b; }
+  .page-description { @apply mt-5 max-w-2xl text-sm leading-7 md:text-base md:leading-8; color: rgba(255,255,255,0.50); }
   .section-title-luxury {
     @apply mt-2 font-display leading-[0.95] tracking-[-0.04em];
     font-size: clamp(1.5rem, 5vw, 2.8rem);
-    color: #0f172a;
+    color: #FFFFFF;
     word-break: break-word;
     overflow-wrap: anywhere;
   }
-  .section-description { @apply mt-2 max-w-3xl text-sm leading-7; color: #94a3b8; }
+  .section-description { @apply mt-2 max-w-3xl text-sm leading-7; color: rgba(255,255,255,0.50); }
 
   .novare-stage-label  { @apply text-[10px] uppercase tracking-[0.42em]; color: #4285F4; }
   .novare-stage-title  { @apply mt-4 font-display leading-[0.92] tracking-[-0.05em]; font-size: clamp(1.6rem, 2.8vw, 2.8rem); color: #F0E8D6; }

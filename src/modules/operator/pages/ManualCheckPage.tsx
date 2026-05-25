@@ -11,6 +11,7 @@ interface Attendee {
   email: string
   ticketType: string
   status: string
+  qrToken?: string
 }
 
 type CheckResult = { success: true; name: string } | { success: false; message: string }
@@ -52,7 +53,8 @@ export default function ManualCheckPage({ onNavigate }: PulsePageProps) {
     }
     setCheckingId(attendee.ticketId)
     try {
-      const res = await operatorService.validateToken(attendee.ticketId, context.eventId, 'manual')
+      const token = attendee.qrToken ?? attendee.ticketId
+      const res = await operatorService.validateToken(token, context.eventId, 'manual')
       setCheckResult(
         res.valid
           ? { success: true, name: res.name }

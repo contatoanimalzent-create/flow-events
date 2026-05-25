@@ -1,4 +1,5 @@
-import { Loader2 } from 'lucide-react'
+import { useRef } from 'react'
+import { Camera, Loader2, Upload } from 'lucide-react'
 import { useStaffForm } from '@/features/staff/hooks'
 import { STAFF_PERMISSION_OPTIONS } from '@/features/staff/types'
 import {
@@ -10,6 +11,7 @@ import {
   ModalHeader,
   ModalShell,
 } from '@/shared/components'
+import { useCloudinaryUpload } from '@/shared/hooks/useCloudinaryUpload'
 
 interface StaffFormModalProps {
   eventId: string
@@ -26,6 +28,8 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
     staffId,
     onSaved,
   })
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { upload, loading: uploading } = useCloudinaryUpload({ folder: `staff/${organizationId}` })
 
   const rows = [
     [
@@ -86,6 +90,49 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
 
             <FormSection title="Dados pessoais">
               <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative h-20 w-20 shrink-0 rounded-full border border-white/10 bg-white/[0.04] overflow-hidden flex items-center justify-center">
+                    {form.photo_url ? (
+                      <img src={form.photo_url} alt="Foto" className="h-full w-full object-cover" />
+                    ) : (
+                      <Camera className="h-7 w-7 text-white/25" />
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      capture="user"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const url = await upload(file)
+                        if (url) updateField('photo_url', url)
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="btn-secondary flex items-center gap-2 text-xs"
+                    >
+                      {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                      {uploading ? 'Enviando...' : form.photo_url ? 'Trocar foto' : 'Enviar foto'}
+                    </button>
+                    {form.photo_url ? (
+                      <button
+                        type="button"
+                        onClick={() => updateField('photo_url', '')}
+                        className="text-[11px] text-status-error hover:underline"
+                      >
+                        Remover foto
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+
                 {rows.slice(0, 3).map((row, rowIndex) => (
                   <FormGrid key={rowIndex}>
                     {row.map((field) => (

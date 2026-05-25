@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 // ---------------------------------------------------------------------------
 
 type EntryType = 'clock_in' | 'clock_out' | 'auto_pause' | 'auto_return'
-type SessionStatus = 'active' | 'paused' | 'completed'
+type SessionStatus = 'open' | 'closed' | 'exception'
 type GeofenceType = 'circle' | 'polygon'
 
 interface EventGeofence {
@@ -27,15 +27,31 @@ interface TimeclockSession {
   id: string
   staff_member_id: string
   event_id: string
-  clock_in_at: string
-  clock_out_at?: string | null
+  opened_at: string
+  closed_at?: string | null
   status: SessionStatus
+}
+
+type PunchType = 'start' | 'pause' | 'resume' | 'end'
+
+const PUNCH_TO_ENTRY: Record<PunchType, EntryType> = {
+  start: 'clock_in',
+  pause: 'auto_pause',
+  resume: 'auto_return',
+  end: 'clock_out',
+}
+
+const ENTRY_TO_PUNCH: Record<EntryType, PunchType> = {
+  clock_in: 'start',
+  auto_pause: 'pause',
+  auto_return: 'resume',
+  clock_out: 'end',
 }
 
 interface TimeclockEntry {
   id: string
   session_id: string
-  entry_type: EntryType
+  punch_type: PunchType
   latitude?: number | null
   longitude?: number | null
   accuracy?: number | null
@@ -44,8 +60,13 @@ interface TimeclockEntry {
 
 interface StaffInfo {
   id: string
-  name: string
-  role: string
+  first_name: string
+  last_name?: string | null
+  role_title?: string | null
+}
+
+function staffDisplayName(s: StaffInfo) {
+  return [s.first_name, s.last_name].filter(Boolean).join(' ')
 }
 
 interface EventInfo {
@@ -220,8 +241,8 @@ export function StaffTimeclockPage() {
         // Validate token and fetch staff member
         const { data: staffData, error: staffErr } = await supabase
           .from('staff_members')
-          .select('id, name, role')
-          .eq('credential_token', credentialToken)
+          .select('id, first_name, last_name, role_title')
+          .eq('qr_token', credentialToken)
           .eq('event_id', eventId)
           .single()
 
@@ -263,12 +284,12 @@ export function StaffTimeclockPage() {
 
         const { data: sessionData } = await supabase
           .from('timeclock_sessions')
-          .select('id, staff_member_id, event_id, clock_in_at, clock_out_at, status')
+          .select('id, staff_member_id, event_id, opened_at, closed_at, status')
           .eq('staff_member_id', (staffData as StaffInfo).id)
           .eq('event_id', eventId)
-          .gte('clock_in_at', todayStart.toISOString())
-          .in('status', ['active', 'paused'])
-          .order('clock_in_at', { ascending: false })
+          .gte('opened_at', todayStart.toISOString())
+          .in('status', ['open', 'exception'])
+          .order('opened_at', { ascending: false })
           .limit(1)
           .maybeSingle()
 
@@ -279,19 +300,19 @@ export function StaffTimeclockPage() {
           // Load today's entries for this session
           const { data: entryData } = await supabase
             .from('timeclock_entries')
-            .select('id, session_id, entry_type, latitude, longitude, accuracy, recorded_at')
+            .select('id, session_id, punch_type, latitude, longitude, accuracy, recorded_at')
             .eq('session_id', s.id)
             .order('recorded_at', { ascending: true })
 
           const entries = (entryData ?? []).map((e) => ({
-            type: e.entry_type as EntryType,
-            recorded_at: e.recorded_at,
-            latitude: e.latitude ?? null,
-            longitude: e.longitude ?? null,
+            type: PUNCH_TO_ENTRY[(e as any).punch_type as PunchType] ?? 'clock_in',
+            recorded_at: (e as any).recorded_at,
+            latitude: (e as any).latitude ?? null,
+            longitude: (e as any).longitude ?? null,
           })) as TimelineItem[]
           setTimeline(entries)
 
-          setPageStatus(s.status === 'paused' ? 'paused' : 'active')
+          setPageStatus(s.status === 'exception' ? 'paused' : 'active')
         } else {
           setPageStatus('idle')
         }
@@ -353,7 +374,7 @@ export function StaffTimeclockPage() {
             const recorded_at = new Date().toISOString()
             await supabase.from('timeclock_entries').insert({
               session_id: currentSession.id,
-              entry_type: 'auto_pause' as EntryType,
+              punch_type: 'pause' as const,
               latitude,
               longitude,
               accuracy,
@@ -361,10 +382,10 @@ export function StaffTimeclockPage() {
             })
             await supabase
               .from('timeclock_sessions')
-              .update({ status: 'paused' })
+              .update({ status: 'exception' as const })
               .eq('id', currentSession.id)
 
-            setSession((prev) => prev ? { ...prev, status: 'paused' } : prev)
+            setSession((prev) => prev ? { ...prev, status: 'exception' as const } : prev)
             setTimeline((prev) => [...prev, { type: 'auto_pause', recorded_at, latitude, longitude }])
             setPageStatus('paused')
           } catch (err) {
@@ -381,7 +402,7 @@ export function StaffTimeclockPage() {
               const recorded_at = new Date().toISOString()
               await supabase.from('timeclock_entries').insert({
                 session_id: currentSession.id,
-                entry_type: 'auto_return' as EntryType,
+                punch_type: 'resume' as const,
                 latitude,
                 longitude,
                 accuracy,
@@ -389,10 +410,10 @@ export function StaffTimeclockPage() {
               })
               await supabase
                 .from('timeclock_sessions')
-                .update({ status: 'active' })
+                .update({ status: 'open' as const })
                 .eq('id', currentSession.id)
 
-              setSession((prev) => prev ? { ...prev, status: 'active' } : prev)
+              setSession((prev) => prev ? { ...prev, status: 'open' as const } : prev)
               setTimeline((prev) => [...prev, { type: 'auto_return', recorded_at, latitude, longitude }])
               setPageStatus('active')
             } catch (err) {
@@ -468,20 +489,20 @@ export function StaffTimeclockPage() {
         .insert({
           staff_member_id: staff.id,
           event_id: eventId,
-          clock_in_at: now,
-          status: 'active',
+          opened_at: now,
+          status: 'open' as const,
         })
-        .select('id, staff_member_id, event_id, clock_in_at, clock_out_at, status')
+        .select('id, staff_member_id, event_id, opened_at, closed_at, status')
         .single()
 
       if (sessionErr || !newSession) {
         throw new Error(sessionErr?.message ?? 'Falha ao criar sessão')
       }
 
-      // Create clock_in entry
+      // Create start entry
       await supabase.from('timeclock_entries').insert({
-        session_id: newSession.id,
-        entry_type: 'clock_in' as EntryType,
+        session_id: (newSession as any).id,
+        punch_type: 'start' as const,
         latitude,
         longitude,
         accuracy,
@@ -535,7 +556,7 @@ export function StaffTimeclockPage() {
 
       await supabase.from('timeclock_entries').insert({
         session_id: session.id,
-        entry_type: 'clock_out' as EntryType,
+        punch_type: 'end' as const,
         latitude,
         longitude,
         accuracy,
@@ -544,12 +565,12 @@ export function StaffTimeclockPage() {
 
       await supabase
         .from('timeclock_sessions')
-        .update({ status: 'completed', clock_out_at: now })
+        .update({ status: 'closed' as const, closed_at: now })
         .eq('id', session.id)
 
-      setSession((prev) => prev ? { ...prev, status: 'completed', clock_out_at: now } : prev)
+      setSession((prev) => prev ? { ...prev, status: 'closed' as const, closed_at: now } : prev)
       setTimeline((prev) => [...prev, { type: 'clock_out', recorded_at: now, latitude, longitude }])
-      setPageStatus('idle')
+      setPageStatus('completed')
 
       // Stop watching
       if (watchIdRef.current !== null) {
@@ -627,8 +648,8 @@ export function StaffTimeclockPage() {
             <p className="text-xs font-semibold uppercase tracking-widest text-white/40">
               Flow Events
             </p>
-            <h1 className="text-lg font-bold text-white">{staff?.name ?? '-'}</h1>
-            <p className="text-sm text-white/50">{staff?.role}</p>
+            <h1 className="text-lg font-bold text-white">{staff ? staffDisplayName(staff) : '-'}</h1>
+            <p className="text-sm text-white/50">{staff?.role_title ?? 'Staff'}</p>
           </div>
           <div className="flex flex-col items-end gap-1">
             {/* Geofence status badge */}
@@ -704,9 +725,9 @@ export function StaffTimeclockPage() {
                 {isActive ? 'Turno em andamento' : 'Turno pausado'}
               </p>
             </div>
-            {session?.clock_in_at && (
+            {session?.opened_at && (
               <p className="mt-1 text-xs text-white/30">
-                Iniciado às {formatTime(session.clock_in_at)}
+                Iniciado às {formatTime(session.opened_at)}
               </p>
             )}
           </div>

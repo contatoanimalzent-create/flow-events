@@ -22,6 +22,7 @@ export const EMPTY_STAFF_FORM: StaffFormData = {
   email: '',
   phone: '',
   cpf: '',
+  photo_url: '',
   role_title: '',
   department: '',
   area: '',

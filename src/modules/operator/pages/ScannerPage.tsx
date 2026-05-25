@@ -15,15 +15,6 @@ interface ScanResult {
   message: string
 }
 
-// Attempt to use html5-qrcode if available (installed separately)
-let Html5QrcodeScanner: any = null
-try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  Html5QrcodeScanner = require('html5-qrcode').Html5QrcodeScanner
-} catch {
-  Html5QrcodeScanner = null
-}
-
 export default function ScannerPage({ onNavigate }: PulsePageProps) {
   const [scanState, setScanState] = useState<ScanState>('idle')
   const [result, setResult] = useState<ScanResult | null>(null)
@@ -31,12 +22,14 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
   const [manualCode, setManualCode] = useState('')
   const [scanCount, setScanCount] = useState(0)
   const [cameraError, setCameraError] = useState<string | null>(null)
+  const [scannerReady, setScannerReady] = useState(false)
 
   const context = useAppContext((s) => s.context)
   const { isOnline, enqueue } = useOffline()
 
   const resultTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const scannerRef = useRef<any>(null)
+  const Html5QrcodeScannerRef = useRef<any>(null)
   const linePos = useRef(0)
   const [linePct, setLinePct] = useState(0)
 
@@ -53,11 +46,27 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
     return () => clearInterval(interval)
   }, [scanState])
 
+  // Load html5-qrcode dynamically (ESM compatible)
+  useEffect(() => {
+    let cancelled = false
+    import('html5-qrcode')
+      .then((mod) => {
+        if (!cancelled) {
+          Html5QrcodeScannerRef.current = mod.Html5QrcodeScanner
+          setScannerReady(true)
+        }
+      })
+      .catch(() => {
+        setCameraError('Scanner QR não disponível, use entrada manual')
+      })
+    return () => { cancelled = true }
+  }, [])
+
   // Start html5-qrcode camera scanner
   useEffect(() => {
-    if (inputMode !== 'camera' || !Html5QrcodeScanner) return
+    if (inputMode !== 'camera' || !scannerReady || !Html5QrcodeScannerRef.current) return
 
-    const scanner = new Html5QrcodeScanner(
+    const scanner = new Html5QrcodeScannerRef.current(
       'qr-reader',
       { fps: 10, qrbox: { width: 220, height: 220 }, rememberLastUsedCamera: true },
       false
@@ -80,7 +89,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       scanner.clear().catch(() => {})
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputMode])
+  }, [inputMode, scannerReady])
 
   const handleScan = useCallback(async (token: string) => {
     if (!token.trim() || scanState === 'processing') return
@@ -198,7 +207,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
         {inputMode === 'camera' ? (
           <>
             {/* html5-qrcode mounts here */}
-            {Html5QrcodeScanner && !cameraError && (
+            {scannerReady && !cameraError && (
               <div id="qr-reader" className="w-full h-full absolute inset-0 opacity-0" />
             )}
 

@@ -26,6 +26,7 @@ export interface StaffMemberRow {
   email?: string | null
   phone?: string | null
   cpf?: string | null
+  photo_url?: string | null
   role_title?: string | null
   department?: string | null
   area?: string | null
@@ -80,6 +81,7 @@ export interface StaffFormData {
   email: string
   phone: string
   cpf: string
+  photo_url: string
   role_title: string
   department: string
   area: string

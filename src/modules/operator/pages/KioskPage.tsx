@@ -13,27 +13,34 @@ interface ScanResult {
   message: string
 }
 
-// Attempt to load html5-qrcode if available
-let Html5QrcodeScanner: any = null
-try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  Html5QrcodeScanner = require('html5-qrcode').Html5QrcodeScanner
-} catch {
-  Html5QrcodeScanner = null
-}
-
 export default function KioskPage({ onNavigate }: PulsePageProps) {
   const [kioskState, setKioskState] = useState<KioskState>('scanning')
   const [result, setResult] = useState<ScanResult | null>(null)
   const [scanCount, setScanCount] = useState(0)
+  const [scannerReady, setScannerReady] = useState(false)
 
   const context = useAppContext((s) => s.context)
   const { isOnline, enqueue } = useOffline()
 
   const resetTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const scannerRef = useRef<any>(null)
+  const Html5QrcodeScannerRef = useRef<any>(null)
   // Pulse ring animation
   const [pulseRing, setPulseRing] = useState(true)
+
+  // Load html5-qrcode dynamically (ESM compatible)
+  useEffect(() => {
+    let cancelled = false
+    import('html5-qrcode')
+      .then((mod) => {
+        if (!cancelled) {
+          Html5QrcodeScannerRef.current = mod.Html5QrcodeScanner
+          setScannerReady(true)
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -106,11 +113,17 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
     [context?.eventId, isOnline, enqueue, kioskState, resetToScanning]
   )
 
+  // Keep handleScan ref in sync so the scanner callback always uses the latest
+  const handleScanRef = useRef(handleScan)
+  useEffect(() => {
+    handleScanRef.current = handleScan
+  }, [handleScan])
+
   // Start html5-qrcode scanner
   useEffect(() => {
-    if (!Html5QrcodeScanner) return
+    if (!scannerReady || !Html5QrcodeScannerRef.current) return
 
-    const scanner = new Html5QrcodeScanner(
+    const scanner = new Html5QrcodeScannerRef.current(
       'kiosk-qr-reader',
       { fps: 10, qrbox: { width: 260, height: 260 }, rememberLastUsedCamera: true },
       false
@@ -118,11 +131,9 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
 
     scanner.render(
       (decodedText: string) => {
-        handleScan(decodedText)
+        handleScanRef.current(decodedText)
       },
-      (_err: string) => {
-        // Suppress "no barcode" noise
-      }
+      (_err: string) => {}
     )
 
     scannerRef.current = scanner
@@ -130,14 +141,8 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
     return () => {
       scanner.clear().catch(() => {})
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // mount once, handleScan captured via ref below
-
-  // Keep handleScan ref in sync so the scanner callback always uses the latest
-  const handleScanRef = useRef(handleScan)
-  useEffect(() => {
-    handleScanRef.current = handleScan
-  }, [handleScan])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scannerReady])
 
   const isShowingResult = kioskState === 'valid' || kioskState === 'invalid'
 
@@ -147,7 +152,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
       style={{ backgroundColor: '#060d1f' }}
     >
       {/* html5-qrcode hidden mount point */}
-      {Html5QrcodeScanner && (
+      {scannerReady && (
         <div id="kiosk-qr-reader" className="absolute opacity-0 pointer-events-none w-0 h-0" />
       )}
 
@@ -279,7 +284,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
                 </>
               )}
 
-              {kioskState === 'scanning' && !Html5QrcodeScanner && (
+              {kioskState === 'scanning' && !scannerReady && (
                 <p className="text-slate-500 text-sm text-center px-4">
                   Câmera não disponível
                 </p>

@@ -1,44 +1,54 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Bell, Heart, MessageCircle, MoreHorizontal, Plus,
   RefreshCw, Search, Send, Share2, Smile, Trash2, Users,
+  Loader2,
 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
+import { supabase } from '@/lib/supabase'
 import { cn } from '@/shared/lib'
 
 type Tab = 'feed' | 'anuncios' | 'networking' | 'conexoes'
 
-const MOCK_POSTS = [
-  {
-    id: '1', author: 'Ana Lima', role: 'Participante', avatar: 'AL', time: '3 min',
-    content: 'Que show incrível! O primeiro set foi surreal 🔥 Quem mais está na Pista Principal?',
-    likes: 24, comments: 8, post_type: 'text', visibility: 'public',
-  },
-  {
-    id: '2', author: 'Pulse Events', role: 'Organizador', avatar: '⚡', time: '12 min',
-    content: '🎤 PRÓXIMO SET começa em 20 minutos no Stage Principal. Preparem-se!',
-    likes: 156, comments: 31, post_type: 'announcement', visibility: 'public',
-  },
-  {
-    id: '3', author: 'Carlos Melo', role: 'Participante', avatar: 'CM', time: '28 min',
-    content: 'Perdeu o crachá ou tem dúvida? Passem na Portaria Norte que a gente resolve!',
-    likes: 7, comments: 2, post_type: 'text', visibility: 'public',
-  },
-]
+interface FeedPost {
+  id: string
+  author: string
+  avatar: string
+  time: string
+  content: string
+  likes: number
+  comments: number
+  post_type: 'text' | 'announcement'
+  image_url: string | null
+}
 
-const MOCK_ANNOUNCEMENTS = [
-  { id: '1', title: 'Próximo set em 20 minutos', body: 'DJ Kairos sobe ao palco às 22h30. Não perca!', priority: 'high', time: '5 min' },
-  { id: '2', title: 'Portaria C fechada temporariamente', body: 'Use as portarias A ou B. Previsão de reabertura: 23h00.', priority: 'normal', time: '18 min' },
-  { id: '3', title: 'Food trucks abertos até meia-noite', body: 'Área de alimentação com 8 opções disponíveis.', priority: 'low', time: '1h' },
-]
+interface Announcement {
+  id: string
+  title: string
+  body: string
+  priority: string
+  time: string
+}
 
-const MOCK_CONNECTIONS = [
-  { id: '1', name: 'Fernanda Costa', role: 'Startup Founder', mutual: 3, status: 'pending' },
-  { id: '2', name: 'Rafael Souza', role: 'Product Designer', mutual: 1, status: 'accepted' },
-  { id: '3', name: 'Beatriz Nunes', role: 'Marketing Lead', mutual: 5, status: 'accepted' },
-]
+interface EventOption {
+  id: string
+  name: string
+}
 
-function PostCard({ post }: { post: typeof MOCK_POSTS[0] }) {
+function formatRelativeTime(dateStr: string): string {
+  const now = Date.now()
+  const then = new Date(dateStr).getTime()
+  const diffMs = now - then
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1) return 'agora'
+  if (diffMin < 60) return `${diffMin} min`
+  const diffH = Math.floor(diffMin / 60)
+  if (diffH < 24) return `${diffH}h`
+  const diffD = Math.floor(diffH / 24)
+  return `${diffD}d`
+}
+
+function PostCard({ post }: { post: FeedPost }) {
   const [liked, setLiked] = useState(false)
   const [likes, setLikes] = useState(post.likes)
 
@@ -56,7 +66,7 @@ function PostCard({ post }: { post: typeof MOCK_POSTS[0] }) {
                 <span className="rounded-full bg-brand-blue/10 px-2 py-0.5 text-[10px] font-medium text-brand-blue">Oficial</span>
               )}
             </div>
-            <div className="text-xs text-text-muted">{post.role} · {post.time} atrás</div>
+            <div className="text-xs text-text-muted">{post.time} atrás</div>
           </div>
         </div>
         <button className="btn-ghost p-1.5 text-text-muted hover:text-text-primary">
@@ -65,6 +75,10 @@ function PostCard({ post }: { post: typeof MOCK_POSTS[0] }) {
       </div>
 
       <p className="text-sm text-text-secondary leading-relaxed">{post.content}</p>
+
+      {post.image_url && (
+        <img src={post.image_url} alt="" className="w-full rounded-lg object-cover max-h-72" />
+      )}
 
       <div className="flex items-center gap-4 pt-1 border-t border-white/5">
         <button
@@ -99,6 +113,123 @@ export function CommunityPageContent() {
   const [newAnnBody, setNewAnnBody] = useState('')
   const [priority, setPriority] = useState<'low' | 'normal' | 'high' | 'urgent'>('normal')
 
+  // ── Real data state ──────────────────────────────────────────────────────
+  const [events, setEvents] = useState<EventOption[]>([])
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
+  const [posts, setPosts] = useState<FeedPost[]>([])
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [attendeesCount, setAttendeesCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [feedEmpty, setFeedEmpty] = useState(false)
+
+  // ── Fetch events for this org ────────────────────────────────────────────
+  useEffect(() => {
+    if (!organization) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { data } = await supabase
+          .from('events')
+          .select('id, name')
+          .eq('organization_id', organization.id)
+          .order('starts_at', { ascending: false })
+          .limit(50)
+        if (!cancelled && data && data.length > 0) {
+          setEvents(data)
+          setSelectedEventId((prev) => prev ?? data[0].id)
+        }
+      } catch {
+        // table may not exist
+      }
+    })()
+    return () => { cancelled = true }
+  }, [organization])
+
+  // ── Fetch community data when event changes ─────────────────────────────
+  const fetchData = useCallback(async () => {
+    if (!selectedEventId || !organization) return
+    setLoading(true)
+
+    // Fetch posts
+    try {
+      const { data, error } = await supabase
+        .from('event_feed_posts')
+        .select('id, body, image_url, created_at, likes_count, author_name')
+        .eq('event_id', selectedEventId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+
+      if (error) {
+        setFeedEmpty(true)
+        setPosts([])
+      } else if (data) {
+        setFeedEmpty(data.length === 0)
+        setPosts(
+          (data as any[]).map((p) => ({
+            id: p.id,
+            author: p.author_name ?? 'Participante',
+            avatar: (p.author_name ?? 'P').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+            time: formatRelativeTime(p.created_at),
+            content: p.body ?? '',
+            likes: p.likes_count ?? 0,
+            comments: 0,
+            post_type: 'text' as const,
+            image_url: p.image_url ?? null,
+          })),
+        )
+      }
+    } catch {
+      setFeedEmpty(true)
+      setPosts([])
+    }
+
+    // Fetch announcements from staff_instructions with high/critical priority
+    try {
+      const { data } = await supabase
+        .from('staff_instructions')
+        .select('id, title, body, priority, created_at')
+        .eq('event_id', selectedEventId)
+        .in('priority', ['high', 'critical'])
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      if (data) {
+        setAnnouncements(
+          (data as any[]).map((a) => ({
+            id: a.id,
+            title: a.title ?? '',
+            body: a.body ?? '',
+            priority: a.priority ?? 'normal',
+            time: formatRelativeTime(a.created_at),
+          })),
+        )
+      } else {
+        setAnnouncements([])
+      }
+    } catch {
+      setAnnouncements([])
+    }
+
+    // Fetch attendees count from digital_tickets
+    try {
+      const { count } = await supabase
+        .from('digital_tickets')
+        .select('id', { count: 'exact', head: true })
+        .eq('event_id', selectedEventId)
+        .in('status', ['confirmed', 'used'])
+
+      setAttendeesCount(count ?? 0)
+    } catch {
+      setAttendeesCount(0)
+    }
+
+    setLoading(false)
+  }, [selectedEventId, organization])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
   if (!organization) return null
 
   return (
@@ -113,18 +244,31 @@ export function CommunityPageContent() {
             Feed, posts, anúncios, networking e conexões do evento.
           </p>
         </div>
-        <button className="btn-secondary flex items-center gap-2 text-xs">
-          <RefreshCw className="h-3.5 w-3.5" /> Atualizar
-        </button>
+        <div className="flex items-center gap-2">
+          {events.length > 1 && (
+            <select
+              className="input text-xs h-9 pr-8"
+              value={selectedEventId ?? ''}
+              onChange={(e) => setSelectedEventId(e.target.value)}
+            >
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>{ev.name}</option>
+              ))}
+            </select>
+          )}
+          <button onClick={() => fetchData()} className="btn-secondary flex items-center gap-2 text-xs">
+            <RefreshCw className="h-3.5 w-3.5" /> Atualizar
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { label: 'Posts hoje', value: '47', color: 'text-brand-blue' },
-          { label: 'Reações', value: '312', color: 'text-status-error' },
-          { label: 'Comentários', value: '89', color: 'text-status-success' },
-          { label: 'Conexões', value: '23', color: 'text-brand-purple' },
+          { label: 'Posts', value: String(posts.length), color: 'text-brand-blue' },
+          { label: 'Reações', value: String(posts.reduce((s, p) => s + p.likes, 0)), color: 'text-status-error' },
+          { label: 'Anúncios', value: String(announcements.length), color: 'text-status-success' },
+          { label: 'Participantes', value: String(attendeesCount), color: 'text-brand-purple' },
         ].map((s) => (
           <div key={s.label} className="card p-4">
             <div className="text-[10px] font-mono uppercase tracking-wider text-text-muted">{s.label}</div>
@@ -154,8 +298,15 @@ export function CommunityPageContent() {
         ))}
       </div>
 
+      {/* Loading */}
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-text-muted" />
+        </div>
+      )}
+
       {/* Feed */}
-      {tab === 'feed' && (
+      {!loading && tab === 'feed' && (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_320px]">
           <div className="space-y-4">
             {/* Compose */}
@@ -185,8 +336,18 @@ export function CommunityPageContent() {
               <input className="input h-10 w-full pl-9 text-sm" placeholder="Buscar no feed..." />
             </div>
 
-            {/* Posts */}
-            {MOCK_POSTS.map((post) => <PostCard key={post.id} post={post} />)}
+            {/* Posts or empty state */}
+            {feedEmpty && posts.length === 0 ? (
+              <div className="card p-12 flex flex-col items-center justify-center text-center gap-3">
+                <MessageCircle className="h-10 w-10 text-text-muted" />
+                <div className="text-sm font-semibold text-text-secondary">Comunidade será ativada em breve</div>
+                <div className="text-xs text-text-muted max-w-sm">
+                  Nenhum post encontrado para este evento. Os posts aparecerão aqui quando participantes começarem a interagir.
+                </div>
+              </div>
+            ) : (
+              posts.map((post) => <PostCard key={post.id} post={post} />)
+            )}
           </div>
 
           {/* Right panel: quick stats + moderation */}
@@ -195,34 +356,38 @@ export function CommunityPageContent() {
               <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Moderação rápida</h3>
               <div className="space-y-2 text-xs text-text-muted">
                 <div className="flex items-center justify-between">
-                  <span>Posts aguardando</span><span className="text-status-warning font-mono">2</span>
+                  <span>Posts aguardando</span><span className="text-status-warning font-mono">0</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Reportados</span><span className="text-status-error font-mono">0</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Removidos hoje</span><span className="font-mono">1</span>
+                  <span>Total no feed</span><span className="font-mono">{posts.length}</span>
                 </div>
               </div>
             </div>
             <div className="card p-4 space-y-3">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Top engajamento</h3>
-              {MOCK_POSTS.sort((a, b) => b.likes - a.likes).slice(0, 3).map((p) => (
-                <div key={p.id} className="flex items-start gap-2">
-                  <Heart className="h-3.5 w-3.5 text-status-error mt-0.5 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs text-text-primary truncate">{p.content.slice(0, 50)}...</div>
-                    <div className="text-[11px] text-text-muted">{p.likes} curtidas</div>
+              {posts.length === 0 ? (
+                <div className="text-xs text-text-muted">Nenhum post ainda.</div>
+              ) : (
+                [...posts].sort((a, b) => b.likes - a.likes).slice(0, 3).map((p) => (
+                  <div key={p.id} className="flex items-start gap-2">
+                    <Heart className="h-3.5 w-3.5 text-status-error mt-0.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-text-primary truncate">{p.content.slice(0, 50)}...</div>
+                      <div className="text-[11px] text-text-muted">{p.likes} curtidas</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
       )}
 
       {/* Anúncios */}
-      {tab === 'anuncios' && (
+      {!loading && tab === 'anuncios' && (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_360px]">
           <div className="space-y-4">
             <div className="card p-5 space-y-4">
@@ -262,29 +427,37 @@ export function CommunityPageContent() {
 
           <div className="space-y-3">
             <div className="text-[10px] font-mono uppercase tracking-wider text-text-muted">Anúncios recentes</div>
-            {MOCK_ANNOUNCEMENTS.map((ann) => (
-              <div key={ann.id} className={cn('card p-4 space-y-2 border-l-2',
-                ann.priority === 'high' ? 'border-l-status-warning' :
-                ann.priority === 'urgent' ? 'border-l-status-error' : 'border-l-brand-blue/30',
-              )}>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-text-primary">{ann.title}</span>
-                  <span className="text-[11px] text-text-muted">{ann.time} atrás</span>
-                </div>
-                <p className="text-xs text-text-muted leading-relaxed">{ann.body}</p>
+            {announcements.length === 0 ? (
+              <div className="card p-8 text-center">
+                <div className="text-xs text-text-muted">Nenhum anúncio de alta prioridade.</div>
               </div>
-            ))}
+            ) : (
+              announcements.map((ann) => (
+                <div key={ann.id} className={cn('card p-4 space-y-2 border-l-2',
+                  ann.priority === 'high' ? 'border-l-status-warning' :
+                  ann.priority === 'critical' ? 'border-l-status-error' : 'border-l-brand-blue/30',
+                )}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-text-primary">{ann.title}</span>
+                    <span className="text-[11px] text-text-muted">{ann.time} atrás</span>
+                  </div>
+                  <p className="text-xs text-text-muted leading-relaxed">{ann.body}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
 
       {/* Networking */}
-      {tab === 'networking' && (
+      {!loading && tab === 'networking' && (
         <div className="card p-12 flex flex-col items-center justify-center text-center gap-3">
           <Users className="h-10 w-10 text-text-muted" />
           <div className="text-sm font-semibold text-text-secondary">Networking premium</div>
           <div className="text-xs text-text-muted max-w-sm">
-            Participantes com badge premium podem solicitar conexões e agendar reuniões durante o evento. Ative o módulo de monetização para liberar.
+            {attendeesCount > 0
+              ? `${attendeesCount} participantes confirmados neste evento. Ative o módulo de networking premium para liberar conexões.`
+              : 'Participantes com badge premium podem solicitar conexões e agendar reuniões durante o evento. Ative o módulo de monetização para liberar.'}
           </div>
           <button className="btn-primary mt-2 text-xs flex items-center gap-2">
             <Plus className="h-3.5 w-3.5" /> Ativar networking premium
@@ -293,47 +466,26 @@ export function CommunityPageContent() {
       )}
 
       {/* Conexões */}
-      {tab === 'conexoes' && (
+      {!loading && tab === 'conexoes' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-text-muted">{MOCK_CONNECTIONS.length} conexões neste evento</div>
+            <div className="text-sm text-text-muted">{attendeesCount} participantes neste evento</div>
           </div>
-          <div className="card overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/5 text-left">
-                  <th className="px-5 py-3 text-[10px] font-mono uppercase tracking-wider text-text-muted">Participante</th>
-                  <th className="px-5 py-3 text-[10px] font-mono uppercase tracking-wider text-text-muted">Conexões em comum</th>
-                  <th className="px-5 py-3 text-[10px] font-mono uppercase tracking-wider text-text-muted">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {MOCK_CONNECTIONS.map((c) => (
-                  <tr key={c.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-brand-blue/10 flex items-center justify-center text-xs font-bold text-brand-blue">
-                          {c.name.split(' ').map((n) => n[0]).join('')}
-                        </div>
-                        <div>
-                          <div className="font-medium text-text-primary">{c.name}</div>
-                          <div className="text-xs text-text-muted">{c.role}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4 text-xs text-text-muted">{c.mutual} em comum</td>
-                    <td className="px-5 py-4">
-                      <span className={cn('rounded-full px-2.5 py-0.5 text-xs font-medium',
-                        c.status === 'accepted' ? 'bg-status-success/10 text-status-success' : 'bg-status-warning/10 text-status-warning',
-                      )}>
-                        {c.status === 'accepted' ? 'Conectado' : 'Pendente'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {attendeesCount === 0 ? (
+            <div className="card p-12 flex flex-col items-center justify-center text-center gap-3">
+              <Share2 className="h-10 w-10 text-text-muted" />
+              <div className="text-sm font-semibold text-text-secondary">Nenhuma conexão ainda</div>
+              <div className="text-xs text-text-muted max-w-sm">
+                Conexões aparecerão aqui quando participantes começarem a interagir no evento.
+              </div>
+            </div>
+          ) : (
+            <div className="card p-8 text-center">
+              <div className="text-xs text-text-muted">
+                O módulo de conexões será exibido quando ativado. Atualmente há {attendeesCount} participantes confirmados.
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

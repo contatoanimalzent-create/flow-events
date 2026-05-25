@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { Bell, Globe, LogOut, Menu, Search, X } from 'lucide-react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
+import { Bell, Globe, LogOut, Menu, Search, X, Calendar, Users, Ticket, Loader2 } from 'lucide-react'
 import type { NavSection } from '@/app/layout'
 import { AuditFeedPanel } from '@/features/audit'
 import { useAccessControl } from '@/features/access-control'
@@ -9,7 +9,14 @@ import { NotificationsPanel, useNotificationsCenter } from '@/features/notificat
 import { useAuthStore } from '@/lib/store/auth'
 import { cn } from '@/shared/lib'
 import { useAppLocale } from '@/shared/i18n/app-locale'
-import { logError } from '@/shared/lib'
+import { supabase } from '@/lib/supabase'
+
+interface SearchResult {
+  type: 'event' | 'staff' | 'ticket'
+  id: string
+  title: string
+  subtitle: string
+}
 
 interface TopbarProps {
   activeSection: NavSection
@@ -36,7 +43,10 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
   const [showNotifications, setShowNotifications] = useState(false)
   const [panelTab, setPanelTab] = useState<'notifications' | 'activity'>('notifications')
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [searching, setSearching] = useState(false)
   const primaryNav = useMemo(() => getPrimaryNav(isPortuguese), [isPortuguese])
+  const { organization } = useAuthStore()
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -54,11 +64,24 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  function handleSearch() {
-    if (!searchQuery.trim()) return
-    logError(`Search not implemented: ${searchQuery}`, { scope: 'topbar', action: 'search' })
-    setShowSearch(false)
-  }
+  const handleSearch = useCallback(async () => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q || !organization?.id) return
+    setSearching(true)
+    const results: SearchResult[] = []
+    try {
+      const [eventsRes, staffRes, ticketsRes] = await Promise.all([
+        supabase.from('events').select('id, name, slug, starts_at').eq('organization_id', organization.id).ilike('name', `%${q}%`).limit(5),
+        supabase.from('staff_members').select('id, first_name, last_name, role_title, event_id').eq('organization_id', organization.id).or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%`).limit(5),
+        supabase.from('digital_tickets').select('id, holder_name, holder_email, ticket_number').ilike('holder_name', `%${q}%`).limit(5),
+      ])
+      ;(eventsRes.data ?? []).forEach((e: any) => results.push({ type: 'event', id: e.id, title: e.name, subtitle: e.slug }))
+      ;(staffRes.data ?? []).forEach((s: any) => results.push({ type: 'staff', id: s.id, title: [s.first_name, s.last_name].filter(Boolean).join(' '), subtitle: s.role_title ?? 'Staff' }))
+      ;(ticketsRes.data ?? []).forEach((t: any) => results.push({ type: 'ticket', id: t.id, title: t.holder_name ?? t.holder_email ?? '-', subtitle: t.ticket_number ?? 'Ingresso' }))
+    } catch { /* silent */ }
+    setSearchResults(results)
+    setSearching(false)
+  }, [searchQuery, organization?.id])
 
   return (
     <>
@@ -166,10 +189,42 @@ export function Topbar({ activeSection, onNavigate, onMenuToggle }: TopbarProps)
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="px-5 py-10 text-center text-sm text-[#9CA3AF]">
-              {searchQuery
-                ? t('Search captured for future integration.', 'Busca registrada para integração futura.')
-                : t('Type to search', 'Digite para buscar')}
+            <div className="max-h-[360px] overflow-y-auto">
+              {searching ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="h-5 w-5 animate-spin text-[#0057E7]" />
+                </div>
+              ) : searchResults.length > 0 ? (
+                <div className="divide-y divide-[#E5E7EB]">
+                  {searchResults.map((r) => (
+                    <button
+                      key={`${r.type}-${r.id}`}
+                      onClick={() => {
+                        setShowSearch(false)
+                        if (r.type === 'event') onNavigate('events')
+                        else if (r.type === 'staff') onNavigate('staff')
+                        else onNavigate('checkin')
+                      }}
+                      className="flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-[#F7F8FA]"
+                    >
+                      {r.type === 'event' ? <Calendar className="h-4 w-4 text-[#0057E7] shrink-0" /> : r.type === 'staff' ? <Users className="h-4 w-4 text-[#22C55E] shrink-0" /> : <Ticket className="h-4 w-4 text-[#d97706] shrink-0" />}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-[#0A0A0A]">{r.title}</p>
+                        <p className="truncate text-xs text-[#9CA3AF]">{r.subtitle}</p>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-[#F7F8FA] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#9CA3AF]">
+                        {r.type === 'event' ? 'Evento' : r.type === 'staff' ? 'Staff' : 'Ingresso'}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="px-5 py-10 text-center text-sm text-[#9CA3AF]">
+                  {searchQuery
+                    ? t('No results found', 'Nenhum resultado encontrado')
+                    : t('Type to search events, staff, tickets...', 'Busque eventos, staff, ingressos...')}
+                </div>
+              )}
             </div>
           </div>
         </div>

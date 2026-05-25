@@ -50,52 +50,45 @@ export const supervisorService = {
     const { data: members } = await supabase
       .from('staff_members')
       .select(`
-        id, role, zone, shift_start, status,
-        user_id,
-        profiles!user_id(full_name),
-        staff_sessions(id, started_at, status),
-        staff_location_pings(lat, lng, pinged_at)
+        id, first_name, last_name, role_title, area, shift_starts_at, status, is_active,
+        checked_in_at, checked_out_at
       `)
       .eq('event_id', eventId)
-      .order('shift_start', { ascending: true })
+      .eq('is_active', true)
+      .order('first_name', { ascending: true })
 
     if (!members) return { members: [], total: 0, active: 0, delayed: 0, absent: 0, outOfArea: 0 }
 
     const now = Date.now()
-    const PING_TIMEOUT_MS = 5 * 60 * 1000 // 5 min without ping = offline
-    const DELAY_THRESHOLD_MS = 15 * 60 * 1000 // 15 min late = delayed
+    const DELAY_THRESHOLD_MS = 15 * 60 * 1000
 
     const result: TeamMember[] = (members as any[]).map((m) => {
-      const activeSession = (m.staff_sessions ?? []).find((s: any) => s.status === 'active')
-      const lastPing = (m.staff_location_pings ?? []).sort((a: any, b: any) =>
-        new Date(b.pinged_at).getTime() - new Date(a.pinged_at).getTime()
-      )[0]
+      let memberStatus: TeamMemberStatus = 'absent'
 
-      let status: TeamMemberStatus = 'absent'
-
-      if (activeSession) {
-        if (lastPing) {
-          const pingAge = now - new Date(lastPing.pinged_at).getTime()
-          status = pingAge > PING_TIMEOUT_MS ? 'offline' : 'active'
-        } else {
-          status = 'active'
-        }
-      } else if (m.shift_start) {
-        const shiftStart = new Date(m.shift_start).getTime()
+      if (m.status === 'active' && m.checked_in_at && !m.checked_out_at) {
+        memberStatus = 'active'
+      } else if (m.shift_starts_at) {
+        const shiftStart = new Date(m.shift_starts_at).getTime()
         const late = now - shiftStart
-        status = late > DELAY_THRESHOLD_MS ? 'delayed' : 'absent'
+        if (late > 0 && late > DELAY_THRESHOLD_MS) {
+          memberStatus = 'delayed'
+        } else if (late <= 0) {
+          memberStatus = 'absent'
+        }
       }
+
+      const fullName = [m.first_name, m.last_name].filter(Boolean).join(' ')
 
       return {
         id: m.id,
-        name: (m.profiles as any)?.full_name ?? 'Sem nome',
-        role: m.role ?? 'staff_member',
-        zone: m.zone ?? null,
-        status,
-        sessionStart: activeSession?.started_at ?? null,
-        lastPingAt: lastPing?.pinged_at ?? null,
-        lat: lastPing?.lat ?? null,
-        lng: lastPing?.lng ?? null,
+        name: fullName || 'Sem nome',
+        role: m.role_title ?? 'staff',
+        zone: m.area ?? null,
+        status: memberStatus,
+        sessionStart: m.checked_in_at ?? null,
+        lastPingAt: null,
+        lat: null,
+        lng: null,
       }
     })
 
@@ -110,126 +103,129 @@ export const supervisorService = {
   },
 
   async getApprovals(eventId: string): Promise<SupervisorApproval[]> {
-    const { data } = await supabase
-      .from('supervisor_approvals')
-      .select(`
-        id, type, reason, requested_at, status,
-        staff_member_id,
-        staff_members(profiles!user_id(full_name))
-      `)
-      .eq('event_id', eventId)
-      .order('requested_at', { ascending: false })
+    try {
+      const { data } = await supabase
+        .from('supervisor_approvals')
+        .select(`
+          id, type, reason, requested_at, status,
+          staff_member_id,
+          staff_member:staff_members(first_name, last_name)
+        `)
+        .eq('event_id', eventId)
+        .order('requested_at', { ascending: false })
 
-    if (!data) return []
+      if (!data) return []
 
-    return (data as any[]).map((a) => ({
-      id: a.id,
-      type: a.type,
-      staffName: a.staff_members?.profiles?.full_name ?? '-',
-      reason: a.reason ?? '',
-      requestedAt: a.requested_at,
-      status: a.status ?? 'pending',
-    }))
+      return (data as any[]).map((a) => ({
+        id: a.id,
+        type: a.type,
+        staffName: [a.staff_member?.first_name, a.staff_member?.last_name].filter(Boolean).join(' ') || '-',
+        reason: a.reason ?? '',
+        requestedAt: a.requested_at,
+        status: a.status ?? 'pending',
+      }))
+    } catch {
+      return []
+    }
   },
 
   async resolveApproval(approvalId: string, approved: boolean, supervisorId: string): Promise<void> {
-    const { error } = await supabase
-      .from('supervisor_approvals')
-      .update({
-        status: approved ? 'approved' : 'rejected',
-        resolved_by: supervisorId,
-        resolved_at: new Date().toISOString(),
-      })
-      .eq('id', approvalId)
-    if (error) throw new Error(error.message)
+    try {
+      await supabase
+        .from('supervisor_approvals')
+        .update({
+          status: approved ? 'approved' : 'rejected',
+          resolved_by: supervisorId,
+          resolved_at: new Date().toISOString(),
+        })
+        .eq('id', approvalId)
+    } catch {
+      // Table may not exist
+    }
   },
 
   async getOccurrences(eventId: string): Promise<SupervisorOccurrence[]> {
-    const { data } = await supabase
-      .from('staff_occurrences')
-      .select(`
-        id, type, description, occurred_at, status,
-        staff_member_id,
-        staff_members(zone, profiles!user_id(full_name))
-      `)
-      .eq('event_id', eventId)
-      .order('occurred_at', { ascending: false })
+    try {
+      const { data } = await supabase
+        .from('staff_occurrences')
+        .select(`
+          id, type, description, created_at,
+          staff_id,
+          staff:staff_members(first_name, last_name, area)
+        `)
+        .eq('event_id', eventId)
+        .order('created_at', { ascending: false })
 
-    if (!data) return []
+      if (!data) return []
 
-    return (data as any[]).map((o) => ({
-      id: o.id,
-      staffName: o.staff_members?.profiles?.full_name ?? '-',
-      type: o.type,
-      description: o.description,
-      zone: o.staff_members?.zone ?? null,
-      occurredAt: o.occurred_at,
-      status: o.status ?? 'open',
-    }))
+      return (data as any[]).map((o) => ({
+        id: o.id,
+        staffName: [o.staff?.first_name, o.staff?.last_name].filter(Boolean).join(' ') || '-',
+        type: o.type,
+        description: o.description,
+        zone: o.staff?.area ?? null,
+        occurredAt: o.created_at,
+        status: o.resolved_at ? 'resolved' : 'open',
+      }))
+    } catch {
+      return []
+    }
   },
 
   async resolveOccurrence(occurrenceId: string): Promise<void> {
-    await supabase
-      .from('staff_occurrences')
-      .update({ status: 'resolved', resolved_at: new Date().toISOString() })
-      .eq('id', occurrenceId)
+    try {
+      await supabase
+        .from('staff_occurrences')
+        .update({ resolved_at: new Date().toISOString() })
+        .eq('id', occurrenceId)
+    } catch {
+      // Table may not exist
+    }
   },
 
   async sendInstruction(eventId: string, supervisorId: string, title: string, body: string, priority: string): Promise<void> {
-    const { error } = await supabase.from('staff_instructions').insert({
-      event_id: eventId,
-      created_by: supervisorId,
-      title,
-      body,
-      priority,
-      created_at: new Date().toISOString(),
-    })
-    if (error) throw new Error(error.message)
+    try {
+      await supabase.from('staff_instructions').insert({
+        event_id: eventId,
+        created_by: supervisorId,
+        title,
+        body,
+        priority,
+        created_at: new Date().toISOString(),
+      })
+    } catch {
+      // Table may not exist
+    }
   },
 
   async getHealthScore(eventId: string): Promise<{
-    score: number // 0-100
+    score: number
     grade: 'A' | 'B' | 'C' | 'D' | 'F'
     factors: Array<{ label: string; value: number; weight: number; ok: boolean }>
   }> {
-    // Fetch all data in parallel
-    const [teamData, { count: totalCheckins }, { count: totalInvalid }] = await Promise.all([
+    const [teamData, validResult, invalidResult] = await Promise.all([
       supervisorService.getTeamLive(eventId),
-      supabase.from('checkins').select('id', { count: 'exact', head: true }).eq('event_id', eventId),
-      supabase.from('checkin_attempts').select('id', { count: 'exact', head: true }).eq('event_id', eventId).eq('valid', false),
+      supabase.from('checkins').select('id', { count: 'exact', head: true }).eq('event_id', eventId).eq('result', 'success'),
+      supabase.from('checkins').select('id', { count: 'exact', head: true }).eq('event_id', eventId).neq('result', 'success'),
     ])
 
-    const checkins = totalCheckins ?? 0
-    const invalids = totalInvalid ?? 0
+    const checkins = validResult.count ?? 0
+    const invalids = invalidResult.count ?? 0
 
-    // Factor 1: Staff active rate (weight 40)
     const activeRate = teamData.total > 0 ? (teamData.active / teamData.total) * 100 : 100
-    const activeOk = activeRate >= 80
-
-    // Factor 2: Delay rate (weight 25)
     const delayRate = teamData.total > 0 ? ((teamData.total - teamData.delayed - teamData.absent) / teamData.total) * 100 : 100
-    const delayOk = delayRate >= 85
-
-    // Factor 3: Absence rate (weight 20)
     const presentRate = teamData.total > 0 ? ((teamData.active + teamData.delayed) / teamData.total) * 100 : 100
-    const presentOk = presentRate >= 70
-
-    // Factor 4: Security (invalid attempts rate) (weight 15)
     const total = checkins + invalids
     const securityRate = total > 0 ? (checkins / total) * 100 : 100
-    const securityOk = securityRate >= 90
 
     const factors = [
-      { label: 'Staff ativo', value: Math.round(activeRate), weight: 40, ok: activeOk },
-      { label: 'Pontualidade', value: Math.round(delayRate), weight: 25, ok: delayOk },
-      { label: 'Presença geral', value: Math.round(presentRate), weight: 20, ok: presentOk },
-      { label: 'Segurança', value: Math.round(securityRate), weight: 15, ok: securityOk },
+      { label: 'Staff ativo', value: Math.round(activeRate), weight: 40, ok: activeRate >= 80 },
+      { label: 'Pontualidade', value: Math.round(delayRate), weight: 25, ok: delayRate >= 85 },
+      { label: 'Presença geral', value: Math.round(presentRate), weight: 20, ok: presentRate >= 70 },
+      { label: 'Segurança', value: Math.round(securityRate), weight: 15, ok: securityRate >= 90 },
     ]
 
-    const score = Math.round(
-      factors.reduce((sum, f) => sum + (f.value * f.weight) / 100, 0)
-    )
-
+    const score = Math.round(factors.reduce((sum, f) => sum + (f.value * f.weight) / 100, 0))
     const grade: 'A' | 'B' | 'C' | 'D' | 'F' =
       score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F'
 

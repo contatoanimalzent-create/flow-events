@@ -2,7 +2,7 @@ import { slugify } from '@/shared/lib'
 import type { EventFormData, EventRow } from '@/features/events/types'
 
 export const EVENT_LIST_SELECT =
-  'id,name,slug,subtitle,category,status,starts_at,ends_at,venue_name,venue_address,total_capacity,sold_tickets,cover_url,fee_type,fee_value,absorb_fee,created_at,event_code'
+  'id,name,slug,subtitle,category,status,starts_at,ends_at,venue_name,venue_address,total_capacity,sold_tickets,cover_url,fee_type,fee_value,absorb_fee,created_at'
 
 function toOptionalString(value: string) {
   return value.trim() || null

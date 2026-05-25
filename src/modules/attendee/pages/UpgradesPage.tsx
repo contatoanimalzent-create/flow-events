@@ -139,12 +139,6 @@ export default function UpgradesPage({ onNavigate }: PulsePageProps) {
                       {upgrade.available} disponíveis
                     </div>
                   )}
-                  {upgrade.expiresAt && (
-                    <div className="flex items-center gap-1.5 text-slate-400 text-xs">
-                      <Clock size={12} />
-                      Até {fmtDeadline(upgrade.expiresAt)}
-                    </div>
-                  )}
                 </div>
 
                 <div className="flex items-center justify-between">

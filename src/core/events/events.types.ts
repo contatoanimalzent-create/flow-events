@@ -4,8 +4,8 @@ export interface UserEvent {
   id: string
   name: string
   slug: string
-  start_date: string
-  end_date: string | null
+  starts_at: string
+  ends_at: string | null
   status: string
   venue_name: string | null
   cover_url: string | null

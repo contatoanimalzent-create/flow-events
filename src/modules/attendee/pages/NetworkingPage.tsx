@@ -44,22 +44,24 @@ export default function NetworkingPage({ onNavigate }: PulsePageProps) {
 
       const { data, error: fetchError } = await supabase
         .from('digital_tickets')
-        .select('attendee_id, profiles!attendee_id(full_name, avatar_url)')
+        .select('id, holder_name, holder_email')
         .eq('event_id', context.eventId)
-        .neq('attendee_id', user.id)
+        .neq('holder_email', user.email ?? '')
         .limit(50)
 
       if (fetchError) throw fetchError
 
       if (data) {
-        type TicketRow = {
-          attendee_id: string
-          profiles: { full_name: string | null; avatar_url: string | null }[] | null
-        }
-        const mapped: PersonItem[] = (data as TicketRow[])
+        const seen = new Set<string>()
+        const mapped: PersonItem[] = (data as any[])
+          .filter((row) => {
+            const key = row.holder_email ?? row.id
+            if (seen.has(key)) return false
+            seen.add(key)
+            return true
+          })
           .map((row) => {
-            const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
-            const name = profile?.full_name ?? 'Participante'
+            const name = row.holder_name ?? 'Participante'
             const initials = name
               .split(' ')
               .map((w: string) => w[0] ?? '')
@@ -67,10 +69,10 @@ export default function NetworkingPage({ onNavigate }: PulsePageProps) {
               .slice(0, 2)
               .toUpperCase() || '?'
             return {
-              id: row.attendee_id,
+              id: row.id,
               name,
               initials,
-              avatarUrl: profile?.avatar_url ?? null,
+              avatarUrl: null,
             }
           })
           .filter((p: PersonItem) => Boolean(p.id))

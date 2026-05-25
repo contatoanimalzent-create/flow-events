@@ -125,7 +125,7 @@ export default function SelectEventPage({ onNavigate }: PulsePageProps) {
                     {STATUS_LABELS[event.status] ?? event.status}
                   </span>
                 </div>
-                <p className="text-slate-400 text-xs">{formatEventDate(event.start_date)}</p>
+                <p className="text-slate-400 text-xs">{formatEventDate(event.starts_at)}</p>
                 {event.venue_name && (
                   <p className="flex items-center gap-1 text-slate-500 text-xs mt-1">
                     <MapPin size={10} />

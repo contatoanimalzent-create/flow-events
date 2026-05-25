@@ -2,7 +2,6 @@ import { supabase } from '@/lib/supabase'
 import type { AppMode } from '../context/app-context.types'
 import type { EffectivePermission, PermissionModule } from './permissions.types'
 
-// Which app modes each DB role can access
 const ROLE_MODE_MAP: Record<string, AppMode[]> = {
   super_admin: ['operator', 'staff', 'supervisor', 'attendee', 'promoter'],
   org_admin: ['operator', 'staff', 'supervisor', 'attendee', 'promoter'],
@@ -14,7 +13,6 @@ const ROLE_MODE_MAP: Record<string, AppMode[]> = {
   promoter: ['promoter'],
 }
 
-// Modules unlocked per mode
 const MODE_MODULES: Record<AppMode, PermissionModule[]> = {
   operator: ['checkin', 'manual-check', 'checkin-history', 'flow', 'operator-alerts'],
   staff: ['shift', 'presence', 'location', 'instructions', 'occurrences'],
@@ -23,7 +21,6 @@ const MODE_MODULES: Record<AppMode, PermissionModule[]> = {
   promoter: ['sales', 'commission', 'ranking', 'goals'],
 }
 
-// Supervisor gets full actions on team modules
 const SUPERVISOR_FULL_MODULES: PermissionModule[] = ['team-live', 'team-map', 'delays', 'absences', 'approvals']
 
 export const permissionsService = {
@@ -32,42 +29,41 @@ export const permissionsService = {
     orgId: string,
     eventId: string
   ): Promise<{ permissions: EffectivePermission[]; modes: AppMode[] }> {
-    // 1. Profile role (org-level)
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', userId)
       .single()
 
-    // 2. Staff roles in this event
-    const { data: staffRows } = await supabase
-      .from('staff_members')
-      .select('role')
-      .eq('user_id', userId)
-      .eq('event_id', eventId)
+    const { data: authUser } = await supabase.auth.getUser()
+    const userEmail = authUser?.user?.email ?? ''
 
-    // 3. Ticket presence (attendee role)
-    const { count: ticketCount } = await supabase
-      .from('digital_tickets')
-      .select('id', { count: 'exact', head: true })
-      .eq('attendee_id', userId)
-      .eq('event_id', eventId)
+    const [staffResult, ticketResult, referralResult] = await Promise.all([
+      supabase
+        .from('staff_members')
+        .select('role_title')
+        .eq('email', userEmail)
+        .eq('event_id', eventId),
+      userEmail
+        ? supabase
+            .from('digital_tickets')
+            .select('id', { count: 'exact', head: true })
+            .eq('holder_email', userEmail)
+            .eq('event_id', eventId)
+        : Promise.resolve({ count: 0 }),
+      supabase
+        .from('referral_links')
+        .select('id', { count: 'exact', head: true })
+        .eq('referrer_id', userId)
+        .eq('event_id', eventId),
+    ])
 
-    // 4. Referral link (promoter role)
-    const { count: referralCount } = await supabase
-      .from('referral_links')
-      .select('id', { count: 'exact', head: true })
-      .eq('owner_id', userId)
-      .eq('event_id', eventId)
-
-    // Collect all roles
     const roles: string[] = []
     if (profile?.role) roles.push(profile.role)
-    staffRows?.forEach((s: any) => roles.push(s.role))
-    if ((ticketCount ?? 0) > 0) roles.push('attendee')
-    if ((referralCount ?? 0) > 0) roles.push('promoter')
+    ;(staffResult.data ?? []).forEach(() => roles.push('staff_member'))
+    if ((ticketResult.count ?? 0) > 0) roles.push('attendee')
+    if ((referralResult.count ?? 0) > 0) roles.push('promoter')
 
-    // Derive available modes
     const modeSet = new Set<AppMode>()
     roles.forEach((role) => {
       const modes = ROLE_MODE_MAP[role] ?? []
@@ -75,7 +71,6 @@ export const permissionsService = {
     })
     const modes = Array.from(modeSet)
 
-    // Build permissions
     const permMap = new Map<PermissionModule, Set<string>>()
 
     const addPerms = (modules: PermissionModule[], actions: string[]) => {
@@ -96,7 +91,6 @@ export const permissionsService = {
       })
     })
 
-    // Global always-available modules
     addPerms(['profile', 'settings', 'notifications', 'help'], ['view', 'edit'])
 
     const permissions: EffectivePermission[] = Array.from(permMap.entries()).map(

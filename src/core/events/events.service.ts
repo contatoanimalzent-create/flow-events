@@ -15,49 +15,51 @@ const ROLE_MODE_MAP: Record<string, AppMode[]> = {
 
 export const eventsService = {
   async getEventsForUser(userId: string, orgId: string): Promise<UserEvent[]> {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, first_name, last_name')
+      .eq('id', userId)
+      .single()
+    const profileRole = profile?.role ?? null
+
+    const { data: authUser } = await supabase.auth.getUser()
+    const userEmail = authUser?.user?.email ?? null
+
     const { data: events } = await supabase
       .from('events')
-      .select('id, name, slug, start_date, end_date, status, cover_url, organization_id, venues(name)')
+      .select('id, name, slug, starts_at, ends_at, status, cover_url, venue_name, organization_id')
       .eq('organization_id', orgId)
       .in('status', ['published', 'ongoing', 'finished'])
-      .order('start_date', { ascending: false })
+      .order('starts_at', { ascending: false })
       .limit(30)
 
     if (!events) return []
 
     const eventIds = events.map((e: any) => e.id)
 
-    // Get staff roles
-    const { data: staffRows } = await supabase
-      .from('staff_members')
-      .select('event_id, role')
-      .eq('user_id', userId)
-      .in('event_id', eventIds)
+    const [staffResult, ticketResult, referralResult] = await Promise.all([
+      supabase
+        .from('staff_members')
+        .select('event_id, role_title')
+        .eq('email', userEmail ?? '')
+        .in('event_id', eventIds),
+      userEmail
+        ? supabase
+            .from('digital_tickets')
+            .select('event_id')
+            .eq('holder_email', userEmail)
+            .in('event_id', eventIds)
+        : Promise.resolve({ data: null }),
+      supabase
+        .from('referral_links')
+        .select('event_id')
+        .eq('referrer_id', userId)
+        .in('event_id', eventIds),
+    ])
 
-    // Get tickets
-    const { data: tickets } = await supabase
-      .from('digital_tickets')
-      .select('event_id')
-      .eq('attendee_id', userId)
-      .in('event_id', eventIds)
-
-    // Get referral links (promoter)
-    const { data: referrals } = await supabase
-      .from('referral_links')
-      .select('event_id')
-      .eq('owner_id', userId)
-      .in('event_id', eventIds)
-
-    const ticketEventIds = new Set((tickets ?? []).map((t: any) => t.event_id))
-    const referralEventIds = new Set((referrals ?? []).map((r: any) => r.event_id))
-
-    // Get profile role (org-level, applies to all events in org)
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single()
-    const profileRole = profile?.role ?? null
+    const staffRows = staffResult.data ?? []
+    const ticketEventIds = new Set((ticketResult.data ?? []).map((t: any) => t.event_id))
+    const referralEventIds = new Set((referralResult.data ?? []).map((r: any) => r.event_id))
 
     const result: UserEvent[] = []
 
@@ -68,25 +70,25 @@ export const eventsService = {
         ;(ROLE_MODE_MAP[profileRole] ?? []).forEach((m) => modeSet.add(m))
       }
 
-      ;(staffRows ?? [])
+      ;(staffRows as any[])
         .filter((s: any) => s.event_id === e.id)
-        .forEach((s: any) => {
-          ;(ROLE_MODE_MAP[s.role] ?? []).forEach((m) => modeSet.add(m))
+        .forEach(() => {
+          modeSet.add('staff')
         })
 
       if (ticketEventIds.has(e.id)) modeSet.add('attendee')
       if (referralEventIds.has(e.id)) modeSet.add('promoter')
 
-      if (modeSet.size === 0) continue // user has no access to this event
+      if (modeSet.size === 0) continue
 
       result.push({
         id: e.id,
         name: e.name,
         slug: e.slug,
-        start_date: e.start_date,
-        end_date: e.end_date,
+        starts_at: e.starts_at,
+        ends_at: e.ends_at ?? null,
         status: e.status,
-        venue_name: e.venues?.name ?? null,
+        venue_name: e.venue_name ?? null,
         cover_url: e.cover_url ?? null,
         organization_id: e.organization_id,
         availableModes: Array.from(modeSet),

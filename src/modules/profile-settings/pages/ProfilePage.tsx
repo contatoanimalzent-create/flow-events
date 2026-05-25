@@ -46,12 +46,16 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
 
       const { data } = await supabase
         .from('profiles')
-        .select('full_name, avatar_url')
+        .select('first_name, last_name, avatar_url')
         .eq('id', user.id)
         .maybeSingle()
 
+      const firstName = (data as any)?.first_name ?? ''
+      const lastName = (data as any)?.last_name ?? ''
+      const displayName = [firstName, lastName].filter(Boolean).join(' ') || user.user_metadata?.full_name || 'Usuário'
+
       setProfile({
-        fullName: (data as any)?.full_name ?? user.user_metadata?.full_name ?? 'Usuário',
+        fullName: displayName,
         email: user.email ?? '-',
         avatarUrl: (data as any)?.avatar_url ?? null,
       })

@@ -42,9 +42,9 @@ export function mapCheckinGateRow(row: Record<string, unknown>): CheckinGateRow 
     is_exit: Boolean(row.is_exit),
     is_active: Boolean(row.is_active),
     device_count: Number(row.device_count ?? 0),
-    gate_type: ((row.gate_type as CheckinGateRow['gate_type'] | undefined) ?? 'mixed'),
-    throughput_per_hour: Number(row.throughput_per_hour ?? 0),
-    operational_status: ((row.operational_status as CheckinGateRow['operational_status'] | undefined) ?? 'ready'),
+    gate_type: row.is_entrance && row.is_exit ? 'mixed' : row.is_exit ? 'exit' : 'entry',
+    throughput_per_hour: Number(row.throughput_target ?? 0),
+    operational_status: ((row.status as CheckinGateRow['operational_status'] | undefined) ?? 'ready'),
     supervisor_staff_id: (row.supervisor_staff_id as string | null | undefined) ?? null,
     notes: (row.notes as string | null | undefined) ?? null,
   }

@@ -67,11 +67,27 @@ export function StaffPageContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="btn-secondary flex items-center gap-2 text-xs">
-            <Upload className="h-3.5 w-3.5" /> Importar
-          </button>
-          <button className="btn-secondary flex items-center gap-2 text-xs">
-            <Download className="h-3.5 w-3.5" /> Exportar
+          <button
+            onClick={() => {
+              if (allStaff.length === 0) return
+              const headers = ['Nome', 'Sobrenome', 'E-mail', 'Telefone', 'CPF', 'Funcao', 'Area', 'Status', 'Portaria']
+              const rows = allStaff.map((m) => [
+                m.first_name, m.last_name ?? '', m.email ?? '', m.phone ?? '', m.cpf ?? '',
+                m.role_title ?? '', m.area ?? '', m.status, m.gate?.name ?? '',
+              ])
+              const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n')
+              const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `staff-${selectedEventId ?? 'all'}.csv`
+              a.click()
+              URL.revokeObjectURL(url)
+            }}
+            disabled={allStaff.length === 0}
+            className="btn-secondary flex items-center gap-2 text-xs"
+          >
+            <Download className="h-3.5 w-3.5" /> Exportar CSV
           </button>
           {canManageStaff ? (
             <button

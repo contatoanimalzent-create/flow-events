@@ -32,23 +32,29 @@ export default function PresencePage({ onNavigate }: PulsePageProps) {
   const timerRef = useRef<ReturnType<typeof setInterval>>()
   const pingRef = useRef<ReturnType<typeof setInterval>>()
 
+  const [organizationId, setOrganizationId] = useState<string | null>(null)
+
   // Load current user + shift + active session
   useEffect(() => {
     const init = async () => {
       try {
         const { data: { user }, error: authError } = await supabase.auth.getUser()
-        if (authError || !user || !context?.eventId) { setStatus('idle'); return }
+        if (authError || !user?.email || !context?.eventId) { setStatus('idle'); return }
 
-        const shift = await staffService.getCurrentShift(user.id, context.eventId)
+        const staffId = await staffService.findStaffMemberForAuthUser(user.email, context.eventId)
+        if (!staffId) { setStatus('idle'); return }
+
+        const shift = await staffService.getCurrentShift(staffId, context.eventId)
         if (!shift) { setStatus('idle'); return }
 
         setStaffMemberId(shift.id)
+        setOrganizationId(shift.organizationId)
 
         const session = await staffService.getActiveSession(shift.id)
         if (session) {
           setSessionId(session.id)
-          setStartTime(session.startedAt)
-          const secondsElapsed = Math.floor((Date.now() - new Date(session.startedAt).getTime()) / 1000)
+          setStartTime(session.openedAt)
+          const secondsElapsed = Math.floor((Date.now() - new Date(session.openedAt).getTime()) / 1000)
           setElapsed(secondsElapsed)
           setStatus('active')
         } else {
@@ -109,7 +115,7 @@ export default function PresencePage({ onNavigate }: PulsePageProps) {
     })
 
   const handleStart = useCallback(async () => {
-    if (!staffMemberId || !context?.eventId) return
+    if (!staffMemberId || !context?.eventId || !organizationId) return
     setActionLoading(true)
     const now = new Date().toISOString()
     const geo = await getLocation()
@@ -119,12 +125,12 @@ export default function PresencePage({ onNavigate }: PulsePageProps) {
 
     try {
       if (isOnline) {
-        const id = await staffService.startSession(staffMemberId, context.eventId, geo?.lat, geo?.lng)
+        const id = await staffService.startSession(staffMemberId, context.eventId, organizationId)
         setSessionId(id)
       } else {
         const id = `offline-sess-${Date.now()}`
         setSessionId(id)
-        enqueue('start-presence', { sessionId: id, staffId: staffMemberId, eventId: context.eventId, lat: geo?.lat, lng: geo?.lng })
+        enqueue('start-presence', { sessionId: id, staffId: staffMemberId, eventId: context.eventId, organizationId })
       }
       setStartTime(now)
       setElapsed(0)
@@ -134,18 +140,17 @@ export default function PresencePage({ onNavigate }: PulsePageProps) {
     } finally {
       setActionLoading(false)
     }
-  }, [staffMemberId, context?.eventId, isOnline, enqueue])
+  }, [staffMemberId, context?.eventId, organizationId, isOnline, enqueue])
 
   const handleEnd = useCallback(async () => {
     if (!sessionId) return
     setActionLoading(true)
-    const geo = await getLocation()
 
     try {
       if (isOnline) {
-        await staffService.endSession(sessionId, geo?.lat, geo?.lng)
+        await staffService.endSession(sessionId)
       } else {
-        enqueue('end-presence', { sessionId, lat: geo?.lat, lng: geo?.lng })
+        enqueue('end-presence', { sessionId })
       }
       setStatus('ended')
     } catch (err) {

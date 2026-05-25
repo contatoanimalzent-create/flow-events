@@ -601,6 +601,7 @@ export function StaffTimeclockPage() {
   const isActive = pageStatus === 'active'
   const isPaused = pageStatus === 'paused'
   const isIdle = pageStatus === 'idle'
+  const isCompleted = pageStatus === 'completed'
   const hasSession = isActive || isPaused
 
   // Clear transient error when user starts interacting
@@ -787,6 +788,16 @@ export function StaffTimeclockPage() {
             <p className="text-center text-xs text-amber-400/70">
               Retorne à área delimitada para encerrar o turno
             </p>
+          )}
+
+          {isCompleted && (
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 py-8">
+              <CheckCircle2 className="h-12 w-12 text-emerald-400" />
+              <p className="text-lg font-bold text-emerald-300">Turno encerrado</p>
+              <p className="text-sm text-white/50">
+                Tempo trabalhado: {formatDuration(calcWorkedSeconds(timeline))}
+              </p>
+            </div>
           )}
         </div>
 

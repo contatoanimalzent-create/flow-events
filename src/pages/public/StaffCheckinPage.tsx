@@ -14,6 +14,7 @@ import {
 
 interface StaffInfo {
   staff_member_id: string
+  event_id: string
   full_name: string
   role_title: string | null
   team: string | null
@@ -30,6 +31,8 @@ type PageStep =
   | 'identified'
   | 'camera'
   | 'preview'
+  | 'camera_checkout'
+  | 'preview_checkout'
   | 'submitting'
   | 'success_checkin'
   | 'success_checkout'
@@ -92,7 +95,7 @@ export function StaffCheckinPage() {
 
   // Geolocation
   const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [coords, setCoords] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null)
   const [distance, setDistance] = useState<number | null>(null)
 
   // Camera
@@ -132,8 +135,24 @@ export function StaffCheckinPage() {
         return
       }
 
-      const data: StaffInfo = await res.json()
-      setStaff(data)
+      const raw = await res.json()
+      const sm = raw.staff_member ?? raw
+      const checkins = raw.today_checkins ?? []
+      const lastCheckin = checkins.find((c: { type: string }) => c.type === 'checkin')
+      const lastCheckout = checkins.find((c: { type: string }) => c.type === 'checkout')
+      const vc = raw.venue_coordinates
+      setStaff({
+        staff_member_id: sm.id ?? sm.staff_member_id,
+        event_id: raw.event_id ?? sm.event_id ?? '',
+        full_name: sm.name ?? sm.full_name ?? '',
+        role_title: sm.role ?? sm.role_title ?? null,
+        team: null,
+        checked_in: raw.is_checked_in ?? false,
+        checkin_time: lastCheckin?.created_at ?? null,
+        checkout_time: lastCheckout?.created_at ?? null,
+        venue_lat: vc?.latitude ?? null,
+        venue_lng: vc?.longitude ?? null,
+      })
       setStep('identified')
     } catch {
       setErrorMessage('Erro de conexão. Verifique sua internet e tente novamente.')
@@ -150,7 +169,7 @@ export function StaffCheckinPage() {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const location = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+          const location = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }
           setCoords(location)
           setGeoStatus('done')
 
@@ -177,7 +196,7 @@ export function StaffCheckinPage() {
 
   // ── Camera ────────────────────────────────────────────────────────────────
 
-  async function openCamera() {
+  async function openCamera(targetStep: Step = 'camera') {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user' },
@@ -187,7 +206,7 @@ export function StaffCheckinPage() {
         videoRef.current.srcObject = stream
         videoRef.current.play()
       }
-      setStep('camera')
+      setStep(targetStep)
     } catch {
       setErrorMessage('Permissão de câmera negada. Habilite nas configurações do navegador.')
       setStep('error')
@@ -256,13 +275,13 @@ export function StaffCheckinPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          event_slug: eventSlug,
           staff_member_id: staff.staff_member_id,
-          action: 'checkin',
+          event_id: staff.event_id,
+          type: 'checkin',
           photo_base64: photoBase64,
           latitude: coords.lat,
           longitude: coords.lng,
-          timestamp: new Date().toISOString(),
+          accuracy_meters: coords.accuracy ?? undefined,
         }),
       })
 
@@ -283,9 +302,10 @@ export function StaffCheckinPage() {
   // ── Checkout flow ─────────────────────────────────────────────────────────
 
   async function handleCheckout() {
-    if (!staff) return
+    if (!staff || !photoBase64) return
 
     setLoading(true)
+    setStep('submitting')
     setErrorMessage('')
 
     try {
@@ -295,12 +315,13 @@ export function StaffCheckinPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          event_slug: eventSlug,
           staff_member_id: staff.staff_member_id,
-          action: 'checkout',
+          event_id: staff.event_id,
+          type: 'checkout',
+          photo_base64: photoBase64,
           latitude: location.lat,
           longitude: location.lng,
-          timestamp: new Date().toISOString(),
+          accuracy_meters: location.accuracy ?? undefined,
         }),
       })
 
@@ -580,7 +601,7 @@ export function StaffCheckinPage() {
                 </button>
               ) : (
                 <button
-                  onClick={handleCheckout}
+                  onClick={() => openCamera('camera_checkout')}
                   disabled={loading}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-red-500 bg-red-500/10 py-5 text-base font-bold uppercase tracking-[0.14em] text-red-400 transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                   style={{ minHeight: 72 }}
@@ -732,6 +753,71 @@ export function StaffCheckinPage() {
     )
   }
 
+  // ── Render: Camera checkout step ───────────────────────────────────────────
+
+  if (step === 'camera_checkout') {
+    return (
+      <div className="flex min-h-screen flex-col bg-[#06070a]">
+        <div className="flex flex-1 flex-col items-center justify-center px-5 py-8">
+          <div className="w-full max-w-sm">
+            <h2 className="mb-4 text-center text-lg font-bold text-red-400">
+              Foto de saída
+            </h2>
+            <p className="mb-6 text-center text-sm text-white/48">
+              Tire uma selfie para registrar a saída
+            </p>
+            <div className="relative mx-auto aspect-[3/4] w-full max-w-[320px] overflow-hidden rounded-2xl border-2 border-red-500/30 bg-black">
+              <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" style={{ transform: 'scaleX(-1)' }} />
+              <div className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-red-500/30" />
+            </div>
+            <canvas ref={canvasRef} className="hidden" />
+            <div className="mt-6 flex justify-center">
+              <button onClick={() => { capturePhoto(); setTimeout(() => setStep('preview_checkout'), 100) }} className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-red-500 bg-red-500/10 transition-all active:scale-90">
+                <Camera className="h-8 w-8 text-red-400" />
+              </button>
+            </div>
+            <button onClick={backToIdentified} className="mt-4 w-full text-center text-xs text-white/32 transition-colors hover:text-white/50">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Render: Preview checkout step ────────────────────────────────────────
+
+  if (step === 'preview_checkout' && photoBase64) {
+    return (
+      <div className="flex min-h-screen flex-col bg-[#06070a]">
+        <div className="flex flex-1 flex-col items-center justify-center px-5 py-8">
+          <div className="w-full max-w-sm">
+            <h2 className="mb-4 text-center text-lg font-bold text-red-400">Confirme a foto de saída</h2>
+            <div className="relative mx-auto aspect-[3/4] w-full max-w-[320px] overflow-hidden rounded-2xl border-2 border-red-500/30">
+              <img src={photoBase64} alt="Selfie saída" className="h-full w-full object-cover" />
+            </div>
+            {coords && (
+              <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
+                <MapPin className="h-4 w-4" />
+                <span className="text-sm">{distance !== null ? `${formatDistance(distance)} do local` : 'Localização capturada'}</span>
+              </div>
+            )}
+            <div className="mt-6 flex flex-col gap-3">
+              <button onClick={handleCheckout} className="flex w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-red-500 bg-red-500/20 py-4 text-sm font-bold uppercase tracking-[0.18em] text-red-400 transition-all active:scale-[0.98]">
+                <LogOut className="h-5 w-5" />
+                Confirmar Saída
+              </button>
+              <button onClick={() => setStep('camera_checkout')} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] py-3 text-sm font-medium text-white/64 transition-all hover:border-white/20 hover:text-white">
+                <Camera className="h-4 w-4" />
+                Tirar outra foto
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // ── Render: Submitting step ───────────────────────────────────────────────
 
   if (step === 'submitting') {
@@ -741,7 +827,7 @@ export function StaffCheckinPage() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
             <Loader2 className="h-7 w-7 animate-spin text-[#D4FF00]" />
           </div>
-          <p className="text-sm text-white/52">Registrando entrada...</p>
+          <p className="text-sm text-white/52">Registrando ponto...</p>
         </div>
       </div>
     )

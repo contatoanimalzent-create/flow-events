@@ -169,6 +169,7 @@ async function handleGet(req: Request): Promise<Response> {
   const venueCoords = parsePoint(event.venue_coordinates)
 
   return jsonResponse({
+    event_id: event.id,
     staff_member: {
       id: staffMember.id,
       name: [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' '),
@@ -274,10 +275,23 @@ async function handlePost(req: Request): Promise<Response> {
   const venueCoords = parsePoint(event.venue_coordinates)
   let distanceFromVenueMeters: number | null = null
 
+  const MAX_DISTANCE_METERS = 200
+
   if (venueCoords) {
     distanceFromVenueMeters = Math.round(
       haversineMeters(latitude, longitude, venueCoords.latitude, venueCoords.longitude),
     )
+    if (distanceFromVenueMeters > MAX_DISTANCE_METERS) {
+      return errorResponse(
+        `Você está a ${distanceFromVenueMeters}m do local do evento. Aproxime-se do Centro Olímpico Estrutural para registrar o ponto (máximo ${MAX_DISTANCE_METERS}m).`,
+        403,
+        'TOO_FAR_FROM_VENUE',
+      )
+    }
+  }
+
+  if (!body.photo_base64 && !body.photo_url) {
+    return errorResponse('Foto obrigatória para registrar o ponto.', 400, 'PHOTO_REQUIRED')
   }
 
   // ── 4/5/6. Check for open checkin today ───────────────────────────────────
@@ -318,7 +332,7 @@ async function handlePost(req: Request): Promise<Response> {
   // ── Handle photo upload (base64 → Supabase Storage) ───────────────────────
   let photoUrl = body.photo_url ?? null
 
-  if (type === 'checkin' && body.photo_base64) {
+  if (body.photo_base64) {
     try {
       const timestamp = Date.now()
       const filePath = `checkins/${staff_member_id}/${timestamp}.jpg`

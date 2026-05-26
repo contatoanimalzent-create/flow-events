@@ -10,3 +10,10 @@ export {
   dataUrlToFile,
 } from './arrival-proof.service'
 export type { EventGeofence, ArrivalProofResult } from './arrival-proof.service'
+export {
+  fetchArrivalProofs,
+  exportStaffCsv,
+  exportArrivalProofsCsv,
+  exportEventReportPdf,
+} from './staff-export.service'
+export type { ArrivalProofRow } from './staff-export.service'

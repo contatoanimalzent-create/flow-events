@@ -1,10 +1,11 @@
-import { Download, Loader2, Plus, Search, Upload, Users } from 'lucide-react'
+import { Download, FileText, Loader2, Plus, Search, Upload, Users } from 'lucide-react'
 import { useQueries } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useAuthStore } from '@/features/auth'
 import { useAccessControl } from '@/features/access-control'
 import { useStaffActions, useStaffList } from '@/features/staff/hooks'
 import { staffKeys, staffQueries } from '@/features/staff/services'
+import { fetchArrivalProofs, exportStaffCsv, exportArrivalProofsCsv, exportEventReportPdf } from '@/features/staff/services'
 import { STAFF_STATUS_CONFIG } from '@/features/staff/types'
 import type { StaffMemberRow, StaffTimeEntryRow } from '@/features/staff/types'
 import { ActionConfirmationDialog, PageEmptyState, PageLoadingState, PaginationControls } from '@/shared/components'
@@ -38,7 +39,42 @@ export function StaffPageContent() {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [pendingDeleteMember, setPendingDeleteMember] = useState<StaffMemberRow | null>(null)
+  const [exporting, setExporting] = useState<null | 'csv' | 'pdf'>(null)
   const { updateStatus, issueCredential, deleteStaff, recordPresence } = useStaffActions(selectedEventId)
+
+  const selectedEvent = events.find((e: { id: string }) => e.id === selectedEventId) as { id: string; name?: string } | undefined
+  const eventName = selectedEvent?.name ?? 'Evento'
+
+  async function handleExportCsv() {
+    if (!selectedEventId || allStaff.length === 0) return
+    setExporting('csv')
+    try {
+      exportStaffCsv(allStaff, eventName)
+      const proofs = await fetchArrivalProofs(selectedEventId)
+      if (proofs.length > 0) {
+        const map: Record<string, StaffMemberRow> = {}
+        allStaff.forEach((s) => { map[s.id] = s })
+        exportArrivalProofsCsv(proofs, map, eventName)
+      }
+    } catch (err) {
+      console.error('[export-csv]', err)
+    } finally {
+      setExporting(null)
+    }
+  }
+
+  async function handleExportPdf() {
+    if (!selectedEventId) return
+    setExporting('pdf')
+    try {
+      const proofs = await fetchArrivalProofs(selectedEventId)
+      exportEventReportPdf({ eventName, staff: allStaff, proofs })
+    } catch (err) {
+      console.error('[export-pdf]', err)
+    } finally {
+      setExporting(null)
+    }
+  }
 
   const staffTimeEntriesQueries = useQueries({
     queries: staff.map((member) => ({
@@ -70,8 +106,21 @@ export function StaffPageContent() {
           <button className="btn-secondary flex items-center gap-2 text-xs">
             <Upload className="h-3.5 w-3.5" /> Importar
           </button>
-          <button className="btn-secondary flex items-center gap-2 text-xs">
-            <Download className="h-3.5 w-3.5" /> Exportar
+          <button
+            onClick={handleExportCsv}
+            disabled={!selectedEventId || allStaff.length === 0 || exporting !== null}
+            className="btn-secondary flex items-center gap-2 text-xs disabled:opacity-40"
+          >
+            {exporting === 'csv' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+            Planilha (CSV)
+          </button>
+          <button
+            onClick={handleExportPdf}
+            disabled={!selectedEventId || exporting !== null}
+            className="btn-secondary flex items-center gap-2 text-xs disabled:opacity-40"
+          >
+            {exporting === 'pdf' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+            Relatório (PDF)
           </button>
           {canManageStaff ? (
             <button

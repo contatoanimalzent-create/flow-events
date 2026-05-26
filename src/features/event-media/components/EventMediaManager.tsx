@@ -178,7 +178,7 @@ export function EventMediaManager({ eventId, organizationId }: EventMediaManager
       {assets.length === 0 ? (
         <PageEmptyState
           title="BIBLIOTECA VAZIA"
-          description="Adicione capa, hero video e galeria premium para a landing pública do evento."
+          description="Adicione capa, hero video e galeria para a landing pública do evento."
           icon={<Film className="mb-3 h-10 w-10 text-text-muted" />}
           action={
             <button onClick={() => setShowUploadModal(true)} className="btn-primary">

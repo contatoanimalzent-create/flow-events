@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import type { AudienceSegmentRow, CampaignDraftFormValues, CampaignDraftRow, CampaignEventOption } from '@/features/campaigns/types'
 import { CAMPAIGN_CHANNEL_LABELS } from '@/features/campaigns/types'
-import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell } from '@/shared/components'
+import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell, SelectInput } from '@/shared/components'
 
 interface CampaignDraftModalProps {
   events: CampaignEventOption[]
@@ -40,36 +40,36 @@ export function CampaignDraftModal({ events, segments, draft, values, saving, on
               <input className="input" value={values.name} onChange={(event) => updateField('name', event.target.value)} placeholder="ex: Reengajamento no-show VIP" />
             </FormField>
             <FormField label="Canal">
-              <select className="input" value={values.channel} onChange={(event) => updateField('channel', event.target.value as CampaignDraftFormValues['channel'])}>
-                {Object.entries(CAMPAIGN_CHANNEL_LABELS).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+              <SelectInput
+                value={values.channel}
+                onChange={(v) => updateField('channel', v as CampaignDraftFormValues['channel'])}
+                options={Object.entries(CAMPAIGN_CHANNEL_LABELS).map(([key, label]) => ({ value: key, label }))}
+              />
             </FormField>
           </FormGrid>
 
           <FormGrid>
             <FormField label="Segmento">
-              <select className="input" value={values.segment_id} onChange={(event) => updateField('segment_id', event.target.value)}>
-                <option value="">Selecione</option>
-                {segments.map((segment) => (
-                  <option key={segment.id} value={segment.id}>
-                    {segment.name}
-                  </option>
-                ))}
-              </select>
+              <SelectInput
+                value={values.segment_id}
+                onChange={(v) => updateField('segment_id', v)}
+                placeholder="Selecione"
+                options={[
+                  { value: '', label: 'Selecione' },
+                  ...segments.map((segment) => ({ value: segment.id, label: segment.name })),
+                ]}
+              />
             </FormField>
             <FormField label="Evento">
-              <select className="input" value={values.event_id} onChange={(event) => updateField('event_id', event.target.value)}>
-                <option value="">Opcional</option>
-                {events.map((event) => (
-                  <option key={event.id} value={event.id}>
-                    {event.name}
-                  </option>
-                ))}
-              </select>
+              <SelectInput
+                value={values.event_id}
+                onChange={(v) => updateField('event_id', v)}
+                placeholder="Opcional"
+                options={[
+                  { value: '', label: 'Opcional' },
+                  ...events.map((event) => ({ value: event.id, label: event.name })),
+                ]}
+              />
             </FormField>
           </FormGrid>
 

@@ -31,6 +31,7 @@ export type PublicRoute =
   | 'ajuda-produtores'
   | 'status'
   | 'eventos-categoria'
+  | 'delete-account'
   | { type: 'event'; slug: string }
   | { type: 'staff-join'; token: string }
   | { type: 'timeclock'; eventId: string; credentialToken: string }
@@ -41,6 +42,7 @@ export function getInitialPublicRoute(): PublicRoute {
   // ── Existing routes ──
   if (path === '/terms' || path === '/termos') return 'terms'
   if (path === '/privacy' || path === '/privacidade') return 'privacy'
+  if (path === '/delete-account' || path === '/excluir-conta') return 'delete-account'
   if (path === '/contact' || path === '/contato') return 'contact'
   if (path === '/about' || path === '/sobre') return 'about'
   if (path === '/events' || path === '/eventos') return 'events'
@@ -101,6 +103,7 @@ export function isImmediatePublicRoute(route: PublicRoute) {
     route === 'account' ||
     route === 'terms' ||
     route === 'privacy' ||
+    route === 'delete-account' ||
     route === 'contact' ||
     route === 'producer' ||
     route === 'signup' ||

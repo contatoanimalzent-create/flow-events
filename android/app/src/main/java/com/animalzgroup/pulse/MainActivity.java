@@ -1,4 +1,4 @@
-package com.pulseevents.app;
+package com.animalzgroup.pulse;
 
 import com.getcapacitor.BridgeActivity;
 

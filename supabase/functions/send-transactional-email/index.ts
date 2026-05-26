@@ -1,5 +1,6 @@
 import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
+import { requireAuth } from '../_shared/auth-guard.ts'
 import {
   buildOrderConfirmationEmail,
   buildOrderConfirmationWithQREmail,
@@ -63,6 +64,9 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
+
+  const auth = await requireAuth(req)
+  if (!auth.ok) return auth.response
 
   try {
     const supabase = createSupabaseAdminClient()

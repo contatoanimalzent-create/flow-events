@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { EMPTY_FINANCIAL_FORECAST_FORM, FINANCIAL_FORECAST_RISK_LABELS } from '@/features/financial/types'
 import type { FinancialEventOption, FinancialEventReport, UpsertFinancialForecastInput } from '@/features/financial/types'
-import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell } from '@/shared/components'
+import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell, SelectInput } from '@/shared/components'
 
 interface ForecastModalProps {
   organizationId: string
@@ -69,14 +69,15 @@ export function ForecastModal({ organizationId, events, initialReport, defaultEv
       <ModalBody>
         <FormSection title="Visão projetada">
           <FormField label="Evento">
-            <select className="input" value={values.event_id} onChange={(event) => setField('event_id', event.target.value)}>
-              <option value="">Selecione um evento</option>
-              {events.map((eventOption) => (
-                <option key={eventOption.id} value={eventOption.id}>
-                  {eventOption.name}
-                </option>
-              ))}
-            </select>
+            <SelectInput
+              value={values.event_id}
+              onChange={(v) => setField('event_id', v)}
+              placeholder="Selecione um evento"
+              options={[
+                { value: '', label: 'Selecione um evento' },
+                ...events.map((eventOption) => ({ value: eventOption.id, label: eventOption.name })),
+              ]}
+            />
           </FormField>
 
           <FormGrid>
@@ -103,13 +104,11 @@ export function ForecastModal({ organizationId, events, initialReport, defaultEv
           </FormGrid>
 
           <FormField label="Risco executivo">
-            <select className="input" value={values.risk_status} onChange={(event) => setField('risk_status', event.target.value)}>
-              {Object.entries(FINANCIAL_FORECAST_RISK_LABELS).map(([key, label]) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <SelectInput
+              value={values.risk_status}
+              onChange={(v) => setField('risk_status', v)}
+              options={Object.entries(FINANCIAL_FORECAST_RISK_LABELS).map(([key, label]) => ({ value: key, label }))}
+            />
           </FormField>
 
           <FormField label="Observacoes">

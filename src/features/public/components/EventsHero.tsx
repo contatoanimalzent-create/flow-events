@@ -34,7 +34,7 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
             <PublicReveal>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-white/70">
                 <Sparkles className="h-3.5 w-3.5 text-brand-acid" />
-                {isPortuguese ? 'Descoberta de eventos premium' : 'Premium event discovery'}
+                {isPortuguese ? 'Gestao completa de eventos' : 'Complete event management'}
               </div>
             </PublicReveal>
 
@@ -42,7 +42,7 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
               <h1 className="mt-6 max-w-4xl font-display text-[clamp(3.8rem,8vw,7rem)] font-semibold uppercase leading-[0.84] tracking-[-0.04em] text-white">
                 {isPortuguese
                   ? 'Experiências que definem a temporada.'
-                  : 'Premium access to the experiences shaping the season.'}
+                  : 'Complete access to the experiences shaping the season.'}
               </h1>
             </PublicReveal>
 
@@ -67,7 +67,7 @@ export function EventsHero({ eventCount, cityCount, categories, onCategorySelect
                   href="/create-event"
                   className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] px-6 py-3.5 text-sm font-medium uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.10]"
                 >
-                  {isPortuguese ? 'Publicar evento premium' : 'Publish a premium event'}
+                  {isPortuguese ? 'Publicar evento' : 'Publish an event'}
                 </a>
               </div>
             </PublicReveal>

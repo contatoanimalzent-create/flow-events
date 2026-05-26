@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
-import { ActionConfirmationDialog } from '@/shared/components'
+import { ActionConfirmationDialog, SelectInput } from '@/shared/components'
 import { filterExampleEvents } from '@/shared/lib/example-events'
 import { cn, formatCurrency, formatDate } from '@/lib/utils'
 
@@ -174,12 +174,16 @@ export function CouponsPage() {
           <input className="input pl-9 h-9 text-sm" placeholder="Buscar código ou descrição..."
             value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <select className="input h-9 text-sm max-w-[200px]"
-          value={eventFilter} onChange={e => setEventFilter(e.target.value)}>
-          <option value="all">Todos os eventos</option>
-          <option value="">Geral (todos eventos)</option>
-          {events.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-        </select>
+        <SelectInput
+          className="max-w-[200px]"
+          value={eventFilter}
+          onChange={setEventFilter}
+          options={[
+            { value: 'all', label: 'Todos os eventos' },
+            { value: '', label: 'Geral (todos eventos)' },
+            ...events.map(e => ({ value: e.id, label: e.name })),
+          ]}
+        />
         <div className="flex-1" />
         <button onClick={() => { setEditing(null); setShowForm(true) }}
           className="btn-primary flex items-center gap-2 text-sm">
@@ -455,10 +459,14 @@ function CouponFormModal({ organizationId, events, coupon, onClose, onSaved }: {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="input-label">Tipo de desconto *</label>
-              <select className="input" value={form.type} onChange={e => set('type', e.target.value as CouponType)}>
-                <option value="percentage">Percentual (%)</option>
-                <option value="fixed">Valor fixo (R$)</option>
-              </select>
+              <SelectInput
+                value={form.type}
+                onChange={(v) => set('type', v as CouponType)}
+                options={[
+                  { value: 'percentage', label: 'Percentual (%)' },
+                  { value: 'fixed', label: 'Valor fixo (R$)' },
+                ]}
+              />
             </div>
             <div>
               <label className="input-label">
@@ -510,10 +518,15 @@ function CouponFormModal({ organizationId, events, coupon, onClose, onSaved }: {
           {/* Evento */}
           <div>
             <label className="input-label">Evento</label>
-            <select className="input" value={eventId} onChange={e => setEventId(e.target.value)}>
-              <option value="">Válido para todos os eventos</option>
-              {events.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-            </select>
+            <SelectInput
+              value={eventId}
+              onChange={setEventId}
+              placeholder="Válido para todos os eventos"
+              options={[
+                { value: '', label: 'Válido para todos os eventos' },
+                ...events.map(e => ({ value: e.id, label: e.name })),
+              ]}
+            />
           </div>
 
           {/* Descrição */}

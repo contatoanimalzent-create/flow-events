@@ -78,8 +78,8 @@ export function EventsDiscoveryPage({ onLogin }: { onLogin: () => void }) {
                 </h1>
                 <p className="mt-5 max-w-3xl text-base leading-8 text-white/62 md:text-lg">
                   {isPortuguese
-                    ? 'Cada evento tem atmosfera própria, mas todos compartilham a mesma fundação premium de venda, agenda, acesso e operação.'
-                    : 'Each event has its own atmosphere, but all share the same premium foundation for sales, schedule, access and operations.'}
+                    ? 'Cada evento tem atmosfera própria, mas todos compartilham a mesma fundação completa de venda, agenda, acesso e operação.'
+                    : 'Each event has its own atmosphere, but all share the same complete foundation for sales, schedule, access and operations.'}
                 </p>
               </div>
 

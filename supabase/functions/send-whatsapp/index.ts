@@ -1,5 +1,6 @@
 import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
+import { requireAuth, requireCronSecret } from '../_shared/auth-guard.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -143,6 +144,16 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   if (req.method !== 'POST') {
     return jsonResponse({ error: 'Method not allowed. Use POST.' }, 405)
+  }
+
+  // ── Auth: accept user JWT or cron secret ──────────────────────────────────
+  const hasAuthHeader = !!req.headers.get('Authorization')
+  if (hasAuthHeader) {
+    const auth = await requireAuth(req)
+    if (!auth.ok) return auth.response
+  } else {
+    const cron = requireCronSecret(req)
+    if (!cron.ok) return cron.response
   }
 
   // ── Env vars (fail-fast) ───────────────────────────────────────────────────

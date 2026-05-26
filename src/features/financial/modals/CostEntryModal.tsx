@@ -6,7 +6,7 @@ import {
   FINANCIAL_COST_STATUS_LABELS,
 } from '@/features/financial/types'
 import type { FinancialCostEntryRow, FinancialEventOption, UpsertFinancialCostEntryInput } from '@/features/financial/types'
-import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell } from '@/shared/components'
+import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell, SelectInput } from '@/shared/components'
 
 interface CostEntryModalProps {
   organizationId: string
@@ -90,22 +90,18 @@ export function CostEntryModal({
 
           <FormGrid>
             <FormField label="Categoria">
-              <select className="input" value={values.category} onChange={(event) => setField('category', event.target.value)}>
-                {Object.entries(FINANCIAL_COST_CATEGORY_LABELS).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+              <SelectInput
+                value={values.category}
+                onChange={(v) => setField('category', v)}
+                options={Object.entries(FINANCIAL_COST_CATEGORY_LABELS).map(([key, label]) => ({ value: key, label }))}
+              />
             </FormField>
             <FormField label="Status">
-              <select className="input" value={values.status} onChange={(event) => setField('status', event.target.value)}>
-                {Object.entries(FINANCIAL_COST_STATUS_LABELS).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+              <SelectInput
+                value={values.status}
+                onChange={(v) => setField('status', v)}
+                options={Object.entries(FINANCIAL_COST_STATUS_LABELS).map(([key, label]) => ({ value: key, label }))}
+              />
             </FormField>
           </FormGrid>
 
@@ -120,14 +116,15 @@ export function CostEntryModal({
 
           {events.length > 0 ? (
             <FormField label="Evento vinculado">
-              <select className="input" value={eventId} onChange={(event) => setEventId(event.target.value)}>
-                <option value="">Custo corporativo não alocado</option>
-                {events.map((eventOption) => (
-                  <option key={eventOption.id} value={eventOption.id}>
-                    {eventOption.name}
-                  </option>
-                ))}
-              </select>
+              <SelectInput
+                value={eventId}
+                onChange={setEventId}
+                placeholder="Custo corporativo não alocado"
+                options={[
+                  { value: '', label: 'Custo corporativo não alocado' },
+                  ...events.map((eventOption) => ({ value: eventOption.id, label: eventOption.name })),
+                ]}
+              />
             </FormField>
           ) : null}
 

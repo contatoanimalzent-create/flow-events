@@ -1,10 +1,22 @@
 import { useState } from 'react'
 import {
   Activity, AlertTriangle, ChevronDown, Eye, Layers,
-  MapPin, RefreshCw, Users, Wifi, ZoomIn, ZoomOut,
+  MapPin, RefreshCw, Users, Wifi, ZoomIn, ZoomOut, Hammer,
 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { cn } from '@/shared/lib'
+
+// AVISO: esta pagina usa MOCK DATA. Em desenvolvimento.
+// Para evitar enganar usuarios e reviewers das lojas, mostra disclaimer no topo.
+const DEVELOPMENT_PREVIEW_BANNER = (
+  <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+    <Hammer className="mt-0.5 h-4 w-4 shrink-0" />
+    <div>
+      <p className="font-semibold">Preview em desenvolvimento</p>
+      <p className="mt-1 text-amber-200/70">Esta tela mostra dados de exemplo para demonstracao. A integracao com staff_location_events em tempo real esta planejada para a proxima versao.</p>
+    </div>
+  </div>
+)
 
 type Layer = 'zones' | 'staff' | 'density' | 'alerts' | 'checkins'
 type ViewMode = 'live' | 'heatmap' | 'staff'
@@ -60,6 +72,7 @@ export function MapPageContent() {
 
   return (
     <div className="admin-page">
+      {DEVELOPMENT_PREVIEW_BANNER}
       <div className="admin-header">
         <div>
           <div className="admin-eyebrow">Situational awareness</div>

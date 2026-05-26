@@ -71,6 +71,28 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'assetType must be image or video' }, { status: 400, headers: corsHeaders })
     }
 
+    // SEGURANCA: limite de tamanho (image 25MB, video 200MB)
+    const MAX_IMAGE_BYTES = 25 * 1024 * 1024
+    const MAX_VIDEO_BYTES = 200 * 1024 * 1024
+    const sizeLimit = assetType === 'image' ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES
+    if (file.size > sizeLimit) {
+      return Response.json(
+        { error: `Arquivo muito grande. Limite: ${Math.round(sizeLimit / 1024 / 1024)}MB` },
+        { status: 413, headers: corsHeaders },
+      )
+    }
+
+    // SEGURANCA: whitelist MIME types (sem SVG, sem executaveis)
+    const ALLOWED_IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']
+    const ALLOWED_VIDEO_MIMES = ['video/mp4', 'video/quicktime', 'video/webm', 'video/x-m4v']
+    const allowed = assetType === 'image' ? ALLOWED_IMAGE_MIMES : ALLOWED_VIDEO_MIMES
+    if (file.type && !allowed.includes(file.type)) {
+      return Response.json(
+        { error: `Tipo de arquivo nao permitido: ${file.type}` },
+        { status: 415, headers: corsHeaders },
+      )
+    }
+
     const publicId = `${folder}/${Date.now()}-${sanitizeFileName(file.name || assetType)}`
     const timestamp = String(Math.floor(Date.now() / 1000))
     const uploadFormData = new FormData()

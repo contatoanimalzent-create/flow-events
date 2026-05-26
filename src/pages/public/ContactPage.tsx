@@ -56,12 +56,12 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
                     {
                       icon: Mail,
                       label: isPortuguese ? 'Suporte' : 'Support',
-                      value: 'support@animalz.events',
+                      value: 'contatopulse@animalzgroup.com',
                     },
                     {
                       icon: Mail,
                       label: isPortuguese ? 'Parcerias' : 'Partnerships',
-                      value: 'business@animalz.events',
+                      value: 'contatopulse@animalzgroup.com',
                     },
                     {
                       icon: Phone,

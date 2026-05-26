@@ -82,7 +82,7 @@ export function TermsPage() {
         {
           title: '12. Contato',
           content: [
-            'Para dúvidas sobre estes termos, escreva para support@animalz.events ou acesse nossa página de contato.',
+            'Para dúvidas sobre estes termos, escreva para contatopulse@animalzgroup.com ou acesse nossa página de contato.',
           ],
         },
       ]
@@ -160,7 +160,7 @@ export function TermsPage() {
         {
           title: '12. Contact',
           content: [
-            'For questions about these terms, email support@animalz.events or visit our contact page.',
+            'For questions about these terms, email contatopulse@animalzgroup.com or visit our contact page.',
           ],
         },
       ]

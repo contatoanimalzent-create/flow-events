@@ -1,5 +1,6 @@
 import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
+import { requireAuth } from '../_shared/auth-guard.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -50,6 +51,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') {
     return errorResponse('Method not allowed. Use POST.', 405, 'METHOD_NOT_ALLOWED')
   }
+
+  // ── Auth: operator must be logged in ──────────────────────────────────────
+  const auth = await requireAuth(req)
+  if (!auth.ok) return auth.response
 
   // ── Parse body ─────────────────────────────────────────────────────────────
   let body: RequestBody
@@ -416,6 +421,56 @@ Deno.serve(async (req: Request): Promise<Response> => {
         })
       }
     }
+  }
+
+  // ── 8.5. CRITICO: anti-replay para tickets de publico ────────────────────
+  // Se o QR token aponta para um digital_ticket (ref_type='ticket'), bloqueia se ja usado
+  if (qrToken && qrToken.ref_type === 'ticket' && qrToken.ref_id) {
+    const { data: ticket } = await admin
+      .from('digital_tickets')
+      .select('id, status, used_at')
+      .eq('id', qrToken.ref_id)
+      .maybeSingle()
+
+    if (ticket?.status === 'used') {
+      return await writeLog({
+        result: 'invalid',
+        message: 'Ingresso ja foi utilizado.',
+        credentialId: credential.id,
+        eventId,
+        zoneId: null,
+        zoneName: null,
+        holderName: null,
+        denialReason: 'ticket_already_used',
+      })
+    }
+
+    if (ticket?.status === 'cancelled' || ticket?.status === 'refunded') {
+      return await writeLog({
+        result: 'invalid',
+        message: 'Ingresso foi cancelado ou reembolsado.',
+        credentialId: credential.id,
+        eventId,
+        zoneId: null,
+        zoneName: null,
+        holderName: null,
+        denialReason: 'ticket_cancelled',
+      })
+    }
+  }
+
+  // Tambem checar max_uses do qr_token (single-use forte)
+  if (qrToken && qrToken.max_uses !== null && qrToken.used_count >= qrToken.max_uses) {
+    return await writeLog({
+      result: 'invalid',
+      message: 'QR Code ja atingiu o limite de usos.',
+      credentialId: credential.id,
+      eventId,
+      zoneId: null,
+      zoneName: null,
+      holderName: null,
+      denialReason: 'max_uses_reached',
+    })
   }
 
   // ── 9. Duplicate detection (same credential, last 5 minutes) ──────────────

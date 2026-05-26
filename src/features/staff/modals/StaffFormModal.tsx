@@ -9,6 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalShell,
+  SelectInput,
 } from '@/shared/components'
 
 interface StaffFormModalProps {
@@ -140,14 +141,15 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
                 </FormGrid>
 
                 <FormField label="Portaria vinculada">
-                  <select className="input" value={form.gate_id} onChange={(event) => updateField('gate_id', event.target.value)}>
-                    <option value="">Sem alocacao fixa</option>
-                    {gateOptions.map((gate) => (
-                      <option key={gate.id} value={gate.id}>
-                        {gate.name}
-                      </option>
-                    ))}
-                  </select>
+                  <SelectInput
+                    value={form.gate_id}
+                    onChange={(v) => updateField('gate_id', v)}
+                    placeholder="Sem alocacao fixa"
+                    options={[
+                      { value: '', label: 'Sem alocacao fixa' },
+                      ...gateOptions.map((gate) => ({ value: gate.id, label: gate.name })),
+                    ]}
+                  />
                 </FormField>
               </div>
             </FormSection>

@@ -63,9 +63,18 @@ export default function UpgradesPage({ onNavigate }: PulsePageProps) {
         return
       }
 
-      // Redirect to Stripe Checkout
+      // Redirect to Stripe Checkout — validate origin to prevent open-redirect
       if (result.url) {
-        window.location.href = result.url
+        try {
+          const u = new URL(result.url)
+          if (u.protocol === 'https:' && /(^|\.)stripe\.com$/.test(u.hostname)) {
+            window.location.href = result.url
+          } else {
+            setBuyError('URL de pagamento inválida')
+          }
+        } catch {
+          setBuyError('URL de pagamento inválida')
+        }
       }
     } catch (err: any) {
       setBuyError(err.message ?? 'Erro ao processar pagamento')

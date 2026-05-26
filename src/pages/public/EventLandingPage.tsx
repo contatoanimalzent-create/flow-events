@@ -387,7 +387,7 @@ export function EventLandingPage({ slug }: EventLandingPageProps) {
   const faqItems = useMemo(() => readFaqItems(settings, isPortuguese), [isPortuguese, settings])
   const ticketOptions = useMemo(() => (detail ? buildTicketOptions(detail.ticketTypes, locale, isPortuguese) : []), [detail, isPortuguese, locale])
 
-  const supportEmail = readString(settings.supportEmail, 'suporte@pulse.so')
+  const supportEmail = readString(settings.supportEmail, 'contatopulse@animalzgroup.com')
   const supportWhatsapp = readString(settings.supportWhatsapp, '+55 11 99999-0000')
   const contentTone = readString(settings.heroTone, heroVideoUrl || heroImageUrl ? 'light' : 'dark') === 'dark' ? 'dark' : 'light'
 
@@ -397,8 +397,8 @@ export function EventLandingPage({ slug }: EventLandingPageProps) {
       event?.short_description ||
       event?.full_description ||
       (isPortuguese
-        ? 'Inscrições, agenda e informações do evento em uma landing Pulse mais clara e premium.'
-        : 'Registrations, agenda and event information in a clearer premium Pulse landing page.'),
+        ? 'Inscrições, agenda e informações do evento em uma landing Pulse clara e objetiva.'
+        : 'Registrations, agenda and event information in a clear, objective Pulse landing page.'),
     image: heroImageUrl,
     url: typeof window !== 'undefined' ? window.location.href : `/e/${slug}`,
   })
@@ -476,7 +476,7 @@ export function EventLandingPage({ slug }: EventLandingPageProps) {
       />
 
       <AboutSection
-        description={eventRecord.full_description || eventRecord.short_description || (isPortuguese ? 'Uma experiência premium com narrativa clara, agenda objetiva e foco em conversão.' : 'A premium experience with clear storytelling, objective scheduling and conversion focus.')}
+        description={eventRecord.full_description || eventRecord.short_description || (isPortuguese ? 'Uma experiência com narrativa clara, agenda objetiva e foco em conversão.' : 'An experience with clear storytelling, objective scheduling and conversion focus.')}
         startsAt={eventRecord.starts_at}
         endsAt={eventRecord.ends_at}
         doorsOpenAt={eventRecord.doors_open_at}

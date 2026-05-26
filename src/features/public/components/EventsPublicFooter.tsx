@@ -226,8 +226,8 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                 </a>
                 <p className="mt-4 max-w-[200px] text-sm leading-7 text-white/50">
                   {isPortuguese
-                    ? 'Plataforma premium para descoberta, venda, operação e governança de eventos.'
-                    : 'Premium platform for event discovery, sales, operations and governance.'}
+                    ? 'Plataforma completa para gestão, venda, operação e governança de eventos.'
+                    : 'Complete platform for event management, sales, operations and governance.'}
                 </p>
 
                 {/* Contact info */}
@@ -333,7 +333,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
               </a>
               <span className="flex items-center gap-1.5">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#0057E7]" />
-                {isPortuguese ? 'Operação premium de eventos' : 'Premium event operations'}
+                {isPortuguese ? 'Operação completa de eventos' : 'Complete event operations'}
               </span>
             </div>
           </div>

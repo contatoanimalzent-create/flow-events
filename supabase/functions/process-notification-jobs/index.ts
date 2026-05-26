@@ -454,13 +454,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
     return jsonResponse({ error: 'Method not allowed. Use POST.' }, 405)
   }
 
-  // Auth: x-cron-secret header (enforced only when CRON_SECRET env var is set)
+  // Auth: x-cron-secret header is MANDATORY (fail-closed if env not configured)
   const CRON_SECRET = Deno.env.get('CRON_SECRET')
-  if (CRON_SECRET) {
-    const incoming = req.headers.get('x-cron-secret') ?? ''
-    if (incoming !== CRON_SECRET) {
-      return jsonResponse({ error: 'Unauthorized.' }, 401)
-    }
+  if (!CRON_SECRET) {
+    console.error('[process-notification-jobs] CRON_SECRET env var not configured')
+    return jsonResponse({ error: 'Server misconfigured.' }, 500)
+  }
+  const incoming = req.headers.get('x-cron-secret') ?? ''
+  if (incoming !== CRON_SECRET) {
+    return jsonResponse({ error: 'Unauthorized.' }, 401)
   }
 
   const env: Env = {

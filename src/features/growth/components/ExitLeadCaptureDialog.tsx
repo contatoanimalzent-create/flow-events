@@ -80,8 +80,8 @@ export function ExitLeadCaptureDialog({
   const resolvedDescription =
     description ||
     (isPortuguese
-      ? 'Salvamos seu acesso a futuras experiências, viradas de lote e convites premium sem poluir sua caixa.'
-      : 'We save your access to future experiences, tier changes and premium invitations without flooding your inbox.')
+      ? 'Salvamos seu acesso a futuras experiências, viradas de lote e convites sem poluir sua caixa.'
+      : 'We save your access to future experiences, tier changes and invitations without flooding your inbox.')
 
   async function handleSubmit() {
     if (!email.trim()) {

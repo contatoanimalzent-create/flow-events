@@ -6,13 +6,17 @@ export default defineConfig({
   plugins: [react()],
   server: {
     fs: {
-      strict: false,
+      strict: true,
     },
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  esbuild: {
+    drop: ['debugger'],
+    pure: ['console.log', 'console.debug', 'console.info'],
   },
   build: {
     target: 'es2020',

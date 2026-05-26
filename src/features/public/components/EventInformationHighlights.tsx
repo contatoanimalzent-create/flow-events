@@ -46,8 +46,8 @@ export function EventInformationHighlights({ event, isFreeMode }: EventInformati
     {
       icon: Sparkles,
       label: isPortuguese ? 'Categoria' : 'Category',
-      value: event.category || (isPortuguese ? 'Experiência premium' : 'Premium experience'),
-      note: event.age_rating ? (isPortuguese ? `Classificacao ${event.age_rating}` : `Age rating ${event.age_rating}`) : (isPortuguese ? 'Curadoria de atmosfera premium' : 'Curated premium atmosphere'),
+      value: event.category || (isPortuguese ? 'Experiência do evento' : 'Event experience'),
+      note: event.age_rating ? (isPortuguese ? `Classificacao ${event.age_rating}` : `Age rating ${event.age_rating}`) : (isPortuguese ? 'Curadoria de atmosfera' : 'Curated atmosphere'),
     },
     {
       icon: ShieldCheck,

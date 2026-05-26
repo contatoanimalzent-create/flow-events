@@ -29,7 +29,7 @@ if (Capacitor.isNativePlatform()) {
     import('@capacitor/splash-screen'),
   ]).then(([{ StatusBar, Style }, { SplashScreen }]) => {
     StatusBar.setStyle({ style: Style.Dark })
-    StatusBar.setBackgroundColor({ color: '#0a0a0a' })
+    StatusBar.setBackgroundColor({ color: '#060d1f' })
     SplashScreen.hide()
   })
 
@@ -41,6 +41,11 @@ if (Capacitor.isNativePlatform()) {
       })
     })
   }
+
+  // Wiring central: push notifications + deep links + app state
+  import('@/core/native/native-init').then(({ initNativeBridge }) => {
+    void initNativeBridge()
+  })
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

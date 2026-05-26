@@ -5,6 +5,7 @@ import { ORDER_PAYMENT_METHOD_CONFIG, ORDER_STATUS_CONFIG } from '@/features/ord
 import type { OrderRow } from '@/features/orders/types'
 import { OrderDetailModal } from '@/features/orders/modals'
 import { PageEmptyState, PageErrorState, PageLoadingState, PaginationControls } from '@/shared/components'
+import { SelectInput } from '@/shared/components/ui'
 import { cn, formatCurrency, formatDate } from '@/shared/lib'
 
 function exportOrdersCsv(orders: OrderRow[]) {
@@ -165,12 +166,17 @@ export function OrdersPageContent() {
           ))}
         </div>
 
-        <select className="input h-9 w-auto pr-8 text-xs" value={methodFilter} onChange={(event) => setMethodFilter(event.target.value as typeof methodFilter)}>
-          <option value="all">Todos os m\u00e9todos</option>
-          <option value="pix">PIX</option>
-          <option value="credit_card">Cart\u00e3o de Cr\u00e9dito</option>
-          <option value="boleto">Boleto</option>
-        </select>
+        <SelectInput
+          className="w-44"
+          value={methodFilter}
+          onChange={(v) => setMethodFilter(v as typeof methodFilter)}
+          options={[
+            { value: 'all', label: 'Todos os métodos' },
+            { value: 'pix', label: 'PIX' },
+            { value: 'credit_card', label: 'Cartão de Crédito' },
+            { value: 'boleto', label: 'Boleto' },
+          ]}
+        />
 
         <div className="flex-1" />
 

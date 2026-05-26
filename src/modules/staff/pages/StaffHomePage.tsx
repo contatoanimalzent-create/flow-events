@@ -6,6 +6,7 @@ import { staffService } from '@/core/staff/staff.service'
 import { supabase } from '@/lib/supabase'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 import type { StaffShift, StaffSession } from '@/core/staff/staff.service'
+import { ArrivalProofGate, StaffPermissionsGate } from '@/features/staff/components'
 
 interface QuickCard {
   id: string; title: string; subtitle: string; icon: LucideIcon
@@ -75,11 +76,22 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
   const accent = '#22C55E'
 
   return (
+    <StaffPermissionsGate>
     <div className="pb-6">
       {/* Hero */}
       <div className="px-4 pt-5 pb-4">
         <p className="text-slate-400 text-sm">Bem-vindo, Staff</p>
         <h2 className="text-xl font-bold text-white mt-0.5">{context?.eventName ?? '-'}</h2>
+      </div>
+
+      {/* Geofence: detecta chegada e pede foto de presenca */}
+      <div className="px-4 mb-4">
+        <ArrivalProofGate
+          eventId={context?.eventId ?? null}
+          eventName={context?.eventName ?? 'Evento'}
+          organizationId={context?.organizationId ?? null}
+          profileId={userId}
+        />
       </div>
 
       {/* Shift status card */}
@@ -180,5 +192,6 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
         })}
       </div>
     </div>
+    </StaffPermissionsGate>
   )
 }

@@ -1,6 +1,7 @@
 import { Clock, Edit2, LogIn, LogOut, QrCode, Trash2 } from 'lucide-react'
 import { STAFF_STATUS_CONFIG } from '@/features/staff/types'
 import type { StaffMemberRow, StaffStatus, StaffTimeEntryRow } from '@/features/staff/types'
+import { SelectInput } from '@/shared/components/ui'
 import { cn, formatCurrency, formatDate } from '@/shared/lib'
 
 interface StaffMemberRowProps {
@@ -56,20 +57,12 @@ export function StaffMemberTableRow({
           </div>
         </td>
         <td className="table-cell">
-          <select
+          <SelectInput
             value={member.status}
-            onChange={(event) => onStatusChange(event.target.value as StaffStatus)}
-            className={cn(
-              'cursor-pointer rounded-full border border-bg-border bg-bg-card px-3 py-1.5 text-xs font-medium outline-none',
-              STAFF_STATUS_CONFIG[member.status]?.color ?? 'text-text-muted',
-            )}
-          >
-            {Object.entries(STAFF_STATUS_CONFIG).map(([status, config]) => (
-              <option key={status} value={status} className="bg-bg-card text-text-primary">
-                {config.label}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => onStatusChange(v as StaffStatus)}
+            options={Object.entries(STAFF_STATUS_CONFIG).map(([status, config]) => ({ value: status, label: config.label }))}
+            triggerClassName={cn('rounded-full px-3 font-medium', STAFF_STATUS_CONFIG[member.status]?.color ?? 'text-text-muted')}
+          />
         </td>
         <td className="table-cell">
           {lastEntry ? (

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   Elements,
   PaymentElement,
@@ -164,6 +164,19 @@ export function CheckoutModal({ eventId, eventName, ticketType, onClose }: Check
   const [buyerName,    setBuyerName]    = useState('')
   const [showOptions,  setShowOptions]  = useState(false)
   const [formError,    setFormError]    = useState('')
+
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && step === 'config') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [step, onClose])
 
   const fees  = calculateFees(ticketType.price, installments)
   const total = fees.totalBuyer * quantity

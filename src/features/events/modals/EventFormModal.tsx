@@ -15,6 +15,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalShell,
+  SelectInput,
 } from '@/shared/components'
 import { cn, formatDate, formatNumber } from '@/shared/lib'
 
@@ -95,23 +96,25 @@ export function EventFormModal({ eventId, organizationId, onClose, onSaved }: Ev
 
                 <FormGrid>
                   <FormField label="Categoria">
-                    <select className="input" value={form.category} onChange={(event) => setField('category', event.target.value)}>
-                      <option value="">Selecionar...</option>
-                      {EVENT_CATEGORIES.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
+                    <SelectInput
+                      value={form.category}
+                      onChange={(v) => setField('category', v)}
+                      placeholder="Selecionar..."
+                      options={[
+                        { value: '', label: 'Selecionar...' },
+                        ...EVENT_CATEGORIES.map((category) => ({ value: category, label: category })),
+                      ]}
+                    />
                   </FormField>
                   <FormField label="Classificacao etaria">
-                    <select className="input" value={form.age_rating} onChange={(event) => setField('age_rating', event.target.value)}>
-                      {EVENT_AGE_RATINGS.map((rating) => (
-                        <option key={rating} value={rating}>
-                          {rating === 'livre' ? 'Livre' : `${rating} anos`}
-                        </option>
-                      ))}
-                    </select>
+                    <SelectInput
+                      value={form.age_rating}
+                      onChange={(v) => setField('age_rating', v)}
+                      options={EVENT_AGE_RATINGS.map((rating) => ({
+                        value: rating,
+                        label: rating === 'livre' ? 'Livre' : `${rating} anos`,
+                      }))}
+                    />
                   </FormField>
                 </FormGrid>
 

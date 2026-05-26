@@ -13,7 +13,7 @@ const topics = [
     icon: '📅',
     title: { en: 'Creating events', pt: 'Criando eventos' },
     description: {
-      en: 'Learn how to create, configure and manage your events, from free registrations to premium VIP experiences.',
+      en: 'Learn how to create, configure and manage your events, from free registrations to VIP experiences.',
       pt: 'Aprenda a criar, configurar e operar seus eventos, de inscrições gratuitas a experiências VIP de alto valor.',
     },
   },

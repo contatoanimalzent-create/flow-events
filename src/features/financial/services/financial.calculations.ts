@@ -300,10 +300,13 @@ export function buildFinancialOverview(params: {
     const reconciliationPendingCount = reconciliationRows.filter((row) => row.reconciliation_status === 'pending').length
     const reconciliationDivergentCount = reconciliationRows.filter((row) => row.reconciliation_status === 'divergent').length
 
+    const paidOrdersAmount = sum(eventOrders.filter((order) => order.status === 'paid').map((order) => order.total_amount))
     const approvedPaymentsAmount = sum(
       approvedPayments.length > 0
         ? approvedPayments.map((payment) => payment.amount)
-        : eventOrders.filter((order) => order.status === 'paid' && order.payment_method === 'free').map((order) => order.total_amount),
+        : paidOrdersAmount > 0
+          ? [paidOrdersAmount]
+          : eventOrders.filter((order) => order.status === 'paid' && order.payment_method === 'free').map((order) => order.total_amount),
     )
     const refundedAmount =
       sum(refundedPayments.map((payment) => payment.amount)) || sum(eventOrders.filter((order) => order.status === 'refunded').map((order) => order.total_amount))

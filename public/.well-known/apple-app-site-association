@@ -1,0 +1,48 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["YOUR_TEAM_ID.com.animalzgroup.pulse"],
+        "components": [
+          {
+            "/": "/e/*",
+            "comment": "Páginas públicas de evento"
+          },
+          {
+            "/": "/event/*",
+            "comment": "Páginas alternativas de evento"
+          },
+          {
+            "/": "/checkout/*",
+            "comment": "Fluxo de checkout"
+          },
+          {
+            "/": "/ticket/*",
+            "comment": "Ingressos comprados"
+          },
+          {
+            "/": "/account/*",
+            "comment": "Conta do usuário"
+          },
+          {
+            "/": "/operator",
+            "comment": "Scanner do operador"
+          },
+          {
+            "/": "/auth/callback",
+            "comment": "Callback OAuth/Supabase"
+          },
+          {
+            "/": "/*",
+            "exclude": true,
+            "comment": "Resto fica no navegador"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["YOUR_TEAM_ID.com.animalzgroup.pulse"]
+  }
+}

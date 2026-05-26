@@ -1,23 +1,34 @@
 import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
-  appId: 'br.com.flowevents.pulse',
-  appName: 'Flow Events',
+  appId: 'com.animalzgroup.pulse',
+  appName: 'Pulse',
   webDir: 'dist',
+  bundledWebRuntime: false,
   server: {
     androidScheme: 'https',
-    // In production native builds, load from the live domain
-    // url: 'https://pulse.animalzgroup.com', // uncomment when building for stores
+    iosScheme: 'https',
+    // Em producao, descomente para carregar do dominio:
+    // url: 'https://pulse.animalzgroup.com',
     cleartext: false,
   },
   android: {
-    allowMixedContent: true,
+    allowMixedContent: false,
     captureInput: true,
     webContentsDebuggingEnabled: false,
+    backgroundColor: '#060d1fff',
+  },
+  ios: {
+    contentInset: 'always',
+    backgroundColor: '#060d1fff',
+    limitsNavigationsToAppBoundDomains: false,
+    scrollEnabled: true,
+    preferredContentMode: 'mobile',
   },
   plugins: {
     Camera: {
       permissions: ['camera'],
+      androidScaleType: 'CENTER_CROP',
     },
     Geolocation: {
       permissions: ['location'],
@@ -28,19 +39,25 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 2000,
       launchAutoHide: true,
-      backgroundColor: '#060d1f',
+      launchFadeOutDuration: 300,
+      backgroundColor: '#060d1fff',
       androidSplashResourceName: 'splash',
-      showSpinnerOnFullScreen: false,
+      androidScaleType: 'CENTER_CROP',
+      showSpinner: false,
+      splashFullScreen: true,
+      splashImmersive: true,
     },
     StatusBar: {
-      style: 'dark',
-      backgroundColor: '#060d1f',
+      style: 'DARK',
+      backgroundColor: '#060d1fff',
+      overlaysWebView: false,
     },
     Keyboard: {
       resize: 'body',
-      style: 'dark',
+      style: 'DARK',
       resizeOnFullScreen: true,
     },
+    Network: {},
   },
 }
 

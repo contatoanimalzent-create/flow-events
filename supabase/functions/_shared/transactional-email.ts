@@ -75,6 +75,21 @@ async function generateQRCodeUrl(qrToken: string): Promise<string | null> {
       return null
     }
 
+    // Signed URL with 30-day TTL — bucket should be PRIVATE.
+    // Falls back to public URL if signing fails (legacy compat while bucket is still public).
+    const TTL_SECONDS = 60 * 60 * 24 * 30
+    const { data: signed, error: signError } = await supabase.storage
+      .from('tickets')
+      .createSignedUrl(filePath, TTL_SECONDS)
+
+    if (signed?.signedUrl) {
+      return signed.signedUrl
+    }
+
+    if (signError) {
+      console.warn('[qr-code] signed URL failed, falling back to public URL:', signError.message)
+    }
+
     const { data } = supabase.storage.from('tickets').getPublicUrl(filePath)
     return data?.publicUrl ?? null
   } catch (error) {

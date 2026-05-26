@@ -65,7 +65,7 @@ export function HomeHeroCinematic({ heroEvent, scrollY, stats }: HomeHeroCinemat
           <PublicReveal>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 backdrop-blur-sm">
               <Sparkles className="h-3.5 w-3.5 text-brand-acid" />
-              {isPortuguese ? 'Plataforma de eventos premium' : 'Premium events platform'}
+              {isPortuguese ? 'Plataforma de gestão de eventos' : 'Event management platform'}
             </div>
           </PublicReveal>
 

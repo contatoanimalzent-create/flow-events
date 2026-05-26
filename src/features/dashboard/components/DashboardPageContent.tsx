@@ -2,6 +2,7 @@ import { AlertTriangle, RefreshCw, TrendingUp, Zap } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useDashboardOverview } from '@/features/dashboard/hooks'
 import { PageErrorState, PageLoadingState } from '@/shared/components'
+import { SelectInput } from '@/shared/components/ui'
 import { cn, formatCurrency, formatNumber } from '@/shared/lib'
 import { DashboardConversionChart } from './DashboardConversionChart'
 import { DashboardCustomerRankingTable } from './DashboardCustomerRankingTable'
@@ -85,16 +86,15 @@ export function DashboardPageContent() {
 
         <div className="flex-1" />
 
-        <select
-          className="input h-9 w-auto pr-8 text-xs"
+        <SelectInput
+          className="w-52"
           value={dashboard.selectedEventId}
-          onChange={(e) => dashboard.setSelectedEventId(e.target.value)}
-        >
-          <option value="all">Todos os eventos</option>
-          {dashboard.eventOptions.map((ev) => (
-            <option key={ev.id} value={ev.id}>{ev.name}</option>
-          ))}
-        </select>
+          onChange={dashboard.setSelectedEventId}
+          options={[
+            { value: 'all', label: 'Todos os eventos' },
+            ...dashboard.eventOptions.map((ev) => ({ value: ev.id, label: ev.name })),
+          ]}
+        />
       </div>
 
       {/* ── Estados ─────────────────────────────────────────────────────── */}

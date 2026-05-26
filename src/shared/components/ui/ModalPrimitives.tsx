@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 import { useAppLocale } from '@/shared/i18n/app-locale'
 import { cn } from '@/shared/lib'
@@ -8,6 +8,9 @@ interface ModalShellProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl' | '6xl'
   className?: string
   panelClassName?: string
+  onClose?: () => void
+  closeOnBackdrop?: boolean
+  closeOnEscape?: boolean
 }
 
 const SIZE_CLASSNAME: Record<NonNullable<ModalShellProps['size']>, string> = {
@@ -20,10 +23,71 @@ const SIZE_CLASSNAME: Record<NonNullable<ModalShellProps['size']>, string> = {
   '6xl': 'max-w-6xl',
 }
 
-export function ModalShell({ children, size = 'lg', className, panelClassName }: ModalShellProps) {
+const FOCUSABLE_SELECTOR = 'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])'
+
+export function ModalShell({
+  children,
+  size = 'lg',
+  className,
+  panelClassName,
+  onClose,
+  closeOnBackdrop = true,
+  closeOnEscape = true,
+}: ModalShellProps) {
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const previouslyFocused = document.activeElement as HTMLElement | null
+    const panel = panelRef.current
+    const focusables = panel?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+    focusables?.[0]?.focus()
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && closeOnEscape && onClose) {
+        e.stopPropagation()
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab' || !panel) return
+      const items = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      const active = document.activeElement as HTMLElement | null
+      if (e.shiftKey && active === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.removeEventListener('keydown', onKeyDown)
+      previouslyFocused?.focus?.()
+    }
+  }, [onClose, closeOnEscape])
+
+  function onBackdropClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (!closeOnBackdrop || !onClose) return
+    if (e.target === e.currentTarget) onClose()
+  }
+
   return (
-    <div className={cn('pulse-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4', className)}>
+    <div
+      role="dialog"
+      aria-modal="true"
+      onMouseDown={onBackdropClick}
+      className={cn('pulse-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4', className)}
+    >
       <div
+        ref={panelRef}
         className={cn(
           'pulse-modal-panel animate-slide-up flex w-full flex-col overflow-hidden rounded-[var(--pulse-radius-lg)] max-h-[88dvh] sm:max-h-[calc(100dvh-2rem)]',
           SIZE_CLASSNAME[size],
@@ -54,6 +118,8 @@ export function ModalHeader({ title, subtitle, eyebrow, onClose, className }: Mo
       </div>
       {onClose ? (
         <button
+          type="button"
+          aria-label="Close"
           onClick={onClose}
           className="pulse-modal-close rounded-[var(--pulse-radius-full)] p-2 transition-all"
         >
@@ -268,16 +334,16 @@ export function ActionConfirmationDialog({
   }
 
   return (
-    <ModalShell size="md" className="z-[130]">
+    <ModalShell size="md" className="z-[130]" onClose={onCancel}>
       <ModalHeader eyebrow={t('Confirmation', 'Confirmacao')} title={title} subtitle={description} onClose={onCancel} />
       <ModalBody>
         <ConfirmActionBox tone={tone} title={t('Impact of this action', 'Impacto desta ação')} description={impact} />
       </ModalBody>
       <ModalFooter>
-        <button onClick={onCancel} className="btn-secondary text-sm">
+        <button type="button" onClick={onCancel} className="btn-secondary text-sm">
           {cancelLabel ?? t('Back', 'Voltar')}
         </button>
-        <button onClick={() => void onConfirm()} className={tone === 'danger' ? 'btn-danger text-sm' : 'btn-primary text-sm'} disabled={confirming}>
+        <button type="button" onClick={() => void onConfirm()} className={tone === 'danger' ? 'btn-danger text-sm' : 'btn-primary text-sm'} disabled={confirming}>
           {confirming ? t('Processing...', 'Processando...') : confirmLabel}
         </button>
       </ModalFooter>

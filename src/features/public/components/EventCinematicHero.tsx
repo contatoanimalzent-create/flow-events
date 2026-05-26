@@ -72,7 +72,7 @@ export function EventCinematicHero({
                       event.short_description ||
                       (isPortuguese
                         ? 'Garanta seu acesso em uma jornada de compra desenhada para grandes experiências.'
-                        : 'Secure your access through a purchase journey designed for premium live experiences.')}
+                        : 'Secure your access through a purchase journey designed for live experiences.')}
                   </p>
                 </PublicReveal>
 

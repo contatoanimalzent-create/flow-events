@@ -1,7 +1,7 @@
 {
   "name": "Pulse",
   "short_name": "Pulse",
-  "description": "Ingressos para os melhores eventos de cultura, gastronomia, música e lifestyle.",
+  "description": "Plataforma completa de gestão de eventos: equipe, check-in, vendas, financeiro e operação em tempo real.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -131,7 +131,7 @@ export function FeaturedEventBanner({ event, showLabel = true }: FeaturedEventBa
                   },
                   {
                     label: isPortuguese ? 'Categoria' : 'Category',
-                    value: event.category || (isPortuguese ? 'Experiência premium' : 'Premium experience'),
+                    value: event.category || (isPortuguese ? 'Experiência do evento' : 'Event experience'),
                   },
                   {
                     label: isPortuguese ? 'Compra' : 'Purchase',

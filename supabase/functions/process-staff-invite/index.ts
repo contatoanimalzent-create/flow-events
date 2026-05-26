@@ -367,8 +367,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const tokenParam = url.searchParams.get('token')
     const runParam   = url.searchParams.get('run')
 
-    // Cron trigger: GET ?run=batch
+    // Cron trigger: GET ?run=batch — require cron secret (fail-closed)
     if (runParam === 'batch') {
+      const expected = Deno.env.get('CRON_SECRET') ?? ''
+      const incoming = req.headers.get('x-cron-secret') ?? ''
+      if (!expected || incoming !== expected) {
+        return Response.json({ error: 'Unauthorized' }, addCors({ status: 401 }))
+      }
       return await runBatch(admin)
     }
 

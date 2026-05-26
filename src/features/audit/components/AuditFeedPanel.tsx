@@ -2,6 +2,7 @@ import { Activity } from 'lucide-react'
 import { useAuditTrail } from '@/features/audit/hooks/useAuditTrail'
 import type { AuditEntityType } from '@/features/audit/types/audit.types'
 import { PaginationControls } from '@/shared/components'
+import { SelectInput } from '@/shared/components/ui'
 import { formatDate } from '@/shared/lib'
 
 const ENTITY_LABELS: Record<AuditEntityType, string> = {
@@ -21,30 +22,30 @@ export function AuditFeedPanel() {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2">
-        <select className="input h-9 text-xs" value={audit.entityType} onChange={(event) => audit.setEntityType(event.target.value as AuditEntityType | 'all')}>
-          <option value="all">Todos tipos</option>
-          {Object.entries(ENTITY_LABELS).map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <select className="input h-9 text-xs" value={audit.userId} onChange={(event) => audit.setUserId(event.target.value)}>
-          <option value="all">Todos usuários</option>
-          {audit.users.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.name}
-            </option>
-          ))}
-        </select>
-        <select className="input h-9 text-xs" value={audit.eventId} onChange={(event) => audit.setEventId(event.target.value)}>
-          <option value="all">Todos eventos</option>
-          {audit.events.map((event) => (
-            <option key={event.id} value={event.id}>
-              {event.label}
-            </option>
-          ))}
-        </select>
+        <SelectInput
+          value={audit.entityType}
+          onChange={(v) => audit.setEntityType(v as AuditEntityType | 'all')}
+          options={[
+            { value: 'all', label: 'Todos tipos' },
+            ...Object.entries(ENTITY_LABELS).map(([key, label]) => ({ value: key, label })),
+          ]}
+        />
+        <SelectInput
+          value={audit.userId}
+          onChange={audit.setUserId}
+          options={[
+            { value: 'all', label: 'Todos usuários' },
+            ...audit.users.map((user) => ({ value: user.id, label: user.name })),
+          ]}
+        />
+        <SelectInput
+          value={audit.eventId}
+          onChange={audit.setEventId}
+          options={[
+            { value: 'all', label: 'Todos eventos' },
+            ...audit.events.map((event) => ({ value: event.id, label: event.label })),
+          ]}
+        />
       </div>
 
       {audit.entries.length === 0 ? (

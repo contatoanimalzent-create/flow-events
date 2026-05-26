@@ -1,3 +1,5 @@
 export { useStaffActions } from './useStaffActions'
 export { useStaffForm } from './useStaffForm'
 export { useStaffList } from './useStaffList'
+export { useArrivalDetection } from './useArrivalDetection'
+export type { ArrivalState } from './useArrivalDetection'

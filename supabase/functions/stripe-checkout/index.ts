@@ -77,12 +77,21 @@ Deno.serve(async (req) => {
 
     const { data: ticketType, error: ttErr } = await supabase
       .from('ticket_types')
-      .select('id, name, price, currency')
+      .select('id, name, price, currency, event_id')
       .eq('id', ticketTypeId)
       .single()
 
     if (ttErr || !ticketType) {
       return Response.json({ error: 'Tipo de ingresso não encontrado' }, { status: 404 })
+    }
+
+    // CRITICO: validar que o ticket_type pertence ao evento informado
+    // Previne cross-org attack onde atacante pega ticketType de outra org
+    if (ticketType.event_id !== event.id) {
+      return Response.json(
+        { error: 'Ingresso não pertence a este evento.' },
+        { status: 400, headers: corsHeaders },
+      )
     }
 
     // ── Fetch producer's Stripe Connect account ────────────────

@@ -54,4 +54,6 @@ export {
   ModalHeader,
   ModalShell,
 } from './ModalPrimitives'
+export { SelectInput } from './SelectInput'
+export type { SelectOption } from './SelectInput'
 export { Surface } from './Surface'

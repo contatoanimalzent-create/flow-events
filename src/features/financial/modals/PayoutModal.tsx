@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { EMPTY_FINANCIAL_PAYOUT_FORM, FINANCIAL_PAYOUT_STATUS_LABELS } from '@/features/financial/types'
 import type { FinancialEventOption, FinancialEventReport, UpsertEventPayoutInput } from '@/features/financial/types'
-import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell } from '@/shared/components'
+import { FormField, FormGrid, FormSection, ModalBody, ModalFooter, ModalHeader, ModalShell, SelectInput } from '@/shared/components'
 
 interface PayoutModalProps {
   organizationId: string
@@ -75,14 +75,15 @@ export function PayoutModal({ organizationId, events, initialReport, defaultEven
       <ModalBody>
         <FormSection title="Parametros de repasse">
           <FormField label="Evento">
-            <select className="input" value={values.event_id} onChange={(event) => setField('event_id', event.target.value)}>
-              <option value="">Selecione um evento</option>
-              {events.map((eventOption) => (
-                <option key={eventOption.id} value={eventOption.id}>
-                  {eventOption.name}
-                </option>
-              ))}
-            </select>
+            <SelectInput
+              value={values.event_id}
+              onChange={(v) => setField('event_id', v)}
+              placeholder="Selecione um evento"
+              options={[
+                { value: '', label: 'Selecione um evento' },
+                ...events.map((eventOption) => ({ value: eventOption.id, label: eventOption.name })),
+              ]}
+            />
           </FormField>
 
           <FormGrid>
@@ -90,13 +91,11 @@ export function PayoutModal({ organizationId, events, initialReport, defaultEven
               <input type="number" min={0} step={0.01} className="input" value={values.gross_sales} onChange={(event) => setField('gross_sales', event.target.value)} />
             </FormField>
             <FormField label="Status">
-              <select className="input" value={values.status} onChange={(event) => setField('status', event.target.value)}>
-                {Object.entries(FINANCIAL_PAYOUT_STATUS_LABELS).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
+              <SelectInput
+                value={values.status}
+                onChange={(v) => setField('status', v)}
+                options={Object.entries(FINANCIAL_PAYOUT_STATUS_LABELS).map(([key, label]) => ({ value: key, label }))}
+              />
             </FormField>
           </FormGrid>
 

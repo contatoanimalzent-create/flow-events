@@ -42,6 +42,13 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Pedido não encontrado' }, { status: 404, headers: corsHeaders })
     }
 
+    // Defense in depth against UUID-enumeration: caller must know the buyer email
+    // already on file for the order. Edge functions accepting anon traffic should
+    // not leak order details just from a guessed orderId.
+    if (buyerEmail && order.buyer_email && buyerEmail.toLowerCase().trim() !== String(order.buyer_email).toLowerCase().trim()) {
+      return Response.json({ error: 'Não autorizado' }, { status: 403, headers: corsHeaders })
+    }
+
     if (order.status === 'paid') {
       return Response.json({ error: 'Pedido já pago' }, { status: 409, headers: corsHeaders })
     }

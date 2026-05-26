@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Loader2, Mail, ShieldCheck } from 'lucide-react'
 import { authService } from '@/features/auth/services/auth.service'
+import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/auth'
 import { useAppLocale } from '@/shared/i18n/app-locale'
 
@@ -38,9 +39,9 @@ export function LoginPage({ onBack, onSignup }: { onBack?: () => void; onSignup?
     if (result.error) {
       setError(t('Incorrect email or password. Please try again.', 'Email ou senha incorretos. Tente novamente.'))
     } else if (!rememberMe) {
-      Object.keys(localStorage)
-        .filter((k) => k.startsWith('sb-') && k.endsWith('-auth-token'))
-        .forEach((k) => localStorage.removeItem(k))
+      window.addEventListener('beforeunload', () => {
+        void supabase.auth.signOut({ scope: 'local' })
+      }, { once: true })
     }
     setLoading(false)
   }

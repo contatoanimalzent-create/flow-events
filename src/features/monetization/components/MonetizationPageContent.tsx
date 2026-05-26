@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-  ArrowUpRight, DollarSign, Package, Plus, RefreshCw,
+  ArrowUpRight, DollarSign, Hammer, Package, Plus, RefreshCw,
   Sparkles, Star, TrendingUp, Users, Zap,
 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
@@ -12,7 +12,7 @@ const MOCK_OFFERS = [
   { id: '1', name: 'Upgrade VIP', type: 'upgrade', price: 150, inventory: 50, sold: 32, status: 'active', conversion: 8.4 },
   { id: '2', name: 'Acesso Backstage', type: 'backstage', price: 300, inventory: 20, sold: 11, status: 'active', conversion: 5.2 },
   { id: '3', name: 'Meet & Greet', type: 'experience', price: 500, inventory: 10, sold: 7, status: 'active', conversion: 3.1 },
-  { id: '4', name: 'Mesa Premium', type: 'table', price: 800, inventory: 5, sold: 3, status: 'active', conversion: 1.8 },
+  { id: '4', name: 'Mesa VIP', type: 'table', price: 800, inventory: 5, sold: 3, status: 'active', conversion: 1.8 },
   { id: '5', name: 'Networking Pass', type: 'networking', price: 80, inventory: 100, sold: 41, status: 'active', conversion: 12.3 },
 ]
 
@@ -49,6 +49,13 @@ export function MonetizationPageContent() {
 
   return (
     <div className="admin-page">
+      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+        <Hammer className="mt-0.5 h-4 w-4 shrink-0" />
+        <div>
+          <p className="font-semibold">Preview em desenvolvimento</p>
+          <p className="mt-1 text-amber-200/70">Dados de demonstracao. A integracao real com upgrades e add-ons sera ligada na proxima versao.</p>
+        </div>
+      </div>
       <div className="admin-header">
         <div>
           <div className="admin-eyebrow">Revenue expansion</div>
@@ -56,7 +63,7 @@ export function MonetizationPageContent() {
             Monetização<span className="admin-title-accent">.</span>
           </h1>
           <p className="admin-subtitle">
-            Upgrades, experiências premium, ativações e networking pago dentro do evento.
+            Upgrades, experiências extras, ativações e networking pago dentro do evento.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -92,7 +99,7 @@ export function MonetizationPageContent() {
         {([
           { key: 'ofertas', label: 'Experiências', icon: Sparkles },
           { key: 'compras', label: 'Compras', icon: DollarSign },
-          { key: 'premium', label: 'Networking Premium', icon: Users },
+          { key: 'premium', label: 'Networking VIP', icon: Users },
           { key: 'ativacoes', label: 'Ativações', icon: Zap },
         ] as { key: Tab; label: string; icon: React.ElementType }[]).map((t) => (
           <button
@@ -221,16 +228,16 @@ export function MonetizationPageContent() {
         </div>
       )}
 
-      {/* Networking Premium */}
+      {/* Networking VIP */}
       {tab === 'premium' && (
         <div className="card p-12 flex flex-col items-center justify-center text-center gap-3">
           <Users className="h-10 w-10 text-text-muted" />
-          <div className="text-sm font-semibold text-text-secondary">Conexões premium</div>
+          <div className="text-sm font-semibold text-text-secondary">Conexões VIP</div>
           <div className="text-xs text-text-muted max-w-sm">
             Permita que participantes paguem para se conectar com palestrantes, artistas ou outros participantes VIP durante o evento.
           </div>
           <button className="btn-primary mt-2 text-xs flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5" /> Ativar networking premium
+            <Sparkles className="h-3.5 w-3.5" /> Ativar networking VIP
           </button>
         </div>
       )}

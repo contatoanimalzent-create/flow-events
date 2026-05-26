@@ -50,7 +50,7 @@ const MOCK_FEED = [
 const MOCK_UPGRADES = [
   { id: 'u1', name: 'Upgrade VIP', description: 'Acesso à área VIP com open bar durante todo o evento.', price: 150, available: 18, type: 'upgrade' },
   { id: 'u2', name: 'Meet & Greet', description: 'Encontro exclusivo com The Waves após o show com foto e autógrafo.', price: 500, available: 3, type: 'experience' },
-  { id: 'u3', name: 'Networking Pass', description: 'Acesso à área de networking premium com drinks incluídos.', price: 80, available: 42, type: 'networking' },
+  { id: 'u3', name: 'Networking Pass', description: 'Acesso à área de networking VIP com drinks incluídos.', price: 80, available: 42, type: 'networking' },
 ]
 
 const MOCK_CONNECTIONS = [

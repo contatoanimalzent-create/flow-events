@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   Users,
 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -30,9 +31,6 @@ interface QRScannerAdvancedProps {
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
 const CREDENTIAL_TYPE_LABELS: Record<string, string> = {
   staff:     'Staff',
@@ -88,26 +86,29 @@ export function QRScannerAdvanced({ eventId, gateId, operatorId }: QRScannerAdva
     setResult(null)
 
     try {
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/validate-checkin`, {
-        method:  'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
+      const { data, error: invokeError } = await supabase.functions.invoke('validate-checkin', {
+        body: {
           qr_token:        token.trim(),
           gate_id:         gateId,
           operator_id:     operatorId,
           device_id:       deviceId,
           event_id:        eventId,
           manual_override: override,
-        }),
+        },
       })
 
-      const data = await response.json()
+      if (invokeError) {
+        setResult({ success: false, denial_reason: invokeError.message ?? 'Erro ao validar.' })
+        setTimeout(() => {
+          setResult(null)
+          cooldownRef.current = false
+          lastTokenRef.current = ''
+        }, 3000)
+        return
+      }
 
       const checkinResult: CheckinResult = {
-        success:         response.ok && data.success !== false,
+        success:         data?.success !== false,
         person_name:     data.person_name   ?? data.attendee_name,
         credential_type: data.credential_type,
         zone:            data.zone          ?? data.access_zone,

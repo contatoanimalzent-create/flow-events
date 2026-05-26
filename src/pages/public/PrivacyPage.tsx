@@ -60,7 +60,7 @@ export function PrivacyPage() {
           title: '8. Seus direitos',
           content: [
             'Você pode solicitar acesso, correcao, exclusao, portabilidade e revisão do uso de seus dados, além de revogar consentimentos quando aplicável.',
-            'Para exercer esses direitos, escreva para privacy@animalz.events.',
+            'Para exercer esses direitos, escreva para contatopulse@animalzgroup.com.',
           ],
         },
         {
@@ -83,9 +83,36 @@ export function PrivacyPage() {
           ],
         },
         {
+          title: '11.1. Permissoes solicitadas no app mobile',
+          content: [
+            'Camera: usada para ler QR Codes de check-in, capturar fotos de eventos e digitalizar credenciais. So acessamos quando voce ativa a funcao.',
+            'Localizacao: usada apenas durante o expediente do staff para confirmar presenca em zonas do venue. Voce pode revogar a qualquer momento nas configuracoes do dispositivo.',
+            'Biblioteca de fotos: usada para anexar imagens de capa, banner e galeria do evento. Nao varremos sua galeria.',
+            'Notificacoes (push): usadas para confirmar compras, lembretes de evento e alertas de check-in. Voce pode desativar nas configuracoes do app.',
+            'Microfone: usado apenas quando voce grava momentos durante um evento. Nao gravamos sem voce iniciar.',
+            'FaceID / TouchID / Biometria: usado opcionalmente para autenticar pagamentos. Biometria nunca sai do dispositivo, nao recebemos a impressao em si.',
+          ],
+        },
+        {
+          title: '11.2. Direitos sob a LGPD (Lei 13.709/2018)',
+          content: [
+            'Voce tem direito a: confirmar a existencia de tratamento, acessar seus dados, corrigir dados incompletos, anonimizar dados desnecessarios, portabilidade, eliminacao dos dados, informacao sobre compartilhamento, revogacao do consentimento e oposicao a tratamentos baseados em legitimo interesse.',
+            'Para exercer qualquer destes direitos, acesse /delete-account na plataforma ou envie email para contatopulse@animalzgroup.com.',
+            'Tempo de resposta: ate 15 dias uteis conforme Art. 19 LGPD.',
+          ],
+        },
+        {
+          title: '11.3. Excluir minha conta',
+          content: [
+            'Voce pode solicitar a exclusao completa da sua conta a qualquer momento em https://pulse.animalzgroup.com/delete-account quando estiver logado.',
+            'Apos a solicitacao: dados pessoais sao anonimizados imediatamente, e a exclusao definitiva acontece em ate 30 dias (periodo de carencia LGPD).',
+            'Dados financeiros (notas fiscais, repasses) sao mantidos por 5 anos por obrigacao legal fiscal.',
+          ],
+        },
+        {
           title: '12. Contato e reclamacoes',
           content: [
-            'Para dúvidas sobre privacidade, fale com privacy@animalz.events ou use nossa página de contato.',
+            'Para dúvidas sobre privacidade, fale com contatopulse@animalzgroup.com ou use nossa página de contato.',
             'Se necessário, você também pode procurar a autoridade competente de protecao de dados.',
           ],
         },
@@ -148,7 +175,7 @@ export function PrivacyPage() {
           title: '8. Your rights',
           content: [
             'You may request access, correction, deletion, portability and review of how your data is used, and you may revoke consent when applicable.',
-            'To exercise these rights, email privacy@animalz.events.',
+            'To exercise these rights, email contatopulse@animalzgroup.com.',
           ],
         },
         {
@@ -171,9 +198,36 @@ export function PrivacyPage() {
           ],
         },
         {
+          title: '11.1. Permissions requested in the mobile app',
+          content: [
+            'Camera: used to scan QR Codes for check-in, capture event photos and digitize credentials. Only accessed when you activate the feature.',
+            'Location: used only during staff working hours to confirm presence in venue zones. You can revoke at any time in device settings.',
+            'Photo library: used to attach cover images, banners and event gallery. We do not scan your gallery.',
+            'Push notifications: used to confirm purchases, event reminders and check-in alerts. You can disable in app settings.',
+            'Microphone: used only when you record moments during an event. We do not record without you starting.',
+            'FaceID / TouchID / Biometrics: optionally used to authenticate payments. Biometrics never leave the device.',
+          ],
+        },
+        {
+          title: '11.2. Your rights (GDPR / CCPA / LGPD)',
+          content: [
+            'You have the right to: access, rectify, delete, restrict processing, data portability, object to processing, and withdraw consent at any time.',
+            'To exercise any of these rights, visit /delete-account when logged in or email contatopulse@animalzgroup.com.',
+            'Response time: up to 30 days per GDPR Article 12.',
+          ],
+        },
+        {
+          title: '11.3. Delete my account',
+          content: [
+            'You can request full account deletion at any time at https://pulse.animalzgroup.com/delete-account while logged in.',
+            'After the request: personal data is immediately anonymized, with final deletion within 30 days (legal grace period).',
+            'Financial data (invoices, payouts) is kept for 5 years per fiscal/tax obligation.',
+          ],
+        },
+        {
           title: '12. Contact and complaints',
           content: [
-            'For privacy questions, contact privacy@animalz.events or use our contact page.',
+            'For privacy questions, contact contatopulse@animalzgroup.com or use our contact page.',
             'If necessary, you may also contact the relevant data protection authority.',
           ],
         },

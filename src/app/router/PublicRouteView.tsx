@@ -32,6 +32,7 @@ const LoginPage = lazy(() => import('@/pages/auth/LoginPage').then((m) => ({ def
 const SignupPage = lazy(() => import('@/pages/auth/SignupPage').then((m) => ({ default: m.SignupPage })))
 const PrivacyPage = lazy(() => import('@/pages/public/PrivacyPage').then((m) => ({ default: m.PrivacyPage })))
 const TermsPage = lazy(() => import('@/pages/public/TermsPage').then((m) => ({ default: m.TermsPage })))
+const AccountDeletionPage = lazy(() => import('@/pages/public/AccountDeletionPage').then((m) => ({ default: m.AccountDeletionPage })))
 
 const StaffApp = lazy(() => import('@/features/mobile/staff/StaffApp').then((m) => ({ default: m.StaffApp })))
 const SupervisorApp = lazy(() => import('@/features/mobile/supervisor/SupervisorApp').then((m) => ({ default: m.SupervisorApp })))
@@ -86,6 +87,8 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
         <TermsPage />
       ) : route === 'privacy' ? (
         <PrivacyPage />
+      ) : route === 'delete-account' ? (
+        <AccountDeletionPage />
       ) : route === 'producer' ? (
         <ProducerPage onLogin={onLogin} />
       ) : route === 'contact' ? (

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-  Bell, Heart, MessageCircle, MoreHorizontal, Plus,
+  Bell, Hammer, Heart, MessageCircle, MoreHorizontal, Plus,
   RefreshCw, Search, Send, Share2, Smile, Trash2, Users,
 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
@@ -103,6 +103,13 @@ export function CommunityPageContent() {
 
   return (
     <div className="admin-page">
+      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+        <Hammer className="mt-0.5 h-4 w-4 shrink-0" />
+        <div>
+          <p className="font-semibold">Preview em desenvolvimento</p>
+          <p className="mt-1 text-amber-200/70">O feed da comunidade mostra dados de exemplo. A integracao com posts reais e moderacao sera lancada na proxima versao.</p>
+        </div>
+      </div>
       <div className="admin-header">
         <div>
           <div className="admin-eyebrow">Social layer</div>
@@ -282,12 +289,12 @@ export function CommunityPageContent() {
       {tab === 'networking' && (
         <div className="card p-12 flex flex-col items-center justify-center text-center gap-3">
           <Users className="h-10 w-10 text-text-muted" />
-          <div className="text-sm font-semibold text-text-secondary">Networking premium</div>
+          <div className="text-sm font-semibold text-text-secondary">Networking VIP</div>
           <div className="text-xs text-text-muted max-w-sm">
-            Participantes com badge premium podem solicitar conexões e agendar reuniões durante o evento. Ative o módulo de monetização para liberar.
+            Participantes com badge VIP podem solicitar conexões e agendar reuniões durante o evento. Ative o módulo de monetização para liberar.
           </div>
           <button className="btn-primary mt-2 text-xs flex items-center gap-2">
-            <Plus className="h-3.5 w-3.5" /> Ativar networking premium
+            <Plus className="h-3.5 w-3.5" /> Ativar networking VIP
           </button>
         </div>
       )}

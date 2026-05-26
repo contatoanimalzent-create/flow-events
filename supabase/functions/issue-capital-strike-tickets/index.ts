@@ -86,6 +86,7 @@ Deno.serve(async (req) => {
 
     for (const inscricao of inscricoes as Inscricao[]) {
       const email = inscricao.email.toLowerCase().trim()
+      const cpfDigits = inscricao.cpf ? inscricao.cpf.replace(/\D/g, '') : null
       const armyKey = inscricao.exercito.toUpperCase()
       const config = ARMY_CONFIG[armyKey]
 
@@ -128,7 +129,7 @@ Deno.serve(async (req) => {
           buyer_name: inscricao.nome_completo,
           buyer_email: email,
           buyer_phone: inscricao.telefone,
-          buyer_cpf: inscricao.cpf,
+          buyer_cpf: cpfDigits,
           subtotal: 0,
           total_amount: 0,
           status: 'paid',
@@ -152,7 +153,7 @@ Deno.serve(async (req) => {
           event_id: EVENT_ID,
           holder_name: inscricao.nome_completo,
           holder_email: email,
-          holder_cpf: inscricao.cpf,
+          holder_cpf: cpfDigits,
           holder_phone: inscricao.telefone,
           unit_price: 0,
           quantity: 1,
@@ -178,7 +179,7 @@ Deno.serve(async (req) => {
           qr_token: qrToken,
           holder_name: inscricao.nome_completo,
           holder_email: email,
-          holder_cpf: inscricao.cpf,
+          holder_cpf: cpfDigits,
           status: 'confirmed',
           is_vip: false,
         }).select('id').single()

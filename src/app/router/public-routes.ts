@@ -34,6 +34,7 @@ export type PublicRoute =
   | 'delete-account'
   | { type: 'event'; slug: string }
   | { type: 'staff-join'; token: string }
+  | { type: 'staff-ponto'; slug: string }
   | { type: 'timeclock'; eventId: string; credentialToken: string }
 
 export function getInitialPublicRoute(): PublicRoute {
@@ -83,6 +84,9 @@ export function getInitialPublicRoute(): PublicRoute {
 
   const staffJoinMatch = path.match(/^\/staff\/join\/([^/]+)/)
   if (staffJoinMatch) return { type: 'staff-join', token: staffJoinMatch[1] }
+
+  const staffPontoMatch = path.match(/^\/staff\/ponto\/([^/]+)/)
+  if (staffPontoMatch) return { type: 'staff-ponto', slug: staffPontoMatch[1] }
 
   if (path === '/timeclock') {
     const params = new URLSearchParams(window.location.search)

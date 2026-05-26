@@ -37,7 +37,7 @@ export function CheckinHistoryModal({ digitalTicketId, onClose }: CheckinHistory
               const Icon = appearance.icon
 
               return (
-                <div key={item.id} className="rounded-[24px] border border-bg-border bg-white/80 p-4">
+                <div key={item.id} className="rounded-[24px] border border-bg-border bg-white/[0.06] p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2">

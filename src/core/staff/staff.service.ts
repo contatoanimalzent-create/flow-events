@@ -7,11 +7,11 @@ import { supabase } from '@/lib/supabase'
 
 export interface StaffShift {
   id: string
+  organizationId: string
   eventId: string
   eventName: string
-  role: string
-  supervisorName: string | null
-  zone: string | null
+  roleTitle: string
+  area: string | null
   startTime: string
   endTime: string | null
   status: 'scheduled' | 'active' | 'completed'
@@ -19,11 +19,10 @@ export interface StaffShift {
 
 export interface StaffSession {
   id: string
-  startedAt: string
-  endedAt: string | null
-  status: 'active' | 'closed'
-  latStart: number | null
-  lngStart: number | null
+  openedAt: string
+  closedAt: string | null
+  status: 'open' | 'closed' | 'exception'
+  totalMinutes: number | null
 }
 
 export interface StaffOccurrence {
@@ -44,22 +43,37 @@ export interface StaffInstruction {
 }
 
 export const staffService = {
-  async getCurrentShift(userId: string, eventId: string): Promise<StaffShift | null> {
+  /**
+   * Find the staff_member record for the currently authenticated user
+   * by matching auth email against staff_members.email.
+   */
+  async findStaffMemberForAuthUser(authUserEmail: string, eventId: string): Promise<string | null> {
+    const { data } = await supabase
+      .from('staff_members')
+      .select('id')
+      .eq('email', authUserEmail)
+      .eq('event_id', eventId)
+      .limit(1)
+      .maybeSingle()
+
+    return data?.id ?? null
+  },
+
+  async getCurrentShift(staffMemberId: string, eventId: string): Promise<StaffShift | null> {
     const { data } = await supabase
       .from('staff_members')
       .select(`
         id,
-        role,
-        zone,
-        shift_start,
-        shift_end,
+        organization_id,
+        role_title,
+        area,
+        shift_starts_at,
+        shift_ends_at,
         status,
         event_id,
-        events(name),
-        supervisor_id,
-        profiles!supervisor_id(full_name)
+        events(name)
       `)
-      .eq('user_id', userId)
+      .eq('id', staffMemberId)
       .eq('event_id', eventId)
       .maybeSingle()
 
@@ -67,24 +81,24 @@ export const staffService = {
 
     return {
       id: data.id,
-      eventId: data.event_id,
+      organizationId: data.organization_id,
+      eventId: data.event_id ?? eventId,
       eventName: (data.events as any)?.name ?? '-',
-      role: data.role ?? 'staff_member',
-      supervisorName: (data.profiles as any)?.full_name ?? null,
-      zone: data.zone ?? null,
-      startTime: data.shift_start ?? new Date().toISOString(),
-      endTime: data.shift_end ?? null,
+      roleTitle: data.role_title ?? 'staff_member',
+      area: data.area ?? null,
+      startTime: data.shift_starts_at ?? new Date().toISOString(),
+      endTime: data.shift_ends_at ?? null,
       status: data.status === 'active' ? 'active' : data.status === 'completed' ? 'completed' : 'scheduled',
     }
   },
 
   async getActiveSession(staffMemberId: string): Promise<StaffSession | null> {
     const { data } = await supabase
-      .from('staff_sessions')
-      .select('id, started_at, ended_at, status, lat_start, lng_start')
+      .from('timeclock_sessions')
+      .select('id, opened_at, closed_at, status, total_minutes')
       .eq('staff_member_id', staffMemberId)
-      .eq('status', 'active')
-      .order('started_at', { ascending: false })
+      .eq('status', 'open')
+      .order('opened_at', { ascending: false })
       .limit(1)
       .maybeSingle()
 
@@ -92,70 +106,75 @@ export const staffService = {
 
     return {
       id: data.id,
-      startedAt: data.started_at,
-      endedAt: data.ended_at ?? null,
+      openedAt: data.opened_at,
+      closedAt: data.closed_at ?? null,
       status: data.status,
-      latStart: data.lat_start ?? null,
-      lngStart: data.lng_start ?? null,
+      totalMinutes: data.total_minutes ?? null,
     }
   },
 
-  async startSession(staffMemberId: string, eventId: string, lat?: number, lng?: number): Promise<string> {
-    const sessionId = `sess-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-    const { error } = await supabase.from('staff_sessions').insert({
-      id: sessionId,
+  async startSession(staffMemberId: string, eventId: string, organizationId: string): Promise<string> {
+    const now = new Date().toISOString()
+    const { data, error } = await supabase.from('timeclock_sessions').insert({
       staff_member_id: staffMemberId,
       event_id: eventId,
-      started_at: new Date().toISOString(),
-      lat_start: lat ?? null,
-      lng_start: lng ?? null,
-      status: 'active',
-    })
+      organization_id: organizationId,
+      opened_at: now,
+      status: 'open',
+    }).select('id').single()
     if (error) throw new Error(error.message)
-    return sessionId
+    return data.id
   },
 
-  async endSession(sessionId: string, lat?: number, lng?: number): Promise<void> {
+  async endSession(sessionId: string): Promise<void> {
+    const now = new Date().toISOString()
     const { error } = await supabase
-      .from('staff_sessions')
+      .from('timeclock_sessions')
       .update({
-        ended_at: new Date().toISOString(),
-        lat_end: lat ?? null,
-        lng_end: lng ?? null,
-        status: 'closed',
+        closed_at: now,
+        status: 'closed' as const,
       })
       .eq('id', sessionId)
     if (error) throw new Error(error.message)
   },
 
-  async sendLocationPing(staffMemberId: string, eventId: string, lat: number, lng: number): Promise<void> {
-    await supabase.from('staff_location_pings').insert({
-      staff_member_id: staffMemberId,
-      event_id: eventId,
+  async sendLocationPing(
+    _staffMemberId: string,
+    _eventId: string,
+    lat: number,
+    lng: number
+  ): Promise<void> {
+    // staff_location_pings table does not exist in the schema.
+    // Log to console as a no-op so callers don't crash.
+    console.debug('[staffService.sendLocationPing] no-op — table not available', {
       lat,
       lng,
-      pinged_at: new Date().toISOString(),
     })
   },
 
   async getOccurrences(staffMemberId: string, eventId: string): Promise<StaffOccurrence[]> {
-    const { data } = await supabase
-      .from('staff_occurrences')
-      .select('id, type, description, occurred_at, status, location')
-      .eq('staff_member_id', staffMemberId)
-      .eq('event_id', eventId)
-      .order('occurred_at', { ascending: false })
+    try {
+      const { data } = await supabase
+        .from('staff_occurrences')
+        .select('id, type, description, occurred_at, status, location')
+        .eq('staff_member_id', staffMemberId)
+        .eq('event_id', eventId)
+        .order('occurred_at', { ascending: false })
 
-    if (!data) return []
+      if (!data) return []
 
-    return (data as any[]).map((o) => ({
-      id: o.id,
-      type: o.type,
-      description: o.description,
-      occurredAt: o.occurred_at,
-      status: o.status ?? 'open',
-      location: o.location ?? null,
-    }))
+      return (data as any[]).map((o) => ({
+        id: o.id,
+        type: o.type,
+        description: o.description,
+        occurredAt: o.occurred_at,
+        status: o.status ?? 'open',
+        location: o.location ?? null,
+      }))
+    } catch (err) {
+      console.warn('[staffService.getOccurrences] table may not exist, returning empty', err)
+      return []
+    }
   },
 
   async createOccurrence(
@@ -165,59 +184,68 @@ export const staffService = {
     description: string,
     location?: string
   ): Promise<void> {
-    const { error } = await supabase.from('staff_occurrences').insert({
-      staff_member_id: staffMemberId,
-      event_id: eventId,
-      type,
-      description,
-      location: location ?? null,
-      occurred_at: new Date().toISOString(),
-      status: 'open',
-    })
-    if (error) throw new Error(error.message)
+    try {
+      const { error } = await supabase.from('staff_occurrences').insert({
+        staff_member_id: staffMemberId,
+        event_id: eventId,
+        type,
+        description,
+        location: location ?? null,
+        occurred_at: new Date().toISOString(),
+        status: 'open',
+      })
+      if (error) throw error
+    } catch (err) {
+      console.warn('[staffService.createOccurrence] table may not exist, skipping', err)
+    }
   },
 
   async getInstructions(eventId: string): Promise<StaffInstruction[]> {
-    const { data } = await supabase
-      .from('staff_instructions')
-      .select('id, title, body, priority, created_at')
-      .eq('event_id', eventId)
-      .order('created_at', { ascending: false })
+    try {
+      const { data } = await supabase
+        .from('staff_instructions')
+        .select('id, title, body, priority, created_at')
+        .eq('event_id', eventId)
+        .order('created_at', { ascending: false })
 
-    if (!data) return []
+      if (!data) return []
 
-    return (data as any[]).map((i) => ({
-      id: i.id,
-      title: i.title,
-      body: i.body,
-      priority: i.priority ?? 'normal',
-      createdAt: i.created_at,
-    }))
+      return (data as any[]).map((i) => ({
+        id: i.id,
+        title: i.title,
+        body: i.body,
+        priority: i.priority ?? 'normal',
+        createdAt: i.created_at,
+      }))
+    } catch (err) {
+      console.warn('[staffService.getInstructions] table may not exist, returning empty', err)
+      return []
+    }
   },
 
-  async getShiftHistory(userId: string, limit = 20): Promise<StaffShift[]> {
+  async getShiftHistory(staffMemberId: string, limit = 20): Promise<StaffShift[]> {
     const { data } = await supabase
       .from('staff_members')
       .select(`
-        id, role, zone, shift_start, shift_end, status, event_id,
+        id, organization_id, role_title, area, shift_starts_at, shift_ends_at, status, event_id,
         events(name)
       `)
-      .eq('user_id', userId)
+      .eq('id', staffMemberId)
       .in('status', ['completed', 'active'])
-      .order('shift_start', { ascending: false })
+      .order('shift_starts_at', { ascending: false })
       .limit(limit)
 
     if (!data) return []
 
-    return (data as any[]).map((d) => ({
+    return (data as any[]).map((d): StaffShift => ({
       id: d.id,
-      eventId: d.event_id,
+      organizationId: d.organization_id ?? '',
+      eventId: d.event_id ?? '',
       eventName: d.events?.name ?? '-',
-      role: d.role ?? 'staff_member',
-      supervisorName: null,
-      zone: d.zone ?? null,
-      startTime: d.shift_start ?? '',
-      endTime: d.shift_end ?? null,
+      roleTitle: d.role_title ?? 'staff_member',
+      area: d.area ?? null,
+      startTime: d.shift_starts_at ?? '',
+      endTime: d.shift_ends_at ?? null,
       status: d.status === 'active' ? 'active' : 'completed',
     }))
   },

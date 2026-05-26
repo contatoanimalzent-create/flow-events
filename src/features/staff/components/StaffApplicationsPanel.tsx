@@ -25,31 +25,32 @@ import { cn } from '@/shared/lib'
 
 export type ApplicationStatus =
   | 'pending'
-  | 'reviewing'
   | 'approved'
   | 'rejected'
-  | 'adjustment_requested'
+  | 'waitlisted'
 
 export interface StaffApplication {
   id: string
   event_id: string
-  token: string
+  organization_id?: string | null
+  invite_link_id?: string | null
+  role_type: string
+  team_id?: string | null
+  shift_id?: string | null
   full_name: string
   email: string
-  phone: string
-  cpf?: string | null
-  tshirt_size?: string | null
+  phone?: string | null
+  document_number?: string | null
+  birth_date?: string | null
   bio?: string | null
-  emergency_contact_name?: string | null
-  emergency_contact_phone?: string | null
-  role?: string | null
-  team?: string | null
-  shift?: string | null
-  custom_answers?: Record<string, unknown> | null
+  experience?: string | null
+  t_shirt_size?: string | null
+  custom_field_answers?: Record<string, unknown> | null
+  terms_accepted: boolean
+  terms_accepted_at?: string | null
   status: ApplicationStatus
-  reviewer_notes?: string | null
-  credential_qr?: string | null
-  credential_issued_at?: string | null
+  reviewed_by?: string | null
+  reviewed_at?: string | null
   created_at: string
   updated_at?: string | null
 }
@@ -72,12 +73,6 @@ const STATUS_CONFIG: Record<
     bg: 'bg-amber-400/10 border-amber-400/20',
     icon: Clock,
   },
-  reviewing: {
-    label: 'Em análise',
-    color: 'text-blue-400',
-    bg: 'bg-blue-400/10 border-blue-400/20',
-    icon: Sliders,
-  },
   approved: {
     label: 'Aprovado',
     color: 'text-emerald-400',
@@ -90,8 +85,8 @@ const STATUS_CONFIG: Record<
     bg: 'bg-red-400/10 border-red-400/20',
     icon: UserX,
   },
-  adjustment_requested: {
-    label: 'Ajuste solicitado',
+  waitlisted: {
+    label: 'Lista de espera',
     color: 'text-violet-400',
     bg: 'bg-violet-400/10 border-violet-400/20',
     icon: AlertCircle,
@@ -101,9 +96,9 @@ const STATUS_CONFIG: Record<
 const TABS: { key: TabFilter; label: string }[] = [
   { key: 'all', label: 'Todos' },
   { key: 'pending', label: 'Pendentes' },
-  { key: 'reviewing', label: 'Em análise' },
   { key: 'approved', label: 'Aprovados' },
   { key: 'rejected', label: 'Reprovados' },
+  { key: 'waitlisted', label: 'Lista de espera' },
 ]
 
 const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-credential`
@@ -184,23 +179,21 @@ function NotesModal({ title, initialValue, onConfirm, onClose, loading }: NotesM
 // ─── Credential QR display ────────────────────────────────────────────────────
 
 function CredentialQR({ app }: { app: StaffApplication }) {
-  if (!app.credential_qr) return null
+  if (app.status !== 'approved' || !app.reviewed_at) return null
   return (
-    <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-[#D4FF00]/15 bg-[#D4FF00]/5 p-5">
+    <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-[#0057E7]/15 bg-[#0057E7]/5 p-5">
       <div className="flex items-center gap-2">
-        <QrCode className="h-4 w-4 text-[#D4FF00]" />
-        <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#D4FF00]">
-          Credencial emitida
+        <QrCode className="h-4 w-4 text-[#4285F4]" />
+        <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#4285F4]">
+          Aprovado
         </span>
       </div>
-      <img
-        src={app.credential_qr}
-        alt={`QR Code, ${app.full_name}`}
-        className="h-36 w-36 rounded-xl border border-white/10"
-      />
-      {app.credential_issued_at && (
+      <div className="flex h-36 w-36 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]">
+        <Shield className="h-12 w-12 text-[#4285F4]/40" />
+      </div>
+      {app.reviewed_at && (
         <p className="text-[11px] text-white/38">
-          Emitida em {formatDateTimePT(app.credential_issued_at)}
+          Aprovado em {formatDateTimePT(app.reviewed_at)}
         </p>
       )}
     </div>
@@ -258,8 +251,8 @@ function ApplicationCard({
               <Mail className="h-3 w-3" />
               {app.email}
             </span>
-            {app.role && <span className="text-white/24">·</span>}
-            {app.role && <span>{app.role}</span>}
+            {app.role_type && <span className="text-white/24">·</span>}
+            {app.role_type && <span>{app.role_type}</span>}
           </div>
         </div>
 
@@ -300,17 +293,11 @@ function ApplicationCard({
 
           {/* Detail grid */}
           <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
-            <DetailItem label="Telefone" value={app.phone} icon={<Phone className="h-3.5 w-3.5" />} />
-            {app.cpf && <DetailItem label="CPF / Documento" value={app.cpf} />}
-            {app.tshirt_size && <DetailItem label="Tamanho camiseta" value={app.tshirt_size} />}
-            {app.team && <DetailItem label="Equipe" value={app.team} />}
-            {app.shift && <DetailItem label="Turno" value={app.shift} />}
-            {app.emergency_contact_name && (
-              <DetailItem
-                label="Contato emergência"
-                value={`${app.emergency_contact_name}${app.emergency_contact_phone ? `, ${app.emergency_contact_phone}` : ''}`}
-              />
-            )}
+            <DetailItem label="Telefone" value={app.phone ?? '-'} icon={<Phone className="h-3.5 w-3.5" />} />
+            {app.document_number && <DetailItem label="CPF / Documento" value={app.document_number} />}
+            {app.t_shirt_size && <DetailItem label="Tamanho camiseta" value={app.t_shirt_size} />}
+            {app.role_type && <DetailItem label="Função" value={app.role_type} />}
+            {app.experience && <DetailItem label="Experiência" value={app.experience} />}
           </div>
 
           {/* Bio */}
@@ -322,11 +309,11 @@ function ApplicationCard({
           )}
 
           {/* Custom answers */}
-          {app.custom_answers && Object.keys(app.custom_answers).length > 0 && (
+          {app.custom_field_answers && Object.keys(app.custom_field_answers).length > 0 && (
             <div className="mt-4">
               <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-white/38">Respostas adicionais</p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {Object.entries(app.custom_answers).map(([key, val]) => (
+                {Object.entries(app.custom_field_answers).map(([key, val]) => (
                   <div key={key} className="rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2.5">
                     <p className="text-[10px] uppercase tracking-[0.14em] text-white/36">{key}</p>
                     <p className="mt-0.5 text-sm text-[#f5f0e8]">{String(val)}</p>
@@ -337,13 +324,13 @@ function ApplicationCard({
           )}
 
           {/* Reviewer notes */}
-          {app.reviewer_notes && (
+          {app.bio && (
             <div className="mt-4 rounded-xl border border-amber-400/15 bg-amber-400/5 px-4 py-3">
               <div className="flex items-center gap-2">
                 <MessageSquare className="h-3.5 w-3.5 text-amber-400" />
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-400">Observação</p>
               </div>
-              <p className="mt-1.5 text-sm text-white/68">{app.reviewer_notes}</p>
+              <p className="mt-1.5 text-sm text-white/68">{app.bio}</p>
             </div>
           )}
 
@@ -505,7 +492,7 @@ export function StaffApplicationsPanel({ eventId }: Props) {
       .from('staff_applications')
       .update({
         status: newStatus,
-        reviewer_notes: notes ?? null,
+        reviewed_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', appId)
@@ -515,7 +502,7 @@ export function StaffApplicationsPanel({ eventId }: Props) {
     setApplications((prev) =>
       prev.map((a) =>
         a.id === appId
-          ? { ...a, status: newStatus, reviewer_notes: notes ?? a.reviewer_notes }
+          ? { ...a, status: newStatus, reviewed_at: new Date().toISOString() }
           : a,
       ),
     )
@@ -526,7 +513,7 @@ export function StaffApplicationsPanel({ eventId }: Props) {
     setActionLoading(app.id)
     try {
       // 1. Update status
-      await updateStatus(app.id, 'approved', app.reviewer_notes ?? undefined)
+      await updateStatus(app.id, 'approved')
 
       // 2. Generate credential
       const res = await fetch(EDGE_FN_URL, {
@@ -546,8 +533,8 @@ export function StaffApplicationsPanel({ eventId }: Props) {
               a.id === app.id
                 ? {
                     ...a,
-                    credential_qr: credData.qr_url,
-                    credential_issued_at: new Date().toISOString(),
+                    status: 'approved' as const,
+                    reviewed_at: new Date().toISOString(),
                   }
                 : a,
             ),
@@ -569,7 +556,7 @@ export function StaffApplicationsPanel({ eventId }: Props) {
       appId: app.id,
       title,
       newStatus,
-      initialNotes: app.reviewer_notes ?? '',
+      initialNotes: '',
       loading: false,
     })
   }
@@ -714,7 +701,7 @@ export function StaffApplicationsPanel({ eventId }: Props) {
                 openNotesModal(app, 'rejected', `Reprovar, ${app.full_name}`)
               }
               onRequestAdjustment={() =>
-                openNotesModal(app, 'adjustment_requested', `Solicitar ajuste, ${app.full_name}`)
+                openNotesModal(app, 'waitlisted', `Mover para lista de espera, ${app.full_name}`)
               }
               actionLoading={actionLoading}
             />

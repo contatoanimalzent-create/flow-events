@@ -1,6 +1,7 @@
 /**
  * Operator Service
  * Real QR validation, manual check, checkin history, flow metrics.
+ * Uses same schema as features/checkin (digital_ticket_id, gate_id, result, etc.)
  */
 
 import { supabase } from '@/lib/supabase'
@@ -26,12 +27,7 @@ export interface FlowMetrics {
 }
 
 export const operatorService = {
-  /**
-   * Validate a QR token for check-in.
-   * Rules: token exists, belongs to event, is paid, is active, not yet used.
-   */
   async validateToken(token: string, eventId: string, gate?: string): Promise<ValidationResult> {
-    // 1. Find the ticket by QR token
     const { data: ticket, error } = await supabase
       .from('digital_tickets')
       .select(`
@@ -39,10 +35,9 @@ export const operatorService = {
         status,
         event_id,
         qr_token,
-        ticket_type_id,
-        attendee_id,
-        ticket_types(name),
-        profiles!attendee_id(full_name)
+        holder_name,
+        holder_email,
+        ticket_type:ticket_types(name)
       `)
       .eq('qr_token', token)
       .maybeSingle()
@@ -51,114 +46,111 @@ export const operatorService = {
       return { valid: false, reason: 'not_found', message: 'Ingresso não encontrado' }
     }
 
-    // 2. Check event match
-    if (ticket.event_id !== eventId) {
+    if ((ticket as any).event_id !== eventId) {
       return { valid: false, reason: 'wrong_event', message: 'Ingresso de outro evento' }
     }
 
-    // 3. Check status
-    if (ticket.status === 'used') {
+    const ticketStatus = (ticket as any).status as string
+    if (ticketStatus === 'used') {
       return { valid: false, reason: 'already_used', message: 'Ingresso já utilizado' }
     }
 
-    if (ticket.status !== 'active' && ticket.status !== 'paid') {
-      return { valid: false, reason: 'invalid_token', message: `Ingresso inválido (${ticket.status})` }
+    if (ticketStatus !== 'confirmed' && ticketStatus !== 'active' && ticketStatus !== 'paid') {
+      return { valid: false, reason: 'invalid_token', message: `Ingresso inválido (${ticketStatus})` }
     }
 
-    // 4. Check existing checkin (dedup)
-    const { count: checkinCount } = await supabase
+    const { count: existingCheckins } = await supabase
       .from('checkins')
       .select('id', { count: 'exact', head: true })
-      .eq('ticket_id', ticket.id)
+      .eq('digital_ticket_id', (ticket as any).id)
+      .eq('result', 'success')
+      .eq('is_exit', false)
 
-    if ((checkinCount ?? 0) > 0) {
+    if ((existingCheckins ?? 0) > 0) {
       return { valid: false, reason: 'already_used', message: 'Ingresso já utilizado (check-in duplicado)' }
     }
 
-    // 5. Register checkin
     const { error: checkinError } = await supabase.from('checkins').insert({
       event_id: eventId,
-      ticket_id: ticket.id,
-      attendee_id: ticket.attendee_id,
-      qr_token: token,
-      gate: gate ?? null,
+      digital_ticket_id: (ticket as any).id,
+      gate_id: gate ?? null,
+      result: 'success',
+      reason_code: 'ticket_valid',
+      is_exit: false,
+      was_offline: false,
       checked_in_at: new Date().toISOString(),
-      offline: false,
     })
 
     if (checkinError) {
       return { valid: false, reason: 'unauthorized', message: 'Erro ao registrar check-in' }
     }
 
-    // 6. Mark ticket as used
     await supabase
       .from('digital_tickets')
-      .update({ status: 'used' })
-      .eq('id', ticket.id)
+      .update({ status: 'used', checked_in_at: new Date().toISOString() })
+      .eq('id', (ticket as any).id)
 
-    const name = (ticket.profiles as any)?.full_name ?? 'Participante'
-    const typeName = (ticket.ticket_types as any)?.name ?? 'Ingresso'
+    const name = (ticket as any).holder_name ?? 'Participante'
+    const typeName = ((ticket as any).ticket_type as any)?.name ?? 'Ingresso'
 
     return {
       valid: true,
       name,
-      ticketLabel: `${typeName}`,
+      ticketLabel: typeName,
       ticketType: typeName,
-      attendeeId: ticket.attendee_id,
+      attendeeId: (ticket as any).id,
       message: 'Acesso liberado',
     }
   },
 
-  /**
-   * Manual check by attendee name or document.
-   */
   async searchAttendee(query: string, eventId: string): Promise<Array<{
-    ticketId: string; attendeeId: string; name: string; email: string; ticketType: string; status: string
+    ticketId: string; attendeeId: string; name: string; email: string; ticketType: string; status: string; qrToken?: string
   }>> {
     const { data } = await supabase
       .from('digital_tickets')
       .select(`
         id,
         status,
-        attendee_id,
-        ticket_types(name),
-        profiles!attendee_id(full_name, email)
+        holder_name,
+        holder_email,
+        qr_token,
+        ticket_type:ticket_types(name)
       `)
       .eq('event_id', eventId)
-      .limit(20)
+      .limit(50)
 
     if (!data) return []
 
     const q = query.toLowerCase()
     return (data as any[])
       .filter((t) => {
-        const name = t.profiles?.full_name ?? ''
-        const email = t.profiles?.email ?? ''
+        const name = t.holder_name ?? ''
+        const email = t.holder_email ?? ''
         return name.toLowerCase().includes(q) || email.toLowerCase().includes(q)
       })
       .map((t) => ({
         ticketId: t.id,
-        attendeeId: t.attendee_id,
-        name: t.profiles?.full_name ?? '-',
-        email: t.profiles?.email ?? '-',
-        ticketType: t.ticket_types?.name ?? 'Ingresso',
+        attendeeId: t.id,
+        name: t.holder_name ?? '-',
+        email: t.holder_email ?? '-',
+        ticketType: t.ticket_type?.name ?? 'Ingresso',
         status: t.status,
+        qrToken: t.qr_token ?? undefined,
       }))
   },
 
-  /**
-   * Get checkin history for the current operator session.
-   */
   async getCheckinHistory(eventId: string, limit = 50): Promise<CheckinRecord[]> {
     const { data } = await supabase
       .from('checkins')
       .select(`
         id,
         checked_in_at,
-        gate,
-        offline,
-        profiles!attendee_id(full_name),
-        digital_tickets(ticket_types(name))
+        gate_id,
+        result,
+        is_exit,
+        was_offline,
+        digital_ticket:digital_tickets(holder_name, ticket_type:ticket_types(name)),
+        gate:gates(name)
       `)
       .eq('event_id', eventId)
       .order('checked_in_at', { ascending: false })
@@ -168,39 +160,37 @@ export const operatorService = {
 
     return (data as any[]).map((c) => ({
       id: c.id,
-      attendeeName: c.profiles?.full_name ?? 'Participante',
-      ticketLabel: c.digital_tickets?.ticket_types?.name ?? 'Ingresso',
+      attendeeName: c.digital_ticket?.holder_name ?? 'Participante',
+      ticketLabel: c.digital_ticket?.ticket_type?.name ?? 'Ingresso',
       validAt: c.checked_in_at,
-      valid: true,
-      gate: c.gate ?? null,
+      valid: c.result === 'success',
+      gate: c.gate?.name ?? null,
     }))
   },
 
-  /**
-   * Get real-time flow metrics for an event.
-   */
   async getFlowMetrics(eventId: string): Promise<FlowMetrics> {
     const [validRes, invalidRes] = await Promise.all([
       supabase
         .from('checkins')
         .select('id', { count: 'exact', head: true })
-        .eq('event_id', eventId),
+        .eq('event_id', eventId)
+        .eq('result', 'success'),
       supabase
-        .from('checkin_attempts')
+        .from('checkins')
         .select('id', { count: 'exact', head: true })
         .eq('event_id', eventId)
-        .eq('valid', false),
+        .neq('result', 'success'),
     ])
 
     const totalValid = validRes.count ?? 0
     const totalInvalid = invalidRes.count ?? 0
 
-    // Last-minute rate
     const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString()
     const { count: recentCount } = await supabase
       .from('checkins')
       .select('id', { count: 'exact', head: true })
       .eq('event_id', eventId)
+      .eq('result', 'success')
       .gte('checked_in_at', oneMinuteAgo)
 
     return {

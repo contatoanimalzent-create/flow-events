@@ -107,6 +107,17 @@ export type Database = {
       financial_entries:                { Row: FinancialEntry;                 Insert: Partial<FinancialEntry>;                 Update: Partial<FinancialEntry> }
       vendors:                          { Row: Vendor;                         Insert: Partial<Vendor>;                         Update: Partial<Vendor> }
       person_event_profiles:            { Row: PersonEventProfile;             Insert: Partial<PersonEventProfile>;             Update: Partial<PersonEventProfile> }
+      // ── Promoter, Referral & Community (20260525) ──────────────────────────
+      agenda_sessions:                  { Row: AgendaSession;                  Insert: Partial<AgendaSession>;                  Update: Partial<AgendaSession> }
+      agenda_favorites:                 { Row: AgendaFavorite;                 Insert: Partial<AgendaFavorite>;                 Update: Partial<AgendaFavorite> }
+      feed_likes:                       { Row: FeedLike;                       Insert: Partial<FeedLike>;                       Update: Partial<FeedLike> }
+      staff_instructions:               { Row: StaffInstruction;               Insert: Partial<StaffInstruction>;               Update: Partial<StaffInstruction> }
+      supervisor_approvals:             { Row: SupervisorApproval;             Insert: Partial<SupervisorApproval>;             Update: Partial<SupervisorApproval> }
+      team_invites:                     { Row: TeamInvite;                     Insert: Partial<TeamInvite>;                     Update: Partial<TeamInvite> }
+      referral_clicks:                  { Row: ReferralClick;                  Insert: Partial<ReferralClick>;                  Update: Partial<ReferralClick> }
+      commissions:                      { Row: Commission;                     Insert: Partial<Commission>;                    Update: Partial<Commission> }
+      promoter_ranking:                 { Row: PromoterRanking;                Insert: Partial<PromoterRanking>;                Update: Partial<PromoterRanking> }
+      promoter_goals:                   { Row: PromoterGoal;                   Insert: Partial<PromoterGoal>;                   Update: Partial<PromoterGoal> }
     }
   }
 }
@@ -1617,4 +1628,124 @@ export interface PersonEventProfile {
   metadata?: Record<string, unknown> | null
   created_at: string
   updated_at: string
+}
+
+// ─── Agenda Sessions ──────────────────────────────────────────────────────────
+
+export interface AgendaSession {
+  id: string
+  event_id: string
+  title: string
+  description?: string | null
+  speaker_name?: string | null
+  stage?: string | null
+  starts_at: string
+  ends_at?: string | null
+  category?: string | null
+  created_at: string
+}
+
+// ─── Agenda Favorites ─────────────────────────────────────────────────────────
+
+export interface AgendaFavorite {
+  id: string
+  session_id: string
+  event_id: string
+  user_id: string
+  created_at: string
+}
+
+// ─── Feed Likes ───────────────────────────────────────────────────────────────
+
+export interface FeedLike {
+  id: string
+  post_id: string
+  user_id: string
+  event_id?: string | null
+  created_at: string
+}
+
+// ─── Staff Instructions ───────────────────────────────────────────────────────
+
+export interface StaffInstruction {
+  id: string
+  event_id: string
+  created_by?: string | null
+  title: string
+  body?: string | null
+  priority: string
+  created_at: string
+}
+
+// ─── Supervisor Approvals ─────────────────────────────────────────────────────
+
+export interface SupervisorApproval {
+  id: string
+  event_id: string
+  staff_member_id?: string | null
+  type: string
+  reason?: string | null
+  requested_at: string
+  status: 'pending' | 'approved' | 'rejected'
+  resolved_by?: string | null
+  resolved_at?: string | null
+}
+
+// ─── Team Invites ─────────────────────────────────────────────────────────────
+
+export interface TeamInvite {
+  id: string
+  organization_id: string
+  email: string
+  role: string
+  invited_by?: string | null
+  status: string
+  created_at: string
+}
+
+// ─── Referral Clicks ──────────────────────────────────────────────────────────
+
+export interface ReferralClick {
+  id: string
+  referral_code: string
+  ip_address?: string | null
+  user_agent?: string | null
+  created_at: string
+}
+
+// ─── Commissions ──────────────────────────────────────────────────────────────
+
+export interface Commission {
+  id: string
+  promoter_id: string
+  event_id: string
+  amount: number
+  currency: string
+  status: 'pending' | 'paid' | 'cancelled'
+  created_at: string
+}
+
+// ─── Promoter Ranking ─────────────────────────────────────────────────────────
+
+export interface PromoterRanking {
+  id: string
+  event_id: string
+  owner_id: string
+  sales_count: number
+  revenue: number
+  updated_at: string
+}
+
+// ─── Promoter Goals ───────────────────────────────────────────────────────────
+
+export interface PromoterGoal {
+  id: string
+  promoter_id: string
+  event_id: string
+  label: string
+  target: number
+  current: number
+  unit: string
+  deadline?: string | null
+  created_at: string
 }

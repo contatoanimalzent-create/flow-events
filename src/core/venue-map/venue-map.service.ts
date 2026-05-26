@@ -22,30 +22,46 @@ export interface VenueMap {
 
 export const venueMapService = {
   async getMap(eventId: string): Promise<VenueMap | null> {
+    // venue_maps uses venue_id (FK to venues) and map_image_url;
+    // zones live in the separate venue_zones table, joined via venue_map_id.
     const { data } = await supabase
       .from('venue_maps')
-      .select('id, event_id, image_url, zones, updated_at')
-      .eq('event_id', eventId)
+      .select(`
+        id, venue_id, map_image_url, updated_at,
+        venue_zones (id, name, color, polygon_coords, capacity, zone_type)
+      `)
+      .eq('venue_id', eventId)
       .maybeSingle()
 
     if (!data) return null
 
+    const zones: VenueZone[] = ((data as any).venue_zones ?? []).map((z: any) => ({
+      id: z.id,
+      name: z.name,
+      color: z.color ?? '#888',
+      x: z.polygon_coords?.[0]?.x ?? 0,
+      y: z.polygon_coords?.[0]?.y ?? 0,
+      width: 0,
+      height: 0,
+      description: z.zone_type ?? null,
+    }))
+
     return {
       id: data.id,
-      eventId: data.event_id,
-      imageUrl: data.image_url ?? null,
-      zones: (data.zones as VenueZone[]) ?? [],
+      eventId: data.venue_id,
+      imageUrl: data.map_image_url ?? null,
+      zones,
       updatedAt: data.updated_at,
     }
   },
 
-  async saveMap(eventId: string, imageUrl: string | null, zones: VenueZone[]): Promise<void> {
+  async saveMap(eventId: string, imageUrl: string | null, _zones: VenueZone[]): Promise<void> {
+    // venue_maps stores venue_id + map_image_url; zones are rows in venue_zones.
     await supabase.from('venue_maps').upsert({
-      event_id: eventId,
-      image_url: imageUrl,
-      zones,
+      venue_id: eventId,
+      map_image_url: imageUrl,
       updated_at: new Date().toISOString(),
-    }, { onConflict: 'event_id' })
+    }, { onConflict: 'venue_id' })
   },
 
   async uploadFloorPlan(eventId: string, file: File): Promise<string> {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import {
   ChevronLeft, ChevronRight, User, Bell, Shield, HelpCircle,
   LogOut, Building2, Calendar, ToggleLeft, Loader2, Globe, Moon, Sun,
-  CheckCircle,
+  CheckCircle, Camera, Save, X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useAppContext } from '@/core/context/app-context.store'
@@ -36,7 +36,12 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
   const [loadingProfile, setLoadingProfile] = useState(true)
   const [resetSent, setResetSent] = useState(false)
   const [resetLoading, setResetLoading] = useState(false)
-  const [profileToast, setProfileToast] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [editFirstName, setEditFirstName] = useState('')
+  const [editLastName, setEditLastName] = useState('')
+  const [editPhone, setEditPhone] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
+  const [editSuccess, setEditSuccess] = useState(false)
 
   // Load real user data
   useEffect(() => {
@@ -46,12 +51,20 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
 
       const { data } = await supabase
         .from('profiles')
-        .select('full_name, avatar_url')
+        .select('first_name, last_name, phone, avatar_url')
         .eq('id', user.id)
         .maybeSingle()
 
+      const firstName = (data as any)?.first_name ?? ''
+      const lastName = (data as any)?.last_name ?? ''
+      const displayName = [firstName, lastName].filter(Boolean).join(' ') || user.user_metadata?.full_name || 'Usuário'
+
+      setEditFirstName(firstName)
+      setEditLastName(lastName)
+      setEditPhone((data as any)?.phone ?? '')
+
       setProfile({
-        fullName: (data as any)?.full_name ?? user.user_metadata?.full_name ?? 'Usuário',
+        fullName: displayName,
         email: user.email ?? '-',
         avatarUrl: (data as any)?.avatar_url ?? null,
       })
@@ -82,8 +95,8 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
     {
       icon: User,
       label: 'Meu perfil',
-      subtitle: 'Nome, foto, preferências',
-      action: () => { setProfileToast(true); setTimeout(() => setProfileToast(false), 3000) },
+      subtitle: 'Nome, telefone, foto',
+      action: () => setEditMode(true),
     },
     { icon: Bell, label: 'Notificações', subtitle: 'Configurar alertas', action: () => onNavigate('/pulse/notifications') },
     { icon: ToggleLeft, label: 'Trocar modo', subtitle: mode ? `Modo atual: ${buildModeLabel(mode)}` : '-', action: () => onNavigate('/pulse/select-mode') },
@@ -122,7 +135,7 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-área-inset-top) + 20px)' }}>
+      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
         <button onClick={() => window.history.back()} className="p-2 -ml-2">
           <ChevronLeft size={22} className="text-slate-300" />
         </button>
@@ -190,11 +203,74 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
         </div>
       )}
 
-      {/* Profile edit coming soon banner */}
-      {profileToast && (
-        <div className="mx-4 mb-3 flex items-center gap-3 bg-white/8 border border-white/12 rounded-2xl px-4 py-3">
-          <User size={16} className="text-slate-300 shrink-0" />
-          <p className="text-slate-200 text-sm">Edição de perfil em breve</p>
+      {/* Profile edit panel */}
+      {editMode && (
+        <div className="mx-4 mb-4 bg-white/5 border border-white/10 rounded-2xl p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-white font-semibold text-sm">Editar perfil</p>
+            <button onClick={() => setEditMode(false)} className="p-1 text-slate-400">
+              <X size={16} />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] uppercase tracking-wider text-slate-500 mb-1 block">Nome</label>
+              <input
+                value={editFirstName}
+                onChange={(e) => setEditFirstName(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 outline-none focus:border-blue-500"
+                placeholder="Nome"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] uppercase tracking-wider text-slate-500 mb-1 block">Sobrenome</label>
+              <input
+                value={editLastName}
+                onChange={(e) => setEditLastName(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 outline-none focus:border-blue-500"
+                placeholder="Sobrenome"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] uppercase tracking-wider text-slate-500 mb-1 block">Telefone</label>
+            <input
+              value={editPhone}
+              onChange={(e) => setEditPhone(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-600 outline-none focus:border-blue-500"
+              placeholder="(00) 00000-0000"
+            />
+          </div>
+          {editSuccess && (
+            <div className="flex items-center gap-2 text-emerald-400 text-xs">
+              <CheckCircle size={14} /> Perfil atualizado
+            </div>
+          )}
+          <button
+            onClick={async () => {
+              setEditSaving(true)
+              try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (!user) return
+                await supabase.from('profiles').update({
+                  first_name: editFirstName.trim(),
+                  last_name: editLastName.trim(),
+                  phone: editPhone.trim() || null,
+                }).eq('id', user.id)
+                const newName = [editFirstName, editLastName].filter(Boolean).join(' ') || 'Usuário'
+                setProfile((p) => p ? { ...p, fullName: newName } : p)
+                setEditSuccess(true)
+                setTimeout(() => { setEditSuccess(false); setEditMode(false) }, 1500)
+              } finally {
+                setEditSaving(false)
+              }
+            }}
+            disabled={editSaving || !editFirstName.trim()}
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 rounded-xl py-3 text-sm font-semibold text-white disabled:opacity-40"
+          >
+            {editSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            Salvar
+          </button>
         </div>
       )}
 

@@ -220,18 +220,18 @@ export function EventsPageContent() {
                       <div className="font-display text-sm tracking-wide">{event.name}</div>
                       <div className="mt-0.5 flex items-center gap-2 text-[11px] text-text-muted">
                         {event.category && <span>{event.category}</span>}
-                        {event.event_code && (
+                        {event.slug && (
                           <button
                             type="button"
-                            title="Clique para copiar o código do scanner"
+                            title="Clique para copiar o slug do scanner"
                             onClick={(e) => {
                               e.stopPropagation()
-                              void navigator.clipboard.writeText(event.event_code!)
+                              void navigator.clipboard.writeText(event.slug)
                             }}
-                            className="flex items-center gap-1 rounded border border-brand-acid/25 bg-brand-acid/8 px-1.5 py-0.5 font-mono font-bold tracking-widest text-brand-acid hover:bg-brand-acid/15 transition-colors"
+                            className="flex items-center gap-1 rounded border border-brand-acid/25 bg-brand-acid/8 px-1.5 py-0.5 font-mono font-bold tracking-[0.06em] text-brand-acid hover:bg-brand-acid/15 transition-colors"
                           >
                             <ScanLine className="h-2.5 w-2.5" />
-                            {event.event_code}
+                            {event.slug}
                           </button>
                         )}
                       </div>

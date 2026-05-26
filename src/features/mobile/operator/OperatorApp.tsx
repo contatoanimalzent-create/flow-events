@@ -158,15 +158,15 @@ function SelectEventScreen({
   )
 
   async function handleCodeSubmit() {
-    const trimmed = code.trim().toUpperCase()
+    const trimmed = code.trim().toLowerCase()
     if (!trimmed) return
     setLoading(true)
     const { data } = await supabase
-      .from('events').select('id, name, date_start, location_name, status')
-      .eq('event_code', trimmed).single()
+      .from('events').select('id, name, starts_at, venue_name, status')
+      .eq('slug', trimmed).single()
     setLoading(false)
     if (data) {
-      onSelect({ id: data.id, name: data.name, date: data.date_start ?? '', venue: data.location_name ?? '', status: data.status })
+      onSelect({ id: data.id, name: data.name, date: (data as any).starts_at ?? '', venue: (data as any).venue_name ?? '', status: data.status })
     }
   }
 

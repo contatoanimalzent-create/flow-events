@@ -110,23 +110,23 @@ export function EventCard({
           </div>
         </div>
 
-        {/* Event code badge */}
-        {event.event_code && (
+        {/* Slug badge for operator access */}
+        {event.slug && (
           <button
             type="button"
-            title="Código do scanner, clique para copiar"
+            title="Slug do evento para scanner, clique para copiar"
             onClick={(e) => {
               e.stopPropagation()
-              void navigator.clipboard.writeText(event.event_code!)
+              void navigator.clipboard.writeText(event.slug)
             }}
             className="flex w-full items-center justify-between rounded-sm border border-brand-acid/20 bg-brand-acid/5 px-3 py-2 transition-colors hover:bg-brand-acid/10 group"
           >
             <span className="flex items-center gap-2 font-mono text-[11px] text-text-muted">
               <ScanLine className="h-3.5 w-3.5 text-brand-acid" />
-              Código do scanner
+              Slug do scanner
             </span>
-            <span className="flex items-center gap-2 font-mono text-sm font-bold tracking-[0.2em] text-brand-acid">
-              {event.event_code}
+            <span className="flex items-center gap-2 font-mono text-sm font-bold tracking-[0.08em] text-brand-acid">
+              {event.slug}
               <Copy className="h-3 w-3 opacity-0 group-hover:opacity-70 transition-opacity" />
             </span>
           </button>

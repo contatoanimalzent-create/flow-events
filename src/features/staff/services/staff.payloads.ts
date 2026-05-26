@@ -1,5 +1,4 @@
 import type { StaffFormData, StaffMemberRow, StaffPermission, StaffTimeEntryRow } from '@/features/staff/types'
-import { normalizeCPF, normalizeCPFForStorage, validateCPF } from '@/lib/validators/cpf'
 
 function parsePermissions(value: unknown): StaffPermission[] {
   if (Array.isArray(value)) {
@@ -21,6 +20,7 @@ export function mapStaffMemberRow(row: Record<string, unknown>): StaffMemberRow 
     email: (row.email as string | null | undefined) ?? null,
     phone: (row.phone as string | null | undefined) ?? null,
     cpf: (row.cpf as string | null | undefined) ?? null,
+    photo_url: (row.photo_url as string | null | undefined) ?? null,
     role_title: (row.role_title as string | null | undefined) ?? null,
     department: (row.department as string | null | undefined) ?? null,
     area: (row.area as string | null | undefined) ?? null,
@@ -63,12 +63,6 @@ export function mapStaffTimeEntryRow(row: Record<string, unknown>): StaffTimeEnt
 }
 
 export function buildStaffPayload(form: StaffFormData, eventId: string, organizationId: string) {
-  const cpf = normalizeCPF(form.cpf)
-
-  if (cpf && !validateCPF(cpf)) {
-    throw new Error('CPF invalido. Informe o CPF real da propria pessoa.')
-  }
-
   return {
     organization_id: organizationId,
     event_id: eventId,
@@ -76,7 +70,8 @@ export function buildStaffPayload(form: StaffFormData, eventId: string, organiza
     last_name: form.last_name.trim() || null,
     email: form.email.trim() || null,
     phone: form.phone.trim() || null,
-    cpf: normalizeCPFForStorage(cpf),
+    cpf: form.cpf.trim() || null,
+    photo_url: form.photo_url.trim() || null,
     role_title: form.role_title.trim() || null,
     department: form.department.trim() || null,
     area: form.area.trim() || null,
@@ -99,6 +94,7 @@ export function mapStaffToForm(row: StaffMemberRow): StaffFormData {
     email: row.email ?? '',
     phone: row.phone ?? '',
     cpf: row.cpf ?? '',
+    photo_url: row.photo_url ?? '',
     role_title: row.role_title ?? '',
     department: row.department ?? '',
     area: row.area ?? '',

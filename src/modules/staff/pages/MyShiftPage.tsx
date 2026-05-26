@@ -8,8 +8,8 @@ import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
 interface Teammate {
   name: string
-  role: string
-  zone: string | null
+  roleTitle: string
+  area: string | null
   isActive: boolean
 }
 
@@ -30,32 +30,43 @@ export default function MyShiftPage({ onNavigate }: PulsePageProps) {
     const load = async () => {
       try {
         const { data: { user }, error: authError } = await supabase.auth.getUser()
-        if (authError || !user || !context?.eventId) { setLoading(false); return }
+        if (authError || !user?.email || !context?.eventId) { setLoading(false); return }
 
-        const s = await staffService.getCurrentShift(user.id, context.eventId)
+        const staffId = await staffService.findStaffMemberForAuthUser(user.email, context.eventId)
+        if (!staffId) { setLoading(false); return }
+
+        const s = await staffService.getCurrentShift(staffId, context.eventId)
         setShift(s)
 
-        if (s?.zone) {
-          // Load teammates in the same zone
+        if (s?.area) {
+          // Load teammates in the same area
           try {
             const { data: members } = await supabase
               .from('staff_members')
               .select(`
-                id, role, zone, status, user_id,
-                profiles!user_id(full_name),
-                staff_sessions(status)
+                id, first_name, last_name, role_title, area, status
               `)
               .eq('event_id', context.eventId)
-              .eq('zone', s.zone)
-              .neq('user_id', user.id)
+              .eq('area', s.area)
+              .neq('id', staffId)
               .limit(10)
 
             if (members) {
+              // Check active timeclock sessions for each teammate
+              const memberIds = (members as any[]).map((m) => m.id)
+              const { data: sessions } = await supabase
+                .from('timeclock_sessions')
+                .select('staff_member_id, status')
+                .in('staff_member_id', memberIds)
+                .eq('status', 'open')
+
+              const activeStaffIds = new Set((sessions ?? []).map((ss: any) => ss.staff_member_id))
+
               setTeammates((members as any[]).map((m) => ({
-                name: (m.profiles as any)?.full_name ?? 'Membro',
-                role: m.role ?? 'staff_member',
-                zone: m.zone ?? null,
-                isActive: ((m.staff_sessions as any[]) ?? []).some((ss: any) => ss.status === 'active'),
+                name: [m.first_name, m.last_name].filter(Boolean).join(' ') || 'Membro',
+                roleTitle: m.role_title ?? 'staff_member',
+                area: m.area ?? null,
+                isActive: activeStaffIds.has(m.id),
               })))
             }
           } catch {
@@ -91,7 +102,7 @@ export default function MyShiftPage({ onNavigate }: PulsePageProps) {
   if (loading) {
     return (
       <div className="flex flex-col min-h-full bg-[#060d1f]">
-        <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-área-inset-top) + 20px)' }}>
+        <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
           <button onClick={() => onNavigate('/pulse/staff')} className="p-2 -ml-2">
             <ChevronLeft size={22} className="text-slate-300" />
           </button>
@@ -107,7 +118,7 @@ export default function MyShiftPage({ onNavigate }: PulsePageProps) {
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-área-inset-top) + 20px)' }}>
+      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
         <button onClick={() => onNavigate('/pulse/staff')} className="p-2 -ml-2">
           <ChevronLeft size={22} className="text-slate-300" />
         </button>
@@ -133,10 +144,7 @@ export default function MyShiftPage({ onNavigate }: PulsePageProps) {
                   <p className={`text-xs font-semibold uppercase tracking-wider ${shift.status === 'active' ? 'text-green-400' : 'text-slate-400'}`}>
                     {shift.status === 'active' ? 'Turno Ativo' : shift.status === 'scheduled' ? 'Turno Agendado' : 'Turno Concluído'}
                   </p>
-                  <p className="text-white font-bold text-xl mt-1">{shift.zone ?? ROLE_LABELS[shift.role] ?? shift.role}</p>
-                  {shift.supervisorName && (
-                    <p className="text-slate-400 text-sm mt-0.5">Supervisor: {shift.supervisorName}</p>
-                  )}
+                  <p className="text-white font-bold text-xl mt-1">{shift.area ?? ROLE_LABELS[shift.roleTitle] ?? shift.roleTitle}</p>
                 </div>
                 {shift.status === 'active' && (
                   <span className="flex items-center gap-1.5 bg-green-500/20 rounded-full px-3 py-1.5">
@@ -178,13 +186,13 @@ export default function MyShiftPage({ onNavigate }: PulsePageProps) {
           </div>
 
           {/* Zone */}
-          {shift.zone && (
+          {shift.area && (
             <div className="px-4 mb-5">
               <div className="flex items-center gap-3 bg-white/5 border border-white/8 rounded-2xl px-4 py-4">
                 <MapPin size={20} className="text-blue-400 shrink-0" />
                 <div className="flex-1">
-                  <p className="text-white text-sm font-semibold">{shift.zone}</p>
-                  <p className="text-slate-400 text-xs">Sua zona de atuação</p>
+                  <p className="text-white text-sm font-semibold">{shift.area}</p>
+                  <p className="text-slate-400 text-xs">Sua area de atuação</p>
                 </div>
               </div>
             </div>
@@ -205,7 +213,7 @@ export default function MyShiftPage({ onNavigate }: PulsePageProps) {
                     </div>
                     <div className="flex-1">
                       <p className="text-white text-sm font-medium">{t.name}</p>
-                      <p className="text-slate-500 text-xs">{ROLE_LABELS[t.role] ?? t.role}</p>
+                      <p className="text-slate-500 text-xs">{ROLE_LABELS[t.roleTitle] ?? t.roleTitle}</p>
                     </div>
                     <div
                       className="w-2 h-2 rounded-full"

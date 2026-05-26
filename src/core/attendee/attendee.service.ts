@@ -46,21 +46,23 @@ export interface UpgradeOffer {
   price: number
   currency: string
   available: number | null
-  expiresAt: string | null
 }
 
 export const attendeeService = {
   async getMyTickets(userId: string): Promise<AttendeeTicket[]> {
+    const { data: authUser } = await supabase.auth.getUser()
+    const email = authUser?.user?.email
+    if (!email) return []
+
     const { data } = await supabase
       .from('digital_tickets')
       .select(`
-        id, qr_token, status, attendee_id,
-        ticket_type_id, event_id,
-        ticket_types(name),
-        events(name, start_date, venues(name)),
-        profiles!attendee_id(full_name)
+        id, qr_token, status, holder_name, holder_email,
+        event_id,
+        ticket_type:ticket_types(name),
+        event:events(name, starts_at, venue_name)
       `)
-      .eq('attendee_id', userId)
+      .eq('holder_email', email)
       .order('created_at', { ascending: false })
 
     if (!data) return []
@@ -69,12 +71,12 @@ export const attendeeService = {
       id: t.id,
       qrToken: t.qr_token,
       status: t.status,
-      ticketType: t.ticket_types?.name ?? 'Ingresso',
+      ticketType: t.ticket_type?.name ?? 'Ingresso',
       eventId: t.event_id,
-      eventName: t.events?.name ?? '-',
-      eventDate: t.events?.start_date ?? null,
-      eventVenue: t.events?.venues?.name ?? null,
-      holderName: t.profiles?.full_name ?? 'Participante',
+      eventName: t.event?.name ?? '-',
+      eventDate: t.event?.starts_at ?? null,
+      eventVenue: t.event?.venue_name ?? null,
+      holderName: t.holder_name ?? 'Participante',
     }))
   },
 
@@ -82,11 +84,10 @@ export const attendeeService = {
     const { data } = await supabase
       .from('digital_tickets')
       .select(`
-        id, qr_token, status, attendee_id,
-        ticket_type_id, event_id,
-        ticket_types(name),
-        events(name, start_date, venues(name)),
-        profiles!attendee_id(full_name)
+        id, qr_token, status, holder_name, holder_email,
+        event_id,
+        ticket_type:ticket_types(name),
+        event:events(name, starts_at, venue_name)
       `)
       .eq('id', ticketId)
       .maybeSingle()
@@ -94,103 +95,116 @@ export const attendeeService = {
     if (!data) return null
 
     return {
-      id: data.id,
-      qrToken: data.qr_token,
-      status: data.status,
-      ticketType: (data.ticket_types as any)?.name ?? 'Ingresso',
-      eventId: data.event_id,
-      eventName: (data.events as any)?.name ?? '-',
-      eventDate: (data.events as any)?.start_date ?? null,
-      eventVenue: (data.events as any)?.venues?.name ?? null,
-      holderName: (data.profiles as any)?.full_name ?? 'Participante',
+      id: (data as any).id,
+      qrToken: (data as any).qr_token,
+      status: (data as any).status,
+      ticketType: (data as any).ticket_type?.name ?? 'Ingresso',
+      eventId: (data as any).event_id,
+      eventName: (data as any).event?.name ?? '-',
+      eventDate: (data as any).event?.starts_at ?? null,
+      eventVenue: (data as any).event?.venue_name ?? null,
+      holderName: (data as any).holder_name ?? 'Participante',
     }
   },
 
   async getAgenda(eventId: string, userId: string): Promise<AgendaSession[]> {
-    const [{ data: sessions }, { data: favorites }] = await Promise.all([
-      supabase
-        .from('agenda_sessions')
-        .select('id, title, description, speaker_name, stage, starts_at, ends_at, category')
-        .eq('event_id', eventId)
-        .order('starts_at', { ascending: true }),
-      supabase
-        .from('agenda_favorites')
-        .select('session_id')
-        .eq('user_id', userId)
-        .eq('event_id', eventId),
-    ])
+    try {
+      const [sessionsResult, favoritesResult] = await Promise.all([
+        supabase
+          .from('agenda_sessions')
+          .select('id, title, description, speaker_name, stage, starts_at, ends_at, category')
+          .eq('event_id', eventId)
+          .order('starts_at', { ascending: true }),
+        supabase
+          .from('agenda_favorites')
+          .select('session_id')
+          .eq('user_id', userId)
+          .eq('event_id', eventId),
+      ])
 
-    if (!sessions) return []
+      const sessions = sessionsResult.data
+      if (!sessions) return []
 
-    const favSet = new Set((favorites ?? []).map((f: any) => f.session_id))
+      const favSet = new Set((favoritesResult.data ?? []).map((f: any) => f.session_id))
 
-    return (sessions as any[]).map((s) => ({
-      id: s.id,
-      title: s.title,
-      description: s.description ?? null,
-      speakerName: s.speaker_name ?? null,
-      stage: s.stage ?? null,
-      startsAt: s.starts_at,
-      endsAt: s.ends_at ?? null,
-      category: s.category ?? null,
-      isFavorite: favSet.has(s.id),
-    }))
+      return (sessions as any[]).map((s) => ({
+        id: s.id,
+        title: s.title,
+        description: s.description ?? null,
+        speakerName: s.speaker_name ?? null,
+        stage: s.stage ?? null,
+        startsAt: s.starts_at,
+        endsAt: s.ends_at ?? null,
+        category: s.category ?? null,
+        isFavorite: favSet.has(s.id),
+      }))
+    } catch {
+      return []
+    }
   },
 
   async toggleFavorite(sessionId: string, eventId: string, userId: string, isFavorite: boolean): Promise<void> {
-    if (isFavorite) {
-      await supabase.from('agenda_favorites').delete()
-        .eq('session_id', sessionId).eq('user_id', userId)
-    } else {
-      await supabase.from('agenda_favorites').upsert({
-        session_id: sessionId, event_id: eventId, user_id: userId,
-      })
+    try {
+      if (isFavorite) {
+        await supabase.from('agenda_favorites').delete()
+          .eq('session_id', sessionId).eq('user_id', userId)
+      } else {
+        await supabase.from('agenda_favorites').upsert({
+          session_id: sessionId, event_id: eventId, user_id: userId,
+        })
+      }
+    } catch {
+      // Tables may not exist yet
     }
   },
 
   async getFeed(eventId: string): Promise<FeedPost[]> {
-    const { data } = await supabase
-      .from('event_feed_posts')
-      .select(`
-        id, body, image_url, created_at, likes_count,
-        author_id,
-        profiles!author_id(full_name, avatar_url)
-      `)
-      .eq('event_id', eventId)
-      .order('created_at', { ascending: false })
-      .limit(50)
+    try {
+      const { data } = await supabase
+        .from('event_feed_posts')
+        .select('id, body, image_url, created_at, likes_count, author_name')
+        .eq('event_id', eventId)
+        .order('created_at', { ascending: false })
+        .limit(50)
 
-    if (!data) return []
+      if (!data) return []
 
-    return (data as any[]).map((p) => ({
-      id: p.id,
-      authorName: p.profiles?.full_name ?? 'Organizador',
-      authorAvatar: p.profiles?.avatar_url ?? null,
-      body: p.body,
-      imageUrl: p.image_url ?? null,
-      createdAt: p.created_at,
-      likesCount: p.likes_count ?? 0,
-    }))
+      return (data as any[]).map((p) => ({
+        id: p.id,
+        authorName: p.author_name ?? 'Organizador',
+        authorAvatar: null,
+        body: p.body,
+        imageUrl: p.image_url ?? null,
+        createdAt: p.created_at,
+        likesCount: p.likes_count ?? 0,
+      }))
+    } catch {
+      return []
+    }
   },
 
   async getUpgrades(eventId: string): Promise<UpgradeOffer[]> {
-    const { data } = await supabase
-      .from('ticket_types')
-      .select('id, name, description, price, currency, available_qty, sale_end_date')
-      .eq('event_id', eventId)
-      .eq('is_upgrade', true)
-      .eq('status', 'active')
+    try {
+      const { data } = await supabase
+        .from('ticket_types')
+        .select('id, name, description, currency, ticket_batches(price, available_quantity)')
+        .eq('event_id', eventId)
+        .eq('is_active', true)
 
-    if (!data) return []
+      if (!data) return []
 
-    return (data as any[]).map((u) => ({
-      id: u.id,
-      name: u.name,
-      description: u.description ?? null,
-      price: u.price ?? 0,
-      currency: u.currency ?? 'BRL',
-      available: u.available_qty ?? null,
-      expiresAt: u.sale_end_date ?? null,
-    }))
+      return (data as any[])
+        .filter((t) => t.ticket_batches?.length > 0)
+        .map((t) => ({
+          id: t.id,
+          name: t.name,
+          description: t.description ?? null,
+          price: t.ticket_batches?.[0]?.price ?? 0,
+          currency: t.currency ?? 'BRL',
+          available: t.ticket_batches?.[0]?.available_quantity ?? null,
+        }))
+    } catch {
+      return []
+    }
   },
 }

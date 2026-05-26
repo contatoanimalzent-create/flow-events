@@ -20,6 +20,7 @@ const AjudaProdutoresPage = lazy(() => import('@/pages/public/AjudaProdutoresPag
 const StatusPage = lazy(() => import('@/pages/public/StatusPage').then((m) => ({ default: m.StatusPage })))
 const EventosCategoriPage = lazy(() => import('@/pages/public/EventosCategoriaPage').then((m) => ({ default: m.EventosCategoriaPage })))
 const StaffJoinPage = lazy(() => import('@/pages/public/StaffJoinPage').then((m) => ({ default: m.StaffJoinPage })))
+const StaffCheckinPage = lazy(() => import('@/pages/public/StaffCheckinPage').then((m) => ({ default: m.StaffCheckinPage })))
 const StaffTimeclockPage = lazy(() => import('@/pages/public/StaffTimeclockPage').then((m) => ({ default: m.StaffTimeclockPage })))
 const ContactPage = lazy(() => import('@/pages/public/ContactPage').then((m) => ({ default: m.ContactPage })))
 const ProducerPage = lazy(() => import('@/pages/public/ProducerPage').then((m) => ({ default: m.ProducerPage })))
@@ -79,6 +80,8 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
     <Suspense fallback={<PublicFallback />}>
       {typeof route === 'object' && route.type === 'staff-join' ? (
         <StaffJoinPage />
+      ) : typeof route === 'object' && route.type === 'staff-ponto' ? (
+        <StaffCheckinPage />
       ) : typeof route === 'object' && route.type === 'timeclock' ? (
         <StaffTimeclockPage />
       ) : typeof route === 'object' && route.type === 'event' ? (

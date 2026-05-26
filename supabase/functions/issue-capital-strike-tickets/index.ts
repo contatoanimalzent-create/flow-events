@@ -268,9 +268,10 @@ function buildCapitalStrikeEmail(params: {
   const { nome, exercito, exercitoColor, exercitoBg, categoria, ticketNumber, qrToken, qrUrl } = params
   const firstName = nome.split(' ')[0]
   const isCoalizao = exercito === 'Coalizão'
-  const armyIcon = isCoalizao ? '&#x1F6E1;&#xFE0F;' : '&#x2694;&#xFE0F;'
+  const patchUrl = isCoalizao
+    ? 'https://www.capitalstrike.com.br/imagens/patch-coalizao.png'
+    : 'https://www.capitalstrike.com.br/imagens/patch-alianca.png'
   const accentDark = isCoalizao ? '#92400E' : '#1E3A8A'
-  const accentMid = isCoalizao ? '#D97706' : '#2563EB'
 
   const qrImage = qrUrl
     ? `<img src="${qrUrl}" alt="QR Code" width="240" height="240" style="display:block;border-radius:12px;" />`
@@ -360,10 +361,8 @@ function buildCapitalStrikeEmail(params: {
       <td style="padding:20px 24px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
           <tr>
-            <td width="48" valign="middle">
-              <div style="width:44px;height:44px;border-radius:12px;background:${exercitoColor}22;border:2px solid ${exercitoColor}55;text-align:center;line-height:44px;font-size:22px;">
-                ${armyIcon}
-              </div>
+            <td width="64" valign="middle">
+              <img src="${patchUrl}" alt="${exercito}" width="56" height="56" style="display:block;border-radius:12px;border:2px solid ${exercitoColor}55;" />
             </td>
             <td style="padding-left:16px;" valign="middle">
               <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:${exercitoColor}99;">Ex&eacute;rcito</div>
@@ -371,7 +370,7 @@ function buildCapitalStrikeEmail(params: {
             </td>
             <td align="right" valign="middle">
               <div style="display:inline-block;padding:8px 20px;border-radius:10px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);">
-                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.4);">Fun&ccedil;&atilde;o</div>
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.4);">Categoria</div>
                 <div style="font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#FFFFFF;margin-top:2px;">${categoria}</div>
               </div>
             </td>

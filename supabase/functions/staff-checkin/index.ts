@@ -156,10 +156,6 @@ async function handleGet(req: Request): Promise<Response> {
     return errorResponse('CPF não confere com o cadastro.', 403, 'CPF_MISMATCH')
   }
 
-  if (memberPhone && cleanPhone && !memberPhone.includes(cleanPhone) && !cleanPhone.includes(memberPhone)) {
-    return errorResponse('WhatsApp não confere com o cadastro.', 403, 'PHONE_MISMATCH')
-  }
-
   // 3. Get today's checkins for this staff member
   const todayStart = todayStartUTC()
 

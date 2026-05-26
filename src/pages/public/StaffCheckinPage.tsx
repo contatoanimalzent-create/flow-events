@@ -91,6 +91,20 @@ export function StaffCheckinPage() {
   const [idEmail, setIdEmail] = useState('')
   const [idCpf, setIdCpf] = useState('')
   const [idPhone, setIdPhone] = useState('')
+
+  function formatPhone(v: string) {
+    const d = v.replace(/\D/g, '').slice(0, 11)
+    if (d.length <= 2) return d
+    if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+  }
+  function formatCpfInput(v: string) {
+    const d = v.replace(/\D/g, '').slice(0, 11)
+    if (d.length <= 3) return d
+    if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
+    if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
+    return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
+  }
   const [staff, setStaff] = useState<StaffInfo | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -435,7 +449,7 @@ export function StaffCheckinPage() {
                 <input
                   type="text"
                   value={idCpf}
-                  onChange={(e) => setIdCpf(e.target.value)}
+                  onChange={(e) => setIdCpf(formatCpfInput(e.target.value))}
                   placeholder="000.000.000-00"
                   required
                   inputMode="numeric"
@@ -450,7 +464,7 @@ export function StaffCheckinPage() {
                 <input
                   type="tel"
                   value={idPhone}
-                  onChange={(e) => setIdPhone(e.target.value)}
+                  onChange={(e) => setIdPhone(formatPhone(e.target.value))}
                   placeholder="(61) 99999-9999"
                   required
                   autoComplete="tel"

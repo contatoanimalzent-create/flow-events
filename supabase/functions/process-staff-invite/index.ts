@@ -379,7 +379,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     try {
       const { data: inviteLink, error } = await admin
         .from('staff_invite_links')
-        .select('id, token, event_id, role_type, team_id, shift_id, custom_fields, expires_at, is_active, used_count, max_uses, created_by, send_status, target_email, target_name')
+        .select('id, organization_id, token, event_id, role_type, team_id, shift_id, custom_fields, expires_at, is_active, used_count, max_uses, created_by, send_status, target_email, target_name')
         .eq('token', tokenParam)
         .single()
 
@@ -512,7 +512,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     try {
       const { data: inviteLink, error: inviteError } = await admin
         .from('staff_invite_links')
-        .select('id, token, event_id, role_type, team_id, shift_id, custom_fields, expires_at, is_active, used_count, max_uses, created_by, send_status, target_email, target_name')
+        .select('id, organization_id, token, event_id, role_type, team_id, shift_id, custom_fields, expires_at, is_active, used_count, max_uses, created_by, send_status, target_email, target_name')
         .eq('token', body.token!)
         .single()
 
@@ -525,52 +525,49 @@ Deno.serve(async (req: Request): Promise<Response> => {
         return Response.json({ error: check.error }, addCors({ status: check.status }))
       }
 
-      const { data: existingApp } = await admin
-        .from('staff_applications')
-        .select('id, status')
+      const { data: existingStaff } = await admin
+        .from('staff_members')
+        .select('id')
         .eq('event_id', inviteLink.event_id)
         .eq('email', body.email!.toLowerCase().trim())
         .maybeSingle()
 
-      if (existingApp) {
+      if (existingStaff) {
         return Response.json(
-          { error: 'An application with this email already exists for this event', existing_status: existingApp.status },
+          { error: 'Este e-mail já está cadastrado como staff neste evento.' },
           addCors({ status: 409 }),
         )
       }
 
       const now = new Date().toISOString()
+      const nameParts = body.full_name!.trim().split(/\s+/)
+      const firstName = nameParts[0]
+      const lastName = nameParts.slice(1).join(' ') || null
 
-      const { data: application, error: appError } = await admin
-        .from('staff_applications')
+      const { data: staffMember, error: staffError } = await admin
+        .from('staff_members')
         .insert({
-          event_id:             inviteLink.event_id,
-          invite_link_id:       inviteLink.id,
-          role_type:            inviteLink.role_type,
-          team_id:              inviteLink.team_id ?? null,
-          shift_id:             inviteLink.shift_id ?? null,
-          full_name:            body.full_name!.trim(),
-          email:                body.email!.toLowerCase().trim(),
-          phone:                body.phone ?? null,
-          document_number:      body.document_number ?? null,
-          birth_date:           body.birth_date ?? null,
-          bio:                  body.bio ?? null,
-          experience:           body.experience ?? null,
-          t_shirt_size:         body.t_shirt_size ?? null,
-          custom_field_answers: body.custom_field_answers ?? null,
-          terms_accepted:       true,
-          terms_accepted_at:    now,
-          status:               'pending',
-          created_at:           now,
-          updated_at:           now,
+          organization_id:  inviteLink.organization_id ?? '00000000-0000-0000-0000-000000000001',
+          event_id:         inviteLink.event_id,
+          first_name:       firstName,
+          last_name:        lastName,
+          email:            body.email!.toLowerCase().trim(),
+          phone:            body.phone ?? null,
+          cpf:              body.document_number ?? null,
+          role_title:       (body as Record<string, unknown>).role_title as string || inviteLink.role_type || 'staff',
+          status:           'active',
+          is_active:        true,
+          notes:            [body.bio, (body as Record<string, unknown>).t_shirt_size ? `Camiseta: ${(body as Record<string, unknown>).t_shirt_size}` : null].filter(Boolean).join(' | ') || null,
+          created_at:       now,
+          updated_at:       now,
         })
         .select('id')
         .single()
 
-      if (appError || !application) {
-        console.error('[process-staff-invite] application insert error:', appError)
+      if (staffError || !staffMember) {
+        console.error('[process-staff-invite] staff_member insert error:', staffError)
         return Response.json(
-          { error: 'Failed to create application', details: appError?.message },
+          { error: 'Failed to register staff member', details: staffError?.message },
           addCors({ status: 500 }),
         )
       }
@@ -580,29 +577,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
         .update({ used_count: (inviteLink.used_count ?? 0) + 1, updated_at: now })
         .eq('id', inviteLink.id)
 
-      await admin.from('notification_jobs').insert({
-        type:     'staff_applied',
-        event_id: inviteLink.event_id,
-        payload: {
-          application_id:  application.id,
-          applicant_name:  body.full_name!.trim(),
-          applicant_email: body.email!.toLowerCase().trim(),
-          role_type:       inviteLink.role_type,
-          team_id:         inviteLink.team_id ?? null,
-          shift_id:        inviteLink.shift_id ?? null,
-          invite_link_id:  inviteLink.id,
-        },
-        status:     'pending',
-        created_at: now,
-      }).then(({ error }) => {
-        if (error) console.warn('[process-staff-invite] notification_jobs insert failed:', error.message)
-      })
-
       return Response.json(
         {
           success:        true,
-          application_id: application.id,
-          message:        'Your application has been received. The event team will review it shortly.',
+          staff_id:       staffMember.id,
+          message:        'Cadastro realizado com sucesso! Você receberá mais informações em breve.',
         },
         addCors({ status: 201 }),
       )

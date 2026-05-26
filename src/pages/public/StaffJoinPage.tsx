@@ -42,6 +42,7 @@ interface FormData {
   email: string
   phone: string
   cpf: string
+  role_title: string
   tshirt_size: TShirtSize | ''
   bio: string
   emergency_contact_name: string
@@ -128,6 +129,7 @@ export function StaffJoinPage() {
     email: '',
     phone: '',
     cpf: '',
+    role_title: '',
     tshirt_size: '',
     bio: '',
     emergency_contact_name: '',
@@ -196,6 +198,8 @@ export function StaffJoinPage() {
     if (!form.full_name.trim()) errors.full_name = 'Nome completo é obrigatório.'
     if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) errors.email = 'E-mail inválido.'
     if (!form.phone.trim()) errors.phone = 'Telefone é obrigatório.'
+    if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
+    if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
     if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
 
     // Custom required fields
@@ -221,12 +225,12 @@ export function StaffJoinPage() {
         full_name: form.full_name.trim(),
         email: form.email.trim().toLowerCase(),
         phone: form.phone.trim(),
-        cpf: form.cpf.trim() || undefined,
-        tshirt_size: form.tshirt_size || undefined,
+        document_number: form.cpf.trim() || undefined,
+        t_shirt_size: form.tshirt_size || undefined,
+        role_title: (form as Record<string, unknown>).role_title || undefined,
         bio: form.bio.trim() || undefined,
-        emergency_contact_name: form.emergency_contact_name.trim() || undefined,
-        emergency_contact_phone: form.emergency_contact_phone.trim() || undefined,
-        custom_answers: form.custom_answers,
+        terms_accepted: true,
+        custom_field_answers: form.custom_answers,
       }
 
       const res = await fetch(EDGE_FN_URL, {
@@ -237,7 +241,7 @@ export function StaffJoinPage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        setErrorMessage(body?.message ?? 'Erro ao enviar inscrição. Tente novamente.')
+        setErrorMessage(body?.error ?? body?.message ?? 'Erro ao realizar cadastro. Tente novamente.')
         setPageState('error')
         return
       }
@@ -297,10 +301,10 @@ export function StaffJoinPage() {
         </div>
         <div className="max-w-md">
           <h1 className="font-display text-[2.8rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
-            Inscrição recebida!
+            Cadastro realizado!
           </h1>
           <p className="mt-4 text-base leading-7 text-white/68">
-            Aguarde a aprovação da equipe. Você receberá uma confirmação por e-mail quando sua inscrição for revisada.
+            Seu cadastro como staff foi confirmado. Você receberá mais informações por e-mail antes do evento.
           </p>
         </div>
         {inviteInfo && (
@@ -346,7 +350,7 @@ export function StaffJoinPage() {
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#D4FF00]/20 bg-[#D4FF00]/10 px-3 py-1.5">
             <Users className="h-3.5 w-3.5 text-[#D4FF00]" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4FF00]">
-              Convite para Staff
+              Cadastro de Staff
             </span>
           </div>
 
@@ -401,7 +405,7 @@ export function StaffJoinPage() {
       <div className="mx-auto max-w-2xl px-5 py-10">
         <div className="rounded-[2rem] border border-white/8 bg-[#12161f] p-6 sm:p-8">
           <h2 className="font-display text-[1.8rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
-            Preencha sua inscrição
+            Preencha seus dados
           </h2>
           <p className="mt-2 text-sm text-white/48">
             Campos marcados com <span className="text-[#D4FF00]">*</span> são obrigatórios.
@@ -454,8 +458,18 @@ export function StaffJoinPage() {
                   </InputField>
                 </div>
 
+                <InputField label="Função no evento" required error={fieldErrors.role_title}>
+                  <input
+                    type="text"
+                    value={form.role_title}
+                    onChange={(e) => setField('role_title', e.target.value)}
+                    placeholder="Ex: Segurança, Bar, Som, Credenciamento..."
+                    className={inputClass}
+                  />
+                </InputField>
+
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <InputField label="CPF / Documento" hint="Opcional" error={fieldErrors.cpf}>
+                  <InputField label="CPF / Documento" required error={fieldErrors.cpf}>
                     <input
                       type="text"
                       value={form.cpf}
@@ -465,7 +479,7 @@ export function StaffJoinPage() {
                     />
                   </InputField>
 
-                  <InputField label="Tamanho da camiseta" hint="Opcional" error={fieldErrors.tshirt_size}>
+                  <InputField label="Tamanho da camiseta" error={fieldErrors.tshirt_size}>
                     <div className="relative">
                       <select
                         value={form.tshirt_size}

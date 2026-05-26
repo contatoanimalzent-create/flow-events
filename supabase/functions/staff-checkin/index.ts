@@ -127,7 +127,7 @@ async function handleGet(req: Request): Promise<Response> {
   // 2. Find the staff member by email + event
   const { data: staffMember, error: staffErr } = await admin
     .from('staff_members')
-    .select('id, name, email, role, status, checked_in_at, checked_out_at')
+    .select('id, first_name, last_name, email, role_title, status, checked_in_at, checked_out_at')
     .eq('event_id', event.id)
     .eq('email', email.toLowerCase().trim())
     .maybeSingle()
@@ -171,9 +171,9 @@ async function handleGet(req: Request): Promise<Response> {
   return jsonResponse({
     staff_member: {
       id: staffMember.id,
-      name: staffMember.name,
+      name: [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' '),
       email: staffMember.email,
-      role: staffMember.role,
+      role: staffMember.role_title,
       status: staffMember.status,
       checked_in_at: staffMember.checked_in_at,
       checked_out_at: staffMember.checked_out_at,
@@ -225,7 +225,7 @@ async function handlePost(req: Request): Promise<Response> {
   // ── 1. Validate staff member exists and is active ─────────────────────────
   const { data: staffMember, error: staffErr } = await admin
     .from('staff_members')
-    .select('id, name, email, role, status, event_id')
+    .select('id, first_name, last_name, email, role_title, status, event_id')
     .eq('id', staff_member_id)
     .maybeSingle()
 
@@ -395,8 +395,8 @@ async function handlePost(req: Request): Promise<Response> {
   // ── 10. Return success ────────────────────────────────────────────────────
   const message =
     type === 'checkin'
-      ? `Check-in registrado com sucesso para ${staffMember.name}.`
-      : `Checkout registrado com sucesso para ${staffMember.name}.`
+      ? `Check-in registrado com sucesso para ${[staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')}.`
+      : `Checkout registrado com sucesso para ${[staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')}.`
 
   return jsonResponse({
     success: true,

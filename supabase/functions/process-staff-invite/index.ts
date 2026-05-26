@@ -36,6 +36,8 @@ interface ApplicationBody {
   bio?: string
   experience?: string
   t_shirt_size?: string
+  role_title?: string
+  pix_key?: string
   custom_field_answers?: Record<string, unknown>
   terms_accepted: boolean
 }
@@ -554,10 +556,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
           email:            body.email!.toLowerCase().trim(),
           phone:            body.phone ?? null,
           cpf:              body.document_number ?? null,
-          role_title:       (body as Record<string, unknown>).role_title as string || inviteLink.role_type || 'staff',
+          role_title:       body.role_title || inviteLink.role_type || 'staff',
+          pix_key:          body.pix_key ?? null,
           status:           'active',
           is_active:        true,
-          notes:            [body.bio, (body as Record<string, unknown>).t_shirt_size ? `Camiseta: ${(body as Record<string, unknown>).t_shirt_size}` : null].filter(Boolean).join(' | ') || null,
+          notes:            [body.bio, body.t_shirt_size ? `Camiseta: ${body.t_shirt_size}` : null].filter(Boolean).join(' | ') || null,
           created_at:       now,
           updated_at:       now,
         })

@@ -43,6 +43,7 @@ interface FormData {
   phone: string
   cpf: string
   role_title: string
+  pix_key: string
   tshirt_size: TShirtSize | ''
   bio: string
   emergency_contact_name: string
@@ -130,6 +131,7 @@ export function StaffJoinPage() {
     phone: '',
     cpf: '',
     role_title: '',
+    pix_key: '',
     tshirt_size: '',
     bio: '',
     emergency_contact_name: '',
@@ -200,6 +202,7 @@ export function StaffJoinPage() {
     if (!form.phone.trim()) errors.phone = 'Telefone é obrigatório.'
     if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
     if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
+    if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX é obrigatória.'
     if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
 
     // Custom required fields
@@ -227,7 +230,8 @@ export function StaffJoinPage() {
         phone: form.phone.trim(),
         document_number: form.cpf.trim() || undefined,
         t_shirt_size: form.tshirt_size || undefined,
-        role_title: (form as Record<string, unknown>).role_title || undefined,
+        role_title: form.role_title.trim() || undefined,
+        pix_key: form.pix_key.trim() || undefined,
         bio: form.bio.trim() || undefined,
         terms_accepted: true,
         custom_field_answers: form.custom_answers,
@@ -469,7 +473,7 @@ export function StaffJoinPage() {
                 </InputField>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <InputField label="CPF / Documento" required error={fieldErrors.cpf}>
+                  <InputField label="CPF" required error={fieldErrors.cpf}>
                     <input
                       type="text"
                       value={form.cpf}
@@ -479,6 +483,18 @@ export function StaffJoinPage() {
                     />
                   </InputField>
 
+                  <InputField label="Chave PIX" required hint="CPF, telefone, e-mail ou chave aleatória" error={fieldErrors.pix_key}>
+                    <input
+                      type="text"
+                      value={form.pix_key}
+                      onChange={(e) => setField('pix_key', e.target.value)}
+                      placeholder="Sua chave PIX para pagamento"
+                      className={inputClass}
+                    />
+                  </InputField>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <InputField label="Tamanho da camiseta" error={fieldErrors.tshirt_size}>
                     <div className="relative">
                       <select

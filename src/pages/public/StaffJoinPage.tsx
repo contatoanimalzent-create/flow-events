@@ -43,6 +43,7 @@ interface FormData {
   phone: string
   cpf: string
   role_title: string
+  company: string
   pix_key: string
   tshirt_size: TShirtSize | ''
   bio: string
@@ -131,6 +132,7 @@ export function StaffJoinPage() {
     phone: '',
     cpf: '',
     role_title: '',
+    company: '',
     pix_key: '',
     tshirt_size: '',
     bio: '',
@@ -231,6 +233,7 @@ export function StaffJoinPage() {
         document_number: form.cpf.trim() || undefined,
         t_shirt_size: form.tshirt_size || undefined,
         role_title: form.role_title.trim() || undefined,
+        company: form.company.trim() || undefined,
         pix_key: form.pix_key.trim() || undefined,
         bio: form.bio.trim() || undefined,
         terms_accepted: true,
@@ -462,15 +465,27 @@ export function StaffJoinPage() {
                   </InputField>
                 </div>
 
-                <InputField label="Função no evento" required error={fieldErrors.role_title}>
-                  <input
-                    type="text"
-                    value={form.role_title}
-                    onChange={(e) => setField('role_title', e.target.value)}
-                    placeholder="Ex: Segurança, Bar, Som, Credenciamento..."
-                    className={inputClass}
-                  />
-                </InputField>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <InputField label="Função no evento" required error={fieldErrors.role_title}>
+                    <input
+                      type="text"
+                      value={form.role_title}
+                      onChange={(e) => setField('role_title', e.target.value)}
+                      placeholder="Ex: Segurança, Bar, Som..."
+                      className={inputClass}
+                    />
+                  </InputField>
+
+                  <InputField label="Empresa" hint="Se terceirizado" error={fieldErrors.company}>
+                    <input
+                      type="text"
+                      value={form.company}
+                      onChange={(e) => setField('company', e.target.value)}
+                      placeholder="Nome da empresa"
+                      className={inputClass}
+                    />
+                  </InputField>
+                </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <InputField label="CPF" required error={fieldErrors.cpf}>

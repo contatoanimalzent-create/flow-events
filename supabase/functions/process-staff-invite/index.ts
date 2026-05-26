@@ -37,6 +37,7 @@ interface ApplicationBody {
   experience?: string
   t_shirt_size?: string
   role_title?: string
+  company?: string
   pix_key?: string
   custom_field_answers?: Record<string, unknown>
   terms_accepted: boolean
@@ -557,6 +558,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
           phone:            body.phone ?? null,
           cpf:              body.document_number ?? null,
           role_title:       body.role_title || inviteLink.role_type || 'staff',
+          company:          body.company ?? null,
           pix_key:          body.pix_key ?? null,
           status:           'active',
           is_active:        true,

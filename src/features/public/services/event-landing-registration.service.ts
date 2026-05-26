@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { normalizeCPF, normalizeCPFForStorage, validateCPF } from '@/lib/validators/cpf'
 
 export interface EventLandingRegistrationInput {
   organizationId: string
@@ -14,6 +15,12 @@ export interface EventLandingRegistrationInput {
 
 export const eventLandingRegistrationService = {
   async submit(input: EventLandingRegistrationInput) {
+    const cpf = normalizeCPF(input.cpf)
+
+    if (cpf && !validateCPF(cpf)) {
+      throw new Error('CPF invalido. Informe o CPF real da propria pessoa.')
+    }
+
     const { data, error } = await supabase
       .from('person_event_profiles')
       .insert({
@@ -27,7 +34,7 @@ export const eventLandingRegistrationService = {
           source: 'event-landing-page',
           ticketOptionId: input.ticketOptionId,
           ticketOptionLabel: input.ticketOptionLabel,
-          cpf: input.cpf || null,
+          cpf: normalizeCPFForStorage(cpf),
           additionalInfo: input.additionalInfo?.trim() || null,
         },
       })

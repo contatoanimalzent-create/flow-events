@@ -46,16 +46,22 @@ export function validateCPF(cpf: string): boolean {
 
 export function formatCPF(cpf: string): string {
   const clean = cpf.replace(/\D/g, '')
-  return clean
-    .slice(0, 3)
-    .concat('.')
-    .concat(clean.slice(3, 6))
-    .concat('.')
-    .concat(clean.slice(6, 9))
-    .concat('-')
-    .concat(clean.slice(9, 11))
+  if (clean.length <= 3) return clean
+  if (clean.length <= 6) return `${clean.slice(0, 3)}.${clean.slice(3)}`
+  if (clean.length <= 9) return `${clean.slice(0, 3)}.${clean.slice(3, 6)}.${clean.slice(6)}`
+  return `${clean.slice(0, 3)}.${clean.slice(3, 6)}.${clean.slice(6, 9)}-${clean.slice(9, 11)}`
 }
 
 export function unformatCPF(cpf: string): string {
   return cpf.replace(/\D/g, '')
+}
+
+export function normalizeCPF(cpf?: string | null): string | null {
+  const clean = (cpf ?? '').replace(/\D/g, '')
+  return clean || null
+}
+
+export function normalizeCPFForStorage(cpf?: string | null): string | null {
+  const clean = normalizeCPF(cpf)
+  return clean ? formatCPF(clean) : null
 }

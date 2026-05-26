@@ -7,6 +7,7 @@ import type {
   OrderRow,
   OrderStatus,
 } from '@/features/orders/types'
+import { normalizeCPF, normalizeCPFForStorage, validateCPF } from '@/lib/validators/cpf'
 
 function nowIso() {
   return new Date().toISOString()
@@ -60,6 +61,15 @@ export function buildOrderDraftTotals(input: CreateOrderDraftInput) {
 
 export function buildOrderDraftPayload(input: CreateOrderDraftInput) {
   const totals = buildOrderDraftTotals(input)
+  const buyerCpf = normalizeCPF(input.buyer.cpf)
+
+  if (!buyerCpf) {
+    throw new Error('CPF obrigatorio para emitir o ingresso.')
+  }
+
+  if (!validateCPF(buyerCpf)) {
+    throw new Error('CPF invalido. Informe o CPF real da propria pessoa.')
+  }
 
   return {
     organization_id: input.organization_id,
@@ -67,7 +77,7 @@ export function buildOrderDraftPayload(input: CreateOrderDraftInput) {
     buyer_name: input.buyer.name.trim(),
     buyer_email: input.buyer.email.trim(),
     buyer_phone: input.buyer.phone?.trim() || null,
-    buyer_cpf: input.buyer.cpf?.trim() || null,
+    buyer_cpf: normalizeCPFForStorage(buyerCpf),
     subtotal: totals.subtotal,
     discount_amount: totals.discountAmount,
     fee_amount: totals.feeAmount,

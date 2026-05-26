@@ -5,6 +5,7 @@ import { ticketKeys } from '@/features/tickets/services/tickets.queries'
 import { paymentKeys, paymentMutations } from '@/features/payments/services'
 import { orderKeys, orderMutations } from '@/features/orders/services'
 import { buildDefaultOrderExpiration, buildOrderDraftTotals } from '@/features/orders/services'
+import { normalizeCPF, normalizeCPFForStorage, validateCPF } from '@/lib/validators/cpf'
 import { useCheckoutStore } from './useCheckoutStore'
 import type { CheckoutCartItem, CreateOrderDraftInput, OrderPaymentMethod } from '@/features/orders/types'
 
@@ -192,6 +193,15 @@ export function useCheckoutFlow({
   async function createDraft(selectedPaymentMethod?: OrderPaymentMethod | null) {
     await sweepExpiredDrafts()
     clearPayment()
+    const buyerCpf = normalizeCPF(buyer.cpf)
+
+    if (!buyerCpf) {
+      throw new Error('CPF obrigatorio para emitir o ingresso.')
+    }
+
+    if (!validateCPF(buyerCpf)) {
+      throw new Error('CPF invalido. Informe o CPF real da propria pessoa.')
+    }
 
     const draft = await createDraftMutation.mutateAsync({
       organization_id: organizationId,
@@ -199,7 +209,7 @@ export function useCheckoutFlow({
       buyer: {
         name: buyer.name,
         email: buyer.email,
-        cpf: buyer.cpf ? buyer.cpf.replace(/\D/g, '') || undefined : undefined,
+        cpf: normalizeCPFForStorage(buyerCpf) ?? undefined,
         phone: buyer.phone || undefined,
       },
       items: cartSummary.items,

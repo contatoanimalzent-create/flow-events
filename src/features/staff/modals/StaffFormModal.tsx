@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import { useStaffForm } from '@/features/staff/hooks'
 import { STAFF_PERMISSION_OPTIONS } from '@/features/staff/types'
+import { formatCPF, unformatCPF } from '@/lib/validators/cpf'
 import {
   FormField,
   FormGrid,
@@ -95,7 +96,15 @@ export function StaffFormModal({ eventId, organizationId, staffId, onClose, onSa
                           className="input"
                           placeholder={field.placeholder}
                           value={form[field.key]}
-                          onChange={(event) => updateField(field.key, event.target.value)}
+                          onChange={(event) => {
+                            const value =
+                              field.key === 'cpf'
+                                ? formatCPF(unformatCPF(event.target.value).slice(0, 11))
+                                : event.target.value
+                            updateField(field.key, value)
+                          }}
+                          inputMode={field.key === 'cpf' ? 'numeric' : undefined}
+                          maxLength={field.key === 'cpf' ? 14 : undefined}
                         />
                       </FormField>
                     ))}

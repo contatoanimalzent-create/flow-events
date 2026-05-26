@@ -88,7 +88,9 @@ export function StaffCheckinPage() {
 
   // State
   const [step, setStep] = useState<PageStep>('email')
-  const [identifier, setIdentifier] = useState('')
+  const [idEmail, setIdEmail] = useState('')
+  const [idCpf, setIdCpf] = useState('')
+  const [idPhone, setIdPhone] = useState('')
   const [staff, setStaff] = useState<StaffInfo | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -117,14 +119,19 @@ export function StaffCheckinPage() {
 
   async function handleIdentify(e: React.FormEvent) {
     e.preventDefault()
-    if (!identifier.trim() || !eventSlug) return
+    if (!idEmail.trim() || !idCpf.trim() || !idPhone.trim() || !eventSlug) return
 
     setLoading(true)
     setErrorMessage('')
 
     try {
-      const q = identifier.trim().toLowerCase()
-      const url = `${EDGE_FN_URL}?event_slug=${encodeURIComponent(eventSlug)}&q=${encodeURIComponent(q)}`
+      const params = new URLSearchParams({
+        event_slug: eventSlug,
+        email: idEmail.trim().toLowerCase(),
+        cpf: idCpf.replace(/\D/g, ''),
+        phone: idPhone.replace(/\D/g, ''),
+      })
+      const url = `${EDGE_FN_URL}?${params}`
       const res = await fetch(url, { method: 'GET' })
 
       if (!res.ok) {
@@ -407,24 +414,53 @@ export function StaffCheckinPage() {
             <form onSubmit={handleIdentify} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[#f5f0e8]">
-                  E-mail, CPF ou WhatsApp
+                  E-mail
+                </label>
+                <input
+                  type="email"
+                  value={idEmail}
+                  onChange={(e) => setIdEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  required
+                  autoFocus
+                  autoComplete="email"
+                  className="w-full rounded-[14px] border border-white/10 bg-white/[0.05] px-4 py-3.5 text-sm text-[#f5f0e8] placeholder-white/28 outline-none transition-all focus:border-[#D4FF00]/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#D4FF00]/10"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[#f5f0e8]">
+                  CPF
                 </label>
                 <input
                   type="text"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="seu@email.com, 000.000.000-00 ou (61) 99999-9999"
+                  value={idCpf}
+                  onChange={(e) => setIdCpf(e.target.value)}
+                  placeholder="000.000.000-00"
                   required
-                  autoFocus
-                  inputMode="text"
+                  inputMode="numeric"
                   className="w-full rounded-[14px] border border-white/10 bg-white/[0.05] px-4 py-3.5 text-sm text-[#f5f0e8] placeholder-white/28 outline-none transition-all focus:border-[#D4FF00]/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#D4FF00]/10"
                 />
-                <p className="text-[11px] text-white/32">Use qualquer dado do seu cadastro</p>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[#f5f0e8]">
+                  WhatsApp
+                </label>
+                <input
+                  type="tel"
+                  value={idPhone}
+                  onChange={(e) => setIdPhone(e.target.value)}
+                  placeholder="(61) 99999-9999"
+                  required
+                  autoComplete="tel"
+                  className="w-full rounded-[14px] border border-white/10 bg-white/[0.05] px-4 py-3.5 text-sm text-[#f5f0e8] placeholder-white/28 outline-none transition-all focus:border-[#D4FF00]/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#D4FF00]/10"
+                />
               </div>
 
               <button
                 type="submit"
-                disabled={loading || !identifier.trim()}
+                disabled={loading || !idEmail.trim() || !idCpf.trim() || !idPhone.trim()}
                 className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-[#D4FF00] py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#06070a] transition-all hover:-translate-y-0.5 hover:bg-[#c8f200] hover:shadow-[0_12px_36px_rgba(212,255,0,0.24)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? (

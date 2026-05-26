@@ -96,11 +96,13 @@ function todayStartUTC(): string {
 async function handleGet(req: Request): Promise<Response> {
   const url = new URL(req.url)
   const eventSlug = url.searchParams.get('event_slug')
-  const q = url.searchParams.get('q') || url.searchParams.get('email')
+  const emailParam = url.searchParams.get('email')
+  const cpfParam = url.searchParams.get('cpf')
+  const phoneParam = url.searchParams.get('phone')
 
-  if (!eventSlug || !q) {
+  if (!eventSlug || !emailParam || !cpfParam || !phoneParam) {
     return errorResponse(
-      'Parâmetros obrigatórios: event_slug e q (email, CPF ou telefone).',
+      'Preencha e-mail, CPF e WhatsApp.',
       400,
       'MISSING_PARAMS',
     )
@@ -123,46 +125,16 @@ async function handleGet(req: Request): Promise<Response> {
     return errorResponse('Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
   }
 
-  const search = q.toLowerCase().trim()
-  const digitsOnly = search.replace(/\D/g, '')
+  const cleanEmail = emailParam.toLowerCase().trim()
+  const cleanCpf = cpfParam.replace(/\D/g, '')
+  const cleanPhone = phoneParam.replace(/\D/g, '')
 
-  let staffMember = null
-  let staffErr = null
-
-  // Try email first
-  if (search.includes('@')) {
-    const res = await admin.from('staff_members')
-      .select('id, first_name, last_name, email, role_title, status, checked_in_at, checked_out_at')
-      .eq('event_id', event.id).eq('email', search).maybeSingle()
-    staffMember = res.data; staffErr = res.error
-  }
-
-  // Try CPF (11 digits)
-  if (!staffMember && digitsOnly.length >= 11) {
-    const cpf = digitsOnly.slice(0, 11)
-    const res = await admin.from('staff_members')
-      .select('id, first_name, last_name, email, role_title, status, checked_in_at, checked_out_at')
-      .eq('event_id', event.id).eq('cpf', cpf).maybeSingle()
-    staffMember = res.data; staffErr = res.error
-  }
-
-  // Try phone (10-11 digits)
-  if (!staffMember && digitsOnly.length >= 10) {
-    const res = await admin.from('staff_members')
-      .select('id, first_name, last_name, email, role_title, status, checked_in_at, checked_out_at')
-      .eq('event_id', event.id).ilike('phone', `%${digitsOnly}%`).maybeSingle()
-    staffMember = res.data; staffErr = res.error
-  }
-
-  // Fallback: try all three with original value
-  if (!staffMember && !staffErr) {
-    const res = await admin.from('staff_members')
-      .select('id, first_name, last_name, email, role_title, status, checked_in_at, checked_out_at')
-      .eq('event_id', event.id)
-      .or(`email.eq.${search},cpf.eq.${digitsOnly},phone.ilike.%${digitsOnly}%`)
-      .maybeSingle()
-    staffMember = res.data; staffErr = res.error
-  }
+  const { data: staffMember, error: staffErr } = await admin
+    .from('staff_members')
+    .select('id, first_name, last_name, email, cpf, phone, role_title, status, checked_in_at, checked_out_at')
+    .eq('event_id', event.id)
+    .eq('email', cleanEmail)
+    .maybeSingle()
 
   if (staffErr) {
     console.error('[staff-checkin] Erro ao buscar membro da equipe:', staffErr)
@@ -171,10 +143,21 @@ async function handleGet(req: Request): Promise<Response> {
 
   if (!staffMember) {
     return errorResponse(
-      'Cadastro não encontrado. Verifique o e-mail, CPF ou WhatsApp informado.',
+      'E-mail não encontrado no cadastro deste evento.',
       404,
       'STAFF_NOT_FOUND',
     )
+  }
+
+  const memberCpf = (staffMember.cpf ?? '').replace(/\D/g, '')
+  const memberPhone = (staffMember.phone ?? '').replace(/\D/g, '')
+
+  if (memberCpf && memberCpf !== cleanCpf) {
+    return errorResponse('CPF não confere com o cadastro.', 403, 'CPF_MISMATCH')
+  }
+
+  if (memberPhone && cleanPhone && !memberPhone.includes(cleanPhone) && !cleanPhone.includes(memberPhone)) {
+    return errorResponse('WhatsApp não confere com o cadastro.', 403, 'PHONE_MISMATCH')
   }
 
   // 3. Get today's checkins for this staff member

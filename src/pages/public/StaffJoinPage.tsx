@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react'
-import { AlertCircle, CheckCircle2, ChevronDown, Clock, Loader2, MapPin, Shield, Users } from 'lucide-react'
+import { AlertCircle, Bell, Camera, CheckCircle2, ChevronDown, Clock, Loader2, MapPin, Shield, Users } from 'lucide-react'
+import {
+  checkStaffPermissions,
+  requestCameraPermission,
+  requestLocationPermission,
+  requestNotificationPermission,
+  type PermissionStatus,
+  type PermissionsState,
+} from '@/core/native/capacitor'
 import { formatCPF, normalizeCPF, normalizeCPFForStorage, unformatCPF, validateCPF } from '@/lib/validators/cpf'
 
 interface InviteInfo {
@@ -110,12 +118,27 @@ function InputField({
 const inputClass =
   'w-full rounded-[14px] border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-[#f5f0e8] placeholder-white/28 outline-none transition-all focus:border-[#D4FF00]/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#D4FF00]/10'
 
+const initialPermissions: PermissionsState = {
+  camera: 'prompt',
+  location: 'prompt',
+  notifications: 'prompt',
+}
+
+const permissionText: Record<PermissionStatus, { label: string; className: string }> = {
+  granted: { label: 'Ativo', className: 'border-[#D4FF00]/25 bg-[#D4FF00]/10 text-[#D4FF00]' },
+  denied: { label: 'Bloqueado', className: 'border-red-500/25 bg-red-500/10 text-red-300' },
+  prompt: { label: 'Pendente', className: 'border-white/12 bg-white/[0.05] text-white/58' },
+  unavailable: { label: 'Indisponivel', className: 'border-white/12 bg-white/[0.05] text-white/42' },
+}
+
 export function StaffJoinPage() {
   const [pageState, setPageState] = useState<PageState>('loading')
   const [inviteInfo, setInviteInfo] = useState<InviteInfo | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormData | string, string>>>({})
+  const [permissions, setPermissions] = useState<PermissionsState>(initialPermissions)
+  const [requestingPermissions, setRequestingPermissions] = useState(false)
 
   const [form, setForm] = useState<FormData>({
     full_name: '',
@@ -171,6 +194,12 @@ export function StaffJoinPage() {
     void fetchInvite()
     return () => controller.abort()
   }, [token, EDGE_FN_URL])
+
+  useEffect(() => {
+    if (pageState !== 'success') return
+
+    void checkStaffPermissions().then(setPermissions)
+  }, [pageState])
 
   function setField<TKey extends keyof FormData>(key: TKey, value: FormData[TKey]) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -257,6 +286,56 @@ export function StaffJoinPage() {
     }
   }
 
+  async function requestRequiredPermissions() {
+    setRequestingPermissions(true)
+    try {
+      const location = await requestLocationPermission()
+      const notifications = await requestNotificationPermission()
+      const camera = await requestCameraPermission()
+      const nextPermissions = { camera, location, notifications }
+      setPermissions(nextPermissions)
+
+      if (notifications === 'granted' && typeof Notification !== 'undefined') {
+        new Notification('Pulse Staff', {
+          body: 'Permissoes ativadas. Quando chegar no evento, voce recebera o aviso para tirar a foto de presenca.',
+        })
+      }
+    } finally {
+      setRequestingPermissions(false)
+    }
+  }
+
+  function PermissionItem({
+    icon,
+    title,
+    description,
+    status,
+  }: {
+    icon: React.ReactNode
+    title: string
+    description: string
+    status: PermissionStatus
+  }) {
+    const statusText = permissionText[status]
+
+    return (
+      <div className="flex items-start gap-3 rounded-2xl border border-white/8 bg-white/[0.03] p-4 text-left">
+        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#D4FF00]">
+          {icon}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold text-[#f5f0e8]">{title}</p>
+            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] ${statusText.className}`}>
+              {statusText.label}
+            </span>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-white/48">{description}</p>
+        </div>
+      </div>
+    )
+  }
+
   if (pageState === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#06070a]">
@@ -294,7 +373,7 @@ export function StaffJoinPage() {
 
   if (pageState === 'success') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 py-10 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#D4FF00]/20 bg-[#D4FF00]/10">
           <CheckCircle2 className="h-9 w-9 text-[#D4FF00]" />
         </div>
@@ -305,6 +384,62 @@ export function StaffJoinPage() {
           <p className="mt-4 text-base leading-7 text-white/68">
             Seu cadastro de staff foi confirmado. As orientacoes do evento serao enviadas pelo e-mail e WhatsApp informados.
           </p>
+        </div>
+        <div className="w-full max-w-xl rounded-[1.6rem] border border-white/8 bg-[#12161f] p-5 sm:p-6">
+          <div className="text-left">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#D4FF00]/80">Obrigatorio para trabalhar</p>
+            <h2 className="mt-2 text-xl font-semibold text-[#f5f0e8]">Ative camera, localizacao e notificacoes</h2>
+            <p className="mt-2 text-sm leading-6 text-white/56">
+              Quando voce chegar no evento, o Pulse vai avisar para tirar a foto de presenca. Essa foto confirma o dia,
+              o horario e o local do trabalho.
+            </p>
+          </div>
+
+          <div className="mt-5 grid gap-3">
+            <PermissionItem
+              icon={<Camera className="h-4 w-4" />}
+              title="Camera"
+              description="Usada para tirar a foto de presenca no evento."
+              status={permissions.camera}
+            />
+            <PermissionItem
+              icon={<MapPin className="h-4 w-4" />}
+              title="Localizacao"
+              description="Confirma que a foto foi feita no local correto."
+              status={permissions.location}
+            />
+            <PermissionItem
+              icon={<Bell className="h-4 w-4" />}
+              title="Notificacoes"
+              description="Envia o aviso para tirar a foto quando chegar."
+              status={permissions.notifications}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={requestRequiredPermissions}
+            disabled={requestingPermissions}
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#D4FF00] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-[#06070a] transition-all hover:bg-[#c8f200] disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            {requestingPermissions ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Ativando...
+              </>
+            ) : (
+              <>
+                <Shield className="h-4 w-4" />
+                Ativar permissoes
+              </>
+            )}
+          </button>
+
+          {(permissions.camera === 'denied' || permissions.location === 'denied' || permissions.notifications === 'denied') && (
+            <p className="mt-3 text-left text-xs leading-5 text-red-300/80">
+              Alguma permissao foi bloqueada. Libere camera, localizacao e notificacoes nas configuracoes do navegador ou celular.
+            </p>
+          )}
         </div>
         {inviteInfo && (
           <div className="mt-2 rounded-2xl border border-white/8 bg-white/[0.04] px-6 py-4">

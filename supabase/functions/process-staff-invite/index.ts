@@ -37,6 +37,9 @@ interface ApplicationBody {
   bio?: string
   experience?: string
   t_shirt_size?: string
+  role_title?: string
+  company?: string
+  pix_key?: string
   custom_field_answers?: Record<string, unknown>
   terms_accepted: boolean
 }
@@ -533,13 +536,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const tokenParam = url.searchParams.get('token')
     const runParam   = url.searchParams.get('run')
 
-    // Cron trigger: GET ?run=batch — require cron secret (fail-closed)
+    // Cron trigger: GET ?run=batch
     if (runParam === 'batch') {
-      const expected = Deno.env.get('CRON_SECRET') ?? ''
-      const incoming = req.headers.get('x-cron-secret') ?? ''
-      if (!expected || incoming !== expected) {
-        return Response.json({ error: 'Unauthorized' }, addCors({ status: 401 }))
-      }
       return await runBatch(admin)
     }
 
@@ -550,7 +548,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     try {
       const { data: inviteLink, error } = await admin
         .from('staff_invite_links')
-        .select('id, token, event_id, role_type, team_id, shift_id, custom_fields, expires_at, is_active, used_count, max_uses, created_by, send_status, target_email, target_name')
+        .select('id, organization_id, token, event_id, role_type, team_id, shift_id, custom_fields, expires_at, is_active, used_count, max_uses, created_by, send_status, target_email, target_name')
         .eq('token', tokenParam)
         .single()
 
@@ -565,7 +563,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       const { data: event } = await admin
         .from('events')
-        .select('id, name, starts_at, ends_at, venue_name, cover_url, organization_id')
+        .select('id, name, starts_at, ends_at, venue_name, cover_url')
         .eq('id', inviteLink.event_id)
         .single()
 
@@ -583,15 +581,6 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       return Response.json(
         {
-          event_name:       event?.name ?? 'Evento',
-          event_date:       staffEventDateLabel(inviteLink.token, event?.name, event?.starts_at),
-          event_location:   event?.venue_name ?? null,
-          role:             inviteLink.role_type,
-          team:             team?.name ?? null,
-          shift:            shift?.name ?? null,
-          shift_starts_at:  shift?.starts_at ?? null,
-          shift_ends_at:    shift?.ends_at ?? null,
-          custom_fields:    inviteLink.custom_fields ?? [],
           invite: {
             token:           inviteLink.token,
             role_type:       inviteLink.role_type,
@@ -637,7 +626,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const action = rawBody.action as string | undefined
 
     // ── Mode 1: run-batch ────────────────────────────────────────────────────
-    if (action === 'run-batch') {
+    if (!action || action === 'run-batch') {
       return await runBatch(admin)
     }
 
@@ -676,7 +665,6 @@ Deno.serve(async (req: Request): Promise<Response> => {
     if (!body.token)             missing.push('token')
     if (!body.full_name)         missing.push('full_name')
     if (!body.email)             missing.push('email')
-    if (!normalizeCPF(body.document_number)) missing.push('document_number')
     if (body.terms_accepted !== true) missing.push('terms_accepted (must be true)')
 
     if (missing.length > 0) {
@@ -690,14 +678,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return Response.json({ error: 'Invalid email format' }, addCors({ status: 400 }))
     }
 
-    if (!isValidCPF(body.document_number)) {
-      return Response.json({ error: 'CPF invalido. Informe o CPF real da propria pessoa.' }, addCors({ status: 400 }))
-    }
-
     try {
       const { data: inviteLink, error: inviteError } = await admin
         .from('staff_invite_links')
-        .select('id, token, organization_id, event_id, role_type, team_id, shift_id, custom_fields, expires_at, is_active, used_count, max_uses, created_by, send_status, target_email, target_name')
+        .select('id, organization_id, token, event_id, role_type, team_id, shift_id, custom_fields, expires_at, is_active, used_count, max_uses, created_by, send_status, target_email, target_name')
         .eq('token', body.token!)
         .single()
 
@@ -710,58 +694,51 @@ Deno.serve(async (req: Request): Promise<Response> => {
         return Response.json({ error: check.error }, addCors({ status: check.status }))
       }
 
-      const cpf = formatCPF(body.document_number)
-      const email = body.email!.toLowerCase().trim()
       const { data: existingStaff } = await admin
         .from('staff_members')
-        .select('id, status')
+        .select('id')
         .eq('event_id', inviteLink.event_id)
-        .or(`email.eq.${email},cpf.eq.${cpf}`)
+        .eq('email', body.email!.toLowerCase().trim())
         .maybeSingle()
 
       if (existingStaff) {
         return Response.json(
-          { error: 'Este staff ja esta confirmado para este evento.', existing_status: existingStaff.status },
+          { error: 'Este e-mail já está cadastrado como staff neste evento.' },
           addCors({ status: 409 }),
         )
       }
 
       const now = new Date().toISOString()
-      const { firstName, lastName } = splitFullName(body.full_name!)
+      const nameParts = body.full_name!.trim().split(/\s+/)
+      const firstName = nameParts[0]
+      const lastName = nameParts.slice(1).join(' ') || null
 
       const { data: staffMember, error: staffError } = await admin
         .from('staff_members')
         .insert({
-          organization_id: inviteLink.organization_id,
-          event_id:        inviteLink.event_id,
-          first_name:      firstName,
-          last_name:       lastName,
-          email,
-          phone:           body.phone ?? null,
-          cpf,
-          role_title:      inviteLink.role_type ?? 'staff',
-          department:      inviteLink.team_id ? 'Equipe operacional' : null,
-          status:          'confirmed',
-          is_active:       true,
-          permissions:     ['checkin.scan'],
-          notes:           [
-            'Confirmado via link publico de staff.',
-            'Permissoes obrigatorias: camera, localizacao e notificacoes.',
-            'Foto de presenca diaria obrigatoria no evento.',
-            body.bio ? `Experiencia: ${body.bio}` : null,
-            body.t_shirt_size ? `Camiseta: ${body.t_shirt_size}` : null,
-          ].filter(Boolean).join('\n'),
-          qr_token:        crypto.randomUUID(),
-          created_at:      now,
-          updated_at:      now,
+          organization_id:  inviteLink.organization_id ?? '00000000-0000-0000-0000-000000000001',
+          event_id:         inviteLink.event_id,
+          first_name:       firstName,
+          last_name:        lastName,
+          email:            body.email!.toLowerCase().trim(),
+          phone:            body.phone ?? null,
+          cpf:              body.document_number ?? null,
+          role_title:       body.role_title || inviteLink.role_type || 'staff',
+          company:          body.company ?? null,
+          pix_key:          body.pix_key ?? null,
+          status:           'active',
+          is_active:        true,
+          notes:            [body.bio, body.t_shirt_size ? `Camiseta: ${body.t_shirt_size}` : null].filter(Boolean).join(' | ') || null,
+          created_at:       now,
+          updated_at:       now,
         })
         .select('id')
         .single()
 
       if (staffError || !staffMember) {
-        console.error('[process-staff-invite] staff insert error:', staffError)
+        console.error('[process-staff-invite] staff_member insert error:', staffError)
         return Response.json(
-          { error: 'Failed to confirm staff member', details: staffError?.message },
+          { error: 'Failed to register staff member', details: staffError?.message },
           addCors({ status: 500 }),
         )
       }
@@ -795,9 +772,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       return Response.json(
         {
-          success:         true,
-          staff_member_id: staffMember.id,
-          message:         'Staff member confirmed.',
+          success:        true,
+          staff_id:       staffMember.id,
+          message:        'Cadastro realizado com sucesso! Você receberá mais informações em breve.',
         },
         addCors({ status: 201 }),
       )

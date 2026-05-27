@@ -25,16 +25,17 @@ export function useRealtimeCheckins(
         { event: 'INSERT', schema: 'public', table: 'checkins', filter: `event_id=eq.${eventId}` },
         async (payload) => {
           const row = payload.new as any
-          // Fetch attendee name asynchronously
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('id', row.attendee_id)
+          // Fetch ticket info asynchronously via digital_ticket_id
+          const { data: ticket } = await supabase
+            .from('digital_tickets')
+            .select('holder_name, ticket_type:ticket_type(name)')
+            .eq('id', row.digital_ticket_id)
             .maybeSingle()
+          const ticketData = ticket as any
           cbRef.current({
-            attendeeName: (profile as any)?.full_name ?? 'Participante',
-            ticketType: 'Ingresso',
-            gate: row.gate ?? null,
+            attendeeName: ticketData?.holder_name ?? 'Participante',
+            ticketType: ticketData?.ticket_type?.name ?? 'Ingresso',
+            gate: row.gate_id ?? null,
           })
         }
       )

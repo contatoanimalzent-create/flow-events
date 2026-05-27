@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, RefreshCw, Loader2, Shield, CheckCircle, AlertCircle } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
 import { attendeeService } from '@/core/attendee/attendee.service'
 import type { AttendeeTicket } from '@/core/attendee/attendee.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
@@ -8,22 +9,16 @@ interface TicketQrPageProps extends PulsePageProps {
   ticketId: string
 }
 
-// Render QR using a URL-based approach (no native lib needed)
 function QRDisplay({ value, size = 200 }: { value: string; size?: number }) {
   if (!value) return null
-  const url = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&bgcolor=060d1f&color=ffffff&margin=12`
   return (
-    <img
-      src={url}
-      alt="QR Code"
-      width={size}
-      height={size}
+    <QRCodeSVG
+      value={value}
+      size={size}
+      bgColor="#060d1f"
+      fgColor="#ffffff"
+      level="H"
       className="rounded-2xl"
-      style={{ imageRendering: 'pixelated' }}
-      onError={(e) => {
-        // If external QR service fails, hide the broken image
-        (e.target as HTMLImageElement).style.display = 'none'
-      }}
     />
   )
 }
@@ -107,7 +102,7 @@ export default function TicketQrPage({ onNavigate, ticketId }: TicketQrPageProps
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f]">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-área-inset-top) + 20px)' }}>
+      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
         <button onClick={() => onNavigate('/pulse/attendee/tickets')} className="p-2 -ml-2">
           <ChevronLeft size={22} className="text-slate-300" />
         </button>

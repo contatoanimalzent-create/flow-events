@@ -47,7 +47,7 @@ function formatCurrency(value: number) {
  * Generate a QR code PNG, upload to Supabase Storage, return public URL.
  * Gmail/Outlook block base64 data URIs, so we need a real https:// URL.
  */
-async function generateQRCodeUrl(qrToken: string): Promise<string | null> {
+export async function generateQRCodeUrl(qrToken: string): Promise<string | null> {
   try {
     const buffer = await QRCode.toBuffer(qrToken, {
       width: 280,

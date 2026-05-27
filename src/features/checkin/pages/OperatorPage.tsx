@@ -20,7 +20,7 @@ function EventCodeForm({ onSuccess }: { onSuccess: (event: EventInfo) => void })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const trimmed = code.trim().toUpperCase()
+    const trimmed = code.trim().toLowerCase()
     if (!trimmed) return
 
     setError(null)
@@ -29,7 +29,7 @@ function EventCodeForm({ onSuccess }: { onSuccess: (event: EventInfo) => void })
     const { data, error: dbError } = await supabase
       .from('events')
       .select('id, name, organization_id')
-      .eq('event_code', trimmed)
+      .eq('slug', trimmed)
       .in('status', ['published', 'ongoing'])
       .single()
 
@@ -68,7 +68,7 @@ function EventCodeForm({ onSuccess }: { onSuccess: (event: EventInfo) => void })
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
           <div>
             <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-widest text-text-muted">
-              Código do evento
+              Slug do evento
             </label>
             <div className="relative">
               <Hash className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
@@ -77,17 +77,17 @@ function EventCodeForm({ onSuccess }: { onSuccess: (event: EventInfo) => void })
                 required
                 autoComplete="off"
                 autoCorrect="off"
-                autoCapitalize="characters"
+                autoCapitalize="none"
                 spellCheck={false}
-                maxLength={8}
+                maxLength={40}
                 value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                className="w-full rounded-sm border border-bg-border bg-bg-card pl-10 pr-3 py-4 font-mono text-2xl font-bold tracking-[0.3em] text-brand-acid placeholder-text-muted/30 focus:border-brand-acid focus:outline-none transition-colors text-center uppercase"
-                placeholder="XXXXXX"
+                onChange={(e) => setCode(e.target.value.toLowerCase())}
+                className="w-full rounded-sm border border-bg-border bg-bg-card pl-10 pr-3 py-4 font-mono text-lg font-bold tracking-[0.12em] text-brand-acid placeholder-text-muted/30 focus:border-brand-acid focus:outline-none transition-colors text-center"
+                placeholder="slug-do-evento"
               />
             </div>
             <p className="mt-2 font-mono text-[10px] text-text-muted text-center">
-              Solicite o código ao organizador do evento
+              Solicite o slug ao organizador (ex: meu-evento-2025)
             </p>
           </div>
 
@@ -100,7 +100,7 @@ function EventCodeForm({ onSuccess }: { onSuccess: (event: EventInfo) => void })
 
           <button
             type="submit"
-            disabled={loading || code.trim().length < 4}
+            disabled={loading || code.trim().length < 2}
             className="btn-primary w-full flex items-center justify-center gap-2 py-4 text-base font-bold tracking-wider"
           >
             {loading ? (

@@ -59,7 +59,7 @@ export const eventSignupService = {
     return {
       id: insertResult.data.id,
       code,
-      qrValue: `${window.location.origin}/signup/${insertResult.data.id}`,
+      qrValue: code,
     }
   },
 }

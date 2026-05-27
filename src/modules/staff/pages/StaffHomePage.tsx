@@ -54,7 +54,15 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
     setLoading(true)
     ;(async () => {
       try {
-        const s = await staffService.getCurrentShift(userId, context.eventId)
+        // Look up the auth user's email to find their staff_member record
+        const { data: { user } } = await supabase.auth.getUser()
+        const email = user?.email
+        if (!email) { setLoading(false); return }
+
+        const staffId = await staffService.findStaffMemberForAuthUser(email, context.eventId)
+        if (!staffId) { setLoading(false); return }
+
+        const s = await staffService.getCurrentShift(staffId, context.eventId)
         setShift(s)
         if (s) {
           try {
@@ -107,8 +115,7 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
                 <p className="text-green-400 text-xs font-semibold uppercase tracking-wider">
                   {shift.status === 'active' ? 'Turno Ativo' : shift.status === 'scheduled' ? 'Turno Agendado' : 'Turno Encerrado'}
                 </p>
-                <p className="text-white font-bold text-lg mt-0.5">{shift.zone ?? 'Sem zona definida'}</p>
-                {shift.supervisorName && <p className="text-slate-400 text-xs">Supervisor: {shift.supervisorName}</p>}
+                <p className="text-white font-bold text-lg mt-0.5">{shift.area ?? 'Sem area definida'}</p>
               </div>
               {shift.status === 'active' && (
                 <div className="flex items-center gap-1.5 bg-green-500/20 rounded-full px-3 py-1">
@@ -134,7 +141,7 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
               )}
               <div>
                 <p className="text-slate-400 text-xs">Função</p>
-                <p className="text-white font-medium capitalize">{shift.role.replace('_', ' ')}</p>
+                <p className="text-white font-medium capitalize">{shift.roleTitle.replace('_', ' ')}</p>
               </div>
             </div>
             {shift.endTime && (
@@ -163,7 +170,7 @@ export default function StaffHomePage({ onNavigate }: PulsePageProps) {
             </p>
             <p className="text-slate-400 text-xs">
               {session
-                ? `Iniciada às ${new Date(session.startedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
+                ? `Iniciada às ${new Date(session.openedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
                 : 'Registre sua presença ao chegar'}
             </p>
           </div>

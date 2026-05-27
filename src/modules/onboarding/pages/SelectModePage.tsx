@@ -42,7 +42,7 @@ export default function SelectModePage({ onNavigate }: PulsePageProps) {
       organizationLogo: activeOrganization.logo_url,
       eventId: activeEvent.id,
       eventName: activeEvent.name,
-      eventDate: activeEvent.start_date,
+      eventDate: activeEvent.starts_at,
       eventCover: activeEvent.cover_url,
       mode,
     })

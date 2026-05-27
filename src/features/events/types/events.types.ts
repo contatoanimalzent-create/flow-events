@@ -25,7 +25,6 @@ export interface EventRow {
   fee_value: number
   absorb_fee: boolean
   created_at: string
-  event_code?: string
 }
 
 export interface EventEmailTheme {

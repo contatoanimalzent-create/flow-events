@@ -19,9 +19,17 @@ export default function StaffHistoryPage({ onNavigate }: PulsePageProps) {
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setLoading(false); return }
+      if (!user?.email) { setLoading(false); return }
       try {
-        const data = await staffService.getShiftHistory(user.id, 20)
+        // Find the staff member by email (no user_id column on staff_members)
+        const { data: members } = await supabase
+          .from('staff_members')
+          .select('id')
+          .eq('email', user.email)
+          .limit(1)
+        const staffId = members?.[0]?.id
+        if (!staffId) { setLoading(false); return }
+        const data = await staffService.getShiftHistory(staffId, 20)
         setHistory(data)
       } finally {
         setLoading(false)
@@ -54,7 +62,7 @@ export default function StaffHistoryPage({ onNavigate }: PulsePageProps) {
 
   return (
     <div className="flex flex-col min-h-full bg-[#060d1f] pb-6">
-      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-área-inset-top) + 20px)' }}>
+      <div className="flex items-center gap-3 px-4 pt-5 pb-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
         <button onClick={() => onNavigate('/pulse/staff')} className="p-2 -ml-2">
           <ChevronLeft size={22} className="text-slate-300" />
         </button>
@@ -79,7 +87,7 @@ export default function StaffHistoryPage({ onNavigate }: PulsePageProps) {
               <div key={h.id} className="bg-white/5 border border-white/8 rounded-2xl p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="text-white font-semibold">{h.zone ?? ROLE_LABELS[h.role] ?? h.role}</p>
+                    <p className="text-white font-semibold">{h.area ?? ROLE_LABELS[h.roleTitle] ?? h.roleTitle}</p>
                     <p className="text-slate-400 text-xs">{h.eventName} · {fmtDate(h.startTime)}</p>
                   </div>
                   {isActive ? (

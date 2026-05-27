@@ -148,7 +148,7 @@ async function queueStaffConfirmationNotifications(
   const templateKey = 'staff-confirmed-permissions'
   const appUrl = (Deno.env.get('APP_URL') ?? 'https://pulse.animalzgroup.com').replace(/\/$/, '')
   const pointUrl = `${appUrl}/staff/ponto/${params.eventSlug}`
-  const logoUrl = `${appUrl}/logo.png`
+  const logoUrl = 'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/public-assets/brand/pulse-logo-principal-transparente.png'
   const venueLabel = buildVenueLabel(params.venueName, params.venueAddress)
   const eventImageUrl = params.eventImageUrl ?? ''
   const phone = normalizeBrazilWhatsapp(params.staffPhone)
@@ -195,7 +195,7 @@ async function queueStaffConfirmationNotifications(
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td valign="middle">
-                          <img src="{{pulse_logo_url}}" alt="Pulse" height="34" style="display:block;height:34px;width:auto;max-width:150px;">
+                          <img src="{{pulse_logo_url}}" alt="Pulse" width="220" style="display:block;width:220px;max-width:78%;height:auto;border:0;">
                         </td>
                         <td align="right" valign="middle" style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#d4ff00;">
                           Ponto digital

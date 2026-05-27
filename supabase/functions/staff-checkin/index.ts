@@ -84,9 +84,20 @@ function parsePoint(raw: unknown): { latitude: number; longitude: number } | nul
  * Get the start of today (UTC) as ISO string.
  */
 function todayStartUTC(): string {
-  const d = new Date()
-  d.setUTCHours(0, 0, 0, 0)
-  return d.toISOString()
+  const [year, month, day] = saoPauloDateFolder().split('-').map(Number)
+  return new Date(Date.UTC(year, month - 1, day, 3, 0, 0, 0)).toISOString()
+}
+
+function saoPauloDateFolder(date = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date)
+
+  const value = (type: string) => parts.find((part) => part.type === type)?.value ?? ''
+  return `${value('year')}-${value('month')}-${value('day')}`
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -348,7 +359,8 @@ async function handlePost(req: Request): Promise<Response> {
   if (body.photo_base64) {
     try {
       const timestamp = Date.now()
-      const filePath = `checkins/${staff_member_id}/${timestamp}.jpg`
+      const dayFolder = saoPauloDateFolder()
+      const filePath = `checkins/${event_id}/${dayFolder}/${staff_member_id}/${type}-${timestamp}.jpg`
 
       // Decode base64 to Uint8Array
       const base64Data = body.photo_base64.replace(/^data:image\/\w+;base64,/, '')
@@ -367,7 +379,7 @@ async function handlePost(req: Request): Promise<Response> {
 
       if (uploadErr) {
         console.error('[staff-checkin] Erro ao fazer upload da foto:', uploadErr)
-        // Non-fatal: continue without the photo
+        return errorResponse('Erro ao salvar a foto do ponto. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
       } else {
         const { data: publicUrlData } = admin.storage
           .from('staff-documents')
@@ -377,11 +389,15 @@ async function handlePost(req: Request): Promise<Response> {
       }
     } catch (uploadException) {
       console.error('[staff-checkin] Exceção no upload da foto:', uploadException)
-      // Non-fatal: continue without the photo
+      return errorResponse('Erro ao processar a foto do ponto. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
     }
   }
 
   // ── 7. Insert into staff_checkins ─────────────────────────────────────────
+  if (!photoUrl) {
+    return errorResponse('Foto obrigatória não foi salva. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
+  }
+
   const { data: checkinRecord, error: insertErr } = await admin
     .from('staff_checkins')
     .insert({

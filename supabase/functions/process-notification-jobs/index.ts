@@ -1,9 +1,9 @@
-import { corsHeaders } from '../_shared/cors.ts'
+﻿import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type JobStatus  = 'pending' | 'running' | 'completed' | 'failed'
 type Channel    = 'email' | 'whatsapp'
@@ -92,9 +92,9 @@ interface Env {
   evolutionInstance:string
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -152,7 +152,7 @@ function buildStaffPointMessage(vars: Record<string, string | number | boolean>,
     `Você já está confirmado(a) como equipe do ${eventName}.`,
     `Seu acesso de staff para o ${eventName} foi liberado.`,
     `A equipe confirmou seus dados para o ${eventName}.`,
-    `Está tudo certo com seus dados para o ${eventName}.`,
+    `EstÃ¡ tudo certo com seus dados para o ${eventName}.`,
     `Seu vínculo de staff no ${eventName} está ativo.`,
     `Confirmamos seu cadastro de equipe para o ${eventName}.`,
     `Seu acesso operacional ao ${eventName} foi aprovado.`,
@@ -167,7 +167,7 @@ function buildStaffPointMessage(vars: Record<string, string | number | boolean>,
     `Use o ponto digital no evento; ele pode pedir localização, câmera e notificações.`,
     `Antes de chegar, deixe o celular pronto para liberar localização, câmera e notificações.`,
     `O registro de presença será feito pelo link, com localização e foto no Pulse.`,
-    `No acesso ao evento, entre no ponto digital e faça a validação solicitada.`,
+    `No acesso ao evento, entre no ponto digital e faça a validaÃ§Ã£o solicitada.`,
     `Guarde este link; ele será usado para registrar sua presença no evento.`,
     `Chegando ao evento, abra este link para fazer seu ponto digital.`,
   ]
@@ -188,9 +188,9 @@ function buildStaffPointMessage(vars: Record<string, string | number | boolean>,
   ].join(' ')
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Provider: Resend (email)
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function sendEmail(params: {
   to: string; subject: string; html: string; text?: string | null; from: string; apiKey: string
@@ -216,9 +216,9 @@ async function sendEmail(params: {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Provider: Twilio (WhatsApp)
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function sendWhatsApp(params: {
   to: string; body: string; env: Env
@@ -293,9 +293,9 @@ async function sendEvolutionWhatsApp(params: {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Audience resolver
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function resolveAudience(
   admin:   ReturnType<typeof createSupabaseAdminClient>,
@@ -340,9 +340,9 @@ async function resolveAudience(
   return []
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Send to one contact, with idempotency guard
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function sendToContact(
   admin:        ReturnType<typeof createSupabaseAdminClient>,
@@ -355,7 +355,7 @@ async function sendToContact(
 ): Promise<SendResult> {
   const recipient = job.channel === 'email' ? contact.email! : contact.phone!
 
-  // ── Idempotency: already sent this job+recipient combination? ─────────────
+  // â”€â”€ Idempotency: already sent this job+recipient combination? â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const { data: existing } = await admin
     .from('communications_log')
     .select('id')
@@ -368,7 +368,7 @@ async function sendToContact(
     return { contact, status: 'sent', message_id: null }
   }
 
-  // ── Merge variables: job.variables + per-contact name ────────────────────
+  // â”€â”€ Merge variables: job.variables + per-contact name â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const vars: Record<string, string | number | boolean> = {
     name:       contact.name ?? '',
     first_name: contact.name?.split(' ')[0] ?? '',
@@ -428,9 +428,9 @@ async function sendToContact(
   return { contact, status: commStatus, message_id: messageId, error: errorMsg ?? undefined }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Process one job end-to-end
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function processJob(
   admin: ReturnType<typeof createSupabaseAdminClient>,
@@ -549,9 +549,9 @@ async function processJob(
   return { processed, failed }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Reset jobs stuck in 'running' > 10 minutes (e.g. function crash)
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function resetStuckJobs(admin: ReturnType<typeof createSupabaseAdminClient>): Promise<number> {
   const stuckBefore = new Date(Date.now() - 10 * 60 * 1000).toISOString()
@@ -564,9 +564,9 @@ async function resetStuckJobs(admin: ReturnType<typeof createSupabaseAdminClient
   return data?.length ?? 0
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Main Handler
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Deno.serve(async (req: Request): Promise<Response> => {
 
@@ -615,7 +615,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     .eq('status', 'pending')
     .lte('scheduled_at', nowIso)
     .order('scheduled_at', { ascending: true })
-    .limit(20)
+    .limit(100)
 
   if (fetchError) {
     console.error('[process-notification-jobs] fetch error:', fetchError)
@@ -652,3 +652,4 @@ Deno.serve(async (req: Request): Promise<Response> => {
     results,
   })
 })
+

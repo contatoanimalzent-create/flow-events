@@ -857,6 +857,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
           role_title:       body.role_title || inviteLink.role_type || 'staff',
           company:          body.company ?? null,
           pix_key:          body.pix_key ?? null,
+          shift_label:      (body as Record<string, unknown>).shift_start && (body as Record<string, unknown>).shift_end ? `${(body as Record<string, unknown>).shift_start} - ${(body as Record<string, unknown>).shift_end}` : null,
           status:           'active',
           is_active:        true,
           notes:            [body.bio, body.t_shirt_size ? `Camiseta: ${body.t_shirt_size}` : null].filter(Boolean).join(' | ') || null,

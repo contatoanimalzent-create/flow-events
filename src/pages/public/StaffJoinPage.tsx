@@ -45,6 +45,8 @@ interface FormData {
   role_title: string
   company: string
   pix_key: string
+  shift_start: string
+  shift_end: string
   tshirt_size: TShirtSize | ''
   bio: string
   emergency_contact_name: string
@@ -134,6 +136,8 @@ export function StaffJoinPage() {
     role_title: '',
     company: '',
     pix_key: '',
+    shift_start: '',
+    shift_end: '',
     tshirt_size: '',
     bio: '',
     emergency_contact_name: '',
@@ -205,6 +209,8 @@ export function StaffJoinPage() {
     if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
     if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
     if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX é obrigatória.'
+    if (!form.shift_start) errors.shift_start = 'Horário de entrada é obrigatório.'
+    if (!form.shift_end) errors.shift_end = 'Horário de saída é obrigatório.'
     if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
 
     // Custom required fields
@@ -235,6 +241,8 @@ export function StaffJoinPage() {
         role_title: form.role_title.trim() || undefined,
         company: form.company.trim() || undefined,
         pix_key: form.pix_key.trim() || undefined,
+        shift_start: form.shift_start || undefined,
+        shift_end: form.shift_end || undefined,
         bio: form.bio.trim() || undefined,
         terms_accepted: true,
         custom_field_answers: form.custom_answers,
@@ -505,6 +513,28 @@ export function StaffJoinPage() {
                       onChange={(e) => setField('pix_key', e.target.value)}
                       placeholder="Sua chave PIX para pagamento"
                       className={inputClass}
+                    />
+                  </InputField>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <InputField label="Horário de entrada" required error={fieldErrors.shift_start}>
+                    <input
+                      type="time"
+                      value={form.shift_start}
+                      onChange={(e) => setField('shift_start', e.target.value)}
+                      className={inputClass}
+                      style={{ colorScheme: 'dark' }}
+                    />
+                  </InputField>
+
+                  <InputField label="Horário de saída" required error={fieldErrors.shift_end}>
+                    <input
+                      type="time"
+                      value={form.shift_end}
+                      onChange={(e) => setField('shift_end', e.target.value)}
+                      className={inputClass}
+                      style={{ colorScheme: 'dark' }}
                     />
                   </InputField>
                 </div>

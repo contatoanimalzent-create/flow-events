@@ -40,6 +40,7 @@ interface ApplicationBody {
   role_title?: string
   company?: string
   pix_key?: string
+  shift_label?: string
   custom_field_answers?: Record<string, unknown>
   terms_accepted: boolean
 }
@@ -173,7 +174,7 @@ async function queueStaffConfirmationNotifications(
     requires_location: true,
     requires_notifications: true,
     arrival_photo_required: true,
-    message: 'Ative câmera, localização e notificações. Ao chegar no evento, tire a foto de presença pelo Pulse.',
+    message: 'Ative câmera, localização e notificações. O ponto digital deve ser usado somente quando você estiver no local do evento.',
   }
 
   await admin.from('email_templates').upsert({
@@ -235,7 +236,7 @@ async function queueStaffConfirmationNotifications(
                 <tr>
                   <td style="padding:22px 30px 0;">
                     <p style="margin:0;color:#d7d7db;font-size:15px;line-height:1.7;">
-                      Antes de chegar, abra o link abaixo e permita <strong style="color:#ffffff;">câmera, localização e notificações</strong>. No evento, o Pulse vai orientar a foto de presença e o registro do ponto.
+                      Abra o link abaixo para liberar <strong style="color:#ffffff;">câmera, localização e notificações</strong>. O ponto digital deve ser usado <strong style="color:#ffffff;">somente quando você estiver no local do evento</strong>. Fora do local, o Pulse informa a distância até o evento e bloqueia o registro.
                     </p>
                   </td>
                 </tr>
@@ -254,7 +255,7 @@ async function queueStaffConfirmationNotifications(
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#101014;border-radius:12px;">
                       <tr>
                         <td style="padding:16px 18px;color:#b9b9c0;font-size:13px;line-height:1.6;">
-                          Dica: use o mesmo e-mail, CPF e WhatsApp informados no cadastro para acessar o ponto.
+                          Dica: use o mesmo e-mail, CPF e WhatsApp informados no cadastro para acessar o ponto. O registro de entrada e saída só é aceito no local do evento.
                         </td>
                       </tr>
                     </table>
@@ -272,7 +273,7 @@ async function queueStaffConfirmationNotifications(
       </body>
       </html>
     `.trim(),
-    text: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Ative câmera, localização e notificações no Pulse para receber o aviso de foto de presença ao chegar no evento.',
+    text: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Use o ponto somente quando estiver no local do evento. Fora do local, o Pulse informa a distância até o evento e bloqueia o registro.',
   }, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] email template upsert failed:', error.message)
   })
@@ -280,7 +281,7 @@ async function queueStaffConfirmationNotifications(
   await admin.from('whatsapp_templates').upsert({
     organization_id: params.organizationId,
     key: templateKey,
-    body: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Ative câmera, localização e notificações no Pulse para receber o aviso de foto de presença ao chegar no evento.',
+    body: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Use o ponto somente quando estiver no local do evento. Fora do local, o Pulse informa a distância até o evento e bloqueia o registro.',
   }, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] whatsapp template upsert failed:', error.message)
   })
@@ -861,7 +862,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
           role_title:       body.role_title || inviteLink.role_type || 'staff',
           company:          body.company ?? null,
           pix_key:          body.pix_key ?? null,
-          shift_label:      (body as Record<string, unknown>).shift_start && (body as Record<string, unknown>).shift_end ? `${(body as Record<string, unknown>).shift_start} - ${(body as Record<string, unknown>).shift_end}` : null,
+          shift_label:      body.shift_label || ((body as Record<string, unknown>).shift_start && (body as Record<string, unknown>).shift_end ? `${(body as Record<string, unknown>).shift_start} - ${(body as Record<string, unknown>).shift_end}` : null),
           status:           'active',
           is_active:        true,
           notes:            [body.bio, body.t_shirt_size ? `Camiseta: ${body.t_shirt_size}` : null].filter(Boolean).join(' | ') || null,

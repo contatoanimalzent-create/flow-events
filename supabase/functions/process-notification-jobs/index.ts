@@ -162,15 +162,15 @@ function buildStaffPointMessage(vars: Record<string, string | number | boolean>,
     `Sua confirmação de staff do ${eventName} está registrada.`,
   ]
   const instructions = [
-    `No dia, abra o link do ponto e permita câmera, localização e notificações.`,
-    `Ao chegar, use o link do ponto e mantenha câmera e localização ativadas.`,
-    `Para registrar presença, acesse o ponto digital e autorize câmera, localização e notificações.`,
+    `Use o ponto somente quando estiver no local do evento; fora do local, o Pulse informa a distância e bloqueia o registro.`,
+    `Ao chegar ao evento, abra o link do ponto e mantenha câmera, localização e notificações ativadas.`,
+    `Para registrar presença, você precisa estar no local do evento e autorizar câmera, localização e notificações.`,
     `Quando estiver no local, entre pelo link e siga a orientação para foto de presença.`,
-    `Use o ponto digital no evento; ele pode pedir localização, câmera e notificações.`,
+    `O ponto digital funciona no evento; se tentar de longe, o Pulse mostra a distância até o local.`,
     `Antes de chegar, deixe o celular pronto para liberar localização, câmera e notificações.`,
-    `O registro de presença será feito pelo link, com localização e foto no Pulse.`,
-    `No acesso ao evento, entre no ponto digital e faça a validaÃ§Ã£o solicitada.`,
-    `Guarde este link; ele será usado para registrar sua presença no evento.`,
+    `O registro de presença será feito pelo link, com localização e foto no Pulse, somente no local do evento.`,
+    `No acesso ao evento, entre no ponto digital e faça a validação solicitada.`,
+    `Guarde este link; ele será usado para registrar sua presença quando você estiver no evento.`,
     `Chegando ao evento, abra este link para fazer seu ponto digital.`,
   ]
   const closings = [

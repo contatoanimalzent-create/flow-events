@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   AlertCircle,
   CheckCircle2,
@@ -47,6 +47,7 @@ interface FormData {
   pix_key: string
   shift_start: string
   shift_end: string
+  shift_label: string
   tshirt_size: TShirtSize | ''
   bio: string
   emergency_contact_name: string
@@ -54,6 +55,65 @@ interface FormData {
   terms_accepted: boolean
   custom_answers: Record<string, string | boolean>
 }
+
+interface StaffRoleOption {
+  value: string
+  label: string
+  scheduleLines: string[]
+  shiftLabel: string
+}
+
+const standardEventStaffSchedule = [
+  'Quinta, 28/05 - 08h às 16h',
+  'Quinta, 28/05 - 16h às 00h',
+  'Sexta, 29/05 - 08h às 16h',
+  'Sexta, 29/05 - 16h às 00h',
+  'Sábado, 30/05 - 16h às 00h',
+]
+
+const STAFF_ROLE_OPTIONS: StaffRoleOption[] = [
+  {
+    value: 'Credenciamento',
+    label: 'Credenciamento',
+    scheduleLines: standardEventStaffSchedule,
+    shiftLabel: standardEventStaffSchedule.join(' | '),
+  },
+  {
+    value: 'Limpeza e carregadores',
+    label: 'Limpeza e carregadores',
+    scheduleLines: standardEventStaffSchedule,
+    shiftLabel: standardEventStaffSchedule.join(' | '),
+  },
+  {
+    value: 'Posto médico e ambulância',
+    label: 'Posto médico e ambulância',
+    scheduleLines: [
+      'Quinta, 28/05 - 09h às 21h30',
+      'Sexta, 29/05 - 09h às 15h',
+      'Sábado, 30/05 - 17h às 00h',
+    ],
+    shiftLabel: 'Quinta, 28/05 - 09h às 21h30 | Sexta, 29/05 - 09h às 15h | Sábado, 30/05 - 17h às 00h',
+  },
+  {
+    value: 'Segurança eventual',
+    label: 'Segurança eventual',
+    scheduleLines: standardEventStaffSchedule,
+    shiftLabel: standardEventStaffSchedule.join(' | '),
+  },
+  {
+    value: 'Segurança patrimonial',
+    label: 'Segurança patrimonial',
+    scheduleLines: [
+      'Quinta, 28/05 - 07h às 19h',
+      'Quinta, 28/05 - 19h às 07h',
+      'Sexta, 29/05 - 07h às 19h',
+      'Sexta, 29/05 - 19h às 07h',
+      'Sábado, 30/05 - 07h às 19h',
+      'Sábado, 30/05 - 19h às 07h',
+    ],
+    shiftLabel: 'Quinta, 28/05 - 07h às 19h | Quinta, 28/05 - 19h às 07h | Sexta, 29/05 - 07h às 19h | Sexta, 29/05 - 19h às 07h | Sábado, 30/05 - 07h às 19h | Sábado, 30/05 - 19h às 07h',
+  },
+]
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -138,6 +198,7 @@ export function StaffJoinPage() {
     pix_key: '',
     shift_start: '',
     shift_end: '',
+    shift_label: '',
     tshirt_size: '',
     bio: '',
     emergency_contact_name: '',
@@ -148,6 +209,10 @@ export function StaffJoinPage() {
 
   const token = getToken()
   const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/process-staff-invite`
+  const selectedRole = useMemo(
+    () => STAFF_ROLE_OPTIONS.find((role) => role.value === form.role_title) ?? null,
+    [form.role_title],
+  )
 
   // Fetch invite on mount
   useEffect(() => {
@@ -192,6 +257,24 @@ export function StaffJoinPage() {
     setFieldErrors((prev) => ({ ...prev, [key]: undefined }))
   }
 
+  function setRole(value: string) {
+    const role = STAFF_ROLE_OPTIONS.find((item) => item.value === value)
+    setForm((prev) => ({
+      ...prev,
+      role_title: value,
+      shift_label: role?.shiftLabel ?? '',
+      shift_start: '',
+      shift_end: '',
+    }))
+    setFieldErrors((prev) => ({
+      ...prev,
+      role_title: undefined,
+      shift_label: undefined,
+      shift_start: undefined,
+      shift_end: undefined,
+    }))
+  }
+
   function setCustomAnswer(key: string, value: string | boolean) {
     setForm((prev) => ({
       ...prev,
@@ -209,8 +292,7 @@ export function StaffJoinPage() {
     if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
     if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
     if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX é obrigatória.'
-    if (!form.shift_start) errors.shift_start = 'Horário de entrada é obrigatório.'
-    if (!form.shift_end) errors.shift_end = 'Horário de saída é obrigatório.'
+    if (!form.shift_label) errors.shift_label = 'Selecione a função para carregar o horário.'
     if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
 
     // Custom required fields
@@ -243,6 +325,7 @@ export function StaffJoinPage() {
         pix_key: form.pix_key.trim() || undefined,
         shift_start: form.shift_start || undefined,
         shift_end: form.shift_end || undefined,
+        shift_label: form.shift_label || undefined,
         bio: form.bio.trim() || undefined,
         terms_accepted: true,
         custom_field_answers: form.custom_answers,
@@ -316,10 +399,10 @@ export function StaffJoinPage() {
         </div>
         <div className="max-w-md">
           <h1 className="font-display text-[2.8rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
-            Cadastro realizado!
+            Dados confirmados!
           </h1>
           <p className="mt-4 text-base leading-7 text-white/68">
-            Seu cadastro como staff foi confirmado. Você receberá mais informações por e-mail antes do evento.
+            Você receberá o link do ponto por e-mail e WhatsApp. Use o ponto somente quando estiver no local do evento.
           </p>
         </div>
         {inviteInfo && (
@@ -475,13 +558,22 @@ export function StaffJoinPage() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <InputField label="Função no evento" required error={fieldErrors.role_title}>
-                    <input
-                      type="text"
-                      value={form.role_title}
-                      onChange={(e) => setField('role_title', e.target.value)}
-                      placeholder="Ex: Segurança, Bar, Som..."
-                      className={inputClass}
-                    />
+                    <div className="relative">
+                      <select
+                        value={form.role_title}
+                        onChange={(e) => setRole(e.target.value)}
+                        className={`${inputClass} appearance-none pr-10`}
+                        style={{ colorScheme: 'dark' }}
+                      >
+                        <option value="" className="bg-[#12161f] text-white/50">Selecione sua função</option>
+                        {STAFF_ROLE_OPTIONS.map((role) => (
+                          <option key={role.value} value={role.value} className="bg-[#12161f] text-[#f5f0e8]">
+                            {role.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/38" />
+                    </div>
                   </InputField>
 
                   <InputField label="Empresa" hint="Se terceirizado" error={fieldErrors.company}>
@@ -517,27 +609,27 @@ export function StaffJoinPage() {
                   </InputField>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <InputField label="Horário de entrada" required error={fieldErrors.shift_start}>
-                    <input
-                      type="time"
-                      value={form.shift_start}
-                      onChange={(e) => setField('shift_start', e.target.value)}
-                      className={inputClass}
-                      style={{ colorScheme: 'dark' }}
-                    />
-                  </InputField>
-
-                  <InputField label="Horário de saída" required error={fieldErrors.shift_end}>
-                    <input
-                      type="time"
-                      value={form.shift_end}
-                      onChange={(e) => setField('shift_end', e.target.value)}
-                      className={inputClass}
-                      style={{ colorScheme: 'dark' }}
-                    />
-                  </InputField>
-                </div>
+                <InputField
+                  label="Horário do trabalho"
+                  required
+                  hint="O horário é definido pela função escolhida e não pode ser alterado aqui."
+                  error={fieldErrors.shift_label}
+                >
+                  <div className="rounded-[18px] border border-white/10 bg-white/[0.035] p-4">
+                    {selectedRole ? (
+                      <div className="space-y-2">
+                        {selectedRole.scheduleLines.map((line) => (
+                          <div key={line} className="flex items-center gap-2 text-sm text-[#f5f0e8]">
+                            <Clock className="h-4 w-4 shrink-0 text-[#D4FF00]" />
+                            <span>{line}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-white/42">Selecione uma função para ver o horário.</p>
+                    )}
+                  </div>
+                </InputField>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <InputField label="Tamanho da camiseta" error={fieldErrors.tshirt_size}>
@@ -710,13 +802,13 @@ export function StaffJoinPage() {
               ) : (
                 <>
                   <Shield className="h-4 w-4" />
-                  Enviar inscrição
+                  Confirmar dados
                 </>
               )}
             </button>
 
             <p className="text-center text-[11px] text-white/30">
-              Sua inscrição será analisada pela equipe do evento antes da confirmação.
+              Depois da confirmação, o ponto digital só registra presença quando você estiver no local do evento.
             </p>
           </form>
         </div>

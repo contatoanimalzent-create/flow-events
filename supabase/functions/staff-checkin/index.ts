@@ -112,7 +112,7 @@ async function handleGet(req: Request): Promise<Response> {
 
   const { data: event, error: eventErr } = await admin
     .from('events')
-    .select('id, venue_coordinates')
+    .select('id, name, venue_coordinates')
     .eq('slug', eventSlug)
     .maybeSingle()
 
@@ -181,6 +181,7 @@ async function handleGet(req: Request): Promise<Response> {
 
   return jsonResponse({
     event_id: event.id,
+    event_name: event.name,
     staff_member: {
       id: staffMember.id,
       name: [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' '),

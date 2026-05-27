@@ -121,6 +121,7 @@ async function queueStaffConfirmationNotifications(
     organizationId: string
     eventId: string
     eventName: string
+    eventSlug: string
     venueName: string | null
     staffMemberId: string
     staffName: string
@@ -134,6 +135,8 @@ async function queueStaffConfirmationNotifications(
   },
 ) {
   const templateKey = 'staff-confirmed-permissions'
+  const appUrl = (Deno.env.get('APP_URL') ?? 'https://pulse.animalzgroup.com').replace(/\/$/, '')
+  const pointUrl = `${appUrl}/staff/ponto/${params.eventSlug}`
   const phone = normalizeBrazilWhatsapp(params.staffPhone)
   const audienceEmails = [params.staffEmail].filter(Boolean)
   const audiencePhones = phone ? [phone] : []
@@ -142,6 +145,7 @@ async function queueStaffConfirmationNotifications(
     staff_member_id: params.staffMemberId,
     staff_name: params.staffName,
     event_name: params.eventName,
+    point_url: pointUrl,
     venue_name: params.venueName ?? '',
     role_type: params.roleType ?? 'staff',
     team_id: params.teamId ?? '',
@@ -162,9 +166,10 @@ async function queueStaffConfirmationNotifications(
       <p>Ola, {{first_name}}.</p>
       <p>Seus dados para trabalhar no evento <strong>{{event_name}}</strong> foram confirmados.</p>
       <p>Agora ative camera, localizacao e notificacoes no Pulse. Quando voce chegar ao evento, o sistema vai avisar para tirar a foto de presenca.</p>
+      <p><strong>Link do ponto:</strong> <a href="{{point_url}}">{{point_url}}</a></p>
       <p>Local: {{venue_name}}</p>
     `.trim(),
-    text: 'Seus dados para {{event_name}} foram confirmados. Ative camera, localizacao e notificacoes no Pulse para receber o aviso de foto de presenca ao chegar no evento.',
+    text: 'Seus dados para {{event_name}} foram confirmados. Link do ponto: {{point_url}}. Ative camera, localizacao e notificacoes no Pulse para receber o aviso de foto de presenca ao chegar no evento.',
   }, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] email template upsert failed:', error.message)
   })
@@ -172,7 +177,7 @@ async function queueStaffConfirmationNotifications(
   await admin.from('whatsapp_templates').upsert({
     organization_id: params.organizationId,
     key: templateKey,
-    body: 'Ola, {{first_name}}. Seus dados para {{event_name}} foram confirmados. Ative camera, localizacao e notificacoes no Pulse para receber o aviso de foto de presenca ao chegar no evento.',
+    body: 'Ola, {{first_name}}. Seus dados para {{event_name}} foram confirmados. Link do ponto: {{point_url}}. Ative camera, localizacao e notificacoes no Pulse para receber o aviso de foto de presenca ao chegar no evento.',
   }, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] whatsapp template upsert failed:', error.message)
   })
@@ -229,6 +234,31 @@ async function queueStaffConfirmationNotifications(
   await admin.from('notification_jobs').insert(jobs).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] notification_jobs insert failed:', error.message)
   })
+}
+
+async function triggerNotificationProcessor() {
+  const cronSecret = Deno.env.get('CRON_SECRET')
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')
+  if (!cronSecret || !supabaseUrl) {
+    console.warn('[process-staff-invite] notification processor not triggered: missing CRON_SECRET or SUPABASE_URL')
+    return
+  }
+
+  try {
+    const res = await fetch(`${supabaseUrl}/functions/v1/process-notification-jobs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-cron-secret': cronSecret,
+      },
+      body: JSON.stringify({ source: 'staff-confirmation' }),
+    })
+    if (!res.ok) {
+      console.warn('[process-staff-invite] notification processor failed:', await res.text())
+    }
+  } catch (err) {
+    console.warn('[process-staff-invite] notification processor exception:', err)
+  }
 }
 
 /** Validate a token record is usable right now */
@@ -750,7 +780,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       const { data: eventInfo } = await admin
         .from('events')
-        .select('name, venue_name')
+        .select('name, slug, venue_name')
         .eq('id', inviteLink.event_id)
         .maybeSingle()
 
@@ -758,6 +788,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         organizationId: inviteLink.organization_id,
         eventId: inviteLink.event_id,
         eventName: eventInfo?.name ?? 'Evento',
+        eventSlug: eventInfo?.slug ?? body.token!,
         venueName: eventInfo?.venue_name ?? null,
         staffMemberId: staffMember.id,
         staffName: body.full_name!.trim(),
@@ -769,6 +800,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         inviteLinkId: inviteLink.id,
         now,
       })
+      await triggerNotificationProcessor()
 
       return Response.json(
         {

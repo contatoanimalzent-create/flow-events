@@ -174,6 +174,7 @@ export function StaffCheckinPage() {
         checkout_time: lastCheckout?.created_at ?? null,
         venue_lat: vc?.latitude ?? null,
         venue_lng: vc?.longitude ?? null,
+        event_name: raw.event_name ?? eventSlug,
       })
       setStep('identified')
     } catch {
@@ -186,7 +187,7 @@ export function StaffCheckinPage() {
 
   // ── Geolocation ───────────────────────────────────────────────────────────
 
-  const getGeolocation = useCallback((): Promise<{ lat: number; lng: number }> => {
+  const getGeolocation = useCallback((): Promise<{ lat: number; lng: number; accuracy?: number }> => {
     setGeoStatus('loading')
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
@@ -218,7 +219,7 @@ export function StaffCheckinPage() {
 
   // ── Camera ────────────────────────────────────────────────────────────────
 
-  async function openCamera(targetStep: Step = 'camera') {
+  async function openCamera(targetStep: PageStep = 'camera') {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user' },
@@ -367,7 +368,9 @@ export function StaffCheckinPage() {
 
   function resetToEmail() {
     setStep('email')
-    setEmail('')
+    setIdEmail('')
+    setIdCpf('')
+    setIdPhone('')
     setStaff(null)
     setErrorMessage('')
     setPhotoBase64(null)

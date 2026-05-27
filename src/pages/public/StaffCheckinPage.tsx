@@ -23,6 +23,7 @@ interface StaffInfo {
   checkout_time: string | null
   venue_lat: number | null
   venue_lng: number | null
+  geofence_radius_meters: number | null
   event_name: string
 }
 
@@ -77,6 +78,12 @@ function formatDistance(meters: number): string {
   return `${(meters / 1000).toFixed(1)}km`
 }
 
+function isOutsideVenue(distance: number | null, radius: number | null, accuracy?: number): boolean {
+  if (distance === null || radius === null) return false
+  const accuracyTolerance = typeof accuracy === 'number' ? Math.min(Math.max(accuracy, 0), 100) : 0
+  return distance > radius + accuracyTolerance
+}
+
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/staff-checkin`
@@ -129,6 +136,18 @@ export function StaffCheckinPage() {
     }
   }, [])
 
+  useEffect(() => {
+    const video = videoRef.current
+    const stream = streamRef.current
+    if (!video || !stream || (step !== 'camera' && step !== 'camera_checkout')) return
+
+    video.srcObject = stream
+    void video.play().catch(() => {
+      setErrorMessage('Não foi possível iniciar a câmera. Toque em tentar novamente e permita o acesso.')
+      setStep('error')
+    })
+  }, [step])
+
   // ── Identify staff ────────────────────────────────────────────────────────
 
   async function handleIdentify(e: React.FormEvent) {
@@ -174,6 +193,7 @@ export function StaffCheckinPage() {
         checkout_time: lastCheckout?.created_at ?? null,
         venue_lat: vc?.latitude ?? null,
         venue_lng: vc?.longitude ?? null,
+        geofence_radius_meters: raw.geofence_radius_meters ?? null,
         event_name: raw.event_name ?? eventSlug,
       })
       setStep('identified')
@@ -225,10 +245,6 @@ export function StaffCheckinPage() {
         video: { facingMode: 'user' },
       })
       streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        videoRef.current.play()
-      }
       setStep(targetStep)
     } catch {
       setErrorMessage('Permissão de câmera negada. Habilite nas configurações do navegador.')
@@ -240,6 +256,11 @@ export function StaffCheckinPage() {
     const video = videoRef.current
     const canvas = canvasRef.current
     if (!video || !canvas) return
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      setErrorMessage('A câmera ainda está carregando. Aguarde alguns segundos e tente tirar a foto novamente.')
+      setStep('error')
+      return
+    }
 
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
@@ -277,8 +298,18 @@ export function StaffCheckinPage() {
         Notification.requestPermission()
       }
 
-      // Get geolocation first
-      await getGeolocation()
+      // Get geolocation first and block clearly before asking for a selfie.
+      const location = await getGeolocation()
+      const dist = staff?.venue_lat != null && staff?.venue_lng != null
+        ? haversineDistance(location.lat, location.lng, staff.venue_lat, staff.venue_lng)
+        : null
+
+      if (isOutsideVenue(dist, staff?.geofence_radius_meters ?? null, location.accuracy)) {
+        setDistance(dist)
+        setErrorMessage(`Você está a ${formatDistance(dist!)} do local do evento. Para registrar o ponto, é necessário estar no local do evento.`)
+        setStep('error')
+        return
+      }
 
       // Then open camera
       await openCamera()
@@ -323,6 +354,27 @@ export function StaffCheckinPage() {
   }
 
   // ── Checkout flow ─────────────────────────────────────────────────────────
+
+  async function startCheckoutFlow() {
+    try {
+      const location = await getGeolocation()
+      const dist = staff?.venue_lat != null && staff?.venue_lng != null
+        ? haversineDistance(location.lat, location.lng, staff.venue_lat, staff.venue_lng)
+        : null
+
+      if (isOutsideVenue(dist, staff?.geofence_radius_meters ?? null, location.accuracy)) {
+        setDistance(dist)
+        setErrorMessage(`Você está a ${formatDistance(dist!)} do local do evento. Para registrar o ponto, é necessário estar no local do evento.`)
+        setStep('error')
+        return
+      }
+
+      await openCamera('camera_checkout')
+    } catch {
+      setErrorMessage('Não foi possível obter sua localização. Verifique as permissões.')
+      setStep('error')
+    }
+  }
 
   async function handleCheckout() {
     if (!staff || !photoBase64) return
@@ -656,7 +708,7 @@ export function StaffCheckinPage() {
                 </button>
               ) : (
                 <button
-                  onClick={() => openCamera('camera_checkout')}
+                  onClick={startCheckoutFlow}
                   disabled={loading}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-red-500 bg-red-500/10 py-5 text-base font-bold uppercase tracking-[0.14em] text-red-400 transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                   style={{ minHeight: 72 }}

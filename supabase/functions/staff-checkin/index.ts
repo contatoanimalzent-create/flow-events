@@ -21,6 +21,9 @@ interface CheckinRequestBody {
   accuracy_meters?: number
 }
 
+const DEFAULT_GEOFENCE_METERS = 350
+const MAX_ACCURACY_TOLERANCE_METERS = 100
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -304,7 +307,11 @@ async function handlePost(req: Request): Promise<Response> {
   const venueCoords = parsePoint(event.venue_coordinates)
   let distanceFromVenueMeters: number | null = null
 
-  const maxDist = event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS
+  const configuredMaxDist = event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS
+  const accuracyTolerance = typeof accuracy_meters === 'number'
+    ? Math.min(Math.max(accuracy_meters, 0), MAX_ACCURACY_TOLERANCE_METERS)
+    : 0
+  const maxDist = configuredMaxDist + accuracyTolerance
 
   if (venueCoords) {
     distanceFromVenueMeters = Math.round(

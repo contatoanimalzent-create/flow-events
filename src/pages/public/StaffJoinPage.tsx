@@ -656,8 +656,8 @@ export function StaffJoinPage() {
                     </a>
                     . <span className="text-[#D4FF00]">*</span>
                   </span>
-                  <span className="text-[11px] text-white/36">
-                    Suas informações serão utilizadas exclusivamente para gerenciamento operacional do evento.
+                  <span className="text-[11px] leading-relaxed text-white/36">
+                    Em conformidade com a LGPD (Lei 13.709/2018), autorizo a coleta e tratamento dos meus dados pessoais, incluindo nome, CPF, telefone, e-mail e chave PIX, exclusivamente para fins de gestão operacional, credenciamento e pagamento relacionados ao evento. Autorizo também o uso da minha imagem (fotos de check-in/check-out) para fins de controle de presença e segurança do evento. Os dados serão armazenados de forma segura e não serão compartilhados com terceiros sem meu consentimento.
                   </span>
                 </div>
               </label>

@@ -46,8 +46,10 @@ interface FilterDefinition {
   filters?: {
     event_id?:   string
     status?:     string
+    statuses?:   string[]
     is_active?:  boolean
     role_title?: string
+    role_titles?: string[]
   }
   emails?:  string[]
   phones?:  string[]
@@ -321,9 +323,13 @@ async function resolveAudience(
 
     const eventId = filters.event_id ?? job.event_id
     const q1 = eventId ? baseQ.eq('event_id', eventId) : baseQ
-    const q2 = filters.status     ? q1.eq('status', filters.status) : q1
+    const q2 = filters.statuses && filters.statuses.length > 0
+      ? q1.in('status', filters.statuses)
+      : (filters.status ? q1.eq('status', filters.status) : q1)
     const q3 = filters.is_active !== undefined ? q2.eq('is_active', filters.is_active) : q2
-    const q4 = filters.role_title ? q3.eq('role_title', filters.role_title) : q3
+    const q4 = filters.role_titles && filters.role_titles.length > 0
+      ? q3.in('role_title', filters.role_titles)
+      : (filters.role_title ? q3.eq('role_title', filters.role_title) : q3)
 
     const { data, error } = await q4
     if (error) {

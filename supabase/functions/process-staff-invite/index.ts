@@ -750,9 +750,32 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       const { data: eventInfo } = await admin
         .from('events')
-        .select('name, venue_name')
+        .select('name, slug, venue_name')
         .eq('id', inviteLink.event_id)
         .maybeSingle()
+
+      const APP_URL = Deno.env.get('APP_URL') ?? 'https://pulse.animalzgroup.com'
+      const pontoUrl = `${APP_URL}/staff/ponto/${eventInfo?.slug ?? ''}`
+      const eventName = eventInfo?.name ?? 'Evento'
+      const staffName = body.full_name!.trim()
+      const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
+      const RESEND_FROM = Deno.env.get('RESEND_FROM_EMAIL') ?? 'Pulse Events <contatopulse@animalzgroup.com>'
+
+      if (RESEND_API_KEY && body.email) {
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body style="margin:0;padding:0;background:#050507;font-family:Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#050507;padding:40px 16px;"><tr><td align="center"><table width="560" cellpadding="0" cellspacing="0" style="background:#0e0e12;border-radius:16px;overflow:hidden;max-width:560px;width:100%;"><tr><td style="background:#d4ff00;padding:20px 32px;text-align:center;"><span style="font-size:24px;font-weight:900;color:#050507;letter-spacing:2px;">PULSE EVENTS</span></td></tr><tr><td style="padding:32px;"><h1 style="font-size:22px;font-weight:700;color:#fff;margin:0 0 16px;">Cadastro confirmado!</h1><p style="color:#aaa;font-size:15px;margin:0 0 24px;">Olá <strong style="color:#fff;">${staffName}</strong>, seu cadastro como staff no <strong style="color:#d4ff00;">${eventName}</strong> foi realizado com sucesso.</p><div style="background:#18181f;border-radius:12px;padding:20px 24px;margin-bottom:24px;"><p style="margin:0 0 8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:2px;">No dia do evento</p><p style="margin:0;color:#fff;font-size:15px;">Use o link abaixo para registrar sua entrada e saída:</p></div><div style="text-align:center;margin-bottom:24px;"><a href="${pontoUrl}" style="display:inline-block;background:#d4ff00;color:#050507;font-weight:700;font-size:16px;padding:14px 36px;border-radius:8px;text-decoration:none;">Abrir Ponto Digital</a></div><p style="color:#666;font-size:12px;">Link: ${pontoUrl}</p><hr style="border:none;border-top:1px solid #222;margin:24px 0;"/><p style="color:#555;font-size:12px;margin:0;">Você precisará informar seu e-mail, CPF e WhatsApp para se identificar. Tenha a câmera e localização ativadas.</p></td></tr><tr><td style="background:#0a0a0e;padding:16px 32px;text-align:center;"><p style="color:#444;font-size:11px;margin:0;">&copy; ${new Date().getFullYear()} Pulse Events</p></td></tr></table></td></tr></table></body></html>`
+
+        fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: RESEND_FROM,
+            to: [body.email!.toLowerCase().trim()],
+            subject: `Cadastro confirmado - ${eventName} | Ponto Digital`,
+            html,
+            text: `Olá ${staffName}, seu cadastro como staff no ${eventName} foi confirmado! No dia do evento, use este link para registrar entrada e saída: ${pontoUrl} — Você precisará e-mail, CPF e WhatsApp para se identificar.`,
+          }),
+        }).catch((err) => console.error('[process-staff-invite] email send error:', err))
+      }
 
       await queueStaffConfirmationNotifications(admin, {
         organizationId: inviteLink.organization_id,
@@ -761,7 +784,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         venueName: eventInfo?.venue_name ?? null,
         staffMemberId: staffMember.id,
         staffName: body.full_name!.trim(),
-        staffEmail: email,
+        staffEmail: body.email!.toLowerCase().trim(),
         staffPhone: body.phone ?? null,
         roleType: inviteLink.role_type,
         teamId: inviteLink.team_id ?? null,

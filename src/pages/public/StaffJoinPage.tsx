@@ -516,10 +516,11 @@ export function StaffJoinPage() {
                         value={form.tshirt_size}
                         onChange={(e) => setField('tshirt_size', e.target.value as TShirtSize | '')}
                         className={`${inputClass} appearance-none pr-10`}
+                        style={{ colorScheme: 'dark' }}
                       >
-                        <option value="">Selecione o tamanho</option>
+                        <option value="" className="bg-[#12161f] text-white/50">Selecione o tamanho</option>
                         {(['PP', 'P', 'M', 'G', 'GG', 'XGG'] as TShirtSize[]).map((size) => (
-                          <option key={size} value={size}>
+                          <option key={size} value={size} className="bg-[#12161f] text-[#f5f0e8]">
                             {size}
                           </option>
                         ))}
@@ -599,10 +600,11 @@ export function StaffJoinPage() {
                             value={(form.custom_answers[field.key] as string) ?? ''}
                             onChange={(e) => setCustomAnswer(field.key, e.target.value)}
                             className={`${inputClass} appearance-none pr-10`}
+                            style={{ colorScheme: 'dark' }}
                           >
-                            <option value="">Selecione...</option>
+                            <option value="" className="bg-[#12161f] text-white/50">Selecione...</option>
                             {field.options?.map((opt) => (
-                              <option key={opt} value={opt}>
+                              <option key={opt} value={opt} className="bg-[#12161f] text-[#f5f0e8]">
                                 {opt}
                               </option>
                             ))}

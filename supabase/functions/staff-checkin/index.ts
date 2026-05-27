@@ -112,7 +112,7 @@ async function handleGet(req: Request): Promise<Response> {
 
   const { data: event, error: eventErr } = await admin
     .from('events')
-    .select('id, name, venue_coordinates')
+    .select('id, name, venue_coordinates, geofence_radius_meters')
     .eq('slug', eventSlug)
     .maybeSingle()
 
@@ -194,6 +194,7 @@ async function handleGet(req: Request): Promise<Response> {
     is_checked_in: isCheckedIn,
     today_checkins: records,
     venue_coordinates: venueCoords,
+    geofence_radius_meters: event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS,
   })
 }
 
@@ -270,7 +271,7 @@ async function handlePost(req: Request): Promise<Response> {
   // ── 2. Get event venue coordinates ────────────────────────────────────────
   const { data: event, error: eventErr } = await admin
     .from('events')
-    .select('id, venue_coordinates')
+    .select('id, venue_coordinates, geofence_radius_meters')
     .eq('id', event_id)
     .maybeSingle()
 
@@ -287,15 +288,15 @@ async function handlePost(req: Request): Promise<Response> {
   const venueCoords = parsePoint(event.venue_coordinates)
   let distanceFromVenueMeters: number | null = null
 
-  const MAX_DISTANCE_METERS = 200
+  const maxDist = event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS
 
   if (venueCoords) {
     distanceFromVenueMeters = Math.round(
       haversineMeters(latitude, longitude, venueCoords.latitude, venueCoords.longitude),
     )
-    if (distanceFromVenueMeters > MAX_DISTANCE_METERS) {
+    if (distanceFromVenueMeters > maxDist) {
       return errorResponse(
-        `Você está a ${distanceFromVenueMeters}m do local do evento. Aproxime-se do Centro Olímpico Estrutural para registrar o ponto (máximo ${MAX_DISTANCE_METERS}m).`,
+        `Você está a ${distanceFromVenueMeters}m do local do evento. Aproxime-se para registrar o ponto (máximo ${maxDist}m).`,
         403,
         'TOO_FAR_FROM_VENUE',
       )

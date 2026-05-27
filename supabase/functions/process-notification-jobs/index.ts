@@ -274,7 +274,7 @@ async function sendEvolutionWhatsApp(params: {
       method: 'POST',
       headers: {
         apikey: params.apiKey,
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
         number: normalizePhoneDigits(params.to),

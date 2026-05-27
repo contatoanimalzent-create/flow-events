@@ -104,6 +104,130 @@ function splitFullName(fullName: string): { firstName: string; lastName: string 
   return { firstName, lastName }
 }
 
+function normalizeBrazilWhatsapp(value?: string | null): string | null {
+  const digits = (value ?? '').replace(/\D/g, '')
+  if (!digits) return null
+  if (digits.startsWith('55') && digits.length >= 12) return `+${digits}`
+  if (digits.length === 10 || digits.length === 11) return `+55${digits}`
+  return digits.startsWith('+') ? digits : `+${digits}`
+}
+
+async function queueStaffConfirmationNotifications(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  params: {
+    organizationId: string
+    eventId: string
+    eventName: string
+    venueName: string | null
+    staffMemberId: string
+    staffName: string
+    staffEmail: string
+    staffPhone?: string | null
+    roleType: string | null
+    teamId: string | null
+    shiftId: string | null
+    inviteLinkId: string
+    now: string
+  },
+) {
+  const templateKey = 'staff-confirmed-permissions'
+  const phone = normalizeBrazilWhatsapp(params.staffPhone)
+  const audienceEmails = [params.staffEmail].filter(Boolean)
+  const audiencePhones = phone ? [phone] : []
+
+  const variables = {
+    staff_member_id: params.staffMemberId,
+    staff_name: params.staffName,
+    event_name: params.eventName,
+    venue_name: params.venueName ?? '',
+    role_type: params.roleType ?? 'staff',
+    team_id: params.teamId ?? '',
+    shift_id: params.shiftId ?? '',
+    invite_link_id: params.inviteLinkId,
+    requires_camera: true,
+    requires_location: true,
+    requires_notifications: true,
+    arrival_photo_required: true,
+    message: 'Ative camera, localizacao e notificacoes. Ao chegar no evento, tire a foto de presenca pelo Pulse.',
+  }
+
+  await admin.from('email_templates').upsert({
+    organization_id: params.organizationId,
+    key: templateKey,
+    subject: '{{event_name}}: dados de staff confirmados',
+    html: `
+      <p>Ola, {{first_name}}.</p>
+      <p>Seus dados para trabalhar no evento <strong>{{event_name}}</strong> foram confirmados.</p>
+      <p>Agora ative camera, localizacao e notificacoes no Pulse. Quando voce chegar ao evento, o sistema vai avisar para tirar a foto de presenca.</p>
+      <p>Local: {{venue_name}}</p>
+    `.trim(),
+    text: 'Seus dados para {{event_name}} foram confirmados. Ative camera, localizacao e notificacoes no Pulse para receber o aviso de foto de presenca ao chegar no evento.',
+  }, { onConflict: 'organization_id,key' }).then(({ error }) => {
+    if (error) console.warn('[process-staff-invite] email template upsert failed:', error.message)
+  })
+
+  await admin.from('whatsapp_templates').upsert({
+    organization_id: params.organizationId,
+    key: templateKey,
+    body: 'Ola, {{first_name}}. Seus dados para {{event_name}} foram confirmados. Ative camera, localizacao e notificacoes no Pulse para receber o aviso de foto de presenca ao chegar no evento.',
+  }, { onConflict: 'organization_id,key' }).then(({ error }) => {
+    if (error) console.warn('[process-staff-invite] whatsapp template upsert failed:', error.message)
+  })
+
+  const { data: segment, error: segmentError } = await admin
+    .from('audience_segments')
+    .insert({
+      organization_id: params.organizationId,
+      name: `Staff confirmado - ${params.staffName}`,
+      description: 'Criado automaticamente pelo link publico de staff.',
+      filter_definition: {
+        source: 'manual',
+        emails: audienceEmails,
+        phones: audiencePhones,
+      },
+      audience_count: audienceEmails.length + audiencePhones.length,
+      last_previewed_at: params.now,
+      created_at: params.now,
+      updated_at: params.now,
+    })
+    .select('id')
+    .single()
+
+  if (segmentError || !segment) {
+    console.warn('[process-staff-invite] audience segment insert failed:', segmentError?.message)
+    return
+  }
+
+  const jobs = [
+    {
+      organization_id: params.organizationId,
+      template_key: templateKey,
+      audience_segment_id: segment.id,
+      scheduled_at: params.now,
+      status: 'pending',
+      channel: 'email',
+      event_id: params.eventId,
+      variables,
+      created_at: params.now,
+    },
+    ...(audiencePhones.length > 0 ? [{
+      organization_id: params.organizationId,
+      template_key: templateKey,
+      audience_segment_id: segment.id,
+      scheduled_at: params.now,
+      status: 'pending',
+      channel: 'whatsapp',
+      event_id: params.eventId,
+      variables,
+      created_at: params.now,
+    }] : []),
+  ]
+
+  await admin.from('notification_jobs').insert(jobs).then(({ error }) => {
+    if (error) console.warn('[process-staff-invite] notification_jobs insert failed:', error.message)
+  })
+}
+
 /** Validate a token record is usable right now */
 function validateTokenRecord(
   token: InviteToken,
@@ -647,28 +771,26 @@ Deno.serve(async (req: Request): Promise<Response> => {
         .update({ used_count: (inviteLink.used_count ?? 0) + 1, updated_at: now })
         .eq('id', inviteLink.id)
 
-      await admin.from('notification_jobs').insert({
-        type:     'staff_confirmed',
-        event_id: inviteLink.event_id,
-        payload: {
-          staff_member_id: staffMember.id,
-          staff_name:      body.full_name!.trim(),
-          staff_email:     email,
-          staff_phone:     body.phone ?? null,
-          role_type:       inviteLink.role_type,
-          team_id:         inviteLink.team_id ?? null,
-          shift_id:        inviteLink.shift_id ?? null,
-          invite_link_id:  inviteLink.id,
-          requires_camera: true,
-          requires_location: true,
-          requires_notifications: true,
-          arrival_photo_required: true,
-          message:         'Ative camera, localizacao e notificacoes. Ao chegar no evento, tire a foto de presenca pelo Pulse.',
-        },
-        status:     'pending',
-        created_at: now,
-      }).then(({ error }) => {
-        if (error) console.warn('[process-staff-invite] notification_jobs insert failed:', error.message)
+      const { data: eventInfo } = await admin
+        .from('events')
+        .select('name, venue_name')
+        .eq('id', inviteLink.event_id)
+        .maybeSingle()
+
+      await queueStaffConfirmationNotifications(admin, {
+        organizationId: inviteLink.organization_id,
+        eventId: inviteLink.event_id,
+        eventName: eventInfo?.name ?? 'Evento',
+        venueName: eventInfo?.venue_name ?? null,
+        staffMemberId: staffMember.id,
+        staffName: body.full_name!.trim(),
+        staffEmail: email,
+        staffPhone: body.phone ?? null,
+        roleType: inviteLink.role_type,
+        teamId: inviteLink.team_id ?? null,
+        shiftId: inviteLink.shift_id ?? null,
+        inviteLinkId: inviteLink.id,
+        now,
       })
 
       return Response.json(

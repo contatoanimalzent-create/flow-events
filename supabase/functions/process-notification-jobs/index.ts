@@ -86,6 +86,10 @@ interface Env {
   twilioAccountSid: string
   twilioAuthToken:  string
   twilioWaNumber:   string
+  whatsappProvider: string
+  evolutionApiUrl:  string
+  evolutionApiKey:  string
+  evolutionInstance:string
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -110,6 +114,78 @@ function normalizePhone(raw: string): string {
   if (p.startsWith('whatsapp:')) p = p.slice(9)
   if (!p.startsWith('+')) p = '+' + p
   return p
+}
+
+function normalizePhoneDigits(raw: string): string {
+  return normalizePhone(raw).replace(/\D/g, '')
+}
+
+function hashString(value: string): number {
+  let hash = 0
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0
+  }
+  return Math.abs(hash)
+}
+
+function buildStaffPointMessage(vars: Record<string, string | number | boolean>, seed: string): string {
+  const firstName = String(vars.first_name || vars.name || 'tudo bem')
+  const eventName = String(vars.event_name || 'evento')
+  const venueName = String(vars.venue_name || 'local do evento')
+  const pointUrl = String(vars.point_url || '')
+  const h = hashString(seed)
+
+  const greetings = [
+    `Olá, ${firstName}.`,
+    `${firstName}, tudo certo?`,
+    `Oi, ${firstName}.`,
+    `${firstName}, passando para confirmar.`,
+    `Olá! ${firstName}, sua confirmação está pronta.`,
+    `${firstName}, seu acesso de equipe foi confirmado.`,
+    `Oi, ${firstName}, confirmação feita por aqui.`,
+    `Olá, ${firstName}, tudo certo para o ${eventName}.`,
+    `${firstName}, segue sua orientação de equipe.`,
+    `Boa, ${firstName}. Seus dados foram confirmados.`,
+  ]
+  const confirmations = [
+    `Seus dados para trabalhar no ${eventName} foram confirmados.`,
+    `Você já está confirmado(a) como equipe do ${eventName}.`,
+    `Seu acesso de staff para o ${eventName} foi liberado.`,
+    `A equipe confirmou seus dados para o ${eventName}.`,
+    `Está tudo certo com seus dados para o ${eventName}.`,
+    `Seu vínculo de staff no ${eventName} está ativo.`,
+    `Confirmamos seu cadastro de equipe para o ${eventName}.`,
+    `Seu acesso operacional ao ${eventName} foi aprovado.`,
+    `Você foi confirmado(a) para atuar no ${eventName}.`,
+    `Sua confirmação de staff do ${eventName} está registrada.`,
+  ]
+  const instructions = [
+    `No dia, abra o link do ponto e permita câmera, localização e notificações.`,
+    `Ao chegar, use o link do ponto e mantenha câmera e localização ativadas.`,
+    `Para registrar presença, acesse o ponto digital e autorize câmera, localização e notificações.`,
+    `Quando estiver no local, entre pelo link e siga a orientação para foto de presença.`,
+    `Use o ponto digital no evento; ele pode pedir localização, câmera e notificações.`,
+    `Antes de chegar, deixe o celular pronto para liberar localização, câmera e notificações.`,
+    `O registro de presença será feito pelo link, com localização e foto no Pulse.`,
+    `No acesso ao evento, entre no ponto digital e faça a validação solicitada.`,
+    `Guarde este link; ele será usado para registrar sua presença no evento.`,
+    `Chegando ao evento, abra este link para fazer seu ponto digital.`,
+  ]
+  const closings = [
+    `Local: ${venueName}.`,
+    `Local do evento: ${venueName}.`,
+    `Endereço/local: ${venueName}.`,
+    `Ponto de trabalho: ${venueName}.`,
+    `Referência de local: ${venueName}.`,
+  ]
+
+  return [
+    greetings[h % greetings.length],
+    confirmations[Math.floor(h / 10) % confirmations.length],
+    closings[Math.floor(h / 100) % closings.length],
+    instructions[Math.floor(h / 1000) % instructions.length],
+    `Link do ponto: ${pointUrl}`,
+  ].join(' ')
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -145,19 +221,32 @@ async function sendEmail(params: {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function sendWhatsApp(params: {
-  to: string; body: string; accountSid: string; authToken: string; fromNumber: string
+  to: string; body: string; env: Env
 }): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  if (
+    params.env.whatsappProvider === 'evolution' ||
+    (params.env.evolutionApiUrl && params.env.evolutionApiKey && params.env.evolutionInstance)
+  ) {
+    return sendEvolutionWhatsApp({
+      to: params.to,
+      body: params.body,
+      apiUrl: params.env.evolutionApiUrl,
+      apiKey: params.env.evolutionApiKey,
+      instance: params.env.evolutionInstance,
+    })
+  }
+
   try {
-    const url  = 'https://api.twilio.com/2010-04-01/Accounts/' + params.accountSid + '/Messages.json'
+    const url  = 'https://api.twilio.com/2010-04-01/Accounts/' + params.env.twilioAccountSid + '/Messages.json'
     const form = new URLSearchParams({
-      From: 'whatsapp:' + normalizePhone(params.fromNumber),
+      From: 'whatsapp:' + normalizePhone(params.env.twilioWaNumber),
       To:   'whatsapp:' + normalizePhone(params.to),
       Body: params.body,
     })
     const res = await fetch(url, {
       method: 'POST',
       headers: {
-        Authorization:  'Basic ' + btoa(params.accountSid + ':' + params.authToken),
+        Authorization:  'Basic ' + btoa(params.env.twilioAccountSid + ':' + params.env.twilioAuthToken),
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: form.toString(),
@@ -167,6 +256,38 @@ async function sendWhatsApp(params: {
       return { ok: false, id: null, error: 'Twilio HTTP ' + res.status + ': ' + (d.error_message ?? JSON.stringify(d)) }
     }
     return { ok: true, id: d.sid ?? null, error: null }
+  } catch (err: unknown) {
+    return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
+  }
+}
+
+async function sendEvolutionWhatsApp(params: {
+  to: string; body: string; apiUrl: string; apiKey: string; instance: string
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  if (!params.apiUrl || !params.apiKey || !params.instance) {
+    return { ok: false, id: null, error: 'Evolution API not configured.' }
+  }
+
+  try {
+    const baseUrl = params.apiUrl.replace(/\/$/, '')
+    const res = await fetch(`${baseUrl}/message/sendText/${params.instance}`, {
+      method: 'POST',
+      headers: {
+        apikey: params.apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        number: normalizePhoneDigits(params.to),
+        text: params.body,
+        delay: 1200,
+        linkPreview: true,
+      }),
+    })
+    const data = await res.json().catch(() => ({})) as { key?: { id?: string }, status?: string, message?: string }
+    if (!res.ok) {
+      return { ok: false, id: null, error: 'Evolution HTTP ' + res.status + ': ' + JSON.stringify(data) }
+    }
+    return { ok: true, id: data.key?.id ?? data.status ?? null, error: null }
   } catch (err: unknown) {
     return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
   }
@@ -271,9 +392,11 @@ async function sendToContact(
   }
 
   if (job.channel === 'whatsapp' && whatsappTmpl) {
-    const rb = interpolate(whatsappTmpl.body, vars)
+    const rb = job.template_key === 'staff-confirmed-permissions'
+      ? buildStaffPointMessage(vars, `${job.id}:${recipient}:${vars.staff_member_id ?? ''}`)
+      : interpolate(whatsappTmpl.body, vars)
     bodyPreview = rb.slice(0, 500)
-    const r = await sendWhatsApp({ to: recipient, body: rb, accountSid: env.twilioAccountSid, authToken: env.twilioAuthToken, fromNumber: env.twilioWaNumber })
+    const r = await sendWhatsApp({ to: recipient, body: rb, env })
     ok = r.ok; messageId = r.id; errorMsg = r.error
   }
 
@@ -298,6 +421,7 @@ async function sendToContact(
       job_id:       job.id,
       template_key: job.template_key,
       variables:    vars,
+      whatsapp_provider: env.whatsappProvider || (env.evolutionApiUrl ? 'evolution' : 'twilio'),
     },
   })
 
@@ -471,6 +595,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
     twilioAccountSid: Deno.env.get('TWILIO_ACCOUNT_SID')    ?? '',
     twilioAuthToken:  Deno.env.get('TWILIO_AUTH_TOKEN')     ?? '',
     twilioWaNumber:   Deno.env.get('TWILIO_WHATSAPP_NUMBER') ?? '',
+    whatsappProvider: (Deno.env.get('WHATSAPP_PROVIDER') ?? '').toLowerCase(),
+    evolutionApiUrl:  Deno.env.get('EVOLUTION_API_URL')      ?? '',
+    evolutionApiKey:  Deno.env.get('EVOLUTION_API_KEY')      ?? '',
+    evolutionInstance:Deno.env.get('EVOLUTION_INSTANCE_NAME') ?? '',
   }
 
   const admin  = createSupabaseAdminClient()

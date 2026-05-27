@@ -12,14 +12,11 @@ const EXAMPLE_EVENT_IDS = new Set([
 const EXAMPLE_EVENT_SLUGS = new Set([
   'animalz-nocturne-sessions-2026',
   'animalz-summit-2025',
-  'capital-strike-a-origem',
 ])
 
 const EXAMPLE_EVENT_NAMES = new Set([
   'animalz nocturne sessions 2026',
   'animalz summit 2025',
-  'capital strike - a origem',
-  'capital strike a origem',
 ])
 
 function normalize(value: string | null | undefined) {

@@ -61,7 +61,20 @@ interface StaffRoleOption {
   label: string
   scheduleLines: string[]
   shiftLabel: string
+  customSchedule?: boolean
+  restricted?: boolean
 }
+
+const PRODUCTION_ALLOWED_NAMES = new Set([
+  'gilliard',
+  'stefania cantuares',
+  'glauber renzo',
+  'lucas souza',
+  'peixoto',
+  'waltecio junior',
+  'jorge',
+  'agatha',
+])
 
 const standardEventStaffSchedule = [
   'Quinta, 28/05 - 08h às 16h',
@@ -113,6 +126,14 @@ const STAFF_ROLE_OPTIONS: StaffRoleOption[] = [
     ],
     shiftLabel: 'Quinta, 28/05 - 07h às 19h | Quinta, 28/05 - 19h às 07h | Sexta, 29/05 - 07h às 19h | Sexta, 29/05 - 19h às 07h | Sábado, 30/05 - 07h às 19h | Sábado, 30/05 - 19h às 07h',
   },
+  {
+    value: 'Produção',
+    label: 'Produção',
+    scheduleLines: ['Horário definido pela produção'],
+    shiftLabel: '',
+    customSchedule: true,
+    restricted: true,
+  },
 ]
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -146,6 +167,15 @@ function formatTimePT(iso?: string | null): string | null {
   } catch {
     return iso
   }
+}
+
+function normalizeName(value: string) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -213,6 +243,11 @@ export function StaffJoinPage() {
     () => STAFF_ROLE_OPTIONS.find((role) => role.value === form.role_title) ?? null,
     [form.role_title],
   )
+  const canChooseProduction = PRODUCTION_ALLOWED_NAMES.has(normalizeName(form.full_name))
+  const visibleRoleOptions = useMemo(
+    () => STAFF_ROLE_OPTIONS.filter((role) => !role.restricted || canChooseProduction),
+    [canChooseProduction],
+  )
 
   // Fetch invite on mount
   useEffect(() => {
@@ -259,10 +294,14 @@ export function StaffJoinPage() {
 
   function setRole(value: string) {
     const role = STAFF_ROLE_OPTIONS.find((item) => item.value === value)
+    if (role?.restricted && !canChooseProduction) {
+      setFieldErrors((prev) => ({ ...prev, role_title: 'Produção é liberada apenas para a equipe autorizada.' }))
+      return
+    }
     setForm((prev) => ({
       ...prev,
       role_title: value,
-      shift_label: role?.shiftLabel ?? '',
+      shift_label: role?.customSchedule ? '' : (role?.shiftLabel ?? ''),
       shift_start: '',
       shift_end: '',
     }))
@@ -291,8 +330,14 @@ export function StaffJoinPage() {
     if (!form.phone.trim()) errors.phone = 'Telefone é obrigatório.'
     if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
     if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
+    if (form.role_title === 'Produção' && !canChooseProduction) errors.role_title = 'Produção é liberada apenas para a equipe autorizada.'
     if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX é obrigatória.'
-    if (!form.shift_label) errors.shift_label = 'Selecione a função para carregar o horário.'
+    if (selectedRole?.customSchedule) {
+      if (!form.shift_start) errors.shift_start = 'Horário de entrada é obrigatório.'
+      if (!form.shift_end) errors.shift_end = 'Horário de saída é obrigatório.'
+    } else if (!form.shift_label) {
+      errors.shift_label = 'Selecione a função para carregar o horário.'
+    }
     if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
 
     // Custom required fields
@@ -325,7 +370,9 @@ export function StaffJoinPage() {
         pix_key: form.pix_key.trim() || undefined,
         shift_start: form.shift_start || undefined,
         shift_end: form.shift_end || undefined,
-        shift_label: form.shift_label || undefined,
+        shift_label: selectedRole?.customSchedule && form.shift_start && form.shift_end
+          ? `${form.shift_start} - ${form.shift_end}`
+          : (form.shift_label || undefined),
         bio: form.bio.trim() || undefined,
         terms_accepted: true,
         custom_field_answers: form.custom_answers,
@@ -566,7 +613,7 @@ export function StaffJoinPage() {
                         style={{ colorScheme: 'dark' }}
                       >
                         <option value="" className="bg-[#12161f] text-white/50">Selecione sua função</option>
-                        {STAFF_ROLE_OPTIONS.map((role) => (
+                        {visibleRoleOptions.map((role) => (
                           <option key={role.value} value={role.value} className="bg-[#12161f] text-[#f5f0e8]">
                             {role.label}
                           </option>
@@ -609,27 +656,51 @@ export function StaffJoinPage() {
                   </InputField>
                 </div>
 
-                <InputField
-                  label="Horário do trabalho"
-                  required
-                  hint="O horário é definido pela função escolhida e não pode ser alterado aqui."
-                  error={fieldErrors.shift_label}
-                >
-                  <div className="rounded-[18px] border border-white/10 bg-white/[0.035] p-4">
-                    {selectedRole ? (
-                      <div className="space-y-2">
-                        {selectedRole.scheduleLines.map((line) => (
-                          <div key={line} className="flex items-center gap-2 text-sm text-[#f5f0e8]">
-                            <Clock className="h-4 w-4 shrink-0 text-[#D4FF00]" />
-                            <span>{line}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-white/42">Selecione uma função para ver o horário.</p>
-                    )}
+                {selectedRole?.customSchedule ? (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <InputField label="Horário de entrada" required error={fieldErrors.shift_start}>
+                      <input
+                        type="time"
+                        value={form.shift_start}
+                        onChange={(e) => setField('shift_start', e.target.value)}
+                        className={inputClass}
+                        style={{ colorScheme: 'dark' }}
+                      />
+                    </InputField>
+
+                    <InputField label="Horário de saída" required error={fieldErrors.shift_end}>
+                      <input
+                        type="time"
+                        value={form.shift_end}
+                        onChange={(e) => setField('shift_end', e.target.value)}
+                        className={inputClass}
+                        style={{ colorScheme: 'dark' }}
+                      />
+                    </InputField>
                   </div>
-                </InputField>
+                ) : (
+                  <InputField
+                    label="Horário do trabalho"
+                    required
+                    hint="O horário é definido pela função escolhida e não pode ser alterado aqui."
+                    error={fieldErrors.shift_label}
+                  >
+                    <div className="rounded-[18px] border border-white/10 bg-white/[0.035] p-4">
+                      {selectedRole ? (
+                        <div className="space-y-2">
+                          {selectedRole.scheduleLines.map((line) => (
+                            <div key={line} className="flex items-center gap-2 text-sm text-[#f5f0e8]">
+                              <Clock className="h-4 w-4 shrink-0 text-[#D4FF00]" />
+                              <span>{line}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-white/42">Selecione uma função para ver o horário.</p>
+                      )}
+                    </div>
+                  </InputField>
+                )}
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <InputField label="Tamanho da camiseta" error={fieldErrors.tshirt_size}>

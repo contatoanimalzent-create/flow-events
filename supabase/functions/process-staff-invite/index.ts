@@ -41,6 +41,8 @@ interface ApplicationBody {
   company?: string
   pix_key?: string
   shift_label?: string
+  shift_start?: string
+  shift_end?: string
   custom_field_answers?: Record<string, unknown>
   terms_accepted: boolean
 }
@@ -70,6 +72,26 @@ function jsonResponse(body: unknown, status = 200): Response {
 function normalizeCPF(value?: string | null): string | null {
   const clean = (value ?? '').replace(/\D/g, '')
   return clean || null
+}
+
+const PRODUCTION_ALLOWED_NAMES = new Set([
+  'gilliard',
+  'stefania cantuares',
+  'glauber renzo',
+  'lucas souza',
+  'peixoto',
+  'waltecio junior',
+  'jorge',
+  'agatha',
+])
+
+function normalizeName(value?: string | null): string {
+  return (value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 function formatCPF(value?: string | null): string | null {
@@ -830,6 +852,29 @@ Deno.serve(async (req: Request): Promise<Response> => {
         return Response.json({ error: check.error }, addCors({ status: check.status }))
       }
 
+      const roleTitle = (body.role_title || inviteLink.role_type || 'staff').trim()
+      const isProductionRole = normalizeName(roleTitle).startsWith('produ')
+      const shiftLabel = body.shift_label
+        || (body.shift_start && body.shift_end ? `${body.shift_start} - ${body.shift_end}` : null)
+
+      if (isProductionRole) {
+        const isAllowedProductionName = PRODUCTION_ALLOWED_NAMES.has(normalizeName(body.full_name))
+
+        if (!isAllowedProductionName) {
+          return Response.json(
+            { error: 'Produção é liberada apenas para a equipe autorizada.' },
+            addCors({ status: 403 }),
+          )
+        }
+
+        if (!shiftLabel) {
+          return Response.json(
+            { error: 'Informe o horário de entrada e saída da produção.' },
+            addCors({ status: 400 }),
+          )
+        }
+      }
+
       const { data: existingStaff } = await admin
         .from('staff_members')
         .select('id')
@@ -859,10 +904,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
           email:            body.email!.toLowerCase().trim(),
           phone:            body.phone ?? null,
           cpf:              body.document_number ?? null,
-          role_title:       body.role_title || inviteLink.role_type || 'staff',
+          role_title:       roleTitle,
           company:          body.company ?? null,
           pix_key:          body.pix_key ?? null,
-          shift_label:      body.shift_label || ((body as Record<string, unknown>).shift_start && (body as Record<string, unknown>).shift_end ? `${(body as Record<string, unknown>).shift_start} - ${(body as Record<string, unknown>).shift_end}` : null),
+          shift_label:      shiftLabel,
           status:           'active',
           is_active:        true,
           notes:            [body.bio, body.t_shirt_size ? `Camiseta: ${body.t_shirt_size}` : null].filter(Boolean).join(' | ') || null,
@@ -903,7 +948,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         staffName: body.full_name!.trim(),
         staffEmail: body.email!.toLowerCase().trim(),
         staffPhone: body.phone ?? null,
-        roleType: inviteLink.role_type,
+        roleType: roleTitle,
         teamId: inviteLink.team_id ?? null,
         shiftId: inviteLink.shift_id ?? null,
         inviteLinkId: inviteLink.id,

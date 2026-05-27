@@ -133,6 +133,7 @@ async function queueStaffConfirmationNotifications(
     eventSlug: string
     venueName: string | null
     venueAddress: Record<string, unknown> | null
+    eventImageUrl: string | null
     staffMemberId: string
     staffName: string
     staffEmail: string
@@ -149,6 +150,7 @@ async function queueStaffConfirmationNotifications(
   const pointUrl = `${appUrl}/staff/ponto/${params.eventSlug}`
   const logoUrl = `${appUrl}/logo.png`
   const venueLabel = buildVenueLabel(params.venueName, params.venueAddress)
+  const eventImageUrl = params.eventImageUrl ?? ''
   const phone = normalizeBrazilWhatsapp(params.staffPhone)
   const audienceEmails = [params.staffEmail].filter(Boolean)
   const audiencePhones = phone ? [phone] : []
@@ -160,6 +162,7 @@ async function queueStaffConfirmationNotifications(
     point_url: pointUrl,
     venue_name: venueLabel || 'Local do evento em confirmação',
     pulse_logo_url: logoUrl,
+    event_image_url: eventImageUrl,
     role_type: params.roleType ?? 'staff',
     team_id: params.teamId ?? '',
     shift_id: params.shiftId ?? '',
@@ -199,6 +202,11 @@ async function queueStaffConfirmationNotifications(
                         </td>
                       </tr>
                     </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background:#050507;">
+                    <img src="{{event_image_url}}" alt="{{event_name}}" width="620" style="display:block;width:100%;max-width:620px;height:auto;border:0;">
                   </td>
                 </tr>
                 <tr>
@@ -873,7 +881,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       const { data: eventInfo } = await admin
         .from('events')
-        .select('name, slug, venue_name, venue_address')
+        .select('name, slug, venue_name, venue_address, cover_url')
         .eq('id', inviteLink.event_id)
         .maybeSingle()
 
@@ -884,6 +892,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         eventSlug: eventInfo?.slug ?? body.token!,
         venueName: eventInfo?.venue_name ?? null,
         venueAddress: (eventInfo?.venue_address as Record<string, unknown> | null | undefined) ?? null,
+        eventImageUrl: (eventInfo?.cover_url as string | null | undefined) ?? null,
         staffMemberId: staffMember.id,
         staffName: body.full_name!.trim(),
         staffEmail: body.email!.toLowerCase().trim(),

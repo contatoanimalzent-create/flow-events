@@ -1,9 +1,9 @@
-import { corsHeaders } from '../_shared/cors.ts'
+﻿import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface InviteToken {
   id: string
@@ -51,9 +51,9 @@ interface BatchResult {
   error?: string
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function addCors(init: ResponseInit = {}): ResponseInit {
   return { ...init, headers: { ...corsHeaders, ...((init.headers as Record<string, string>) ?? {}) } }
@@ -115,6 +115,15 @@ function normalizeBrazilWhatsapp(value?: string | null): string | null {
   return digits.startsWith('+') ? digits : `+${digits}`
 }
 
+function buildVenueLabel(venueName?: string | null, venueAddress?: Record<string, unknown> | null): string {
+  const fullAddress = typeof venueAddress?.full_address === 'string' ? venueAddress.full_address : ''
+  const city = typeof venueAddress?.city === 'string' ? venueAddress.city : ''
+  const state = typeof venueAddress?.state === 'string' ? venueAddress.state : ''
+  const cityState = [city, state].filter(Boolean).join(' - ')
+  const address = fullAddress || cityState
+  return [venueName, address].filter(Boolean).join(' | ')
+}
+
 async function queueStaffConfirmationNotifications(
   admin: ReturnType<typeof createSupabaseAdminClient>,
   params: {
@@ -123,6 +132,7 @@ async function queueStaffConfirmationNotifications(
     eventName: string
     eventSlug: string
     venueName: string | null
+    venueAddress: Record<string, unknown> | null
     staffMemberId: string
     staffName: string
     staffEmail: string
@@ -137,6 +147,8 @@ async function queueStaffConfirmationNotifications(
   const templateKey = 'staff-confirmed-permissions'
   const appUrl = (Deno.env.get('APP_URL') ?? 'https://pulse.animalzgroup.com').replace(/\/$/, '')
   const pointUrl = `${appUrl}/staff/ponto/${params.eventSlug}`
+  const logoUrl = `${appUrl}/logo.png`
+  const venueLabel = buildVenueLabel(params.venueName, params.venueAddress)
   const phone = normalizeBrazilWhatsapp(params.staffPhone)
   const audienceEmails = [params.staffEmail].filter(Boolean)
   const audiencePhones = phone ? [phone] : []
@@ -146,7 +158,8 @@ async function queueStaffConfirmationNotifications(
     staff_name: params.staffName,
     event_name: params.eventName,
     point_url: pointUrl,
-    venue_name: params.venueName ?? '',
+    venue_name: venueLabel || 'Local do evento em confirmação',
+    pulse_logo_url: logoUrl,
     role_type: params.roleType ?? 'staff',
     team_id: params.teamId ?? '',
     shift_id: params.shiftId ?? '',
@@ -155,21 +168,101 @@ async function queueStaffConfirmationNotifications(
     requires_location: true,
     requires_notifications: true,
     arrival_photo_required: true,
-    message: 'Ative camera, localizacao e notificacoes. Ao chegar no evento, tire a foto de presenca pelo Pulse.',
+    message: 'Ative câmera, localização e notificações. Ao chegar no evento, tire a foto de presença pelo Pulse.',
   }
 
   await admin.from('email_templates').upsert({
     organization_id: params.organizationId,
     key: templateKey,
-    subject: '{{event_name}}: dados de staff confirmados',
+    subject: '{{event_name}} | Ponto digital liberado',
     html: `
-      <p>Ola, {{first_name}}.</p>
-      <p>Seus dados para trabalhar no evento <strong>{{event_name}}</strong> foram confirmados.</p>
-      <p>Agora ative camera, localizacao e notificacoes no Pulse. Quando voce chegar ao evento, o sistema vai avisar para tirar a foto de presenca.</p>
-      <p><strong>Link do ponto:</strong> <a href="{{point_url}}">{{point_url}}</a></p>
-      <p>Local: {{venue_name}}</p>
+      <!DOCTYPE html>
+      <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin:0;padding:0;background:#050507;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#050507;padding:32px 14px;">
+          <tr>
+            <td align="center">
+              <table role="presentation" width="620" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;background:#0d0d10;border:1px solid #242428;border-radius:18px;overflow:hidden;">
+                <tr>
+                  <td style="background:#101014;padding:22px 28px;border-bottom:1px solid #25252a;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td valign="middle">
+                          <img src="{{pulse_logo_url}}" alt="Pulse" height="34" style="display:block;height:34px;width:auto;max-width:150px;">
+                        </td>
+                        <td align="right" valign="middle" style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#d4ff00;">
+                          Ponto digital
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:34px 30px 8px;">
+                    <div style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#d4ff00;margin-bottom:14px;">Staff confirmado</div>
+                    <h1 style="margin:0;color:#ffffff;font-size:30px;line-height:1.12;font-weight:900;">{{event_name}}</h1>
+                    <p style="margin:18px 0 0;color:#d7d7db;font-size:16px;line-height:1.65;">
+                      Olá, <strong style="color:#ffffff;">{{first_name}}</strong>. Seus dados para trabalhar no evento foram confirmados.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:22px 30px 0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17171c;border:1px solid #2b2b31;border-radius:14px;">
+                      <tr>
+                        <td style="padding:20px;">
+                          <div style="font-size:11px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#a7a7ad;margin-bottom:8px;">Local</div>
+                          <div style="font-size:16px;line-height:1.5;color:#ffffff;font-weight:700;">{{venue_name}}</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:22px 30px 0;">
+                    <p style="margin:0;color:#d7d7db;font-size:15px;line-height:1.7;">
+                      Antes de chegar, abra o link abaixo e permita <strong style="color:#ffffff;">câmera, localização e notificações</strong>. No evento, o Pulse vai orientar a foto de presença e o registro do ponto.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding:30px 30px 24px;">
+                    <a href="{{point_url}}" style="display:inline-block;background:#d4ff00;color:#050507;text-decoration:none;font-size:16px;font-weight:900;padding:15px 26px;border-radius:10px;">
+                      Abrir meu ponto digital
+                    </a>
+                    <div style="margin-top:16px;color:#8f8f96;font-size:12px;line-height:1.5;word-break:break-all;">
+                      {{point_url}}
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 30px 30px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#101014;border-radius:12px;">
+                      <tr>
+                        <td style="padding:16px 18px;color:#b9b9c0;font-size:13px;line-height:1.6;">
+                          Dica: use o mesmo e-mail, CPF e WhatsApp informados no cadastro para acessar o ponto.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background:#08080a;padding:18px 30px;color:#696970;font-size:11px;line-height:1.5;">
+                    Pulse Events | Comunicação automática para equipe credenciada.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
     `.trim(),
-    text: 'Seus dados para {{event_name}} foram confirmados. Link do ponto: {{point_url}}. Ative camera, localizacao e notificacoes no Pulse para receber o aviso de foto de presenca ao chegar no evento.',
+    text: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Ative câmera, localização e notificações no Pulse para receber o aviso de foto de presença ao chegar no evento.',
   }, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] email template upsert failed:', error.message)
   })
@@ -177,7 +270,7 @@ async function queueStaffConfirmationNotifications(
   await admin.from('whatsapp_templates').upsert({
     organization_id: params.organizationId,
     key: templateKey,
-    body: 'Ola, {{first_name}}. Seus dados para {{event_name}} foram confirmados. Link do ponto: {{point_url}}. Ative camera, localizacao e notificacoes no Pulse para receber o aviso de foto de presenca ao chegar no evento.',
+    body: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Ative câmera, localização e notificações no Pulse para receber o aviso de foto de presença ao chegar no evento.',
   }, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] whatsapp template upsert failed:', error.message)
   })
@@ -292,8 +385,8 @@ function buildInviteEmailHtml(params: {
   const expiryLine = expiresAt
     ? `<p style="color:#888;font-size:13px;margin-top:8px;">Este convite expira em ${new Date(expiresAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}.</p>`
     : ''
-  const teamLine = teamName ? `<p style="margin:4px 0;color:#fff8ef;font-size:15px;">🏷️ Equipe: <strong>${teamName}</strong></p>` : ''
-  const shiftLine = shiftName ? `<p style="margin:4px 0;color:#fff8ef;font-size:15px;">🕐 Turno: <strong>${shiftName}</strong></p>` : ''
+  const teamLine = teamName ? `<p style="margin:4px 0;color:#fff8ef;font-size:15px;">Equipe: <strong>${teamName}</strong></p>` : ''
+  const shiftLine = shiftName ? `<p style="margin:4px 0;color:#fff8ef;font-size:15px;">Turno: <strong>${shiftName}</strong></p>` : ''
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -322,7 +415,7 @@ function buildInviteEmailHtml(params: {
 
             <div style="background:#18181f;border-radius:12px;padding:20px 24px;margin-bottom:28px;">
               <p style="margin:0 0 12px 0;font-family:'Bebas Neue',Impact,sans-serif;font-size:22px;color:#d4ff00;letter-spacing:1px;">${eventName}</p>
-              <p style="margin:4px 0;color:#fff8ef;font-size:15px;">🎯 Função: <strong>${roleType}</strong></p>
+              <p style="margin:4px 0;color:#fff8ef;font-size:15px;"> Função: <strong>${roleType}</strong></p>
               ${teamLine}
               ${shiftLine}
             </div>
@@ -362,9 +455,9 @@ function buildInviteEmailHtml(params: {
 </html>`
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Batch processor
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Promise<Response> {
   const now = new Date()
@@ -396,7 +489,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
   for (const link of pendingLinks) {
     stats.processed++
 
-    // ── No target_email → skip ──────────────────────────────────────────────
+    // â”€â”€ No target_email â†’ skip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (!link.target_email) {
       await admin
         .from('staff_invite_links')
@@ -407,7 +500,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       continue
     }
 
-    // ── Expired → mark expired ───────────────────────────────────────────────
+    // â”€â”€ Expired â†’ mark expired â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (link.expires_at && new Date(link.expires_at) < now) {
       await admin
         .from('staff_invite_links')
@@ -431,7 +524,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       continue
     }
 
-    // ── Idempotency: check if already sent via communications_log ───────────
+    // â”€â”€ Idempotency: check if already sent via communications_log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const { data: existingLog } = await admin
       .from('communications_log')
       .select('id')
@@ -450,7 +543,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       continue
     }
 
-    // ── Fetch enrichment data ────────────────────────────────────────────────
+    // â”€â”€ Fetch enrichment data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [{ data: event }, { data: team }, { data: shift }] = await Promise.all([
       admin.from('events').select('name').eq('id', link.event_id).maybeSingle(),
       link.team_id
@@ -477,7 +570,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       expiresAt: link.expires_at,
     })
 
-    // ── Send via Resend ──────────────────────────────────────────────────────
+    // â”€â”€ Send via Resend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let sendError: string | null = null
     let sendSuccess = false
 
@@ -506,7 +599,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       sendError = err instanceof Error ? err.message : 'Unknown send error'
     }
 
-    // ── Update staff_invite_links ────────────────────────────────────────────
+    // â”€â”€ Update staff_invite_links â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     await admin
       .from('staff_invite_links')
       .update({
@@ -517,7 +610,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       })
       .eq('id', link.id)
 
-    // ── Insert communications_log ────────────────────────────────────────────
+    // â”€â”€ Insert communications_log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     await admin.from('communications_log').insert({
       channel:          'email',
       recipient_email:  link.target_email,
@@ -546,9 +639,9 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
   return jsonResponse({ ...stats, results })
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Main Handler
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Deno.serve(async (req: Request): Promise<Response> => {
   // CORS preflight
@@ -649,18 +742,18 @@ Deno.serve(async (req: Request): Promise<Response> => {
     try {
       rawBody = await req.json()
     } catch {
-      // Empty body → treat as batch trigger
+      // Empty body â†’ treat as batch trigger
       rawBody = {}
     }
 
     const action = rawBody.action as string | undefined
 
-    // ── Mode 1: run-batch ────────────────────────────────────────────────────
+    // â”€â”€ Mode 1: run-batch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (!action || action === 'run-batch') {
       return await runBatch(admin)
     }
 
-    // ── Mode 2: send-invite-email (single) ───────────────────────────────────
+    // â”€â”€ Mode 2: send-invite-email (single) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (action === 'send-invite-email') {
       const { invite_link_id, target_email, organization_id } = rawBody as {
         invite_link_id?: string
@@ -688,7 +781,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return await runBatch(admin)
     }
 
-    // ── Mode 3: submit application ───────────────────────────────────────────
+    // â”€â”€ Mode 3: submit application â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const body = rawBody as Partial<ApplicationBody>
 
     const missing: string[] = []
@@ -780,32 +873,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       const { data: eventInfo } = await admin
         .from('events')
-        .select('name, slug, venue_name')
+        .select('name, slug, venue_name, venue_address')
         .eq('id', inviteLink.event_id)
         .maybeSingle()
-
-      const APP_URL = Deno.env.get('APP_URL') ?? 'https://pulse.animalzgroup.com'
-      const pontoUrl = `${APP_URL}/staff/ponto/${eventInfo?.slug ?? ''}`
-      const eventName = eventInfo?.name ?? 'Evento'
-      const staffName = body.full_name!.trim()
-      const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
-      const RESEND_FROM = Deno.env.get('RESEND_FROM_EMAIL') ?? 'Pulse Events <contatopulse@animalzgroup.com>'
-
-      if (RESEND_API_KEY && body.email) {
-        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body style="margin:0;padding:0;background:#050507;font-family:Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#050507;padding:40px 16px;"><tr><td align="center"><table width="560" cellpadding="0" cellspacing="0" style="background:#0e0e12;border-radius:16px;overflow:hidden;max-width:560px;width:100%;"><tr><td style="background:#d4ff00;padding:20px 32px;text-align:center;"><span style="font-size:24px;font-weight:900;color:#050507;letter-spacing:2px;">PULSE EVENTS</span></td></tr><tr><td style="padding:32px;"><h1 style="font-size:22px;font-weight:700;color:#fff;margin:0 0 16px;">Cadastro confirmado!</h1><p style="color:#aaa;font-size:15px;margin:0 0 24px;">Olá <strong style="color:#fff;">${staffName}</strong>, seu cadastro como staff no <strong style="color:#d4ff00;">${eventName}</strong> foi realizado com sucesso.</p><div style="background:#18181f;border-radius:12px;padding:20px 24px;margin-bottom:24px;"><p style="margin:0 0 8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:2px;">No dia do evento</p><p style="margin:0;color:#fff;font-size:15px;">Use o link abaixo para registrar sua entrada e saída:</p></div><div style="text-align:center;margin-bottom:24px;"><a href="${pontoUrl}" style="display:inline-block;background:#d4ff00;color:#050507;font-weight:700;font-size:16px;padding:14px 36px;border-radius:8px;text-decoration:none;">Abrir Ponto Digital</a></div><p style="color:#666;font-size:12px;">Link: ${pontoUrl}</p><hr style="border:none;border-top:1px solid #222;margin:24px 0;"/><p style="color:#555;font-size:12px;margin:0;">Você precisará informar seu e-mail, CPF e WhatsApp para se identificar. Tenha a câmera e localização ativadas.</p></td></tr><tr><td style="background:#0a0a0e;padding:16px 32px;text-align:center;"><p style="color:#444;font-size:11px;margin:0;">&copy; ${new Date().getFullYear()} Pulse Events</p></td></tr></table></td></tr></table></body></html>`
-
-        fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            from: RESEND_FROM,
-            to: [body.email!.toLowerCase().trim()],
-            subject: `Cadastro confirmado - ${eventName} | Ponto Digital`,
-            html,
-            text: `Olá ${staffName}, seu cadastro como staff no ${eventName} foi confirmado! No dia do evento, use este link para registrar entrada e saída: ${pontoUrl} — Você precisará e-mail, CPF e WhatsApp para se identificar.`,
-          }),
-        }).catch((err) => console.error('[process-staff-invite] email send error:', err))
-      }
 
       await queueStaffConfirmationNotifications(admin, {
         organizationId: inviteLink.organization_id,
@@ -813,6 +883,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         eventName: eventInfo?.name ?? 'Evento',
         eventSlug: eventInfo?.slug ?? body.token!,
         venueName: eventInfo?.venue_name ?? null,
+        venueAddress: (eventInfo?.venue_address as Record<string, unknown> | null | undefined) ?? null,
         staffMemberId: staffMember.id,
         staffName: body.full_name!.trim(),
         staffEmail: body.email!.toLowerCase().trim(),
@@ -829,7 +900,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         {
           success:        true,
           staff_id:       staffMember.id,
-          message:        'Cadastro realizado com sucesso! Você receberá mais informações em breve.',
+          message:        'Dados enviados com sucesso! Você receberá as informações do ponto em breve.',
         },
         addCors({ status: 201 }),
       )

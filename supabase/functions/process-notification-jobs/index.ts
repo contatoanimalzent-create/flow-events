@@ -517,7 +517,8 @@ async function processJob(
   console.info('[process-notification-jobs] Job ' + job.id + ': ' + eligible.length + ' eligible (' + job.channel + ')')
 
   // Send in batches of 10
-  const BATCH = 10
+  const BATCH = 5
+  const BATCH_DELAY_MS = 3000
   let processed = 0
   let failed    = 0
 
@@ -534,6 +535,9 @@ async function processJob(
         failed++
         console.error('[process-notification-jobs] sendToContact threw:', r.reason)
       }
+    }
+    if (i + BATCH < eligible.length) {
+      await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS))
     }
   }
 

@@ -154,9 +154,11 @@ async function queueStaffConfirmationNotifications(
   const phone = normalizeBrazilWhatsapp(params.staffPhone)
   const audienceEmails = [params.staffEmail].filter(Boolean)
   const audiencePhones = phone ? [phone] : []
+  const { firstName } = splitFullName(params.staffName)
 
   const variables = {
     staff_member_id: params.staffMemberId,
+    first_name: firstName,
     staff_name: params.staffName,
     event_name: params.eventName,
     point_url: pointUrl,
@@ -757,7 +759,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const action = rawBody.action as string | undefined
 
     // â”€â”€ Mode 1: run-batch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    if (!action || action === 'run-batch') {
+    const looksLikeStaffSubmission = Boolean(rawBody.token || rawBody.full_name || rawBody.email)
+
+    if (action === 'run-batch' || (!action && !looksLikeStaffSubmission)) {
       return await runBatch(admin)
     }
 

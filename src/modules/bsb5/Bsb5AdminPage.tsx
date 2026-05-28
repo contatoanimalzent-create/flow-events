@@ -9,6 +9,7 @@ import {
   RefreshCw,
   ShieldAlert,
   Users,
+  X,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -68,6 +69,7 @@ interface BsbCheckin {
   photo_url: string | null
   latitude: number | null
   longitude: number | null
+  accuracy_meters: number | null
 }
 
 function fullName(staff: Pick<BsbStaff, 'first_name' | 'last_name'>) {
@@ -82,6 +84,10 @@ function formatDateTime(value: string | null) {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+function formatCoordinate(value: number | null) {
+  return typeof value === 'number' ? value.toFixed(6) : '-'
 }
 
 function StatusBadge({ staff }: { staff: BsbStaff }) {
@@ -102,6 +108,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   const [event, setEvent] = useState<BsbEvent | null>(null)
   const [staff, setStaff] = useState<BsbStaff[]>([])
   const [checkins, setCheckins] = useState<BsbCheckin[]>([])
+  const [selectedPhoto, setSelectedPhoto] = useState<BsbCheckin | null>(null)
   const [copyLabel, setCopyLabel] = useState<string | null>(null)
 
   const setContext = useAppContext((s) => s.setContext)
@@ -179,7 +186,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           .order('first_name', { ascending: true }),
         supabase
           .from('staff_checkins')
-          .select('id,staff_member_id,type,created_at,photo_url,latitude,longitude')
+          .select('id,staff_member_id,type,created_at,photo_url,latitude,longitude,accuracy_meters')
           .eq('event_id', bsbEvent.id)
           .order('created_at', { ascending: false })
           .limit(30),
@@ -343,12 +350,15 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-bold">{entry.staff_member_id ? checkinStaffNames.get(entry.staff_member_id) ?? 'Staff' : 'Staff'}</p>
+                      <p className="mt-1 text-[11px] text-slate-500">
+                        Lat {formatCoordinate(entry.latitude)} - Lng {formatCoordinate(entry.longitude)}
+                      </p>
                       <p className="text-xs text-slate-400">{entry.type === 'checkout' ? 'Saída' : 'Entrada'} · {formatDateTime(entry.created_at)}</p>
                     </div>
                     {entry.photo_url && (
-                      <a href={entry.photo_url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#D4FF00]">
+                      <button onClick={() => setSelectedPhoto(entry)} className="text-xs font-semibold text-[#D4FF00]">
                         Foto
-                      </a>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -357,6 +367,60 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
             </div>
           </div>
         </section>
+
+        {selectedPhoto && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+            <div className="max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#080b12] shadow-2xl">
+              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                <div>
+                  <p className="text-sm font-bold">
+                    {selectedPhoto.staff_member_id ? checkinStaffNames.get(selectedPhoto.staff_member_id) ?? 'Staff' : 'Staff'}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {selectedPhoto.type === 'checkout' ? 'Saida' : 'Entrada'} - {formatDateTime(selectedPhoto.created_at)}
+                  </p>
+                </div>
+                <button onClick={() => setSelectedPhoto(null)} className="rounded-full border border-white/10 p-2 text-slate-300">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="grid max-h-[calc(92vh-60px)] overflow-y-auto lg:grid-cols-[1fr_280px]">
+                <div className="bg-black">
+                  <img src={selectedPhoto.photo_url ?? ''} alt="Foto do ponto" className="h-full max-h-[72vh] w-full object-contain" />
+                </div>
+
+                <div className="space-y-3 p-4">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4FF00]">Horario</p>
+                    <p className="mt-1 text-sm text-white">{formatDateTime(selectedPhoto.created_at)}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#D4FF00]">Coordenadas</p>
+                    <p className="mt-1 text-sm text-white">Lat {formatCoordinate(selectedPhoto.latitude)}</p>
+                    <p className="text-sm text-white">Lng {formatCoordinate(selectedPhoto.longitude)}</p>
+                    {typeof selectedPhoto.accuracy_meters === 'number' && (
+                      <p className="mt-1 text-xs text-slate-400">Precisao aproximada: {Math.round(selectedPhoto.accuracy_meters)}m</p>
+                    )}
+                  </div>
+
+                  {typeof selectedPhoto.latitude === 'number' && typeof selectedPhoto.longitude === 'number' && (
+                    <a
+                      href={`https://www.google.com/maps?q=${selectedPhoto.latitude},${selectedPhoto.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center gap-2 rounded-2xl bg-[#D4FF00] px-4 py-3 text-sm font-bold text-black"
+                    >
+                      Abrir no mapa
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

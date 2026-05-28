@@ -36,6 +36,7 @@ const NotFoundPage = lazy(() => import('@/modules/shared-shell/pages/NotFoundPag
 const SelectOrganizationPage = lazy(() => import('@/modules/onboarding/pages/SelectOrganizationPage'))
 const SelectEventPage = lazy(() => import('@/modules/onboarding/pages/SelectEventPage'))
 const SelectModePage = lazy(() => import('@/modules/onboarding/pages/SelectModePage'))
+const Bsb5AdminPage = lazy(() => import('@/modules/bsb5/Bsb5AdminPage'))
 
 // Shared shell
 const NotificationsCenterPage = lazy(() => import('@/modules/shared-shell/pages/NotificationsCenterPage'))
@@ -128,6 +129,7 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
   const starts = (p: string) => path.startsWith(p)
 
   // Onboarding
+  if (is('/pulse/bsb5')) return <Bsb5AdminPage onNavigate={navigate} />
   if (is('/pulse/select-organization')) return <SelectOrganizationPage onNavigate={navigate} />
   if (is('/pulse/select-event')) return <SelectEventPage onNavigate={navigate} />
   if (is('/pulse/select-mode')) return <SelectModePage onNavigate={navigate} />
@@ -229,9 +231,10 @@ export function PulseApp() {
       }
 
       const isOnboardingRoute = path.startsWith('/pulse/select-')
+      const isDirectSetupRoute = path === '/pulse/bsb5'
 
       // Sessão existe mas sem contexto → onboarding
-      if (!isContextReady && !isOnboardingRoute) {
+      if (!isContextReady && !isOnboardingRoute && !isDirectSetupRoute) {
         replace('/pulse/select-organization')
         return
       }

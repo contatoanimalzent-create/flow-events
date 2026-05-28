@@ -435,8 +435,13 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
               <p className="mt-1 text-2xl font-black text-blue-100">{selectedDayExits.length}</p>
             </div>
             <div className="rounded-2xl border border-amber-400/15 bg-amber-400/10 p-4">
-              <p className="text-xs text-amber-100/70">Sem entrada nesse dia</p>
-              <p className="mt-1 text-2xl font-black text-amber-100">{selectedDayMissing}</p>
+              <p className="text-xs text-amber-100/70">Cadastrados sem ponto nesse dia</p>
+              <p className="mt-1 text-2xl font-black text-amber-100">
+                {selectedDayMissing} {selectedDayMissing === 1 ? 'pessoa' : 'pessoas'}
+              </p>
+              <p className="mt-1 text-[11px] text-amber-100/55">
+                Total de staff ativo menos quem bateu entrada no dia selecionado.
+              </p>
             </div>
           </div>
         </section>

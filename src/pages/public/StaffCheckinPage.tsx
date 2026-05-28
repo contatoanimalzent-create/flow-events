@@ -97,7 +97,7 @@ export function StaffCheckinPage() {
   function normalizeBsbPhoneDigits(v: string): string {
     let d = v.replace(/\D/g, '')
     if (d.startsWith('0055')) d = d.slice(4)
-    if (d.startsWith('55') && d.length > 11) d = d.slice(2)
+    if (d.startsWith('55')) d = d.slice(2)
     return d.slice(0, 11)
   }
 

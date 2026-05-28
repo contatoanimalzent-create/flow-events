@@ -119,7 +119,7 @@ function normalizeBrazilWhatsapp(value?: string | null): string | null {
 function normalizeBsbPhoneDigits(value?: string | null): string {
   let digits = (value ?? '').replace(/\D/g, '')
   if (digits.startsWith('0055')) digits = digits.slice(4)
-  if (digits.startsWith('55') && digits.length > 11) digits = digits.slice(2)
+  if (digits.startsWith('55')) digits = digits.slice(2)
   return digits.slice(0, 11)
 }
 

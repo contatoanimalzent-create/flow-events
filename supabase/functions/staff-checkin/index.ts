@@ -121,6 +121,7 @@ function saoPauloDateTime(date = new Date()): string {
 function normalizePhoneDigits(phone: string): string {
   let digits = phone.replace(/\D/g, '')
   if (digits.startsWith('00')) digits = digits.slice(2)
+  if (digits.startsWith('55') && digits.length < 12) digits = digits.slice(2)
   if (!digits.startsWith('55') && digits.length >= 10 && digits.length <= 11) digits = `55${digits}`
   return digits
 }

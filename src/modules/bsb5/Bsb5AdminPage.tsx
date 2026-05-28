@@ -25,11 +25,13 @@ const BSB5_JOIN_LINK = 'https://pulse.animalzgroup.com/staff/join/bsb5'
 const BSB5_PONTO_LINK = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
 const ALLOWED_EMAIL = 'walteciojr@gmail.com'
 const DEFAULT_MODES: AppMode[] = ['supervisor', 'operator', 'staff', 'promoter', 'attendee']
-const BSB5_DAYS = [
+const BSB5_EVENT_DAYS = [
   { key: '2026-05-28', label: '28/05', title: 'Quinta' },
   { key: '2026-05-29', label: '29/05', title: 'Sexta' },
   { key: '2026-05-30', label: '30/05', title: 'Sábado' },
 ]
+const BSB5_EVENT_START = '2026-05-28'
+const BSB5_EVENT_END = '2026-05-30'
 
 interface BsbEvent {
   id: string
@@ -105,7 +107,24 @@ function saoPauloDateKey(value: string | null) {
 
 function todayBsbDay() {
   const today = saoPauloDateKey(new Date().toISOString())
-  return BSB5_DAYS.some((day) => day.key === today) ? today : BSB5_DAYS[0].key
+  return today
+}
+
+function formatDayLabel(key: string) {
+  const [, month, day] = key.split('-')
+  return `${day}/${month}`
+}
+
+function dayPhase(key: string) {
+  if (key < BSB5_EVENT_START) return 'Pré-evento'
+  if (key > BSB5_EVENT_END) return 'Pós-evento'
+  return 'Evento'
+}
+
+function dayTitle(key: string) {
+  const known = BSB5_EVENT_DAYS.find((day) => day.key === key)
+  if (known) return known.title
+  return dayPhase(key)
 }
 
 function formatCoordinate(value: number | null) {
@@ -250,14 +269,36 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
 
   const checkinsByDay = useMemo(() => {
     const grouped = new Map<string, BsbCheckin[]>()
-    BSB5_DAYS.forEach((day) => grouped.set(day.key, []))
+    BSB5_EVENT_DAYS.forEach((day) => grouped.set(day.key, []))
     checkins.forEach((entry) => {
       const key = saoPauloDateKey(entry.created_at)
-      const list = grouped.get(key)
-      if (list) list.push(entry)
+      if (!key) return
+      const list = grouped.get(key) ?? []
+      list.push(entry)
+      grouped.set(key, list)
     })
     return grouped
   }, [checkins])
+
+  const dayOptions = useMemo(() => {
+    const keys = new Set<string>(BSB5_EVENT_DAYS.map((day) => day.key))
+    checkins.forEach((entry) => {
+      const key = saoPauloDateKey(entry.created_at)
+      if (key) keys.add(key)
+    })
+    return Array.from(keys).sort().map((key) => ({
+      key,
+      label: formatDayLabel(key),
+      title: dayTitle(key),
+      phase: dayPhase(key),
+    }))
+  }, [checkins])
+
+  useEffect(() => {
+    if (dayOptions.length > 0 && !dayOptions.some((day) => day.key === selectedDay)) {
+      setSelectedDay(dayOptions[0].key)
+    }
+  }, [dayOptions, selectedDay])
 
   const selectedDayCheckins = checkinsByDay.get(selectedDay) ?? []
   const selectedDayEntries = selectedDayCheckins.filter((entry) => entry.type !== 'checkout')
@@ -356,10 +397,10 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="font-bold">Pontos por dia</h2>
-              <p className="mt-1 text-xs text-slate-400">Selecione o dia para ver somente os pontos daquele dia.</p>
+              <p className="mt-1 text-xs text-slate-400">Selecione o dia para ver pré-evento, evento ou pós-evento separadamente.</p>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {BSB5_DAYS.map((day) => {
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              {dayOptions.map((day) => {
                 const dayEntries = (checkinsByDay.get(day.key) ?? []).filter((entry) => entry.type !== 'checkout')
                 const active = selectedDay === day.key
                 return (
@@ -374,6 +415,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
                   >
                     <p className="text-xs font-black">{day.label}</p>
                     <p className={`text-[11px] ${active ? 'text-black/65' : 'text-slate-400'}`}>{day.title}</p>
+                    <p className={`text-[10px] ${active ? 'text-black/55' : 'text-slate-500'}`}>{day.phase}</p>
                     <p className={`mt-1 text-[11px] ${active ? 'text-black/75' : 'text-[#D4FF00]'}`}>
                       {dayEntries.length} entradas
                     </p>
@@ -429,7 +471,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
               <div>
                 <h2 className="font-bold">Entradas e saídas do dia</h2>
                 <p className="mt-1 text-xs text-slate-400">
-                  {BSB5_DAYS.find((day) => day.key === selectedDay)?.label} - {BSB5_DAYS.find((day) => day.key === selectedDay)?.title}
+                  {formatDayLabel(selectedDay)} - {dayPhase(selectedDay)}
                 </p>
               </div>
               <a href={BSB5_PONTO_LINK} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4FF00]">

@@ -88,6 +88,7 @@ interface Env {
   twilioAccountSid: string
   twilioAuthToken:  string
   twilioWaNumber:   string
+  twilioSmsNumber:  string
   whatsappProvider: string
   evolutionApiUrl:  string
   evolutionApiKey:  string
@@ -262,13 +263,33 @@ async function sendWhatsApp(params: {
     params.env.whatsappProvider === 'evolution' ||
     (params.env.evolutionApiUrl && params.env.evolutionApiKey && params.env.evolutionInstance)
   ) {
-    return sendEvolutionWhatsApp({
+    const evolutionResult = await sendEvolutionWhatsApp({
       to: params.to,
       body: params.body,
       apiUrl: params.env.evolutionApiUrl,
       apiKey: params.env.evolutionApiKey,
       instance: params.env.evolutionInstance,
     })
+    if (evolutionResult.ok) return evolutionResult
+
+    const smsResult = await sendSms({
+      to: params.to,
+      body: params.body,
+      env: params.env,
+    })
+    if (smsResult.ok) {
+      return {
+        ok: true,
+        id: smsResult.id,
+        error: null,
+      }
+    }
+
+    return {
+      ok: false,
+      id: null,
+      error: `${evolutionResult.error} | SMS fallback: ${smsResult.error}`,
+    }
   }
 
   try {
@@ -288,9 +309,48 @@ async function sendWhatsApp(params: {
     })
     const d = (await res.json()) as { sid?: string; error_message?: string }
     if (!res.ok) {
-      return { ok: false, id: null, error: 'Twilio HTTP ' + res.status + ': ' + (d.error_message ?? JSON.stringify(d)) }
+      const smsResult = await sendSms({ to: params.to, body: params.body, env: params.env })
+      if (smsResult.ok) return smsResult
+      return { ok: false, id: null, error: 'Twilio HTTP ' + res.status + ': ' + (d.error_message ?? JSON.stringify(d)) + ' | SMS fallback: ' + smsResult.error }
     }
     return { ok: true, id: d.sid ?? null, error: null }
+  } catch (err: unknown) {
+    const smsResult = await sendSms({ to: params.to, body: params.body, env: params.env })
+    if (smsResult.ok) return smsResult
+    return { ok: false, id: null, error: `${err instanceof Error ? err.message : String(err)} | SMS fallback: ${smsResult.error}` }
+  }
+}
+
+async function sendSms(params: {
+  to: string; body: string; env: Env
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  if (!params.env.twilioAccountSid || !params.env.twilioAuthToken) {
+    return { ok: false, id: null, error: 'Twilio SMS not configured.' }
+  }
+
+  const from = params.env.twilioSmsNumber || params.env.twilioWaNumber
+  if (!from) return { ok: false, id: null, error: 'Twilio SMS sender not configured.' }
+
+  try {
+    const url = 'https://api.twilio.com/2010-04-01/Accounts/' + params.env.twilioAccountSid + '/Messages.json'
+    const form = new URLSearchParams({
+      From: normalizePhone(from),
+      To: normalizePhone(params.to),
+      Body: params.body,
+    })
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + btoa(params.env.twilioAccountSid + ':' + params.env.twilioAuthToken),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: form.toString(),
+    })
+    const data = (await res.json()) as { sid?: string; error_message?: string }
+    if (!res.ok) {
+      return { ok: false, id: null, error: 'Twilio SMS HTTP ' + res.status + ': ' + (data.error_message ?? JSON.stringify(data)) }
+    }
+    return { ok: true, id: data.sid ?? null, error: null }
   } catch (err: unknown) {
     return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
   }
@@ -638,6 +698,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     twilioAccountSid: Deno.env.get('TWILIO_ACCOUNT_SID')    ?? '',
     twilioAuthToken:  Deno.env.get('TWILIO_AUTH_TOKEN')     ?? '',
     twilioWaNumber:   Deno.env.get('TWILIO_WHATSAPP_NUMBER') ?? '',
+    twilioSmsNumber:  Deno.env.get('TWILIO_SMS_NUMBER') ?? Deno.env.get('TWILIO_PHONE_NUMBER') ?? '',
     whatsappProvider: (Deno.env.get('WHATSAPP_PROVIDER') ?? '').toLowerCase(),
     evolutionApiUrl:  Deno.env.get('EVOLUTION_API_URL')      ?? '',
     evolutionApiKey:  Deno.env.get('EVOLUTION_API_KEY')      ?? '',

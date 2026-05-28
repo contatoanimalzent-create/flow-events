@@ -23,8 +23,9 @@ import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 const BSB5_SLUG = 'bsb-fight-5'
 const BSB5_JOIN_LINK = 'https://pulse.animalzgroup.com/staff/join/bsb5'
 const BSB5_PONTO_LINK = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
-const ALLOWED_EMAIL = 'walteciojr@gmail.com'
+const ALLOWED_EMAILS = ['walteciojr@gmail.com', 'hds.vieira@gmail.com']
 const DEFAULT_MODES: AppMode[] = ['supervisor', 'operator', 'staff', 'promoter', 'attendee']
+type AdminTab = 'staff' | 'checkins'
 const BSB5_EVENT_DAYS = [
   { key: '2026-05-28', label: '28/05', title: 'Quinta' },
   { key: '2026-05-29', label: '29/05', title: 'Sexta' },
@@ -169,6 +170,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   const [editDraft, setEditDraft] = useState<Record<string, string>>({})
   const [savingStaff, setSavingStaff] = useState(false)
   const [staffMessage, setStaffMessage] = useState<string | null>(null)
+  const [adminTab, setAdminTab] = useState<AdminTab>('staff')
 
   const setContext = useAppContext((s) => s.setContext)
   const setAvailableModes = useAppContext((s) => s.setAvailableModes)
@@ -183,7 +185,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
       const user = authData.user
       const email = user?.email?.toLowerCase() ?? ''
 
-      if (!user || email !== ALLOWED_EMAIL) {
+      if (!user || !ALLOWED_EMAILS.includes(email)) {
         setAllowed(false)
         return
       }
@@ -439,7 +441,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
         <ShieldAlert className="mb-4 h-10 w-10 text-red-300" />
         <h1 className="text-xl font-bold">Acesso exclusivo</h1>
         <p className="mt-2 max-w-sm text-sm text-slate-400">
-          Este painel direto do BSB FIGHT 5 está liberado somente para {ALLOWED_EMAIL}.
+          Este painel direto do BSB FIGHT 5 está liberado somente para os administradores autorizados.
         </p>
       </div>
     )
@@ -506,6 +508,30 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           </div>
         )}
 
+        <section className="grid gap-3 sm:grid-cols-2">
+          {[
+            ['staff', 'Cadastrados', `${filteredStaff.length} colaboradores`],
+            ['checkins', 'Pontos', `${checkins.length} registros`],
+          ].map(([tab, label, detail]) => {
+            const active = adminTab === tab
+            return (
+              <button
+                key={tab}
+                onClick={() => setAdminTab(tab as AdminTab)}
+                className={`rounded-2xl border px-4 py-4 text-left transition ${
+                  active
+                    ? 'border-[#D4FF00] bg-[#D4FF00] text-black'
+                    : 'border-white/10 bg-white/[0.04] text-white'
+                }`}
+              >
+                <p className="text-sm font-black">{label}</p>
+                <p className={`mt-1 text-xs ${active ? 'text-black/65' : 'text-slate-400'}`}>{detail}</p>
+              </button>
+            )
+          })}
+        </section>
+
+        {adminTab === 'checkins' && (
         <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -557,8 +583,32 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
               </p>
             </div>
           </div>
-        </section>
 
+          <div className="mt-4 space-y-2">
+            {selectedDayCheckins.map((entry) => (
+              <div key={entry.id} className="rounded-2xl border border-white/8 bg-black/20 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold">{entry.staff_member_id ? checkinStaffNames.get(entry.staff_member_id) ?? 'Staff' : 'Staff'}</p>
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      Lat {formatCoordinate(entry.latitude)} - Lng {formatCoordinate(entry.longitude)}
+                    </p>
+                    <p className="text-xs text-slate-400">{entry.type === 'checkout' ? 'Saida' : 'Entrada'} | {formatDateTime(entry.created_at)}</p>
+                  </div>
+                  {entry.photo_url && (
+                    <button onClick={() => setSelectedPhoto(entry)} className="text-xs font-semibold text-[#D4FF00]">
+                      Foto
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            {selectedDayCheckins.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Ainda nao ha registros de ponto nesse dia.</p>}
+          </div>
+        </section>
+        )}
+
+        {adminTab === 'staff' && (
         <section className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
             <div className="mb-4 flex items-center justify-between">
@@ -626,6 +676,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
             )}
           </div>
 
+          {false && (
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
             <div className="mb-4 flex items-center justify-between">
               <div>
@@ -660,7 +711,9 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
               {selectedDayCheckins.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Ainda não há registros de ponto nesse dia.</p>}
             </div>
           </div>
+          )}
         </section>
+        )}
 
         {editingStaff && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">

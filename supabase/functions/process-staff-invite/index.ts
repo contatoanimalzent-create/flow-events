@@ -288,7 +288,7 @@ async function queueStaffConfirmationNotifications(
   await admin.from('whatsapp_templates').upsert({
     organization_id: params.organizationId,
     key: templateKey,
-    body: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Use o ponto somente quando estiver no local do evento. Fora do local, o Pulse informa a distância até o evento e bloqueia o registro.',
+    body: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Use o ponto somente quando estiver no local do evento.',
   }, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] whatsapp template upsert failed:', error.message)
   })

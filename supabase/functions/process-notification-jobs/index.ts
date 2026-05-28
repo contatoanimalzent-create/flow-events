@@ -137,24 +137,50 @@ function hashString(value: string): number {
   return Math.abs(hash)
 }
 
+function getSaoPauloGreeting(now = new Date()): string {
+  const hourText = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    hour: '2-digit',
+    hour12: false,
+  }).format(now)
+  const hour = Number(hourText.replace(/\D/g, ''))
+  if (hour >= 5 && hour < 12) return 'Bom dia'
+  if (hour >= 12 && hour < 18) return 'Boa tarde'
+  return 'Boa noite'
+}
+
+function normalizeVenueText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\b(d[aeo]s?|e)\b/g, '')
+    .replace(/[^a-z0-9]/gi, '')
+    .toLowerCase()
+}
+
+function cleanVenueLabel(value: string): string {
+  const parts = value.split('|').map((part) => part.trim()).filter(Boolean)
+  if (parts.length < 2) return value
+  const first = normalizeVenueText(parts[0])
+  const second = normalizeVenueText(parts[1])
+  if (first && second.includes(first)) return parts[1]
+  return parts.join(' | ')
+}
+
 function buildStaffPointMessage(vars: Record<string, string | number | boolean>, seed: string): string {
   const firstName = String(vars.first_name || vars.name || 'tudo bem')
   const eventName = String(vars.event_name || 'evento')
-  const venueName = String(vars.venue_name || 'local do evento')
+  const venueName = cleanVenueLabel(String(vars.venue_name || 'local do evento'))
   const pointUrl = String(vars.point_url || '')
   const h = hashString(seed)
+  const greeting = getSaoPauloGreeting()
 
   const greetings = [
-    `Olá, ${firstName}.`,
-    `${firstName}, tudo certo?`,
-    `Oi, ${firstName}.`,
-    `${firstName}, passando para confirmar.`,
-    `Olá! ${firstName}, sua confirmação está pronta.`,
-    `${firstName}, seu acesso de equipe foi confirmado.`,
-    `Oi, ${firstName}, confirmação feita por aqui.`,
-    `Olá, ${firstName}, tudo certo para o ${eventName}.`,
-    `${firstName}, segue sua orientação de equipe.`,
-    `Boa, ${firstName}. Seus dados foram confirmados.`,
+    `${greeting}, ${firstName}.`,
+    `${greeting}, ${firstName}, tudo certo?`,
+    `${greeting}! ${firstName}, segue sua orientação de equipe.`,
+    `${greeting}, ${firstName}. Passando com as informações do ${eventName}.`,
+    `${greeting}, ${firstName}. Seu acesso de equipe está pronto.`,
   ]
   const confirmations = [
     `Seus dados para trabalhar no ${eventName} foram confirmados.`,

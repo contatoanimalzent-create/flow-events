@@ -25,6 +25,11 @@ const BSB5_JOIN_LINK = 'https://pulse.animalzgroup.com/staff/join/bsb5'
 const BSB5_PONTO_LINK = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
 const ALLOWED_EMAIL = 'walteciojr@gmail.com'
 const DEFAULT_MODES: AppMode[] = ['supervisor', 'operator', 'staff', 'promoter', 'attendee']
+const BSB5_DAYS = [
+  { key: '2026-05-28', label: '28/05', title: 'Quinta' },
+  { key: '2026-05-29', label: '29/05', title: 'Sexta' },
+  { key: '2026-05-30', label: '30/05', title: 'Sábado' },
+]
 
 interface BsbEvent {
   id: string
@@ -86,6 +91,23 @@ function formatDateTime(value: string | null) {
   })
 }
 
+function saoPauloDateKey(value: string | null) {
+  if (!value) return ''
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date(value))
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? ''
+  return `${part('year')}-${part('month')}-${part('day')}`
+}
+
+function todayBsbDay() {
+  const today = saoPauloDateKey(new Date().toISOString())
+  return BSB5_DAYS.some((day) => day.key === today) ? today : BSB5_DAYS[0].key
+}
+
 function formatCoordinate(value: number | null) {
   return typeof value === 'number' ? value.toFixed(6) : '-'
 }
@@ -110,6 +132,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   const [checkins, setCheckins] = useState<BsbCheckin[]>([])
   const [selectedPhoto, setSelectedPhoto] = useState<BsbCheckin | null>(null)
   const [copyLabel, setCopyLabel] = useState<string | null>(null)
+  const [selectedDay, setSelectedDay] = useState(todayBsbDay)
 
   const setContext = useAppContext((s) => s.setContext)
   const setAvailableModes = useAppContext((s) => s.setAvailableModes)
@@ -189,7 +212,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           .select('id,staff_member_id,type,created_at,photo_url,latitude,longitude,accuracy_meters')
           .eq('event_id', bsbEvent.id)
           .order('created_at', { ascending: false })
-          .limit(30),
+          .limit(1000),
       ])
 
       setEvent(bsbEvent)
@@ -224,6 +247,23 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     staff.forEach((s) => names.set(s.id, fullName(s)))
     return names
   }, [staff])
+
+  const checkinsByDay = useMemo(() => {
+    const grouped = new Map<string, BsbCheckin[]>()
+    BSB5_DAYS.forEach((day) => grouped.set(day.key, []))
+    checkins.forEach((entry) => {
+      const key = saoPauloDateKey(entry.created_at)
+      const list = grouped.get(key)
+      if (list) list.push(entry)
+    })
+    return grouped
+  }, [checkins])
+
+  const selectedDayCheckins = checkinsByDay.get(selectedDay) ?? []
+  const selectedDayEntries = selectedDayCheckins.filter((entry) => entry.type !== 'checkout')
+  const selectedDayExits = selectedDayCheckins.filter((entry) => entry.type === 'checkout')
+  const selectedDayStaffIds = new Set(selectedDayEntries.map((entry) => entry.staff_member_id).filter(Boolean))
+  const selectedDayMissing = Math.max(staff.length - selectedDayStaffIds.size, 0)
 
   async function copy(text: string, label: string) {
     await navigator.clipboard.writeText(text)
@@ -312,6 +352,53 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           </div>
         )}
 
+        <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-bold">Pontos por dia</h2>
+              <p className="mt-1 text-xs text-slate-400">Selecione o dia para ver somente os pontos daquele dia.</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {BSB5_DAYS.map((day) => {
+                const dayEntries = (checkinsByDay.get(day.key) ?? []).filter((entry) => entry.type !== 'checkout')
+                const active = selectedDay === day.key
+                return (
+                  <button
+                    key={day.key}
+                    onClick={() => setSelectedDay(day.key)}
+                    className={`rounded-2xl border px-3 py-2 text-left transition ${
+                      active
+                        ? 'border-[#D4FF00] bg-[#D4FF00] text-black'
+                        : 'border-white/10 bg-black/20 text-white'
+                    }`}
+                  >
+                    <p className="text-xs font-black">{day.label}</p>
+                    <p className={`text-[11px] ${active ? 'text-black/65' : 'text-slate-400'}`}>{day.title}</p>
+                    <p className={`mt-1 text-[11px] ${active ? 'text-black/75' : 'text-[#D4FF00]'}`}>
+                      {dayEntries.length} entradas
+                    </p>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-emerald-400/15 bg-emerald-400/10 p-4">
+              <p className="text-xs text-emerald-100/70">Entradas no dia</p>
+              <p className="mt-1 text-2xl font-black text-emerald-100">{selectedDayEntries.length}</p>
+            </div>
+            <div className="rounded-2xl border border-blue-400/15 bg-blue-400/10 p-4">
+              <p className="text-xs text-blue-100/70">Saídas no dia</p>
+              <p className="mt-1 text-2xl font-black text-blue-100">{selectedDayExits.length}</p>
+            </div>
+            <div className="rounded-2xl border border-amber-400/15 bg-amber-400/10 p-4">
+              <p className="text-xs text-amber-100/70">Sem entrada nesse dia</p>
+              <p className="mt-1 text-2xl font-black text-amber-100">{selectedDayMissing}</p>
+            </div>
+          </div>
+        </section>
+
         <section className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
             <div className="mb-4 flex items-center justify-between">
@@ -339,13 +426,18 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-bold">Entradas e saídas</h2>
+              <div>
+                <h2 className="font-bold">Entradas e saídas do dia</h2>
+                <p className="mt-1 text-xs text-slate-400">
+                  {BSB5_DAYS.find((day) => day.key === selectedDay)?.label} - {BSB5_DAYS.find((day) => day.key === selectedDay)?.title}
+                </p>
+              </div>
               <a href={BSB5_PONTO_LINK} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4FF00]">
                 Ponto <ExternalLink className="h-3 w-3" />
               </a>
             </div>
             <div className="space-y-2">
-              {checkins.map((entry) => (
+              {selectedDayCheckins.map((entry) => (
                 <div key={entry.id} className="rounded-2xl border border-white/8 bg-black/20 p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -363,7 +455,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
                   </div>
                 </div>
               ))}
-              {checkins.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Ainda não há registros de ponto.</p>}
+              {selectedDayCheckins.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Ainda não há registros de ponto nesse dia.</p>}
             </div>
           </div>
         </section>

@@ -74,6 +74,21 @@ function isAlreadyRegisteredResponse(body: Record<string, unknown>): boolean {
   )
 }
 
+function formatPhoneInput(v: string): string {
+  const d = v.replace(/\D/g, '').slice(0, 11)
+  if (d.length <= 2) return d
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+}
+
+function formatCpfInput(v: string): string {
+  const d = v.replace(/\D/g, '').slice(0, 11)
+  if (d.length <= 3) return d
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
+}
+
 const standardEventStaffSchedule = [
   'Quinta, 28/05 - 08h às 16h',
   'Quinta, 28/05 - 16h às 00h',
@@ -303,19 +318,30 @@ export function StaffJoinPage() {
 
     if (!form.full_name.trim()) errors.full_name = 'Nome completo é obrigatório.'
     if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) errors.email = 'E-mail inválido.'
+    const phoneDigits = form.phone.replace(/\D/g, '')
+    const cpfDigits = form.cpf.replace(/\D/g, '')
+
     if (!form.phone.trim()) errors.phone = 'Telefone é obrigatório.'
+    else if (phoneDigits.length < 10) errors.phone = 'Telefone inválido.'
     if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
+    else if (cpfDigits.length !== 11) errors.cpf = 'CPF inválido.'
     if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
+    if (!form.company.trim()) errors.company = 'Empresa é obrigatória.'
     if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX é obrigatória.'
     if (!form.shift_label) errors.shift_label = 'Selecione a função para carregar o horário.'
+    if (!form.tshirt_size) errors.tshirt_size = 'Tamanho da camiseta é obrigatório.'
+    if (!form.bio.trim()) errors.bio = 'Experiência / apresentação é obrigatória.'
+    if (!form.emergency_contact_name.trim()) errors.emergency_contact_name = 'Contato de emergência é obrigatório.'
+    if (!form.emergency_contact_phone.trim()) errors.emergency_contact_phone = 'Telefone de emergência é obrigatório.'
+    else if (form.emergency_contact_phone.replace(/\D/g, '').length < 10) {
+      errors.emergency_contact_phone = 'Telefone de emergência inválido.'
+    }
     if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
 
-    // Custom required fields
+    // All custom fields shown on this form are required for BSB5.
     for (const field of inviteInfo?.custom_fields ?? []) {
-      if (field.required) {
-        const val = form.custom_answers[field.key]
-        if (!val && val !== false) errors[`custom_${field.key}`] = `${field.label} é obrigatório.`
-      }
+      const val = form.custom_answers[field.key]
+      if (!val) errors[`custom_${field.key}`] = `${field.label} é obrigatório.`
     }
 
     setFieldErrors(errors)
@@ -332,16 +358,19 @@ export function StaffJoinPage() {
         token,
         full_name: form.full_name.trim(),
         email: form.email.trim().toLowerCase(),
-        phone: form.phone.trim(),
-        document_number: form.cpf.trim() || undefined,
+        phone: form.phone.replace(/\D/g, ''),
+        document_number: form.cpf.replace(/\D/g, '') || undefined,
         t_shirt_size: form.tshirt_size || undefined,
         role_title: form.role_title.trim() || undefined,
-        company: form.company.trim() || undefined,
+        company: form.company.trim(),
         pix_key: form.pix_key.trim() || undefined,
         shift_start: form.shift_start || undefined,
         shift_end: form.shift_end || undefined,
         shift_label: form.shift_label || undefined,
-        bio: form.bio.trim() || undefined,
+        bio: [
+          form.bio.trim(),
+          `Contato de emergência: ${form.emergency_contact_name.trim()} - ${form.emergency_contact_phone.trim()}`,
+        ].join(' | '),
         terms_accepted: true,
         custom_field_answers: form.custom_answers,
       }
@@ -569,14 +598,15 @@ export function StaffJoinPage() {
               </h3>
               <div className="flex flex-col gap-4">
                 <InputField label="Nome completo" required error={fieldErrors.full_name}>
-                  <input
-                    type="text"
-                    value={form.full_name}
-                    onChange={(e) => setField('full_name', e.target.value)}
-                    placeholder="Seu nome completo"
-                    className={inputClass}
-                    autoComplete="name"
-                  />
+                    <input
+                      type="text"
+                      value={form.full_name}
+                      onChange={(e) => setField('full_name', e.target.value)}
+                      placeholder="Seu nome completo"
+                      className={inputClass}
+                      autoComplete="name"
+                      required
+                    />
                 </InputField>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -588,6 +618,7 @@ export function StaffJoinPage() {
                       placeholder="seu@email.com"
                       className={inputClass}
                       autoComplete="email"
+                      required
                     />
                   </InputField>
 
@@ -600,10 +631,13 @@ export function StaffJoinPage() {
                     <input
                       type="tel"
                       value={form.phone}
-                      onChange={(e) => setField('phone', e.target.value)}
+                      onChange={(e) => setField('phone', formatPhoneInput(e.target.value))}
                       placeholder="(11) 91234-5678"
                       className={inputClass}
                       autoComplete="tel"
+                      inputMode="numeric"
+                      maxLength={15}
+                      required
                     />
                   </InputField>
                 </div>
@@ -616,6 +650,7 @@ export function StaffJoinPage() {
                         onChange={(e) => setRole(e.target.value)}
                         className={`${inputClass} appearance-none pr-10`}
                         style={{ colorScheme: 'dark' }}
+                        required
                       >
                         <option value="" className="bg-[#12161f] text-white/50">Selecione sua função</option>
                         {STAFF_ROLE_OPTIONS.map((role) => (
@@ -628,13 +663,14 @@ export function StaffJoinPage() {
                     </div>
                   </InputField>
 
-                  <InputField label="Empresa" hint="Se terceirizado" error={fieldErrors.company}>
+                  <InputField label="Empresa" required error={fieldErrors.company}>
                     <input
                       type="text"
                       value={form.company}
                       onChange={(e) => setField('company', e.target.value)}
                       placeholder="Nome da empresa"
                       className={inputClass}
+                      required
                     />
                   </InputField>
                 </div>
@@ -644,9 +680,12 @@ export function StaffJoinPage() {
                     <input
                       type="text"
                       value={form.cpf}
-                      onChange={(e) => setField('cpf', e.target.value)}
+                      onChange={(e) => setField('cpf', formatCpfInput(e.target.value))}
                       placeholder="000.000.000-00"
                       className={inputClass}
+                      inputMode="numeric"
+                      maxLength={14}
+                      required
                     />
                   </InputField>
 
@@ -657,6 +696,7 @@ export function StaffJoinPage() {
                       onChange={(e) => setField('pix_key', e.target.value)}
                       placeholder="Sua chave PIX para pagamento"
                       className={inputClass}
+                      required
                     />
                   </InputField>
                 </div>
@@ -684,13 +724,14 @@ export function StaffJoinPage() {
                 </InputField>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <InputField label="Tamanho da camiseta" error={fieldErrors.tshirt_size}>
+                  <InputField label="Tamanho da camiseta" required error={fieldErrors.tshirt_size}>
                     <div className="relative">
                       <select
                         value={form.tshirt_size}
                         onChange={(e) => setField('tshirt_size', e.target.value as TShirtSize | '')}
                         className={`${inputClass} appearance-none pr-10`}
                         style={{ colorScheme: 'dark' }}
+                        required
                       >
                         <option value="" className="bg-[#12161f] text-white/50">Selecione o tamanho</option>
                         {(['PP', 'P', 'M', 'G', 'GG', 'XGG'] as TShirtSize[]).map((size) => (
@@ -706,8 +747,8 @@ export function StaffJoinPage() {
 
                 <InputField
                   label="Experiência / Apresentação"
-                  hint="Opcional, Conte um pouco sobre sua experiência com eventos"
                   error={fieldErrors.bio}
+                  required
                 >
                   <textarea
                     value={form.bio}
@@ -715,6 +756,7 @@ export function StaffJoinPage() {
                     placeholder="Ex: já trabalhei em 5 festivais como coordenador de acesso..."
                     rows={3}
                     className={`${inputClass} resize-none`}
+                    required
                   />
                 </InputField>
               </div>
@@ -723,25 +765,29 @@ export function StaffJoinPage() {
             {/* Emergency contact */}
             <section>
               <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-white/38">
-                Contato de emergência <span className="text-white/24">(opcional)</span>
+                Contato de emergência
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <InputField label="Nome" error={fieldErrors.emergency_contact_name}>
+                <InputField label="Nome" required error={fieldErrors.emergency_contact_name}>
                   <input
                     type="text"
                     value={form.emergency_contact_name}
                     onChange={(e) => setField('emergency_contact_name', e.target.value)}
                     placeholder="Nome do contato"
                     className={inputClass}
+                    required
                   />
                 </InputField>
-                <InputField label="Telefone" error={fieldErrors.emergency_contact_phone}>
+                <InputField label="Telefone" required error={fieldErrors.emergency_contact_phone}>
                   <input
                     type="tel"
                     value={form.emergency_contact_phone}
-                    onChange={(e) => setField('emergency_contact_phone', e.target.value)}
+                    onChange={(e) => setField('emergency_contact_phone', formatPhoneInput(e.target.value))}
                     placeholder="(11) 91234-5678"
                     className={inputClass}
+                    inputMode="numeric"
+                    maxLength={15}
+                    required
                   />
                 </InputField>
               </div>
@@ -758,7 +804,7 @@ export function StaffJoinPage() {
                     <InputField
                       key={field.key}
                       label={field.label}
-                      required={field.required}
+                      required
                       error={fieldErrors[`custom_${field.key}`]}
                     >
                       {field.type === 'textarea' ? (
@@ -767,6 +813,7 @@ export function StaffJoinPage() {
                           onChange={(e) => setCustomAnswer(field.key, e.target.value)}
                           rows={3}
                           className={`${inputClass} resize-none`}
+                          required
                         />
                       ) : field.type === 'select' ? (
                         <div className="relative">
@@ -775,6 +822,7 @@ export function StaffJoinPage() {
                             onChange={(e) => setCustomAnswer(field.key, e.target.value)}
                             className={`${inputClass} appearance-none pr-10`}
                             style={{ colorScheme: 'dark' }}
+                            required
                           >
                             <option value="" className="bg-[#12161f] text-white/50">Selecione...</option>
                             {field.options?.map((opt) => (
@@ -792,6 +840,7 @@ export function StaffJoinPage() {
                             checked={(form.custom_answers[field.key] as boolean) ?? false}
                             onChange={(e) => setCustomAnswer(field.key, e.target.checked)}
                             className="h-4 w-4 rounded border-white/20 accent-[#D4FF00]"
+                            required
                           />
                           <span className="text-sm text-white/68">{field.label}</span>
                         </label>
@@ -801,6 +850,7 @@ export function StaffJoinPage() {
                           value={(form.custom_answers[field.key] as string) ?? ''}
                           onChange={(e) => setCustomAnswer(field.key, e.target.value)}
                           className={inputClass}
+                          required
                         />
                       )}
                     </InputField>

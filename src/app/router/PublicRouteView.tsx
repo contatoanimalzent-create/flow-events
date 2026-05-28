@@ -43,6 +43,7 @@ const OperatorApp = lazy(() => import('@/features/mobile/operator/OperatorApp').
 
 // Unified Pulse app, single app, single auth, multi-role
 const PulseApp = lazy(() => import('@/features/pulse/PulseApp').then((m) => ({ default: m.PulseApp })))
+const Bsb5AdminPage = lazy(() => import('@/modules/bsb5/Bsb5AdminPage'))
 
 function PublicFallback() {
   return <LoadingState title="Loading" description="" className="min-h-screen" />
@@ -67,6 +68,7 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
   const user = useAuthStore((state) => state.user)
 
   // ── Unified Pulse app (NEW, replaces individual profile apps) ──
+  if (route === 'bsb5-admin') return <Suspense fallback={<MobileLoader />}><Bsb5AdminPage onNavigate={(to) => { window.location.href = to }} /></Suspense>
   if (route === 'pulse-app') return <Suspense fallback={<MobileLoader />}><PulseApp /></Suspense>
 
   // Legacy individual mobile apps (kept for backward compat at /op, /staff, /supervisor, /app, /promoter)

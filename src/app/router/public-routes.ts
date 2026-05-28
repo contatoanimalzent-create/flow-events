@@ -16,6 +16,7 @@ export type PublicRoute =
   | 'participant-app'
   | 'promoter-app'
   | 'pulse-app'
+  | 'bsb5-admin'
   // ── New content pages ──
   | 'como-funciona'
   | 'precos'
@@ -70,6 +71,7 @@ export function getInitialPublicRoute(): PublicRoute {
   if (path.startsWith('/eventos/') || path.startsWith('/events/')) return 'eventos-categoria'
 
   // ── Pulse unified app ──
+  if (path === '/pulse/bsb5' || path === '/bsb5-admin' || path === '/admin-bsb5') return 'bsb5-admin'
   if (path.startsWith('/pulse')) return 'pulse-app'
 
   // ── Legacy mobile apps ──
@@ -117,6 +119,7 @@ export function isImmediatePublicRoute(route: PublicRoute) {
     route === 'participant-app' ||
     route === 'promoter-app' ||
     route === 'pulse-app' ||
+    route === 'bsb5-admin' ||
     route === 'como-funciona' ||
     route === 'precos' ||
     route === 'demo' ||

@@ -123,6 +123,12 @@ const STAFF_ROLE_OPTIONS: StaffRoleOption[] = [
     shiftLabel: standardEventStaffSchedule.join(' | '),
   },
   {
+    value: 'Produção',
+    label: 'Produção',
+    scheduleLines: standardEventStaffSchedule,
+    shiftLabel: standardEventStaffSchedule.join(' | '),
+  },
+  {
     value: 'Posto médico e ambulância',
     label: 'Posto médico e ambulância',
     scheduleLines: [

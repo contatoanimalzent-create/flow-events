@@ -57,10 +57,15 @@ interface BsbStaff {
   id: string
   first_name: string | null
   last_name: string | null
+  cpf: string | null
   email: string | null
   phone: string | null
   role_title: string | null
+  company: string | null
   area: string | null
+  notes: string | null
+  shift_label: string | null
+  pix_key: string | null
   status: string | null
   is_active: boolean | null
   checked_in_at: string | null
@@ -131,6 +136,13 @@ function formatCoordinate(value: number | null) {
   return typeof value === 'number' ? value.toFixed(6) : '-'
 }
 
+function normalizeSearch(value: string | null | undefined) {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
 function StatusBadge({ staff }: { staff: BsbStaff }) {
   const checkedIn = Boolean(staff.checked_in_at && !staff.checked_out_at)
   const label = checkedIn ? 'No evento' : staff.checked_out_at ? 'Saiu' : 'Aguardando'
@@ -152,6 +164,11 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<BsbCheckin | null>(null)
   const [copyLabel, setCopyLabel] = useState<string | null>(null)
   const [selectedDay, setSelectedDay] = useState(todayBsbDay)
+  const [staffSearch, setStaffSearch] = useState('')
+  const [editingStaff, setEditingStaff] = useState<BsbStaff | null>(null)
+  const [editDraft, setEditDraft] = useState<Record<string, string>>({})
+  const [savingStaff, setSavingStaff] = useState(false)
+  const [staffMessage, setStaffMessage] = useState<string | null>(null)
 
   const setContext = useAppContext((s) => s.setContext)
   const setAvailableModes = useAppContext((s) => s.setAvailableModes)
@@ -222,7 +239,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
       const [staffResult, checkinResult] = await Promise.all([
         supabase
           .from('staff_members')
-          .select('id,first_name,last_name,email,phone,role_title,area,status,is_active,checked_in_at,checked_out_at,created_at')
+          .select('id,first_name,last_name,cpf,email,phone,role_title,company,area,notes,shift_label,pix_key,status,is_active,checked_in_at,checked_out_at,created_at')
           .eq('event_id', bsbEvent.id)
           .eq('is_active', true)
           .order('first_name', { ascending: true }),
@@ -261,9 +278,31 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     { label: 'Registros recentes', value: stats.checkins, Icon: Clipboard },
   ]
 
+  const filteredStaff = useMemo(() => {
+    const term = normalizeSearch(staffSearch).trim()
+    if (!term) return staff
+
+    return staff.filter((member) => {
+      const searchable = [
+        fullName(member),
+        member.cpf,
+        member.email,
+        member.phone,
+        member.role_title,
+        member.company,
+        member.area,
+        member.shift_label,
+        member.notes,
+        member.pix_key,
+      ].map(normalizeSearch).join(' ')
+
+      return searchable.includes(term)
+    })
+  }, [staff, staffSearch])
+
   const staffByRole = useMemo(() => {
     const groups = new Map<string, BsbStaff[]>()
-    staff.forEach((member) => {
+    filteredStaff.forEach((member) => {
       const role = member.role_title?.trim() || 'Funcao nao informada'
       const list = groups.get(role) ?? []
       list.push(member)
@@ -276,7 +315,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
         members: members.sort((a, b) => fullName(a).localeCompare(fullName(b), 'pt-BR')),
       }))
       .sort((a, b) => a.role.localeCompare(b.role, 'pt-BR'))
-  }, [staff])
+  }, [filteredStaff])
 
   const checkinStaffNames = useMemo(() => {
     const names = new Map<string, string>()
@@ -327,6 +366,63 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     await navigator.clipboard.writeText(text)
     setCopyLabel(label)
     window.setTimeout(() => setCopyLabel(null), 1600)
+  }
+
+  function openStaffEditor(member: BsbStaff) {
+    setEditingStaff(member)
+    setStaffMessage(null)
+    setEditDraft({
+      first_name: member.first_name ?? '',
+      last_name: member.last_name ?? '',
+      cpf: member.cpf ?? '',
+      email: member.email ?? '',
+      phone: member.phone ?? '',
+      role_title: member.role_title ?? '',
+      company: member.company ?? '',
+      area: member.area ?? '',
+      pix_key: member.pix_key ?? '',
+      shift_label: member.shift_label ?? '',
+      notes: member.notes ?? '',
+    })
+  }
+
+  async function saveStaff() {
+    if (!editingStaff) return
+    setSavingStaff(true)
+    setStaffMessage(null)
+
+    const payload = {
+      first_name: editDraft.first_name?.trim() || null,
+      last_name: editDraft.last_name?.trim() || null,
+      cpf: editDraft.cpf?.trim() || null,
+      email: editDraft.email?.trim() || null,
+      phone: editDraft.phone?.trim() || null,
+      role_title: editDraft.role_title?.trim() || null,
+      company: editDraft.company?.trim() || null,
+      area: editDraft.area?.trim() || null,
+      pix_key: editDraft.pix_key?.trim() || null,
+      shift_label: editDraft.shift_label?.trim() || null,
+      notes: editDraft.notes?.trim() || null,
+    }
+
+    const { data, error } = await supabase
+      .from('staff_members')
+      .update(payload)
+      .eq('id', editingStaff.id)
+      .select('id,first_name,last_name,cpf,email,phone,role_title,company,area,notes,shift_label,pix_key,status,is_active,checked_in_at,checked_out_at,created_at')
+      .single()
+
+    setSavingStaff(false)
+
+    if (error) {
+      setStaffMessage(`Erro ao salvar: ${error.message}`)
+      return
+    }
+
+    const updated = data as BsbStaff
+    setStaff((current) => current.map((member) => (member.id === updated.id ? updated : member)))
+    setEditingStaff(updated)
+    setStaffMessage('Dados atualizados.')
   }
 
   if (loading) {
@@ -466,11 +562,20 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
         <section className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-bold">Staff do BSB5</h2>
+              <div>
+                <h2 className="font-bold">Staff do BSB5</h2>
+                <p className="mt-1 text-xs text-slate-400">{filteredStaff.length} de {staff.length} colaboradores</p>
+              </div>
               <a href={BSB5_JOIN_LINK} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4FF00]">
                 Cadastro <ExternalLink className="h-3 w-3" />
               </a>
             </div>
+            <input
+              value={staffSearch}
+              onChange={(event) => setStaffSearch(event.target.value)}
+              placeholder="Pesquisar por nome, função, CPF, telefone, e-mail, empresa..."
+              className="mb-4 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-[#D4FF00]"
+            />
             <div className="space-y-4">
               {staffByRole.map((group) => (
                 <div key={group.role} className="space-y-2">
@@ -485,16 +590,22 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="truncate text-sm font-bold">{fullName(member)}</p>
-                          <p className="truncate text-xs text-slate-400">{member.area || 'Sem area especifica'}</p>
-                          <p className="mt-1 truncate text-xs text-slate-500">{member.phone || member.email || 'Sem contato'}</p>
+                          <p className="truncate text-xs text-slate-400">CPF: {member.cpf || '-'} | {member.phone || 'Sem telefone'}</p>
+                          <p className="mt-1 truncate text-xs text-slate-500">{member.email || 'Sem e-mail'}{member.company ? ` | ${member.company}` : ''}</p>
                         </div>
-                        <StatusBadge staff={member} />
+                        <div className="flex shrink-0 flex-col items-end gap-2">
+                          <StatusBadge staff={member} />
+                          <button onClick={() => openStaffEditor(member)} className="rounded-full border border-white/10 px-3 py-1 text-[11px] font-bold text-[#D4FF00]">
+                            Ver / editar
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ))}
               {staff.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Nenhum staff cadastrado nesse evento.</p>}
+              {staff.length > 0 && filteredStaff.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Nenhum colaborador encontrado nessa busca.</p>}
             </div>
             {false && (
             <div className="space-y-2">
@@ -550,6 +661,93 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
             </div>
           </div>
         </section>
+
+        {editingStaff && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+            <div className="max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#080b12] shadow-2xl">
+              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                <div>
+                  <p className="text-sm font-bold">{fullName(editingStaff)}</p>
+                  <p className="text-xs text-slate-400">{editingStaff.role_title || 'Funcao nao informada'}</p>
+                </div>
+                <button onClick={() => setEditingStaff(null)} className="rounded-full border border-white/10 p-2 text-slate-300">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="max-h-[calc(92vh-62px)] space-y-4 overflow-y-auto p-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {[
+                    ['first_name', 'Nome'],
+                    ['last_name', 'Sobrenome'],
+                    ['cpf', 'CPF'],
+                    ['phone', 'Telefone'],
+                    ['email', 'E-mail'],
+                    ['role_title', 'Funcao'],
+                    ['company', 'Empresa'],
+                    ['area', 'Area'],
+                    ['pix_key', 'Chave Pix'],
+                  ].map(([key, label]) => (
+                    <label key={key} className="space-y-1">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">{label}</span>
+                      <input
+                        value={editDraft[key] ?? ''}
+                        onChange={(event) => setEditDraft((draft) => ({ ...draft, [key]: event.target.value }))}
+                        className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+                      />
+                    </label>
+                  ))}
+                </div>
+
+                <label className="block space-y-1">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Turno / horario</span>
+                  <textarea
+                    value={editDraft.shift_label ?? ''}
+                    onChange={(event) => setEditDraft((draft) => ({ ...draft, shift_label: event.target.value }))}
+                    rows={3}
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+                  />
+                </label>
+
+                <label className="block space-y-1">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Observacoes</span>
+                  <textarea
+                    value={editDraft.notes ?? ''}
+                    onChange={(event) => setEditDraft((draft) => ({ ...draft, notes: event.target.value }))}
+                    rows={5}
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+                  />
+                </label>
+
+                <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300 sm:grid-cols-2">
+                  <p>Status: <strong className="text-white">{editingStaff.status || '-'}</strong></p>
+                  <p>Cadastrado: <strong className="text-white">{formatDateTime(editingStaff.created_at)}</strong></p>
+                  <p>Entrada atual: <strong className="text-white">{formatDateTime(editingStaff.checked_in_at)}</strong></p>
+                  <p>Saida atual: <strong className="text-white">{formatDateTime(editingStaff.checked_out_at)}</strong></p>
+                </div>
+
+                {staffMessage && (
+                  <div className="rounded-2xl border border-[#D4FF00]/20 bg-[#D4FF00]/10 px-4 py-3 text-sm text-[#D4FF00]">
+                    {staffMessage}
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                  <button onClick={() => setEditingStaff(null)} className="rounded-2xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-200">
+                    Fechar
+                  </button>
+                  <button
+                    onClick={saveStaff}
+                    disabled={savingStaff}
+                    className="rounded-2xl bg-[#D4FF00] px-4 py-3 text-sm font-black text-black disabled:opacity-60"
+                  >
+                    {savingStaff ? 'Salvando...' : 'Salvar alteracoes'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {selectedPhoto && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">

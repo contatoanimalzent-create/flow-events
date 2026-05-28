@@ -259,6 +259,7 @@ export function PulseApp() {
 
   // ── determine if chrome should show ──
   const noChromePaths = [
+    '/pulse/bsb5',
     '/pulse/select-organization',
     '/pulse/select-event',
     '/pulse/select-mode',

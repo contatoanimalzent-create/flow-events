@@ -23,6 +23,8 @@ interface CheckinRequestBody {
 
 const DEFAULT_GEOFENCE_METERS = 350
 const MAX_ACCURACY_TOLERANCE_METERS = 100
+const BSB5_RECEIPT_IMAGE_URL =
+  'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/staff-documents/bsb5/ponto-pulse.png'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -153,6 +155,47 @@ async function sendEvolutionWhatsApp(params: {
     const data = await res.json().catch(() => ({})) as { key?: { id?: string }, status?: string }
     if (!res.ok) {
       return { ok: false, id: null, error: `Evolution HTTP ${res.status}: ${JSON.stringify(data)}` }
+    }
+    return { ok: true, id: data.key?.id ?? data.status ?? null, error: null }
+  } catch (err: unknown) {
+    return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
+  }
+}
+
+async function sendEvolutionWhatsAppImage(params: {
+  to: string
+  imageUrl: string
+  caption: string
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  const apiUrl = Deno.env.get('EVOLUTION_API_URL') ?? ''
+  const apiKey = Deno.env.get('EVOLUTION_API_KEY') ?? ''
+  const instance = Deno.env.get('EVOLUTION_INSTANCE_NAME') ?? ''
+
+  if (!apiUrl || !apiKey || !instance || !params.to || !params.imageUrl) {
+    return { ok: false, id: null, error: 'Evolution API not configured.' }
+  }
+
+  try {
+    const baseUrl = apiUrl.replace(/\/$/, '')
+    const res = await fetch(`${baseUrl}/message/sendMedia/${instance}`, {
+      method: 'POST',
+      headers: {
+        apikey: apiKey,
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        number: normalizePhoneDigits(params.to),
+        mediatype: 'image',
+        mimetype: 'image/png',
+        media: params.imageUrl,
+        fileName: 'comprovante-ponto-bsb-fight-5.png',
+        caption: params.caption,
+        delay: 1200,
+      }),
+    })
+    const data = await res.json().catch(() => ({})) as { key?: { id?: string }, status?: string }
+    if (!res.ok) {
+      return { ok: false, id: null, error: `Evolution media HTTP ${res.status}: ${JSON.stringify(data)}` }
     }
     return { ok: true, id: data.key?.id ?? data.status ?? null, error: null }
   } catch (err: unknown) {
@@ -522,13 +565,21 @@ async function handlePost(req: Request): Promise<Response> {
       'Lembrete: o ponto deve ser batido todos os dias do evento.',
     ].join('\n')
 
-    const whatsappResult = await sendEvolutionWhatsApp({
+    const whatsappResult = await sendEvolutionWhatsAppImage({
       to: staffMember.phone,
-      body: receiptMessage,
+      imageUrl: BSB5_RECEIPT_IMAGE_URL,
+      caption: receiptMessage,
     })
 
     if (!whatsappResult.ok) {
-      console.warn('[staff-checkin] Falha ao enviar comprovante por WhatsApp:', whatsappResult.error)
+      console.warn('[staff-checkin] Falha ao enviar comprovante com imagem por WhatsApp:', whatsappResult.error)
+      const textFallback = await sendEvolutionWhatsApp({
+        to: staffMember.phone,
+        body: receiptMessage,
+      })
+      if (!textFallback.ok) {
+        console.warn('[staff-checkin] Falha ao enviar comprovante em texto por WhatsApp:', textFallback.error)
+      }
     }
   }
 

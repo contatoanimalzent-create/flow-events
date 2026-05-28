@@ -114,8 +114,14 @@ function interpolate(tmpl: string, vars: Record<string, string | number | boolea
 function normalizePhone(raw: string): string {
   let p = raw.trim()
   if (p.startsWith('whatsapp:')) p = p.slice(9)
-  if (!p.startsWith('+')) p = '+' + p
-  return p
+
+  let digits = p.replace(/\D/g, '')
+  if (!digits) return ''
+  if (digits.startsWith('00')) digits = digits.slice(2)
+
+  if (digits.startsWith('55') && digits.length >= 12) return `+${digits}`
+  if (digits.length === 10 || digits.length === 11) return `+55${digits}`
+  return `+${digits}`
 }
 
 function normalizePhoneDigits(raw: string): string {

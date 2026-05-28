@@ -261,6 +261,23 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     { label: 'Registros recentes', value: stats.checkins, Icon: Clipboard },
   ]
 
+  const staffByRole = useMemo(() => {
+    const groups = new Map<string, BsbStaff[]>()
+    staff.forEach((member) => {
+      const role = member.role_title?.trim() || 'Funcao nao informada'
+      const list = groups.get(role) ?? []
+      list.push(member)
+      groups.set(role, list)
+    })
+
+    return Array.from(groups.entries())
+      .map(([role, members]) => ({
+        role,
+        members: members.sort((a, b) => fullName(a).localeCompare(fullName(b), 'pt-BR')),
+      }))
+      .sort((a, b) => a.role.localeCompare(b.role, 'pt-BR'))
+  }, [staff])
+
   const checkinStaffNames = useMemo(() => {
     const names = new Map<string, string>()
     staff.forEach((s) => names.set(s.id, fullName(s)))
@@ -454,6 +471,32 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
                 Cadastro <ExternalLink className="h-3 w-3" />
               </a>
             </div>
+            <div className="space-y-4">
+              {staffByRole.map((group) => (
+                <div key={group.role} className="space-y-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <h3 className="text-sm font-black text-white">{group.role}</h3>
+                    <span className="rounded-full bg-[#D4FF00] px-2 py-0.5 text-[11px] font-black text-black">
+                      {group.members.length}
+                    </span>
+                  </div>
+                  {group.members.map((member) => (
+                    <div key={member.id} className="rounded-2xl border border-white/8 bg-black/20 p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold">{fullName(member)}</p>
+                          <p className="truncate text-xs text-slate-400">{member.area || 'Sem area especifica'}</p>
+                          <p className="mt-1 truncate text-xs text-slate-500">{member.phone || member.email || 'Sem contato'}</p>
+                        </div>
+                        <StatusBadge staff={member} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+              {staff.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Nenhum staff cadastrado nesse evento.</p>}
+            </div>
+            {false && (
             <div className="space-y-2">
               {staff.map((member) => (
                 <div key={member.id} className="rounded-2xl border border-white/8 bg-black/20 p-3">
@@ -469,6 +512,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
               ))}
               {staff.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Nenhum staff cadastrado nesse evento.</p>}
             </div>
+            )}
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">

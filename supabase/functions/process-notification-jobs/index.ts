@@ -224,6 +224,76 @@ function buildStaffPointMessage(vars: Record<string, string | number | boolean>,
   ].join(' ')
 }
 
+function splitMessageSentences(body: string): string[] {
+  return body
+    .replace(/\s+/g, ' ')
+    .split(/(?<=[.!?])\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+}
+
+function diversifyWhatsAppBody(
+  body: string,
+  vars: Record<string, string | number | boolean>,
+  seed: string,
+): string {
+  const h = hashString(seed)
+  const firstName = String(vars.first_name || vars.name || '').trim()
+  const greeting = getSaoPauloGreeting()
+  const sentences = splitMessageSentences(body)
+  const nameSuffix = firstName ? `, ${firstName}` : ''
+
+  const openings = [
+    `${greeting}${nameSuffix}.`,
+    `${greeting}${nameSuffix}, tudo certo?`,
+    `${greeting}! Passando uma orientação rápida${firstName ? ` para você, ${firstName}` : ''}.`,
+    `${greeting}${nameSuffix}. Aviso do Pulse.`,
+    `${greeting}${nameSuffix}. Recado sobre seu ponto no evento.`,
+    `${greeting}${nameSuffix}. Informação importante para hoje.`,
+    `${greeting}${nameSuffix}. Confira esta orientação do evento.`,
+    `${greeting}${nameSuffix}. Mensagem operacional do Pulse.`,
+  ]
+
+  const connectors = [
+    'Atenção:',
+    'Importante:',
+    'Orientação:',
+    'Para organizar a equipe:',
+    'Sobre o seu acesso:',
+    'Para evitar erro no ponto:',
+    'Quando estiver no evento:',
+    'Antes de registrar presença:',
+  ]
+
+  const closings = [
+    'Qualquer dúvida, procure a equipe de credenciamento.',
+    'Guarde esta mensagem para consultar no evento.',
+    'Use o link apenas quando estiver no local do evento.',
+    'O registro deve ser feito no local do evento.',
+    'No evento, siga a orientação da equipe de credenciamento.',
+    'Mantenha câmera e localização liberadas no celular.',
+    'O ponto precisa ser batido em todos os dias em que você trabalhar.',
+    'Ao concluir o ponto, mostre o comprovante no credenciamento.',
+  ]
+
+  const opening = openings[h % openings.length]
+  const connector = connectors[Math.floor(h / 10) % connectors.length]
+  const closing = closings[Math.floor(h / 100) % closings.length]
+
+  if (sentences.length === 0) return [opening, connector, body, closing].filter(Boolean).join(' ')
+
+  const shouldMoveFirstSentence = sentences.length > 2 && h % 3 === 0
+  const main = shouldMoveFirstSentence
+    ? [...sentences.slice(1), sentences[0]]
+    : sentences
+
+  return [
+    opening,
+    `${connector} ${main.join(' ')}`,
+    closing,
+  ].join(' ')
+}
+
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Provider: Resend (email)
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -491,9 +561,10 @@ async function sendToContact(
   }
 
   if (job.channel === 'whatsapp' && whatsappTmpl) {
+    const seed = `${job.id}:${recipient}:${vars.staff_member_id ?? ''}:${job.template_key}`
     const rb = job.template_key === 'staff-confirmed-permissions'
       ? buildStaffPointMessage(vars, `${job.id}:${recipient}:${vars.staff_member_id ?? ''}`)
-      : interpolate(whatsappTmpl.body, vars)
+      : diversifyWhatsAppBody(interpolate(whatsappTmpl.body, vars), vars, seed)
     bodyPreview = rb.slice(0, 500)
     const r = await sendWhatsApp({ to: recipient, body: rb, env })
     ok = r.ok; messageId = r.id; errorMsg = r.error
@@ -615,9 +686,8 @@ async function processJob(
 
   console.info('[process-notification-jobs] Job ' + job.id + ': ' + eligible.length + ' eligible (' + job.channel + ')')
 
-  // Send in batches of 10
-  const BATCH = 5
-  const BATCH_DELAY_MS = 3000
+  const BATCH = job.channel === 'whatsapp' ? 1 : 5
+  const BATCH_DELAY_MS = job.channel === 'whatsapp' ? 9000 : 3000
   let processed = 0
   let failed    = 0
 

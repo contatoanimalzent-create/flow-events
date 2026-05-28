@@ -344,14 +344,11 @@ export function StaffJoinPage() {
     if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
     else if (cpfDigits.length !== 11) errors.cpf = 'CPF inválido.'
     if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
-    if (!form.company.trim()) errors.company = 'Empresa é obrigatória.'
     if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX é obrigatória.'
     if (!form.shift_label) errors.shift_label = 'Selecione a função para carregar o horário.'
     if (!form.tshirt_size) errors.tshirt_size = 'Tamanho da camiseta é obrigatório.'
     if (!form.bio.trim()) errors.bio = 'Experiência / apresentação é obrigatória.'
-    if (!form.emergency_contact_name.trim()) errors.emergency_contact_name = 'Contato de emergência é obrigatório.'
-    if (!form.emergency_contact_phone.trim()) errors.emergency_contact_phone = 'Telefone de emergência é obrigatório.'
-    else if (!isValidBsbPhone(form.emergency_contact_phone)) {
+    if (form.emergency_contact_phone.trim() && !isValidBsbPhone(form.emergency_contact_phone)) {
       errors.emergency_contact_phone = 'Informe o telefone com DDD 61: (61) 99999-9999.'
     }
     if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
@@ -388,8 +385,10 @@ export function StaffJoinPage() {
         shift_label: form.shift_label || undefined,
         bio: [
           form.bio.trim(),
-          `Contato de emergência: ${form.emergency_contact_name.trim()} - ${form.emergency_contact_phone.trim()}`,
-        ].join(' | '),
+          form.emergency_contact_name.trim() || form.emergency_contact_phone.trim()
+            ? `Contato de emergência: ${form.emergency_contact_name.trim() || '-'} - ${form.emergency_contact_phone.trim() || '-'}`
+            : null,
+        ].filter(Boolean).join(' | '),
         terms_accepted: true,
         custom_field_answers: form.custom_answers,
       }
@@ -682,14 +681,13 @@ export function StaffJoinPage() {
                     </div>
                   </InputField>
 
-                  <InputField label="Empresa" required error={fieldErrors.company}>
+                  <InputField label="Empresa" error={fieldErrors.company}>
                     <input
                       type="text"
                       value={form.company}
                       onChange={(e) => setField('company', e.target.value)}
                       placeholder="Nome da empresa"
                       className={inputClass}
-                      required
                     />
                   </InputField>
                 </div>
@@ -787,17 +785,16 @@ export function StaffJoinPage() {
                 Contato de emergência
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <InputField label="Nome" required error={fieldErrors.emergency_contact_name}>
+                <InputField label="Nome" error={fieldErrors.emergency_contact_name}>
                   <input
                     type="text"
                     value={form.emergency_contact_name}
                     onChange={(e) => setField('emergency_contact_name', e.target.value)}
                     placeholder="Nome do contato"
                     className={inputClass}
-                    required
                   />
                 </InputField>
-                <InputField label="Telefone" required error={fieldErrors.emergency_contact_phone}>
+                <InputField label="Telefone" error={fieldErrors.emergency_contact_phone}>
                   <input
                     type="tel"
                     value={form.emergency_contact_phone}
@@ -806,7 +803,6 @@ export function StaffJoinPage() {
                     className={inputClass}
                     inputMode="numeric"
                     maxLength={15}
-                    required
                   />
                 </InputField>
               </div>

@@ -94,8 +94,15 @@ export function StaffCheckinPage() {
   const [idCpf, setIdCpf] = useState('')
   const [idPhone, setIdPhone] = useState('')
 
+  function normalizeBsbPhoneDigits(v: string): string {
+    let d = v.replace(/\D/g, '')
+    if (d.startsWith('0055')) d = d.slice(4)
+    if (d.startsWith('55') && d.length > 11) d = d.slice(2)
+    return d.slice(0, 11)
+  }
+
   function formatPhone(v: string) {
-    const d = v.replace(/\D/g, '').slice(0, 11)
+    const d = normalizeBsbPhoneDigits(v)
     if (d.length <= 2) return d
     if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
     return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
@@ -148,6 +155,12 @@ export function StaffCheckinPage() {
   async function handleIdentify(e: React.FormEvent) {
     e.preventDefault()
     if (!idEmail.trim() || !idCpf.trim() || !idPhone.trim() || !eventSlug) return
+    const phoneDigits = normalizeBsbPhoneDigits(idPhone)
+    if (phoneDigits.length !== 11 || !phoneDigits.startsWith('61')) {
+      setErrorMessage('Informe o WhatsApp com DDD 61: (61) 99999-9999.')
+      setStep('error')
+      return
+    }
 
     setLoading(true)
     setErrorMessage('')
@@ -157,7 +170,7 @@ export function StaffCheckinPage() {
         event_slug: eventSlug,
         email: idEmail.trim().toLowerCase(),
         cpf: idCpf.replace(/\D/g, ''),
-        phone: idPhone.replace(/\D/g, ''),
+        phone: phoneDigits,
       })
       const url = `${EDGE_FN_URL}?${params}`
       const res = await fetch(url, { method: 'GET' })

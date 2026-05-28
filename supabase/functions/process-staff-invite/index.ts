@@ -116,6 +116,13 @@ function normalizeBrazilWhatsapp(value?: string | null): string | null {
   return digits.startsWith('+') ? digits : `+${digits}`
 }
 
+function normalizeBsbPhoneDigits(value?: string | null): string {
+  let digits = (value ?? '').replace(/\D/g, '')
+  if (digits.startsWith('0055')) digits = digits.slice(4)
+  if (digits.startsWith('55') && digits.length > 11) digits = digits.slice(2)
+  return digits.slice(0, 11)
+}
+
 function buildVenueLabel(venueName?: string | null, venueAddress?: Record<string, unknown> | null): string {
   const fullAddress = typeof venueAddress?.full_address === 'string' ? venueAddress.full_address : ''
   const city = typeof venueAddress?.city === 'string' ? venueAddress.city : ''
@@ -830,6 +837,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
         return Response.json({ error: check.error }, addCors({ status: check.status }))
       }
 
+      const cleanPhone = normalizeBsbPhoneDigits(body.phone)
+      if (body.token === 'bsb5' && (cleanPhone.length !== 11 || !cleanPhone.startsWith('61'))) {
+        return Response.json(
+          { error: 'Informe o WhatsApp com DDD 61: (61) 99999-9999.' },
+          addCors({ status: 400 }),
+        )
+      }
+
       const { data: existingStaff } = await admin
         .from('staff_members')
         .select('id')
@@ -857,7 +872,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
           first_name:       firstName,
           last_name:        lastName,
           email:            body.email!.toLowerCase().trim(),
-          phone:            body.phone ?? null,
+          phone:            cleanPhone || body.phone || null,
           cpf:              body.document_number ?? null,
           role_title:       body.role_title || inviteLink.role_type || 'staff',
           company:          body.company ?? null,
@@ -902,7 +917,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         staffMemberId: staffMember.id,
         staffName: body.full_name!.trim(),
         staffEmail: body.email!.toLowerCase().trim(),
-        staffPhone: body.phone ?? null,
+        staffPhone: cleanPhone || body.phone || null,
         roleType: inviteLink.role_type,
         teamId: inviteLink.team_id ?? null,
         shiftId: inviteLink.shift_id ?? null,

@@ -75,10 +75,22 @@ function isAlreadyRegisteredResponse(body: Record<string, unknown>): boolean {
 }
 
 function formatPhoneInput(v: string): string {
-  const d = v.replace(/\D/g, '').slice(0, 11)
+  const d = normalizeBsbPhoneDigits(v)
   if (d.length <= 2) return d
   if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+}
+
+function normalizeBsbPhoneDigits(v: string): string {
+  let d = v.replace(/\D/g, '')
+  if (d.startsWith('0055')) d = d.slice(4)
+  if (d.startsWith('55') && d.length > 11) d = d.slice(2)
+  return d.slice(0, 11)
+}
+
+function isValidBsbPhone(v: string): boolean {
+  const d = normalizeBsbPhoneDigits(v)
+  return d.length === 11 && d.startsWith('61')
 }
 
 function formatCpfInput(v: string): string {
@@ -318,11 +330,11 @@ export function StaffJoinPage() {
 
     if (!form.full_name.trim()) errors.full_name = 'Nome completo é obrigatório.'
     if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) errors.email = 'E-mail inválido.'
-    const phoneDigits = form.phone.replace(/\D/g, '')
+    const phoneDigits = normalizeBsbPhoneDigits(form.phone)
     const cpfDigits = form.cpf.replace(/\D/g, '')
 
     if (!form.phone.trim()) errors.phone = 'Telefone é obrigatório.'
-    else if (phoneDigits.length < 10) errors.phone = 'Telefone inválido.'
+    else if (!isValidBsbPhone(form.phone)) errors.phone = 'Informe o WhatsApp com DDD 61: (61) 99999-9999.'
     if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
     else if (cpfDigits.length !== 11) errors.cpf = 'CPF inválido.'
     if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
@@ -333,8 +345,8 @@ export function StaffJoinPage() {
     if (!form.bio.trim()) errors.bio = 'Experiência / apresentação é obrigatória.'
     if (!form.emergency_contact_name.trim()) errors.emergency_contact_name = 'Contato de emergência é obrigatório.'
     if (!form.emergency_contact_phone.trim()) errors.emergency_contact_phone = 'Telefone de emergência é obrigatório.'
-    else if (form.emergency_contact_phone.replace(/\D/g, '').length < 10) {
-      errors.emergency_contact_phone = 'Telefone de emergência inválido.'
+    else if (!isValidBsbPhone(form.emergency_contact_phone)) {
+      errors.emergency_contact_phone = 'Informe o telefone com DDD 61: (61) 99999-9999.'
     }
     if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
 
@@ -354,11 +366,12 @@ export function StaffJoinPage() {
 
     setSubmitting(true)
     try {
+      const phoneDigits = normalizeBsbPhoneDigits(form.phone)
       const payload = {
         token,
         full_name: form.full_name.trim(),
         email: form.email.trim().toLowerCase(),
-        phone: form.phone.replace(/\D/g, ''),
+        phone: phoneDigits,
         document_number: form.cpf.replace(/\D/g, '') || undefined,
         t_shirt_size: form.tshirt_size || undefined,
         role_title: form.role_title.trim() || undefined,

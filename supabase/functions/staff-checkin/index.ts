@@ -108,6 +108,58 @@ function saoPauloDateFolder(date = new Date()): string {
   return `${value('year')}-${value('month')}-${value('day')}`
 }
 
+function saoPauloDateTime(date = new Date()): string {
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(date)
+}
+
+function normalizePhoneDigits(phone: string): string {
+  let digits = phone.replace(/\D/g, '')
+  if (digits.startsWith('00')) digits = digits.slice(2)
+  if (!digits.startsWith('55') && digits.length >= 10 && digits.length <= 11) digits = `55${digits}`
+  return digits
+}
+
+async function sendEvolutionWhatsApp(params: {
+  to: string
+  body: string
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  const apiUrl = Deno.env.get('EVOLUTION_API_URL') ?? ''
+  const apiKey = Deno.env.get('EVOLUTION_API_KEY') ?? ''
+  const instance = Deno.env.get('EVOLUTION_INSTANCE_NAME') ?? ''
+
+  if (!apiUrl || !apiKey || !instance || !params.to) {
+    return { ok: false, id: null, error: 'Evolution API not configured.' }
+  }
+
+  try {
+    const baseUrl = apiUrl.replace(/\/$/, '')
+    const res = await fetch(`${baseUrl}/message/sendText/${instance}`, {
+      method: 'POST',
+      headers: {
+        apikey: apiKey,
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        number: normalizePhoneDigits(params.to),
+        text: params.body,
+        delay: 1200,
+        linkPreview: true,
+      }),
+    })
+    const data = await res.json().catch(() => ({})) as { key?: { id?: string }, status?: string }
+    if (!res.ok) {
+      return { ok: false, id: null, error: `Evolution HTTP ${res.status}: ${JSON.stringify(data)}` }
+    }
+    return { ok: true, id: data.key?.id ?? data.status ?? null, error: null }
+  } catch (err: unknown) {
+    return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // GET handler — lookup staff status
 // ─────────────────────────────────────────────────────────────────────────────
@@ -258,7 +310,7 @@ async function handlePost(req: Request): Promise<Response> {
   // ── 1. Validate staff member exists and is active ─────────────────────────
   const { data: staffMember, error: staffErr } = await admin
     .from('staff_members')
-    .select('id, first_name, last_name, email, role_title, status, event_id')
+    .select('id, first_name, last_name, email, phone, role_title, status, event_id')
     .eq('id', staff_member_id)
     .maybeSingle()
 
@@ -290,7 +342,7 @@ async function handlePost(req: Request): Promise<Response> {
   // ── 2. Get event venue coordinates ────────────────────────────────────────
   const { data: event, error: eventErr } = await admin
     .from('events')
-    .select('id, venue_coordinates, geofence_radius_meters')
+    .select('id, name, venue_name, venue_address, venue_coordinates, geofence_radius_meters')
     .eq('id', event_id)
     .maybeSingle()
 
@@ -448,6 +500,38 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   // ── 10. Return success ────────────────────────────────────────────────────
+  if (type === 'checkin' && staffMember.phone) {
+    const staffName = [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')
+    const venueAddress = event.venue_address as Record<string, unknown> | null
+    const addressParts = venueAddress
+      ? [venueAddress.street, venueAddress.city, venueAddress.state].filter(Boolean).join(', ')
+      : ''
+    const venueLabel = [event.venue_name, addressParts].filter(Boolean).join(' - ') || 'Centro Olímpico da Estrutural, Brasília - DF'
+    const receiptCode = String(checkinRecord.id).slice(0, 8).toUpperCase()
+    const receiptMessage = [
+      `COMPROVANTE DE PONTO - ${event.name ?? 'BSB FIGHT 5'}`,
+      '',
+      `Nome: ${staffName}`,
+      'Tipo: Entrada',
+      `Data/hora: ${saoPauloDateTime(new Date(checkinRecord.created_at))}`,
+      `Local: ${venueLabel}`,
+      `Coordenadas: ${Number(latitude).toFixed(6)}, ${Number(longitude).toFixed(6)}`,
+      `Código: ${receiptCode}`,
+      '',
+      'Dirija-se ao credenciamento para retirar sua pulseira e mostre este comprovante.',
+      'Lembrete: o ponto deve ser batido todos os dias do evento.',
+    ].join('\n')
+
+    const whatsappResult = await sendEvolutionWhatsApp({
+      to: staffMember.phone,
+      body: receiptMessage,
+    })
+
+    if (!whatsappResult.ok) {
+      console.warn('[staff-checkin] Falha ao enviar comprovante por WhatsApp:', whatsappResult.error)
+    }
+  }
+
   const message =
     type === 'checkin'
       ? `Check-in registrado com sucesso para ${[staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')}.`

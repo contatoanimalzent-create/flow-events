@@ -944,6 +944,12 @@ export function StaffCheckinPage() {
           <p className="mt-3 text-base text-white/56">
             {staff?.full_name}, sua presença foi confirmada.
           </p>
+          <p className="mt-4 text-base leading-7 text-white/70">
+            Dirija-se ao credenciamento para retirar sua pulseira e mostre o comprovante enviado no seu WhatsApp.
+          </p>
+          <p className="mt-3 text-sm leading-6 text-white/48">
+            Lembre-se: o ponto deve ser batido todos os dias do evento.
+          </p>
           <p className="mt-1 text-sm text-white/40">
             {new Date().toLocaleTimeString('pt-BR', {
               hour: '2-digit',

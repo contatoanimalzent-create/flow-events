@@ -33,7 +33,7 @@ interface CustomField {
   options?: string[]
 }
 
-type PageState = 'loading' | 'valid' | 'error' | 'success'
+type PageState = 'loading' | 'valid' | 'error' | 'success' | 'already_registered'
 
 type TShirtSize = 'PP' | 'P' | 'M' | 'G' | 'GG' | 'XGG'
 
@@ -61,6 +61,17 @@ interface StaffRoleOption {
   label: string
   scheduleLines: string[]
   shiftLabel: string
+}
+
+const BSB5_POINT_URL = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
+
+function isAlreadyRegisteredResponse(body: Record<string, unknown>): boolean {
+  const text = String(body?.error ?? body?.message ?? body?.code ?? '').toLowerCase()
+  return (
+    text.includes('já está cadastrado') ||
+    text.includes('ja esta cadastrado') ||
+    text.includes('already')
+  )
 }
 
 const standardEventStaffSchedule = [
@@ -233,6 +244,10 @@ export function StaffJoinPage() {
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({}))
+          if (isAlreadyRegisteredResponse(body)) {
+            setPageState('already_registered')
+            return
+          }
           setErrorMessage(body?.message ?? 'Este convite é inválido, expirou ou já atingiu o limite de vagas.')
           setPageState('error')
           return
@@ -339,6 +354,10 @@ export function StaffJoinPage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
+        if (isAlreadyRegisteredResponse(body)) {
+          setPageState('already_registered')
+          return
+        }
         setErrorMessage(body?.error ?? body?.message ?? 'Erro ao realizar cadastro. Tente novamente.')
         setPageState('error')
         return
@@ -391,6 +410,39 @@ export function StaffJoinPage() {
   }
 
   // ── Success state ──────────────────────────────────────────────────────────
+  if (pageState === 'already_registered') {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 text-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#D4FF00]/20 bg-[#D4FF00]/10">
+          <CheckCircle2 className="h-9 w-9 text-[#D4FF00]" />
+        </div>
+        <div className="max-w-md">
+          <h1 className="font-display text-[2.4rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
+            Cadastro já confirmado
+          </h1>
+          <p className="mt-4 text-base leading-7 text-white/68">
+            Seus dados já estão no BSB FIGHT 5. Agora use o link de ponto somente quando estiver no local do evento.
+          </p>
+          <p className="mt-3 text-sm leading-6 text-white/48">
+            O ponto deve ser batido todos os dias do evento.
+          </p>
+        </div>
+        <a
+          href={BSB5_POINT_URL}
+          className="mt-2 inline-flex items-center gap-2 rounded-full bg-[#D4FF00] px-7 py-3 text-sm font-bold uppercase tracking-[0.12em] text-black transition-all hover:bg-[#e2ff3d]"
+        >
+          Bater ponto
+        </a>
+        <a
+          href={BSB5_POINT_URL}
+          className="break-all text-sm font-medium text-[#D4FF00] underline underline-offset-4"
+        >
+          {BSB5_POINT_URL}
+        </a>
+      </div>
+    )
+  }
+
   if (pageState === 'success') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 text-center">

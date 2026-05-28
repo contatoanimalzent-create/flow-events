@@ -319,7 +319,7 @@ async function handlePost(req: Request): Promise<Response> {
     )
     if (distanceFromVenueMeters > maxDist) {
       return errorResponse(
-        `Você está a ${distanceFromVenueMeters}m do local do evento. Para registrar o ponto, é necessário estar no local do evento.`,
+        'Para registrar o ponto, é necessário estar no local do evento.',
         403,
         'TOO_FAR_FROM_VENUE',
       )

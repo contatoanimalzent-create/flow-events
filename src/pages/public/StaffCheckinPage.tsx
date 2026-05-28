@@ -73,11 +73,6 @@ function haversineDistance(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
-function formatDistance(meters: number): string {
-  if (meters < 1000) return `${Math.round(meters)}m`
-  return `${(meters / 1000).toFixed(1)}km`
-}
-
 function isOutsideVenue(distance: number | null, radius: number | null, accuracy?: number): boolean {
   if (distance === null || radius === null) return false
   const accuracyTolerance = typeof accuracy === 'number' ? Math.min(Math.max(accuracy, 0), 100) : 0
@@ -306,7 +301,7 @@ export function StaffCheckinPage() {
 
       if (isOutsideVenue(dist, staff?.geofence_radius_meters ?? null, location.accuracy)) {
         setDistance(dist)
-        setErrorMessage(`Você está a ${formatDistance(dist!)} do local do evento. Para registrar o ponto, é necessário estar no local do evento.`)
+        setErrorMessage('Para registrar o ponto, é necessário estar no local do evento.')
         setStep('error')
         return
       }
@@ -364,7 +359,7 @@ export function StaffCheckinPage() {
 
       if (isOutsideVenue(dist, staff?.geofence_radius_meters ?? null, location.accuracy)) {
         setDistance(dist)
-        setErrorMessage(`Você está a ${formatDistance(dist!)} do local do evento. Para registrar o ponto, é necessário estar no local do evento.`)
+        setErrorMessage('Para registrar o ponto, é necessário estar no local do evento.')
         setStep('error')
         return
       }
@@ -686,12 +681,10 @@ export function StaffCheckinPage() {
                 <span className="text-sm">Obtendo localização...</span>
               </div>
             )}
-            {geoStatus === 'done' && distance !== null && (
+            {geoStatus === 'done' && coords && (
               <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm">
-                  {formatDistance(distance)} do local do evento
-                </span>
+                <span className="text-sm">Localização capturada</span>
               </div>
             )}
 
@@ -829,9 +822,7 @@ export function StaffCheckinPage() {
               <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
                 <MapPin className="h-4 w-4" />
                 <span className="text-sm">
-                  {distance !== null
-                    ? `${formatDistance(distance)} do local do evento`
-                    : 'Localização capturada'}
+                  Localização capturada
                 </span>
               </div>
             )}
@@ -906,7 +897,7 @@ export function StaffCheckinPage() {
             {coords && (
               <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm">{distance !== null ? `${formatDistance(distance)} do local` : 'Localização capturada'}</span>
+                <span className="text-sm">Localização capturada</span>
               </div>
             )}
             <div className="mt-6 flex flex-col gap-3">

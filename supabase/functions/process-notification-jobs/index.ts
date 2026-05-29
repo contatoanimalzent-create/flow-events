@@ -803,8 +803,8 @@ async function processJob(
 
   console.info('[process-notification-jobs] Job ' + job.id + ': ' + eligible.length + ' eligible (' + job.channel + ')')
 
-  const BATCH = job.channel === 'whatsapp' ? 1 : 5
-  const BATCH_DELAY_MS = job.channel === 'whatsapp' ? 9000 : 3000
+  const BATCH = 1
+  const BATCH_DELAY_MS = job.channel === 'whatsapp' ? 9000 : 750
   let processed = 0
   let failed    = 0
 

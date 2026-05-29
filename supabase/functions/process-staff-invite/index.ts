@@ -157,8 +157,9 @@ async function queueStaffConfirmationNotifications(
   const appUrl = (Deno.env.get('APP_URL') ?? 'https://pulse.animalzgroup.com').replace(/\/$/, '')
   const pointUrl = `${appUrl}/staff/ponto/${params.eventSlug}`
   const logoUrl = 'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/public-assets/brand/pulse-logo-principal-transparente.png'
+  const defaultBsb5ImageUrl = 'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/staff-documents/bsb5/ponto-pulse.png'
   const venueLabel = buildVenueLabel(params.venueName, params.venueAddress)
-  const eventImageUrl = params.eventImageUrl ?? ''
+  const eventImageUrl = params.eventImageUrl || (params.eventSlug === 'bsb-fight-5' ? defaultBsb5ImageUrl : '')
   const phone = normalizeBrazilWhatsapp(params.staffPhone)
   const audienceEmails = [params.staffEmail].filter(Boolean)
   const audiencePhones = phone ? [phone] : []
@@ -187,7 +188,7 @@ async function queueStaffConfirmationNotifications(
   await admin.from('email_templates').upsert({
     organization_id: params.organizationId,
     key: templateKey,
-    subject: '{{event_name}} | Ponto digital liberado',
+    subject: '{{event_name}} | Dados confirmados e ponto digital',
     html: `
       <!DOCTYPE html>
       <html lang="pt-BR">
@@ -201,11 +202,11 @@ async function queueStaffConfirmationNotifications(
             <td align="center">
               <table role="presentation" width="620" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;background:#0d0d10;border:1px solid #242428;border-radius:18px;overflow:hidden;">
                 <tr>
-                  <td style="background:#101014;padding:22px 28px;border-bottom:1px solid #25252a;">
+                  <td style="background:#101014;padding:24px 28px;border-bottom:1px solid #25252a;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td valign="middle">
-                          <img src="{{pulse_logo_url}}" alt="Pulse" width="220" style="display:block;width:220px;max-width:78%;height:auto;border:0;">
+                          <img src="{{pulse_logo_url}}" alt="Pulse" width="280" style="display:block;width:280px;max-width:82%;height:auto;border:0;">
                         </td>
                         <td align="right" valign="middle" style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#d4ff00;">
                           Ponto digital
@@ -221,10 +222,10 @@ async function queueStaffConfirmationNotifications(
                 </tr>
                 <tr>
                   <td style="padding:34px 30px 8px;">
-                    <div style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#d4ff00;margin-bottom:14px;">Staff confirmado</div>
+                    <div style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#d4ff00;margin-bottom:14px;">Equipe confirmada</div>
                     <h1 style="margin:0;color:#ffffff;font-size:30px;line-height:1.12;font-weight:900;">{{event_name}}</h1>
                     <p style="margin:18px 0 0;color:#d7d7db;font-size:16px;line-height:1.65;">
-                      Olá, <strong style="color:#ffffff;">{{first_name}}</strong>. Seus dados para trabalhar no evento foram confirmados.
+                      Olá, <strong style="color:#ffffff;">{{first_name}}</strong>. Seus dados para trabalhar no evento foram confirmados. Este é o seu acesso ao ponto digital do Pulse.
                     </p>
                   </td>
                 </tr>
@@ -242,8 +243,22 @@ async function queueStaffConfirmationNotifications(
                 </tr>
                 <tr>
                   <td style="padding:22px 30px 0;">
-                    <p style="margin:0;color:#d7d7db;font-size:15px;line-height:1.7;">
-                      Abra o link abaixo para liberar <strong style="color:#ffffff;">câmera, localização e notificações</strong>. O ponto digital deve ser usado <strong style="color:#ffffff;">somente quando você estiver no local do evento</strong>. Fora do local, o Pulse informa a distância até o evento e bloqueia o registro.
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="width:50%;padding:0 8px 12px 0;" valign="top">
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#121217;border:1px solid #2b2b31;border-radius:14px;">
+                            <tr><td style="padding:16px;color:#d7d7db;font-size:14px;line-height:1.55;"><strong style="display:block;color:#ffffff;margin-bottom:6px;">Antes do ponto</strong>Ative câmera, localização e notificações no celular.</td></tr>
+                          </table>
+                        </td>
+                        <td style="width:50%;padding:0 0 12px 8px;" valign="top">
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#121217;border:1px solid #2b2b31;border-radius:14px;">
+                            <tr><td style="padding:16px;color:#d7d7db;font-size:14px;line-height:1.55;"><strong style="display:block;color:#ffffff;margin-bottom:6px;">No evento</strong>Use o link somente quando estiver no local do evento.</td></tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                    <p style="margin:8px 0 0;color:#d7d7db;font-size:15px;line-height:1.7;">
+                      O ponto deve ser batido em todos os dias em que você trabalhar. Depois de concluir a entrada, apresente o comprovante no credenciamento para retirar sua pulseira.
                     </p>
                   </td>
                 </tr>
@@ -262,7 +277,7 @@ async function queueStaffConfirmationNotifications(
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#101014;border-radius:12px;">
                       <tr>
                         <td style="padding:16px 18px;color:#b9b9c0;font-size:13px;line-height:1.6;">
-                          Dica: use o mesmo e-mail, CPF e WhatsApp informados no cadastro para acessar o ponto. O registro de entrada e saída só é aceito no local do evento.
+                          Dica: use o mesmo e-mail, CPF e WhatsApp informados no cadastro para acessar o ponto. Fora do local do evento, o sistema bloqueia o registro.
                         </td>
                       </tr>
                     </table>
@@ -280,7 +295,7 @@ async function queueStaffConfirmationNotifications(
       </body>
       </html>
     `.trim(),
-    text: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Use o ponto somente quando estiver no local do evento. Fora do local, o Pulse informa a distância até o evento e bloqueia o registro.',
+    text: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Use o ponto somente quando estiver no local do evento. Ative câmera, localização e notificações. O ponto deve ser batido em todos os dias em que você trabalhar. Depois da entrada, apresente o comprovante no credenciamento para retirar sua pulseira.',
   }, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] email template upsert failed:', error.message)
   })

@@ -294,6 +294,36 @@ function diversifyWhatsAppBody(
   ].join(' ')
 }
 
+function compactSmsBody(rawBody: string): string {
+  const body = rawBody
+    .replace(/\s+/g, ' ')
+    .replace(/Link do ponto:/gi, 'Ponto:')
+    .trim()
+  if (body.length <= 300) return body
+
+  const url = body.match(/https?:\/\/\S+/)?.[0]?.replace(/[).,;]+$/, '') ?? ''
+  const eventName = body.match(/BSB\s*FIGHT\s*5/i)?.[0]?.toUpperCase() ?? 'evento'
+  const localMatch = body.match(/(?:Local(?: do evento)?|Ponto de trabalho|Referência de local):\s*([^.!?]+)[.!?]/i)
+  const local = localMatch?.[1]?.trim()
+
+  const compact = [
+    `Pulse: ${eventName}.`,
+    'Seus dados foram confirmados.',
+    local ? `Local: ${local}.` : '',
+    url ? `Ponto: ${url}` : '',
+    'Use somente quando estiver no local do evento.',
+  ].filter(Boolean).join(' ')
+
+  if (compact.length <= 320) return compact
+
+  return [
+    `Pulse: ${eventName}.`,
+    'Dados confirmados.',
+    url ? `Ponto: ${url}` : '',
+    'Use no local do evento.',
+  ].filter(Boolean).join(' ')
+}
+
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Provider: Resend (email)
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -344,7 +374,7 @@ async function sendWhatsApp(params: {
 
     const smsResult = await sendSms({
       to: params.to,
-      body: params.body,
+      body: compactSmsBody(params.body),
       env: params.env,
     })
     if (smsResult.ok) {
@@ -379,13 +409,13 @@ async function sendWhatsApp(params: {
     })
     const d = (await res.json()) as { sid?: string; error_message?: string }
     if (!res.ok) {
-      const smsResult = await sendSms({ to: params.to, body: params.body, env: params.env })
+      const smsResult = await sendSms({ to: params.to, body: compactSmsBody(params.body), env: params.env })
       if (smsResult.ok) return smsResult
       return { ok: false, id: null, error: 'Twilio HTTP ' + res.status + ': ' + (d.error_message ?? JSON.stringify(d)) + ' | SMS fallback: ' + smsResult.error }
     }
     return { ok: true, id: d.sid ?? null, error: null }
   } catch (err: unknown) {
-    const smsResult = await sendSms({ to: params.to, body: params.body, env: params.env })
+    const smsResult = await sendSms({ to: params.to, body: compactSmsBody(params.body), env: params.env })
     if (smsResult.ok) return smsResult
     return { ok: false, id: null, error: `${err instanceof Error ? err.message : String(err)} | SMS fallback: ${smsResult.error}` }
   }

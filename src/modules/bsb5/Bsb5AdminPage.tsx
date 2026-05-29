@@ -171,6 +171,18 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   const [savingStaff, setSavingStaff] = useState(false)
   const [staffMessage, setStaffMessage] = useState<string | null>(null)
   const [adminTab, setAdminTab] = useState<AdminTab>('staff')
+  const [manualDraft, setManualDraft] = useState<Record<string, string>>({
+    full_name: '',
+    role_title: 'Apoio',
+    phone: '',
+    cpf: '',
+    email: '',
+    company: '',
+    area: '',
+    shift_label: '',
+    notes: '',
+  })
+  const [manualBusy, setManualBusy] = useState<string | null>(null)
 
   const setContext = useAppContext((s) => s.setContext)
   const setAvailableModes = useAppContext((s) => s.setAvailableModes)
@@ -427,6 +439,72 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     setStaffMessage('Dados atualizados.')
   }
 
+  async function runAdminAction(action: string, payload: Record<string, unknown>) {
+    const { data, error } = await supabase.functions.invoke('bsb5-admin-action', {
+      body: { action, ...payload },
+    })
+
+    if (error) throw error
+    if (data?.error) throw new Error(data.error)
+    return data
+  }
+
+  async function createManualStaff() {
+    if (!manualDraft.full_name.trim()) {
+      setStaffMessage('Informe pelo menos o nome da pessoa.')
+      return
+    }
+
+    setManualBusy('create')
+    setStaffMessage(null)
+    try {
+      const data = await runAdminAction('create_staff', manualDraft)
+      if (data?.staff) {
+        setStaff((current) => [data.staff as BsbStaff, ...current])
+        setManualDraft({
+          full_name: '',
+          role_title: 'Apoio',
+          phone: '',
+          cpf: '',
+          email: '',
+          company: '',
+          area: '',
+          shift_label: '',
+          notes: '',
+        })
+      }
+      setStaffMessage('Colaborador cadastrado manualmente.')
+    } catch (error) {
+      setStaffMessage(error instanceof Error ? error.message : 'Erro ao cadastrar manualmente.')
+    } finally {
+      setManualBusy(null)
+    }
+  }
+
+  async function manualPoint(member: BsbStaff, type: 'checkin' | 'checkout') {
+    const label = type === 'checkin' ? 'entrada' : 'saida'
+    setManualBusy(`${type}:${member.id}`)
+    setStaffMessage(null)
+    try {
+      const data = await runAdminAction(type === 'checkin' ? 'manual_checkin' : 'manual_checkout', {
+        staff_member_id: member.id,
+      })
+
+      if (data?.staff) {
+        const updated = data.staff as BsbStaff
+        setStaff((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+      }
+      if (data?.checkin) {
+        setCheckins((current) => [data.checkin as BsbCheckin, ...current])
+      }
+      setStaffMessage(`Registro manual de ${label} realizado para ${fullName(member)}.`)
+    } catch (error) {
+      setStaffMessage(error instanceof Error ? error.message : `Erro ao registrar ${label}.`)
+    } finally {
+      setManualBusy(null)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#06070a] text-white">
@@ -609,6 +687,62 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
         )}
 
         {adminTab === 'staff' && (
+        <>
+        <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="mb-4">
+            <h2 className="font-bold">Cadastro manual de colaborador</h2>
+            <p className="mt-1 text-xs text-slate-400">
+              Use quando a pessoa não conseguir preencher tudo ou estiver com problema de permissões no celular.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['full_name', 'Nome completo *'],
+              ['role_title', 'Função'],
+              ['phone', 'Telefone'],
+              ['cpf', 'CPF'],
+              ['email', 'E-mail'],
+              ['company', 'Empresa'],
+              ['area', 'Área'],
+              ['shift_label', 'Turno / horário'],
+            ].map(([key, label]) => (
+              <label key={key} className="space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{label}</span>
+                <input
+                  value={manualDraft[key] ?? ''}
+                  onChange={(event) => setManualDraft((draft) => ({ ...draft, [key]: event.target.value }))}
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+                />
+              </label>
+            ))}
+          </div>
+
+          <label className="mt-3 block space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">Observação</span>
+            <textarea
+              value={manualDraft.notes ?? ''}
+              onChange={(event) => setManualDraft((draft) => ({ ...draft, notes: event.target.value }))}
+              rows={2}
+              className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+              placeholder="Ex.: pessoa sem CPF em mãos, registro feito no credenciamento..."
+            />
+          </label>
+
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-slate-500">
+              Depois de criar, use os botões de entrada/saída manual na lista abaixo.
+            </p>
+            <button
+              onClick={createManualStaff}
+              disabled={manualBusy === 'create'}
+              className="rounded-2xl bg-[#D4FF00] px-4 py-3 text-sm font-black text-black disabled:opacity-60"
+            >
+              {manualBusy === 'create' ? 'Cadastrando...' : 'Cadastrar manualmente'}
+            </button>
+          </div>
+        </section>
+
         <section className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
             <div className="mb-4 flex items-center justify-between">
@@ -648,6 +782,22 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
                           <button onClick={() => openStaffEditor(member)} className="rounded-full border border-white/10 px-3 py-1 text-[11px] font-bold text-[#D4FF00]">
                             Ver / editar
                           </button>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => manualPoint(member, 'checkin')}
+                              disabled={manualBusy === `checkin:${member.id}` || Boolean(member.checked_in_at && !member.checked_out_at)}
+                              className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-black text-emerald-100 disabled:cursor-not-allowed disabled:opacity-35"
+                            >
+                              {manualBusy === `checkin:${member.id}` ? '...' : 'Entrada'}
+                            </button>
+                            <button
+                              onClick={() => manualPoint(member, 'checkout')}
+                              disabled={manualBusy === `checkout:${member.id}` || !Boolean(member.checked_in_at && !member.checked_out_at)}
+                              className="rounded-full border border-blue-400/20 bg-blue-400/10 px-2.5 py-1 text-[10px] font-black text-blue-100 disabled:cursor-not-allowed disabled:opacity-35"
+                            >
+                              {manualBusy === `checkout:${member.id}` ? '...' : 'Saida'}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -713,6 +863,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           </div>
           )}
         </section>
+        </>
         )}
 
         {editingStaff && (

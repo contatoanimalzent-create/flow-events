@@ -689,9 +689,12 @@ async function handlePost(req: Request): Promise<Response> {
 
   // ── 8/9. Update staff_members checked_in_at / checked_out_at ──────────────
   const updateField = type === 'checkin' ? 'checked_in_at' : 'checked_out_at'
+  const staffUpdate = type === 'checkin'
+    ? { checked_in_at: new Date().toISOString(), checked_out_at: null }
+    : { checked_out_at: new Date().toISOString() }
   const { error: updateErr } = await admin
     .from('staff_members')
-    .update({ [updateField]: new Date().toISOString() })
+    .update(staffUpdate)
     .eq('id', staff_member_id)
 
   if (updateErr) {

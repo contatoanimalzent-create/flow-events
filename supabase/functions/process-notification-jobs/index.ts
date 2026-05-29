@@ -89,6 +89,7 @@ interface Env {
   twilioAuthToken:  string
   twilioWaNumber:   string
   twilioSmsNumber:  string
+  twilioMessagingServiceSid: string
   whatsappProvider: string
   evolutionApiUrl:  string
   evolutionApiKey:  string
@@ -358,6 +359,8 @@ function compactSmsBody(rawBody: string): string {
   const body = rawBody
     .replace(/\s+/g, ' ')
     .replace(/Link do ponto:/gi, 'Ponto:')
+    .replace(/;?\s*se tentar de longe,?\s*o Pulse mostra a distância até o local/gi, '')
+    .replace(/fora do local,?\s*o Pulse informa a distância e bloqueia o registro/gi, 'fora do local o Pulse bloqueia o registro')
     .trim()
   if (body.length <= 300) return body
 
@@ -419,6 +422,14 @@ async function sendEmail(params: {
 async function sendWhatsApp(params: {
   to: string; body: string; env: Env
 }): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  if (params.env.whatsappProvider === 'sms' || params.env.whatsappProvider === 'sms-only') {
+    return await sendSms({
+      to: params.to,
+      body: compactSmsBody(params.body),
+      env: params.env,
+    })
+  }
+
   if (
     params.env.whatsappProvider === 'evolution' ||
     params.env.evolutionProviders.length > 0 ||
@@ -493,16 +504,22 @@ async function sendSms(params: {
     return { ok: false, id: null, error: 'Twilio SMS not configured.' }
   }
 
-  const from = params.env.twilioSmsNumber || params.env.twilioWaNumber
-  if (!from) return { ok: false, id: null, error: 'Twilio SMS sender not configured.' }
+  const from = params.env.twilioSmsNumber
+  if (!from && !params.env.twilioMessagingServiceSid) {
+    return { ok: false, id: null, error: 'Twilio SMS sender not configured.' }
+  }
 
   try {
     const url = 'https://api.twilio.com/2010-04-01/Accounts/' + params.env.twilioAccountSid + '/Messages.json'
     const form = new URLSearchParams({
-      From: normalizePhone(from),
       To: normalizePhone(params.to),
       Body: params.body,
     })
+    if (params.env.twilioMessagingServiceSid) {
+      form.set('MessagingServiceSid', params.env.twilioMessagingServiceSid)
+    } else {
+      form.set('From', normalizePhone(from))
+    }
     const res = await fetch(url, {
       method: 'POST',
       headers: {
@@ -804,7 +821,9 @@ async function processJob(
   console.info('[process-notification-jobs] Job ' + job.id + ': ' + eligible.length + ' eligible (' + job.channel + ')')
 
   const BATCH = 1
-  const BATCH_DELAY_MS = job.channel === 'whatsapp' ? 9000 : 750
+  const BATCH_DELAY_MS = job.channel === 'whatsapp' && env.whatsappProvider !== 'sms' && env.whatsappProvider !== 'sms-only'
+    ? 9000
+    : 750
   let processed = 0
   let failed    = 0
 
@@ -885,7 +904,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
     twilioAccountSid: Deno.env.get('TWILIO_ACCOUNT_SID')    ?? '',
     twilioAuthToken:  Deno.env.get('TWILIO_AUTH_TOKEN')     ?? '',
     twilioWaNumber:   Deno.env.get('TWILIO_WHATSAPP_NUMBER') ?? '',
-    twilioSmsNumber:  Deno.env.get('TWILIO_SMS_NUMBER') ?? Deno.env.get('TWILIO_PHONE_NUMBER') ?? '',
+    twilioSmsNumber:  Deno.env.get('TWILIO_SMS_NUMBER') ?? '',
+    twilioMessagingServiceSid: Deno.env.get('TWILIO_MESSAGING_SERVICE_SID') ?? '',
     whatsappProvider: (Deno.env.get('WHATSAPP_PROVIDER') ?? '').toLowerCase(),
     evolutionApiUrl:  Deno.env.get('EVOLUTION_API_URL')      ?? '',
     evolutionApiKey:  Deno.env.get('EVOLUTION_API_KEY')      ?? '',

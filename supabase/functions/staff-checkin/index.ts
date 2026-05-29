@@ -137,6 +137,11 @@ function normalizePhone(phone: string): string {
   return digits ? `+${digits}` : ''
 }
 
+function useSmsOnly(): boolean {
+  const provider = (Deno.env.get('WHATSAPP_PROVIDER') ?? '').toLowerCase()
+  return provider === 'sms' || provider === 'sms-only'
+}
+
 function uniqueEvolutionProviders(providers: EvolutionProvider[]): EvolutionProvider[] {
   const seen = new Set<string>()
   return providers.filter((provider) => {
@@ -196,19 +201,24 @@ async function sendTwilioSms(params: {
 }): Promise<{ ok: boolean; id: string | null; error: string | null }> {
   const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID') ?? ''
   const authToken = Deno.env.get('TWILIO_AUTH_TOKEN') ?? ''
-  const from = Deno.env.get('TWILIO_SMS_NUMBER') ?? Deno.env.get('TWILIO_PHONE_NUMBER') ?? ''
+  const from = Deno.env.get('TWILIO_SMS_NUMBER') ?? ''
+  const messagingServiceSid = Deno.env.get('TWILIO_MESSAGING_SERVICE_SID') ?? ''
 
-  if (!accountSid || !authToken || !from || !params.to) {
+  if (!accountSid || !authToken || (!from && !messagingServiceSid) || !params.to) {
     return { ok: false, id: null, error: 'Twilio SMS not configured.' }
   }
 
   try {
     const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
     const form = new URLSearchParams({
-      From: normalizePhone(from),
       To: normalizePhone(params.to),
       Body: params.body,
     })
+    if (messagingServiceSid) {
+      form.set('MessagingServiceSid', messagingServiceSid)
+    } else {
+      form.set('From', normalizePhone(from))
+    }
     const res = await fetch(url, {
       method: 'POST',
       headers: {
@@ -720,13 +730,22 @@ async function handlePost(req: Request): Promise<Response> {
       'Bata o ponto todos os dias em que trabalhar.',
     ].join(' ')
 
-    const whatsappResult = await sendEvolutionWhatsAppImage({
-      to: staffMember.phone,
-      imageUrl: BSB5_RECEIPT_IMAGE_URL,
-      caption: receiptMessage,
-    })
+    if (useSmsOnly()) {
+      const smsFallback = await sendTwilioSms({
+        to: staffMember.phone,
+        body: receiptSms,
+      })
+      if (!smsFallback.ok) {
+        console.warn('[staff-checkin] Falha ao enviar comprovante por SMS:', smsFallback.error)
+      }
+    } else {
+      const whatsappResult = await sendEvolutionWhatsAppImage({
+        to: staffMember.phone,
+        imageUrl: BSB5_RECEIPT_IMAGE_URL,
+        caption: receiptMessage,
+      })
 
-    if (!whatsappResult.ok) {
+      if (!whatsappResult.ok) {
       console.warn('[staff-checkin] Falha ao enviar comprovante com imagem por WhatsApp:', whatsappResult.error)
       const textFallback = await sendEvolutionWhatsApp({
         to: staffMember.phone,
@@ -742,6 +761,7 @@ async function handlePost(req: Request): Promise<Response> {
           console.warn('[staff-checkin] Falha ao enviar comprovante por SMS:', smsFallback.error)
         }
       }
+    }
     }
   }
 

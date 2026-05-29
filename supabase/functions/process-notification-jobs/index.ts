@@ -873,6 +873,67 @@ async function resetStuckJobs(admin: ReturnType<typeof createSupabaseAdminClient
   return data?.length ?? 0
 }
 
+function getRetryCount(variables: unknown): number {
+  if (!variables || typeof variables !== 'object') return 0
+  const value = (variables as Record<string, unknown>).__retry_count
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
+}
+
+async function recoverFailedEmailJobs(admin: ReturnType<typeof createSupabaseAdminClient>): Promise<number> {
+  const retryWindowStart = new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString()
+  const { data, error } = await admin
+    .from('notification_jobs')
+    .select('id, variables, error_message, completed_at, failed_count')
+    .eq('status', 'failed')
+    .eq('channel', 'email')
+    .eq('template_key', 'staff-confirmed-permissions')
+    .gte('scheduled_at', retryWindowStart)
+    .order('completed_at', { ascending: true })
+    .limit(50)
+
+  if (error) {
+    console.error('[process-notification-jobs] failed email recovery fetch error:', error)
+    return 0
+  }
+
+  let recovered = 0
+  const now = Date.now()
+  for (const job of data ?? []) {
+    const variables = (job.variables ?? {}) as Record<string, unknown>
+    const retryCount = getRetryCount(variables)
+    if (retryCount >= 4) continue
+
+    const delayMinutes = [1, 3, 6, 10][retryCount] ?? 10
+    const scheduledAt = new Date(now + delayMinutes * 60 * 1000).toISOString()
+    const { error: updateError } = await admin
+      .from('notification_jobs')
+      .update({
+        status: 'pending' as JobStatus,
+        scheduled_at: scheduledAt,
+        started_at: null,
+        completed_at: null,
+        processed_count: 0,
+        failed_count: 0,
+        error_message: null,
+        variables: {
+          ...variables,
+          __retry_count: retryCount + 1,
+          __last_error: job.error_message ?? null,
+        },
+      })
+      .eq('id', job.id)
+      .eq('status', 'failed')
+
+    if (updateError) {
+      console.error('[process-notification-jobs] failed email recovery update error:', updateError)
+      continue
+    }
+    recovered++
+  }
+
+  return recovered
+}
+
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Main Handler
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -919,6 +980,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
   // 0. Reset stuck jobs
   const resetCount = await resetStuckJobs(admin)
   if (resetCount > 0) console.info('[process-notification-jobs] Reset ' + resetCount + ' stuck jobs')
+  const recoveredEmailJobs = await recoverFailedEmailJobs(admin)
+  if (recoveredEmailJobs > 0) console.info('[process-notification-jobs] Requeued ' + recoveredEmailJobs + ' failed email jobs')
 
   // 1. Fetch pending jobs with scheduled_at <= now
   const { data: pendingJobs, error: fetchError } = await admin
@@ -935,7 +998,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   if (!pendingJobs || pendingJobs.length === 0) {
-    return jsonResponse({ message: 'No pending jobs', jobs_processed: 0, reset_stuck: resetCount })
+    return jsonResponse({
+      message: 'No pending jobs',
+      jobs_processed: 0,
+      reset_stuck: resetCount,
+      recovered_email_jobs: recoveredEmailJobs,
+    })
   }
 
   // 2. Process each job sequentially (jobs can have large audiences, avoid timeout)
@@ -961,7 +1029,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
     messages_sent:   results.reduce((s, r) => s + r.processed, 0),
     messages_failed: results.reduce((s, r) => s + r.failed, 0),
     reset_stuck:     resetCount,
+    recovered_email_jobs: recoveredEmailJobs,
     results,
   })
-})
+}) 
 

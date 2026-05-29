@@ -5,6 +5,8 @@ import {
   Clipboard,
   ExternalLink,
   Loader2,
+  Lock,
+  Mail,
   MapPin,
   RefreshCw,
   ShieldAlert,
@@ -159,6 +161,11 @@ function StatusBadge({ staff }: { staff: BsbStaff }) {
 export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   const [loading, setLoading] = useState(true)
   const [allowed, setAllowed] = useState(false)
+  const [authEmail, setAuthEmail] = useState<string | null>(null)
+  const [loginEmail, setLoginEmail] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [loginBusy, setLoginBusy] = useState(false)
+  const [loginError, setLoginError] = useState<string | null>(null)
   const [event, setEvent] = useState<BsbEvent | null>(null)
   const [staff, setStaff] = useState<BsbStaff[]>([])
   const [checkins, setCheckins] = useState<BsbCheckin[]>([])
@@ -196,6 +203,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
       const { data: authData } = await supabase.auth.getUser()
       const user = authData.user
       const email = user?.email?.toLowerCase() ?? ''
+      setAuthEmail(email || null)
 
       if (!user || !ALLOWED_EMAILS.includes(email)) {
         setAllowed(false)
@@ -274,6 +282,26 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   }, [loadPermissions, setActiveEvent, setActiveOrganization, setAvailableModes, setContext])
 
   useEffect(() => { load() }, [load])
+
+  async function loginAdmin(event: React.FormEvent) {
+    event.preventDefault()
+    setLoginBusy(true)
+    setLoginError(null)
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail.trim().toLowerCase(),
+      password: loginPassword,
+    })
+
+    if (error) {
+      setLoginError('E-mail ou senha inválidos.')
+      setLoginBusy(false)
+      return
+    }
+
+    setLoginBusy(false)
+    await load()
+  }
 
   const stats = useMemo(() => {
     const inside = staff.filter((s) => s.checked_in_at && !s.checked_out_at).length
@@ -515,12 +543,66 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
 
   if (!allowed) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#06070a] px-6 text-center text-white">
-        <ShieldAlert className="mb-4 h-10 w-10 text-red-300" />
-        <h1 className="text-xl font-bold">Acesso exclusivo</h1>
-        <p className="mt-2 max-w-sm text-sm text-slate-400">
-          Este painel direto do BSB FIGHT 5 está liberado somente para os administradores autorizados.
-        </p>
+      <div className="flex min-h-screen items-center justify-center bg-[#06070a] px-5 py-8 text-white">
+        <form onSubmit={loginAdmin} className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl">
+          <ShieldAlert className="mb-4 h-9 w-9 text-[#D4FF00]" />
+          <h1 className="text-2xl font-black tracking-tight">Admin BSB FIGHT 5</h1>
+          <p className="mt-2 text-sm text-slate-400">
+            Entre com o e-mail autorizado para acessar somente o painel do BSB FIGHT 5.
+          </p>
+
+          {authEmail && !ALLOWED_EMAILS.includes(authEmail) && (
+            <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-xs text-red-100">
+              Sessão atual: {authEmail}. Este e-mail não está liberado para este painel.
+            </div>
+          )}
+
+          <label className="mt-5 block space-y-1.5">
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">E-mail</span>
+            <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-3 focus-within:border-[#D4FF00]">
+              <Mail className="h-4 w-4 text-slate-500" />
+              <input
+                type="email"
+                value={loginEmail}
+                onChange={(event) => setLoginEmail(event.target.value)}
+                className="min-w-0 flex-1 bg-transparent py-3 text-sm text-white outline-none placeholder:text-slate-600"
+                placeholder="admin@email.com"
+                autoComplete="email"
+                required
+              />
+            </div>
+          </label>
+
+          <label className="mt-3 block space-y-1.5">
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Senha</span>
+            <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-3 focus-within:border-[#D4FF00]">
+              <Lock className="h-4 w-4 text-slate-500" />
+              <input
+                type="password"
+                value={loginPassword}
+                onChange={(event) => setLoginPassword(event.target.value)}
+                className="min-w-0 flex-1 bg-transparent py-3 text-sm text-white outline-none placeholder:text-slate-600"
+                placeholder="Senha"
+                autoComplete="current-password"
+                required
+              />
+            </div>
+          </label>
+
+          {loginError && (
+            <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-sm text-red-100">
+              {loginError}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loginBusy || !loginEmail || !loginPassword}
+            className="mt-5 w-full rounded-2xl bg-[#D4FF00] px-4 py-3 text-sm font-black text-black disabled:opacity-60"
+          >
+            {loginBusy ? 'Entrando...' : 'Entrar no admin'}
+          </button>
+        </form>
       </div>
     )
   }

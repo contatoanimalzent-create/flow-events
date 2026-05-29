@@ -28,7 +28,22 @@ function splitName(value?: string | null): { firstName: string; lastName: string
 
 function normalizeCpf(value?: string | null): string | null {
   const digits = (value ?? '').replace(/\D/g, '')
-  return digits.length === 11 ? digits : null
+  return isValidCpf(digits) ? digits : null
+}
+
+function isValidCpf(value?: string | null): boolean {
+  const cpf = (value ?? '').replace(/\D/g, '')
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false
+
+  let sum = 0
+  for (let i = 0; i < 9; i++) sum += Number(cpf[i]) * (10 - i)
+  let digit = sum % 11 < 2 ? 0 : 11 - (sum % 11)
+  if (Number(cpf[9]) !== digit) return false
+
+  sum = 0
+  for (let i = 0; i < 10; i++) sum += Number(cpf[i]) * (11 - i)
+  digit = sum % 11 < 2 ? 0 : 11 - (sum % 11)
+  return Number(cpf[10]) === digit
 }
 
 function normalizePhone(value?: string | null): string | null {

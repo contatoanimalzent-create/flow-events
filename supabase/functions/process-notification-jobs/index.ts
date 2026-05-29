@@ -93,6 +93,13 @@ interface Env {
   evolutionApiUrl:  string
   evolutionApiKey:  string
   evolutionInstance:string
+  evolutionProviders: EvolutionProvider[]
+}
+
+interface EvolutionProvider {
+  apiUrl: string
+  apiKey: string
+  instance: string
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -128,6 +135,59 @@ function normalizePhone(raw: string): string {
 
 function normalizePhoneDigits(raw: string): string {
   return normalizePhone(raw).replace(/\D/g, '')
+}
+
+function uniqueEvolutionProviders(providers: EvolutionProvider[]): EvolutionProvider[] {
+  const seen = new Set<string>()
+  return providers.filter((provider) => {
+    if (!provider.apiUrl || !provider.apiKey || !provider.instance) return false
+    const key = `${provider.apiUrl}|${provider.apiKey}|${provider.instance}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+function parseEvolutionProviders(): EvolutionProvider[] {
+  const primaryUrl = Deno.env.get('EVOLUTION_API_URL') ?? ''
+  const primaryKey = Deno.env.get('EVOLUTION_API_KEY') ?? ''
+  const primaryInstance = Deno.env.get('EVOLUTION_INSTANCE_NAME') ?? ''
+  const providers: EvolutionProvider[] = []
+
+  const json = Deno.env.get('EVOLUTION_PROVIDERS_JSON') ?? ''
+  if (json.trim()) {
+    try {
+      const parsed = JSON.parse(json) as Array<Partial<EvolutionProvider>>
+      for (const item of parsed) {
+        providers.push({
+          apiUrl: item.apiUrl || primaryUrl,
+          apiKey: item.apiKey || primaryKey,
+          instance: item.instance || '',
+        })
+      }
+    } catch (err) {
+      console.warn('[process-notification-jobs] Invalid EVOLUTION_PROVIDERS_JSON:', err)
+    }
+  }
+
+  const names = (Deno.env.get('EVOLUTION_INSTANCE_NAMES') ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+  for (const instance of names) {
+    providers.push({ apiUrl: primaryUrl, apiKey: primaryKey, instance })
+  }
+
+  providers.push({ apiUrl: primaryUrl, apiKey: primaryKey, instance: primaryInstance })
+  for (let i = 2; i <= 5; i++) {
+    providers.push({
+      apiUrl: Deno.env.get(`EVOLUTION_API_URL_${i}`) ?? primaryUrl,
+      apiKey: Deno.env.get(`EVOLUTION_API_KEY_${i}`) ?? primaryKey,
+      instance: Deno.env.get(`EVOLUTION_INSTANCE_NAME_${i}`) ?? '',
+    })
+  }
+
+  return uniqueEvolutionProviders(providers)
 }
 
 function hashString(value: string): number {
@@ -361,14 +421,19 @@ async function sendWhatsApp(params: {
 }): Promise<{ ok: boolean; id: string | null; error: string | null }> {
   if (
     params.env.whatsappProvider === 'evolution' ||
+    params.env.evolutionProviders.length > 0 ||
     (params.env.evolutionApiUrl && params.env.evolutionApiKey && params.env.evolutionInstance)
   ) {
-    const evolutionResult = await sendEvolutionWhatsApp({
+    const evolutionResult = await sendEvolutionWhatsAppFailover({
       to: params.to,
       body: params.body,
-      apiUrl: params.env.evolutionApiUrl,
-      apiKey: params.env.evolutionApiKey,
-      instance: params.env.evolutionInstance,
+      providers: params.env.evolutionProviders.length > 0
+        ? params.env.evolutionProviders
+        : [{
+          apiUrl: params.env.evolutionApiUrl,
+          apiKey: params.env.evolutionApiKey,
+          instance: params.env.evolutionInstance,
+        }],
     })
     if (evolutionResult.ok) return evolutionResult
 
@@ -486,6 +551,28 @@ async function sendEvolutionWhatsApp(params: {
   } catch (err: unknown) {
     return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
   }
+}
+
+async function sendEvolutionWhatsAppFailover(params: {
+  to: string
+  body: string
+  providers: EvolutionProvider[]
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  const errors: string[] = []
+  for (const provider of uniqueEvolutionProviders(params.providers)) {
+    const result = await sendEvolutionWhatsApp({
+      to: params.to,
+      body: params.body,
+      apiUrl: provider.apiUrl,
+      apiKey: provider.apiKey,
+      instance: provider.instance,
+    })
+    if (result.ok) {
+      return { ok: true, id: result.id ? `${provider.instance}:${result.id}` : provider.instance, error: null }
+    }
+    errors.push(`${provider.instance || 'sem-instancia'}: ${result.error}`)
+  }
+  return { ok: false, id: null, error: errors.join(' | ') || 'Evolution providers not configured.' }
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -803,6 +890,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     evolutionApiUrl:  Deno.env.get('EVOLUTION_API_URL')      ?? '',
     evolutionApiKey:  Deno.env.get('EVOLUTION_API_KEY')      ?? '',
     evolutionInstance:Deno.env.get('EVOLUTION_INSTANCE_NAME') ?? '',
+    evolutionProviders: parseEvolutionProviders(),
   }
 
   const admin  = createSupabaseAdminClient()

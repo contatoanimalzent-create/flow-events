@@ -26,6 +26,12 @@ const MAX_ACCURACY_TOLERANCE_METERS = 100
 const BSB5_RECEIPT_IMAGE_URL =
   'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/staff-documents/bsb5/ponto-pulse.png'
 
+interface EvolutionProvider {
+  apiUrl: string
+  apiKey: string
+  instance: string
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,24 +132,123 @@ function normalizePhoneDigits(phone: string): string {
   return digits
 }
 
+function normalizePhone(phone: string): string {
+  const digits = normalizePhoneDigits(phone)
+  return digits ? `+${digits}` : ''
+}
+
+function uniqueEvolutionProviders(providers: EvolutionProvider[]): EvolutionProvider[] {
+  const seen = new Set<string>()
+  return providers.filter((provider) => {
+    if (!provider.apiUrl || !provider.apiKey || !provider.instance) return false
+    const key = `${provider.apiUrl}|${provider.apiKey}|${provider.instance}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+function parseEvolutionProviders(): EvolutionProvider[] {
+  const primaryUrl = Deno.env.get('EVOLUTION_API_URL') ?? ''
+  const primaryKey = Deno.env.get('EVOLUTION_API_KEY') ?? ''
+  const primaryInstance = Deno.env.get('EVOLUTION_INSTANCE_NAME') ?? ''
+  const providers: EvolutionProvider[] = []
+
+  const json = Deno.env.get('EVOLUTION_PROVIDERS_JSON') ?? ''
+  if (json.trim()) {
+    try {
+      const parsed = JSON.parse(json) as Array<Partial<EvolutionProvider>>
+      for (const item of parsed) {
+        providers.push({
+          apiUrl: item.apiUrl || primaryUrl,
+          apiKey: item.apiKey || primaryKey,
+          instance: item.instance || '',
+        })
+      }
+    } catch (err) {
+      console.warn('[staff-checkin] Invalid EVOLUTION_PROVIDERS_JSON:', err)
+    }
+  }
+
+  const names = (Deno.env.get('EVOLUTION_INSTANCE_NAMES') ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+  for (const instance of names) {
+    providers.push({ apiUrl: primaryUrl, apiKey: primaryKey, instance })
+  }
+
+  providers.push({ apiUrl: primaryUrl, apiKey: primaryKey, instance: primaryInstance })
+  for (let i = 2; i <= 5; i++) {
+    providers.push({
+      apiUrl: Deno.env.get(`EVOLUTION_API_URL_${i}`) ?? primaryUrl,
+      apiKey: Deno.env.get(`EVOLUTION_API_KEY_${i}`) ?? primaryKey,
+      instance: Deno.env.get(`EVOLUTION_INSTANCE_NAME_${i}`) ?? '',
+    })
+  }
+
+  return uniqueEvolutionProviders(providers)
+}
+
+async function sendTwilioSms(params: {
+  to: string
+  body: string
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID') ?? ''
+  const authToken = Deno.env.get('TWILIO_AUTH_TOKEN') ?? ''
+  const from = Deno.env.get('TWILIO_SMS_NUMBER') ?? Deno.env.get('TWILIO_PHONE_NUMBER') ?? ''
+
+  if (!accountSid || !authToken || !from || !params.to) {
+    return { ok: false, id: null, error: 'Twilio SMS not configured.' }
+  }
+
+  try {
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
+    const form = new URLSearchParams({
+      From: normalizePhone(from),
+      To: normalizePhone(params.to),
+      Body: params.body,
+    })
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + btoa(`${accountSid}:${authToken}`),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: form.toString(),
+    })
+    const data = await res.json().catch(() => ({})) as { sid?: string; error_message?: string }
+    if (!res.ok) {
+      return { ok: false, id: null, error: `Twilio SMS HTTP ${res.status}: ${data.error_message ?? JSON.stringify(data)}` }
+    }
+    return { ok: true, id: data.sid ?? null, error: null }
+  } catch (err: unknown) {
+    return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
+  }
+}
+
 async function sendEvolutionWhatsApp(params: {
   to: string
   body: string
 }): Promise<{ ok: boolean; id: string | null; error: string | null }> {
-  const apiUrl = Deno.env.get('EVOLUTION_API_URL') ?? ''
-  const apiKey = Deno.env.get('EVOLUTION_API_KEY') ?? ''
-  const instance = Deno.env.get('EVOLUTION_INSTANCE_NAME') ?? ''
+  return sendEvolutionWhatsAppFailover({ ...params, media: null })
+}
 
-  if (!apiUrl || !apiKey || !instance || !params.to) {
+async function sendEvolutionTextWithProvider(params: {
+  to: string
+  body: string
+  provider: EvolutionProvider
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  if (!params.provider.apiUrl || !params.provider.apiKey || !params.provider.instance || !params.to) {
     return { ok: false, id: null, error: 'Evolution API not configured.' }
   }
 
   try {
-    const baseUrl = apiUrl.replace(/\/$/, '')
-    const res = await fetch(`${baseUrl}/message/sendText/${instance}`, {
+    const baseUrl = params.provider.apiUrl.replace(/\/$/, '')
+    const res = await fetch(`${baseUrl}/message/sendText/${params.provider.instance}`, {
       method: 'POST',
       headers: {
-        apikey: apiKey,
+        apikey: params.provider.apiKey,
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
@@ -168,20 +273,33 @@ async function sendEvolutionWhatsAppImage(params: {
   imageUrl: string
   caption: string
 }): Promise<{ ok: boolean; id: string | null; error: string | null }> {
-  const apiUrl = Deno.env.get('EVOLUTION_API_URL') ?? ''
-  const apiKey = Deno.env.get('EVOLUTION_API_KEY') ?? ''
-  const instance = Deno.env.get('EVOLUTION_INSTANCE_NAME') ?? ''
+  return sendEvolutionWhatsAppFailover({
+    to: params.to,
+    body: params.caption,
+    media: {
+      imageUrl: params.imageUrl,
+      fileName: 'comprovante-ponto-bsb-fight-5.png',
+    },
+  })
+}
 
-  if (!apiUrl || !apiKey || !instance || !params.to || !params.imageUrl) {
+async function sendEvolutionImageWithProvider(params: {
+  to: string
+  imageUrl: string
+  caption: string
+  fileName: string
+  provider: EvolutionProvider
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  if (!params.provider.apiUrl || !params.provider.apiKey || !params.provider.instance || !params.to || !params.imageUrl) {
     return { ok: false, id: null, error: 'Evolution API not configured.' }
   }
 
   try {
-    const baseUrl = apiUrl.replace(/\/$/, '')
-    const res = await fetch(`${baseUrl}/message/sendMedia/${instance}`, {
+    const baseUrl = params.provider.apiUrl.replace(/\/$/, '')
+    const res = await fetch(`${baseUrl}/message/sendMedia/${params.provider.instance}`, {
       method: 'POST',
       headers: {
-        apikey: apiKey,
+        apikey: params.provider.apiKey,
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify({
@@ -189,7 +307,7 @@ async function sendEvolutionWhatsAppImage(params: {
         mediatype: 'image',
         mimetype: 'image/png',
         media: params.imageUrl,
-        fileName: 'comprovante-ponto-bsb-fight-5.png',
+        fileName: params.fileName,
         caption: params.caption,
         delay: 1200,
       }),
@@ -202,6 +320,34 @@ async function sendEvolutionWhatsAppImage(params: {
   } catch (err: unknown) {
     return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
   }
+}
+
+async function sendEvolutionWhatsAppFailover(params: {
+  to: string
+  body: string
+  media: { imageUrl: string; fileName: string } | null
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  const errors: string[] = []
+  for (const provider of parseEvolutionProviders()) {
+    const result = params.media
+      ? await sendEvolutionImageWithProvider({
+        to: params.to,
+        imageUrl: params.media.imageUrl,
+        caption: params.body,
+        fileName: params.media.fileName,
+        provider,
+      })
+      : await sendEvolutionTextWithProvider({
+        to: params.to,
+        body: params.body,
+        provider,
+      })
+    if (result.ok) {
+      return { ok: true, id: result.id ? `${provider.instance}:${result.id}` : provider.instance, error: null }
+    }
+    errors.push(`${provider.instance || 'sem-instancia'}: ${result.error}`)
+  }
+  return { ok: false, id: null, error: errors.join(' | ') || 'Evolution providers not configured.' }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -562,9 +708,17 @@ async function handlePost(req: Request): Promise<Response> {
       `Coordenadas: ${Number(latitude).toFixed(6)}, ${Number(longitude).toFixed(6)}`,
       `Código: ${receiptCode}`,
       '',
-      'Dirija-se ao credenciamento para retirar sua pulseira e mostre este comprovante.',
+      'PONTO REGISTRADO. Dirija-se agora ao credenciamento para retirar sua pulseira.',
+      'Mostre este comprovante para a equipe no credenciamento.',
       'Lembrete: o ponto deve ser batido todos os dias do evento.',
     ].join('\n')
+    const receiptSms = [
+      `Pulse: ponto registrado no ${event.name ?? 'BSB FIGHT 5'}.`,
+      `Codigo: ${receiptCode}.`,
+      `Horario: ${saoPauloDateTime(new Date(checkinRecord.created_at))}.`,
+      'Retire sua pulseira no credenciamento e mostre este comprovante.',
+      'Bata o ponto todos os dias em que trabalhar.',
+    ].join(' ')
 
     const whatsappResult = await sendEvolutionWhatsAppImage({
       to: staffMember.phone,
@@ -580,13 +734,20 @@ async function handlePost(req: Request): Promise<Response> {
       })
       if (!textFallback.ok) {
         console.warn('[staff-checkin] Falha ao enviar comprovante em texto por WhatsApp:', textFallback.error)
+        const smsFallback = await sendTwilioSms({
+          to: staffMember.phone,
+          body: receiptSms,
+        })
+        if (!smsFallback.ok) {
+          console.warn('[staff-checkin] Falha ao enviar comprovante por SMS:', smsFallback.error)
+        }
       }
     }
   }
 
   const message =
     type === 'checkin'
-      ? `Check-in registrado com sucesso para ${[staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')}.`
+      ? `Check-in registrado com sucesso para ${[staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')}. Dirija-se ao credenciamento para retirar sua pulseira e mostre o comprovante.`
       : `Checkout registrado com sucesso para ${[staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')}.`
 
   return jsonResponse({

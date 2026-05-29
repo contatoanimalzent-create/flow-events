@@ -958,7 +958,7 @@ export function StaffCheckinPage() {
             {staff?.full_name}, sua presença foi confirmada.
           </p>
           <p className="mt-4 text-base leading-7 text-white/70">
-            Dirija-se ao credenciamento para retirar sua pulseira e mostre o comprovante enviado no seu WhatsApp.
+            Dirija-se agora ao credenciamento para retirar sua pulseira. Mostre o comprovante enviado no WhatsApp ou SMS; se a mensagem demorar, mostre esta tela.
           </p>
           <p className="mt-3 text-sm leading-6 text-white/48">
             Lembre-se: o ponto deve ser batido todos os dias do evento.

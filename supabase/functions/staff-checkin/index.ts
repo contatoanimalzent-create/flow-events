@@ -21,7 +21,7 @@ interface CheckinRequestBody {
   accuracy_meters?: number
 }
 
-const DEFAULT_GEOFENCE_METERS = 350
+const DEFAULT_GEOFENCE_METERS = 200
 const MAX_ACCURACY_TOLERANCE_METERS = 100
 const BSB5_RECEIPT_IMAGE_URL =
   'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/staff-documents/bsb5/ponto-pulse.png'

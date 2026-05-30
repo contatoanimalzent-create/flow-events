@@ -491,8 +491,9 @@ export function StaffJoinPage() {
   }
 
   if (pageState === 'success') {
+    const pontoUrl = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 py-8 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#D4FF00]/20 bg-[#D4FF00]/10">
           <CheckCircle2 className="h-9 w-9 text-[#D4FF00]" />
         </div>
@@ -501,18 +502,40 @@ export function StaffJoinPage() {
             Dados confirmados!
           </h1>
           <p className="mt-4 text-base leading-7 text-white/68">
-            Você receberá o link do ponto por e-mail e WhatsApp. Use o ponto somente quando estiver no local do evento.
+            Bata seu ponto direto pelo link abaixo quando chegar no local do evento.
           </p>
         </div>
+
         {inviteInfo && (
-          <div className="mt-2 rounded-2xl border border-white/8 bg-white/[0.04] px-6 py-4">
+          <div className="mt-1 rounded-2xl border border-white/8 bg-white/[0.04] px-6 py-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[#D4FF00]/80">Evento</p>
             <p className="mt-1 text-base font-semibold text-[#f5f0e8]">{inviteInfo.event_name}</p>
-            {inviteInfo.role && (
-              <p className="mt-1 text-sm text-white/52">{inviteInfo.role}</p>
-            )}
+            {inviteInfo.role && <p className="mt-1 text-sm text-white/52">{inviteInfo.role}</p>}
           </div>
         )}
+
+        <div className="w-full max-w-md space-y-3">
+          <a
+            href={pontoUrl}
+            className="block w-full rounded-2xl bg-[#D4FF00] px-6 py-5 text-base font-bold uppercase tracking-[0.14em] text-[#06070a] transition-all hover:-translate-y-0.5 hover:bg-[#c8f200] hover:shadow-[0_12px_36px_rgba(212,255,0,0.24)] active:scale-[0.98]"
+          >
+            👉 Bater meu ponto agora
+          </a>
+          <p className="text-xs text-white/50 break-all">
+            ou copie o link: <span className="text-white/70">{pontoUrl}</span>
+          </p>
+        </div>
+
+        <div className="mt-2 max-w-md rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 px-5 py-4 text-left">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">⚠️ Atenção</p>
+          <p className="mt-2 text-sm leading-6 text-amber-100">
+            O ponto <strong>SÓ funciona quando você estiver dentro do local do evento</strong>. Ative GPS, câmera e notificações no seu celular. O sistema bloqueia o registro se você estiver longe.
+          </p>
+        </div>
+
+        <p className="max-w-md text-xs leading-6 text-white/40">
+          Você também recebeu o link por e-mail e WhatsApp. Bata o ponto todos os dias que trabalhar e mostre o comprovante no credenciamento para retirar sua pulseira.
+        </p>
       </div>
     )
   }

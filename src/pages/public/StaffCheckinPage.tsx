@@ -222,34 +222,56 @@ export function StaffCheckinPage() {
 
   // ── Geolocation ───────────────────────────────────────────────────────────
 
-  const getGeolocation = useCallback((): Promise<{ lat: number; lng: number; accuracy?: number }> => {
-    setGeoStatus('loading')
+  // Tenta GPS preciso (até 25s). Se falhar por timeout, tenta de novo sem highAccuracy (rede/WiFi, 15s)
+  function tryGetPosition(options: PositionOptions): Promise<GeolocationPosition> {
     return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const location = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }
-          setCoords(location)
-          setGeoStatus('done')
-
-          if (staff?.venue_lat != null && staff?.venue_lng != null) {
-            const dist = haversineDistance(
-              location.lat,
-              location.lng,
-              staff.venue_lat,
-              staff.venue_lng,
-            )
-            setDistance(dist)
-          }
-
-          resolve(location)
-        },
-        (err) => {
-          setGeoStatus('error')
-          reject(err)
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
-      )
+      navigator.geolocation.getCurrentPosition(resolve, reject, options)
     })
+  }
+
+  function gpsErrorMessage(err: GeolocationPositionError): string {
+    if (err.code === err.PERMISSION_DENIED) {
+      return 'Permissão de localização negada. iPhone: Ajustes → Safari → Localização → Permitir. Android: cadeado no endereço → Permissões → Localização. Depois recarregue a página.'
+    }
+    if (err.code === err.POSITION_UNAVAILABLE) {
+      return 'GPS indisponível. Ative o GPS/Localização no seu celular (puxe a barra de notificações e ligue o ícone de Localização) e tente de novo.'
+    }
+    if (err.code === err.TIMEOUT) {
+      return 'GPS demorou demais para responder. Saia para uma área aberta (sem teto/coberta), aguarde alguns segundos e tente de novo.'
+    }
+    return 'Não foi possível obter localização. Verifique GPS, conexão e permissões.'
+  }
+
+  const getGeolocation = useCallback(async (): Promise<{ lat: number; lng: number; accuracy?: number }> => {
+    setGeoStatus('loading')
+    try {
+      let pos: GeolocationPosition
+      try {
+        // Tentativa 1: GPS preciso (até 25s, aceita posição recente de até 30s)
+        pos = await tryGetPosition({ enableHighAccuracy: true, timeout: 25000, maximumAge: 30000 })
+      } catch (err) {
+        const e = err as GeolocationPositionError
+        // Se foi timeout/unavailable, tenta de novo SEM highAccuracy (rede/WiFi)
+        if (e.code === e.TIMEOUT || e.code === e.POSITION_UNAVAILABLE) {
+          pos = await tryGetPosition({ enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 })
+        } else {
+          throw err
+        }
+      }
+      const location = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }
+      setCoords(location)
+      setGeoStatus('done')
+      if (staff?.venue_lat != null && staff?.venue_lng != null) {
+        const dist = haversineDistance(location.lat, location.lng, staff.venue_lat, staff.venue_lng)
+        setDistance(dist)
+      }
+      return location
+    } catch (err) {
+      setGeoStatus('error')
+      const e = err as GeolocationPositionError
+      setErrorMessage(gpsErrorMessage(e))
+      throw err
+    }
   }, [staff])
 
   // ── Camera ────────────────────────────────────────────────────────────────
@@ -331,24 +353,28 @@ export function StaffCheckinPage() {
     setRequestingPerms(true)
     setErrorMessage('')
 
-    // 1. Pede GPS (dispara prompt nativo)
+    // 1. Pede GPS (dispara prompt nativo, com fallback se highAccuracy falhar)
     try {
-      await new Promise<void>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
-            setGpsPerm('granted')
-            resolve()
-          },
-          (err) => {
-            if (err.code === err.PERMISSION_DENIED) setGpsPerm('denied')
-            else setGpsPerm('prompt')
-            reject(err)
-          },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
-        )
-      })
-    } catch { /* segue para câmera mesmo se GPS falhou */ }
+      let pos: GeolocationPosition
+      try {
+        pos = await tryGetPosition({ enableHighAccuracy: true, timeout: 25000, maximumAge: 30000 })
+      } catch (err) {
+        const e = err as GeolocationPositionError
+        if (e.code === e.TIMEOUT || e.code === e.POSITION_UNAVAILABLE) {
+          // Fallback: tenta sem highAccuracy (usa rede/WiFi)
+          pos = await tryGetPosition({ enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 })
+        } else {
+          throw err
+        }
+      }
+      setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
+      setGpsPerm('granted')
+    } catch (err) {
+      const e = err as GeolocationPositionError
+      if (e?.code === e?.PERMISSION_DENIED) setGpsPerm('denied')
+      else setGpsPerm('prompt')
+      setErrorMessage(gpsErrorMessage(e))
+    }
 
     // 2. Pede câmera (dispara prompt nativo)
     try {

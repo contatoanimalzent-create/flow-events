@@ -8,7 +8,11 @@ import {
   LogIn,
   LogOut,
   MapPin,
+  Shield,
+  XCircle,
 } from 'lucide-react'
+
+type PermissionState = 'unknown' | 'granted' | 'denied' | 'prompt'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -122,6 +126,9 @@ export function StaffCheckinPage() {
   const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [coords, setCoords] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null)
   const [distance, setDistance] = useState<number | null>(null)
+  const [cameraPerm, setCameraPerm] = useState<PermissionState>('unknown')
+  const [gpsPerm, setGpsPerm] = useState<PermissionState>('unknown')
+  const [requestingPerms, setRequestingPerms] = useState(false)
 
   // Camera
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -296,6 +303,67 @@ export function StaffCheckinPage() {
     setPhotoBase64(null)
     openCamera()
   }
+
+  // ── Permissions check (camera + GPS) ──────────────────────────────────────
+
+  const checkPermissions = useCallback(async () => {
+    // Query Permissions API onde existe
+    try {
+      const navWithPerms = navigator as Navigator & { permissions?: { query: (d: { name: PermissionName }) => Promise<PermissionStatus> } }
+      if (navWithPerms.permissions?.query) {
+        try {
+          const cam = await navWithPerms.permissions.query({ name: 'camera' as PermissionName })
+          setCameraPerm(cam.state as PermissionState)
+        } catch { /* not supported on this browser */ }
+        try {
+          const geo = await navWithPerms.permissions.query({ name: 'geolocation' as PermissionName })
+          setGpsPerm(geo.state as PermissionState)
+        } catch { /* not supported */ }
+      }
+    } catch { /* ignore */ }
+  }, [])
+
+  useEffect(() => {
+    void checkPermissions()
+  }, [checkPermissions])
+
+  const requestAllPermissions = useCallback(async () => {
+    setRequestingPerms(true)
+    setErrorMessage('')
+
+    // 1. Pede GPS (dispara prompt nativo)
+    try {
+      await new Promise<void>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy })
+            setGpsPerm('granted')
+            resolve()
+          },
+          (err) => {
+            if (err.code === err.PERMISSION_DENIED) setGpsPerm('denied')
+            else setGpsPerm('prompt')
+            reject(err)
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+        )
+      })
+    } catch { /* segue para câmera mesmo se GPS falhou */ }
+
+    // 2. Pede câmera (dispara prompt nativo)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+      stream.getTracks().forEach((t) => t.stop())
+      setCameraPerm('granted')
+    } catch (err) {
+      const e = err as DOMException
+      if (e?.name === 'NotAllowedError' || e?.name === 'PermissionDeniedError') setCameraPerm('denied')
+      else setCameraPerm('prompt')
+    }
+
+    setRequestingPerms(false)
+    await checkPermissions()
+  }, [checkPermissions])
 
   // ── Checkin flow ──────────────────────────────────────────────────────────
 
@@ -698,6 +766,83 @@ export function StaffCheckinPage() {
               <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
                 <MapPin className="h-4 w-4" />
                 <span className="text-sm">Localização capturada</span>
+              </div>
+            )}
+
+            {/* Permissões — checa antes de Entrada/Saída */}
+            {(cameraPerm !== 'granted' || gpsPerm !== 'granted') && (
+              <div className="mt-4 rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 p-5">
+                <div className="flex items-start gap-3">
+                  <Shield className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold uppercase tracking-[0.14em] text-amber-300">
+                      Permissões necessárias
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-amber-100/80">
+                      O ponto precisa da sua câmera e localização. Toque no botão abaixo e <strong>autorize as duas</strong> nos avisos do celular.
+                    </p>
+
+                    <div className="mt-3 flex flex-col gap-2">
+                      <div className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
+                        <div className="flex items-center gap-2 text-xs text-white/70">
+                          <MapPin className="h-3.5 w-3.5" /> Localização (GPS)
+                        </div>
+                        {gpsPerm === 'granted' ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-green-400">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Permitido
+                          </span>
+                        ) : gpsPerm === 'denied' ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-red-400">
+                            <XCircle className="h-3.5 w-3.5" /> Negado
+                          </span>
+                        ) : (
+                          <span className="text-xs text-white/40">Pendente</span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
+                        <div className="flex items-center gap-2 text-xs text-white/70">
+                          <Camera className="h-3.5 w-3.5" /> Câmera
+                        </div>
+                        {cameraPerm === 'granted' ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-green-400">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Permitido
+                          </span>
+                        ) : cameraPerm === 'denied' ? (
+                          <span className="flex items-center gap-1 text-xs font-bold text-red-400">
+                            <XCircle className="h-3.5 w-3.5" /> Negado
+                          </span>
+                        ) : (
+                          <span className="text-xs text-white/40">Pendente</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {(cameraPerm === 'denied' || gpsPerm === 'denied') ? (
+                      <div className="mt-3 rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-xs leading-5 text-red-200">
+                        <p className="font-bold">Como reativar:</p>
+                        <p className="mt-1"><strong>iPhone:</strong> Ajustes → Safari → Câmera/Localização → Permitir. Depois recarregue esta página.</p>
+                        <p className="mt-1"><strong>Android:</strong> No Chrome, toque no cadeado 🔒 ao lado do endereço → Permissões → ative Câmera e Localização → recarregue.</p>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void requestAllPermissions()}
+                        disabled={requestingPerms}
+                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-3.5 text-sm font-bold uppercase tracking-[0.14em] text-[#06070a] transition-all hover:bg-amber-300 active:scale-[0.98] disabled:opacity-50"
+                      >
+                        {requestingPerms ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" /> Solicitando...
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="h-4 w-4" /> Permitir câmera e localização
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

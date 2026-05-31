@@ -289,7 +289,7 @@ export function StaffCheckinPage() {
     }
   }
 
-  function capturePhoto() {
+  function capturePhoto(nextStep: PageStep = 'preview') {
     const video = videoRef.current
     const canvas = canvasRef.current
     if (!video || !canvas) return
@@ -318,7 +318,7 @@ export function StaffCheckinPage() {
       streamRef.current = null
     }
 
-    setStep('preview')
+    setStep(nextStep)
   }
 
   function retakePhoto() {
@@ -486,7 +486,16 @@ export function StaffCheckinPage() {
     setErrorMessage('')
 
     try {
-      const location = await getGeolocation()
+      // Reusa coords ja capturado em startCheckoutFlow (evita 2o GPS lento/timeout)
+      let location = coords
+      if (!location) {
+        try { location = await getGeolocation() } catch {
+          setErrorMessage('Localização indisponível. Ative o GPS e tente de novo.')
+          setStep('error')
+          setLoading(false)
+          return
+        }
+      }
 
       const res = await fetch(EDGE_FN_URL, {
         method: 'POST',
@@ -962,7 +971,7 @@ export function StaffCheckinPage() {
             {/* Capture button */}
             <div className="mt-6 flex justify-center">
               <button
-                onClick={capturePhoto}
+                onClick={() => capturePhoto('preview')}
                 className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-[#D4FF00] bg-[#D4FF00]/10 transition-all active:scale-90"
               >
                 <Camera className="h-8 w-8 text-[#D4FF00]" />
@@ -1054,7 +1063,7 @@ export function StaffCheckinPage() {
             </div>
             <canvas ref={canvasRef} className="hidden" />
             <div className="mt-6 flex justify-center">
-              <button onClick={() => { capturePhoto(); setTimeout(() => setStep('preview_checkout'), 100) }} className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-red-500 bg-red-500/10 transition-all active:scale-90">
+              <button onClick={() => capturePhoto('preview_checkout')} className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-red-500 bg-red-500/10 transition-all active:scale-90">
                 <Camera className="h-8 w-8 text-red-400" />
               </button>
             </div>

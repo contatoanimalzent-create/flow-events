@@ -881,37 +881,36 @@ export function StaffCheckinPage() {
               </div>
             )}
 
-            {/* Action buttons */}
+            {/* Action buttons — sempre mostra Entrada E Saída, staff escolhe */}
             <div className="mt-6 flex flex-col gap-3">
-              {!staff.checked_in ? (
-                <button
-                  onClick={startCheckinFlow}
-                  className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#D4FF00] py-5 text-base font-bold uppercase tracking-[0.14em] text-[#06070a] transition-all hover:-translate-y-0.5 hover:bg-[#c8f200] hover:shadow-[0_12px_36px_rgba(212,255,0,0.24)] active:scale-[0.98]"
-                  style={{ minHeight: 72 }}
-                >
-                  <LogIn className="h-6 w-6" />
-                  Registrar Entrada
-                </button>
-              ) : (
-                <button
-                  onClick={startCheckoutFlow}
-                  disabled={loading}
-                  className="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-red-500 bg-red-500/10 py-5 text-base font-bold uppercase tracking-[0.14em] text-red-400 transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-                  style={{ minHeight: 72 }}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Registrando...
-                    </>
-                  ) : (
-                    <>
-                      <LogOut className="h-6 w-6" />
-                      Registrar Saída
-                    </>
-                  )}
-                </button>
-              )}
+              <button
+                onClick={startCheckinFlow}
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#D4FF00] py-5 text-base font-bold uppercase tracking-[0.14em] text-[#06070a] transition-all hover:-translate-y-0.5 hover:bg-[#c8f200] hover:shadow-[0_12px_36px_rgba(212,255,0,0.24)] active:scale-[0.98] disabled:opacity-50"
+                style={{ minHeight: 72 }}
+              >
+                <LogIn className="h-6 w-6" />
+                Registrar Entrada
+              </button>
+
+              <button
+                onClick={startCheckoutFlow}
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-red-500 bg-red-500/10 py-5 text-base font-bold uppercase tracking-[0.14em] text-red-400 transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                style={{ minHeight: 72 }}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Registrando...
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="h-6 w-6" />
+                    Registrar Saída
+                  </>
+                )}
+              </button>
 
               <button
                 onClick={resetToEmail}

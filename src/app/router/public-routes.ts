@@ -37,6 +37,7 @@ export type PublicRoute =
   | { type: 'staff-join'; token: string }
   | { type: 'staff-ponto'; slug: string }
   | { type: 'timeclock'; eventId: string; credentialToken: string }
+  | { type: 'kiosk'; slug: string }
 
 export function getInitialPublicRoute(): PublicRoute {
   const path = window.location.pathname
@@ -89,6 +90,9 @@ export function getInitialPublicRoute(): PublicRoute {
 
   const staffPontoMatch = path.match(/^\/staff\/ponto\/([^/]+)/)
   if (staffPontoMatch) return { type: 'staff-ponto', slug: staffPontoMatch[1] }
+
+  const kioskMatch = path.match(/^\/kiosk\/([^/]+)/)
+  if (kioskMatch) return { type: 'kiosk', slug: kioskMatch[1] }
 
   if (path === '/timeclock') {
     const params = new URLSearchParams(window.location.search)

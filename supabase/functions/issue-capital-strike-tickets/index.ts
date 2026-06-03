@@ -4,6 +4,16 @@ import { generateQRCodeUrl, sendResendEmail } from '../_shared/transactional-ema
 
 const EVENT_ID = '2b7682c0-15f7-4909-954b-8ee8f086978c'
 const ORG_ID = '00000000-0000-0000-0000-000000000001'
+const GROUP_LINKS = {
+  COALIZAO: 'https://chat.whatsapp.com/D5AotUXrtdlKBZaK3UIZt5?mode=gi_t',
+  ALIANCA: 'https://chat.whatsapp.com/IZAAyIdnUN2C8N2GNPJIO7?mode=gi_t',
+  OPERADORES: 'https://chat.whatsapp.com/HVk2nBYhvjNA72vmnrcnmv',
+} as const
+const CAPITAL_STRIKE_ASSETS = {
+  LOGO: 'https://raw.githubusercontent.com/contatoanimalzent-create/flow-events/main/public/capital-strike/logo-a-origem.png',
+  PATCH_COALIZAO: 'https://raw.githubusercontent.com/contatoanimalzent-create/flow-events/main/public/capital-strike/patch-coalizao.png',
+  PATCH_ALIANCA: 'https://raw.githubusercontent.com/contatoanimalzent-create/flow-events/main/public/capital-strike/patch-alianca.png',
+} as const
 
 const ARMY_CONFIG: Record<string, { ticketTypeId: string; batchId: string }> = {
   COALIZAO: {
@@ -18,6 +28,7 @@ const ARMY_CONFIG: Record<string, { ticketTypeId: string; batchId: string }> = {
 
 interface Inscricao {
   id: string
+  source: 'inscricoes' | 'capital_strike_registrations'
   nome_completo: string
   email: string
   telefone: string
@@ -25,6 +36,116 @@ interface Inscricao {
   exercito: string
   categoria: string
   confirmado: boolean
+}
+
+function buildEmailAlias(email: string, suffix: string) {
+  const [local, domain] = email.toLowerCase().trim().split('@')
+  if (!local || !domain) return email.toLowerCase().trim()
+  return `${local.replace(/\+.*/, '')}+${suffix}@${domain}`
+}
+
+function normalizeArmy(value?: string | null) {
+  const normalized = (value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
+  if (normalized.includes('COALIZ')) return 'COALIZAO'
+  if (normalized.includes('ALIAN')) return 'ALIANCA'
+  return normalized
+}
+
+function armyLabelFromKey(armyKey: string) {
+  return armyKey === 'COALIZAO' ? 'Coalizão' : 'Aliança'
+}
+
+function deriveKitStatus(value?: string | null) {
+  const normalized = (value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
+  if (normalized.includes('SEM') && normalized.includes('KIT')) return 'Sem kit'
+  if (normalized.includes('COM') && normalized.includes('KIT')) return 'Com kit'
+  if (normalized.includes('KIT')) return 'Com kit'
+  return 'Não informado'
+}
+
+function buildTicketMetadata(inscricao: Inscricao, armyKey: string) {
+  return {
+    event_key: 'capital-strike-a-origem',
+    registration_id: inscricao.id,
+    registration_source: inscricao.source,
+    army_key: armyKey,
+    army_label: armyLabelFromKey(armyKey),
+    category: inscricao.categoria,
+    kit_status: deriveKitStatus(inscricao.categoria),
+  }
+}
+
+function parseRequestedIds(ids: string[] | null, source: Inscricao['source']) {
+  if (!ids || ids.length === 0) return null
+  const prefix = `${source}:`
+  return ids
+    .map((id) => id.startsWith(prefix) ? id.slice(prefix.length) : id.includes(':') ? null : id)
+    .filter((id): id is string => Boolean(id))
+}
+
+async function fetchLegacyInscricoes(supabase: ReturnType<typeof createSupabaseAdminClient>, ids: string[] | null): Promise<Inscricao[]> {
+  let query = supabase
+    .from('inscricoes')
+    .select('id, nome_completo, email, telefone, cpf, exercito, categoria, confirmado')
+    .eq('confirmado', true)
+    .order('nome_completo', { ascending: true })
+
+  if (ids && ids.length > 0) query = query.in('id', ids)
+
+  const { data, error } = await query
+  if (error) {
+    if (error.code === '42P01' || error.message.toLowerCase().includes('does not exist')) return []
+    throw new Error(`Erro ao buscar inscricoes: ${error.message}`)
+  }
+
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+    id: String(row.id),
+    source: 'inscricoes',
+    nome_completo: String(row.nome_completo ?? ''),
+    email: String(row.email ?? ''),
+    telefone: String(row.telefone ?? ''),
+    cpf: row.cpf ? String(row.cpf) : null,
+    exercito: normalizeArmy(String(row.exercito ?? '')),
+    categoria: String(row.categoria ?? 'OPERADOR'),
+    confirmado: Boolean(row.confirmado),
+  }))
+}
+
+async function fetchCapitalStrikeRegistrations(supabase: ReturnType<typeof createSupabaseAdminClient>, ids: string[] | null): Promise<Inscricao[]> {
+  let query = supabase
+    .from('capital_strike_registrations')
+    .select('id, full_name, email, phone, cpf, army, squad, kit_status')
+    .order('full_name', { ascending: true })
+
+  if (ids && ids.length > 0) query = query.in('id', ids)
+
+  const { data, error } = await query
+  if (error) {
+    if (error.code === '42P01' || error.message.toLowerCase().includes('does not exist')) return []
+    throw new Error(`Erro ao buscar registros Capital Strike: ${error.message}`)
+  }
+
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+    id: String(row.id),
+    source: 'capital_strike_registrations',
+    nome_completo: String(row.full_name ?? ''),
+    email: String(row.email ?? ''),
+    telefone: String(row.phone ?? ''),
+    cpf: row.cpf ? String(row.cpf) : null,
+    exercito: normalizeArmy(String(row.army ?? '')),
+    categoria: String(row.kit_status ?? 'Não informado'),
+    confirmado: true,
+  }))
+}
+
+function dedupeByEmail(inscricoes: Inscricao[]) {
+  const byEmail = new Map<string, Inscricao>()
+  for (const inscricao of inscricoes) {
+    const email = inscricao.email.toLowerCase().trim()
+    if (!email) continue
+    if (!byEmail.has(email)) byEmail.set(email, inscricao)
+  }
+  return Array.from(byEmail.values()).sort((a, b) => a.nome_completo.localeCompare(b.nome_completo, 'pt-BR'))
 }
 
 Deno.serve(async (req) => {
@@ -38,25 +159,48 @@ Deno.serve(async (req) => {
     const mode: 'generate' | 'send' | 'generate_and_send' = body.mode ?? 'generate_and_send'
     const inscricaoIds: string[] | null = body.inscricao_ids ?? null
     const dryRun: boolean = body.dry_run ?? false
+    const testSend: boolean = body.test_send === true
+    const testDeliveryEmail = typeof body.test_email === 'string' ? body.test_email.toLowerCase().trim() : ''
 
-    // 1. Fetch inscricoes (confirmed only)
-    let query = supabase
-      .from('inscricoes')
-      .select('id, nome_completo, email, telefone, cpf, exercito, categoria, confirmado')
-      .eq('confirmado', true)
-      .order('nome_completo', { ascending: true })
+    let inscricoes: Inscricao[]
+    if (testSend) {
+      if (!testDeliveryEmail || !testDeliveryEmail.includes('@')) {
+        throw new Error('test_email obrigatorio para envio de teste')
+      }
 
-    if (inscricaoIds && inscricaoIds.length > 0) {
-      query = query.in('id', inscricaoIds)
+      inscricoes = [
+        {
+          id: 'test-coalizao',
+          source: 'capital_strike_registrations',
+          nome_completo: 'Teste QR Coalizao',
+          email: buildEmailAlias(testDeliveryEmail, 'teste-coalizao'),
+          telefone: '',
+          cpf: null,
+          exercito: 'COALIZAO',
+          categoria: 'OPERADOR',
+          confirmado: true,
+        },
+        {
+          id: 'test-alianca',
+          source: 'capital_strike_registrations',
+          nome_completo: 'Teste QR Alianca',
+          email: buildEmailAlias(testDeliveryEmail, 'teste-alianca'),
+          telefone: '',
+          cpf: null,
+          exercito: 'ALIANCA',
+          categoria: 'OPERADOR',
+          confirmado: true,
+        },
+      ]
+    } else {
+      const [legacyInscricoes, capitalRegistrations] = await Promise.all([
+        fetchLegacyInscricoes(supabase, parseRequestedIds(inscricaoIds, 'inscricoes')),
+        fetchCapitalStrikeRegistrations(supabase, parseRequestedIds(inscricaoIds, 'capital_strike_registrations')),
+      ])
+      inscricoes = dedupeByEmail([...legacyInscricoes, ...capitalRegistrations])
     }
 
-    const { data: inscricoes, error: fetchError } = await query
-
-    if (fetchError) {
-      throw new Error(`Erro ao buscar inscrições: ${fetchError.message}`)
-    }
-
-    if (!inscricoes || inscricoes.length === 0) {
+    if (inscricoes.length === 0) {
       return Response.json({ ok: true, message: 'Nenhuma inscrição confirmada encontrada', stats: { total: 0 } }, { headers: corsHeaders })
     }
 
@@ -82,13 +226,14 @@ Deno.serve(async (req) => {
     }
 
     const stats = { total: inscricoes.length, already_had_ticket: 0, tickets_created: 0, emails_sent: 0, errors: [] as string[] }
-    const results: Array<{ inscricao_id: string; nome: string; email: string; ticket_id: string; qr_token: string; email_sent: boolean }> = []
+    const results: Array<{ inscricao_id: string; nome: string; email: string; ticket_id: string; qr_token: string; qr_url: string | null; email_sent: boolean }> = []
 
     for (const inscricao of inscricoes as Inscricao[]) {
       const email = inscricao.email.toLowerCase().trim()
       const cpfDigits = inscricao.cpf ? inscricao.cpf.replace(/\D/g, '') : null
       const armyKey = inscricao.exercito.toUpperCase()
       const config = ARMY_CONFIG[armyKey]
+      const ticketMetadata = buildTicketMetadata(inscricao, armyKey)
 
       if (!config) {
         stats.errors.push(`Exército desconhecido para ${inscricao.nome_completo}: ${inscricao.exercito}`)
@@ -111,7 +256,7 @@ Deno.serve(async (req) => {
         continue
       } else {
         if (dryRun) {
-          results.push({ inscricao_id: inscricao.id, nome: inscricao.nome_completo, email, ticket_id: 'dry-run', qr_token: 'dry-run', email_sent: false })
+          results.push({ inscricao_id: inscricao.id, nome: inscricao.nome_completo, email, ticket_id: 'dry-run', qr_token: 'dry-run', qr_url: null, email_sent: false })
           stats.tickets_created++
           continue
         }
@@ -137,7 +282,14 @@ Deno.serve(async (req) => {
           paid_at: new Date().toISOString(),
           confirmed_at: new Date().toISOString(),
           source_channel: 'capital-strike-registration',
-          metadata: { inscricao_id: inscricao.id, exercito: inscricao.exercito, categoria: inscricao.categoria },
+          metadata: {
+            inscricao_id: inscricao.id,
+            inscricao_source: inscricao.source,
+            exercito: inscricao.exercito,
+            categoria: inscricao.categoria,
+            test_send: testSend,
+            delivery_email: testSend ? testDeliveryEmail : null,
+          },
         })
 
         if (orderError) {
@@ -182,6 +334,7 @@ Deno.serve(async (req) => {
           holder_cpf: cpfDigits,
           status: 'confirmed',
           is_vip: false,
+          metadata: ticketMetadata,
         }).select('id').single()
 
         if (ticketError) {
@@ -194,13 +347,22 @@ Deno.serve(async (req) => {
         existingByEmail.set(email, { id: ticketId, qr_token: qrToken, ticket_number: ticketNumber, email_sent_at: null })
       }
 
+      if (!dryRun) {
+        await supabase
+          .from('digital_tickets')
+          .update({ metadata: ticketMetadata })
+          .eq('id', ticketId)
+      }
+
       // Send email
       let emailSent = false
+      let qrUrlForResult: string | null = null
       if (mode !== 'generate' && !dryRun) {
         try {
           const qrUrl = await generateQRCodeUrl(qrToken)
+          qrUrlForResult = qrUrl
 
-          const armyLabel = armyKey === 'COALIZAO' ? 'Coalizão' : 'Aliança'
+          const armyLabel = armyLabelFromKey(armyKey)
           const armyColor = armyKey === 'COALIZAO' ? '#F59E0B' : '#3B82F6'
           const armyBg = armyKey === 'COALIZAO' ? '#78350F' : '#1E3A5F'
 
@@ -213,13 +375,16 @@ Deno.serve(async (req) => {
             ticketNumber,
             qrToken,
             qrUrl,
+            armyGroupLink: armyKey === 'COALIZAO' ? GROUP_LINKS.COALIZAO : GROUP_LINKS.ALIANCA,
+            operatorsGroupLink: GROUP_LINKS.OPERADORES,
           })
 
+          const deliveryEmail = testSend ? testDeliveryEmail : email
           const result = await sendResendEmail({
-            to: email,
-            subject: `Seu QR Code - Capital Strike: A Origem | ${armyLabel}`,
+            to: deliveryEmail,
+            subject: `${testSend ? '[TESTE] ' : ''}Seu QR Code - Capital Strike: A Origem | ${armyLabel}`,
             html,
-            text: `Olá ${inscricao.nome_completo},\n\nSeu credenciamento para Capital Strike - A Origem está confirmado!\nExército: ${armyLabel}\nCategoria: ${inscricao.categoria}\nTicket: ${ticketNumber}\n\nApresente o QR Code deste email na entrada do evento.\n\nNos vemos no campo de batalha!`,
+            text: `Ola ${inscricao.nome_completo},\n\nSeu credenciamento para Capital Strike - A Origem esta confirmado!\nExercito: ${armyLabel}\nCategoria: ${inscricao.categoria}\nTicket: ${ticketNumber}\n\nQR Code: ${qrUrl ?? qrToken}\n\nEntre nos grupos oficiais:\nGrupo ${armyLabel}: ${armyKey === 'COALIZAO' ? GROUP_LINKS.COALIZAO : GROUP_LINKS.ALIANCA}\nGrupo Operadores: ${GROUP_LINKS.OPERADORES}\n\nApresente o QR Code deste email na entrada do evento.\n\nNos vemos no campo de batalha!`,
           })
 
           if (result.status === 'sent') {
@@ -240,9 +405,10 @@ Deno.serve(async (req) => {
       results.push({
         inscricao_id: inscricao.id,
         nome: inscricao.nome_completo,
-        email,
+        email: testSend ? testDeliveryEmail : email,
         ticket_id: ticketId,
         qr_token: qrToken,
+        qr_url: qrUrlForResult,
         email_sent: emailSent,
       })
     }
@@ -264,14 +430,22 @@ function buildCapitalStrikeEmail(params: {
   ticketNumber: string
   qrToken: string
   qrUrl: string | null
+  armyGroupLink: string
+  operatorsGroupLink: string
 }) {
-  const { nome, exercito, exercitoColor, exercitoBg, categoria, ticketNumber, qrToken, qrUrl } = params
+  const { nome, exercito, exercitoColor, exercitoBg, categoria, ticketNumber, qrToken, qrUrl, armyGroupLink, operatorsGroupLink } = params
   const firstName = nome.split(' ')[0]
   const isCoalizao = exercito === 'Coalizão'
-  const patchUrl = isCoalizao
-    ? 'https://www.capitalstrike.com.br/imagens/patch-coalizao.png'
-    : 'https://www.capitalstrike.com.br/imagens/patch-alianca.png'
   const accentDark = isCoalizao ? '#92400E' : '#1E3A8A'
+  const patchUrl = isCoalizao ? CAPITAL_STRIKE_ASSETS.PATCH_COALIZAO : CAPITAL_STRIKE_ASSETS.PATCH_ALIANCA
+  const qrLinkHtml = qrUrl
+    ? `<div style="margin-top:16px;">
+        <a href="${qrUrl}" target="_blank" rel="noopener"
+          style="display:inline-block;text-decoration:none;border-radius:10px;border:1px solid ${exercitoColor}66;color:${exercitoColor};background:${exercitoColor}11;padding:10px 16px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;">
+          Abrir link do QR Code
+        </a>
+      </div>`
+    : `<div style="margin-top:16px;font-size:12px;color:${exercitoColor};font-weight:800;letter-spacing:1px;">Codigo: ${qrToken}</div>`
 
   const qrImage = qrUrl
     ? `<img src="${qrUrl}" alt="QR Code" width="240" height="240" style="display:block;border-radius:12px;" />`
@@ -309,8 +483,7 @@ function buildCapitalStrikeEmail(params: {
     <tr><td style="height:20px;"></td></tr>
     <!-- Main title -->
     <tr><td align="center" style="padding:0 32px;">
-      <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:6px;color:${exercitoColor};">Capital Strike</div>
-      <h1 style="margin:8px 0 0 0;font-size:56px;font-weight:900;line-height:1.0;text-transform:uppercase;letter-spacing:-2px;color:#FFFFFF;">A Origem</h1>
+      <img src="${CAPITAL_STRIKE_ASSETS.LOGO}" alt="Capital Strike - A Origem" width="360" style="display:block;width:100%;max-width:360px;height:auto;margin:0 auto;" />
       <div style="margin-top:12px;font-size:14px;font-style:italic;color:rgba(255,255,255,0.5);letter-spacing:1px;">&#x201C;Toda guerra tem um come&ccedil;o&#x201D;</div>
     </td></tr>
     <tr><td style="height:28px;"></td></tr>
@@ -361,8 +534,8 @@ function buildCapitalStrikeEmail(params: {
       <td style="padding:20px 24px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
           <tr>
-            <td width="64" valign="middle">
-              <img src="${patchUrl}" alt="${exercito}" width="56" height="56" style="display:block;border-radius:12px;border:2px solid ${exercitoColor}55;" />
+            <td width="82" valign="middle">
+              <img src="${patchUrl}" alt="Patch ${exercito}" width="72" height="72" style="display:block;width:72px;height:72px;border-radius:16px;border:2px solid ${exercitoColor}55;object-fit:contain;background:#050505;" />
             </td>
             <td style="padding-left:16px;" valign="middle">
               <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:${exercitoColor}99;">Ex&eacute;rcito</div>
@@ -373,6 +546,39 @@ function buildCapitalStrikeEmail(params: {
                 <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.4);">Categoria</div>
                 <div style="font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#FFFFFF;margin-top:2px;">${categoria}</div>
               </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</td></tr>
+
+<!-- GROUP LINKS -->
+<tr><td style="padding:24px 36px 0 36px;">
+  <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:5px;color:${exercitoColor};margin-bottom:16px;">Grupos Oficiais</div>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+    style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;">
+    <tr>
+      <td style="padding:22px 24px;">
+        <div style="font-size:14px;color:rgba(255,255,255,0.72);line-height:1.6;margin-bottom:18px;">
+          Entre no grupo do seu ex&eacute;rcito e tamb&eacute;m no grupo geral dos Operadores para receber instru&ccedil;&otilde;es oficiais.
+        </div>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td style="padding:6px 0;">
+              <a href="${armyGroupLink}" target="_blank" rel="noopener"
+                style="display:block;text-decoration:none;background:${exercitoColor};color:#050505;border-radius:12px;padding:14px 18px;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:1px;text-align:center;">
+                Entrar no grupo ${exercito}
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0 0 0;">
+              <a href="${operatorsGroupLink}" target="_blank" rel="noopener"
+                style="display:block;text-decoration:none;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#ffffff;border-radius:12px;padding:14px 18px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;text-align:center;">
+                Entrar no grupo Operadores
+              </a>
             </td>
           </tr>
         </table>
@@ -405,6 +611,7 @@ function buildCapitalStrikeEmail(params: {
           <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:3px;color:${exercitoColor};">&#x2713; Confirmado</span>
         </div>
       </div>
+      ${qrLinkHtml}
     </td></tr>
   </table>
 </td></tr>

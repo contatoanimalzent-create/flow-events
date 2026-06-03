@@ -64,6 +64,11 @@ function deriveKitStatus(value?: string | null) {
   return 'Não informado'
 }
 
+function normalizeCpfForStorage(value?: string | null) {
+  const digits = value ? value.replace(/[^0-9]/g, '') : ''
+  return digits.length === 11 ? digits : null
+}
+
 function buildTicketMetadata(inscricao: Inscricao, armyKey: string) {
   return {
     event_key: 'capital-strike-a-origem',
@@ -80,12 +85,14 @@ function buildTicketMetadata(inscricao: Inscricao, armyKey: string) {
 function parseRequestedIds(ids: string[] | null, source: Inscricao['source']) {
   if (!ids || ids.length === 0) return null
   const prefix = `${source}:`
-  return ids
+  const parsed = ids
     .map((id) => id.startsWith(prefix) ? id.slice(prefix.length) : id.includes(':') ? null : id)
     .filter((id): id is string => Boolean(id))
+  return parsed.length > 0 ? parsed : []
 }
 
 async function fetchLegacyInscricoes(supabase: ReturnType<typeof createSupabaseAdminClient>, ids: string[] | null): Promise<Inscricao[]> {
+  if (ids && ids.length === 0) return []
   let query = supabase
     .from('inscricoes')
     .select('id, nome_completo, email, telefone, cpf, exercito, categoria, confirmado')
@@ -115,6 +122,7 @@ async function fetchLegacyInscricoes(supabase: ReturnType<typeof createSupabaseA
 }
 
 async function fetchCapitalStrikeRegistrations(supabase: ReturnType<typeof createSupabaseAdminClient>, ids: string[] | null): Promise<Inscricao[]> {
+  if (ids && ids.length === 0) return []
   let query = supabase
     .from('capital_strike_registrations')
     .select('id, full_name, email, phone, cpf, army, squad, kit_status')
@@ -210,25 +218,31 @@ Deno.serve(async (req) => {
       return Response.json({ ok: true, message: 'Nenhuma inscrição confirmada encontrada', stats: { total: 0 } }, { headers: corsHeaders })
     }
 
-    // 2. Check which inscricoes already have digital_tickets (by matching email + event_id)
-    const emails = inscricoes.map((i: Inscricao) => i.email.toLowerCase().trim())
+    // 2. Check which inscricoes already have digital_tickets.
+    // registration_source + registration_id is the stable idempotency key; email is fallback only.
     const { data: existingTickets } = await supabase
       .from('digital_tickets')
-      .select('id, holder_email, qr_token, ticket_number, email_sent_at')
+      .select('id, holder_email, qr_token, ticket_number, email_sent_at, metadata, created_at')
       .eq('event_id', EVENT_ID)
-      .in('holder_email', emails)
+      .order('created_at', { ascending: true })
 
     const existingByEmail = new Map<string, { id: string; qr_token: string; ticket_number: string; email_sent_at: string | null }>()
+    const existingByRegistration = new Map<string, { id: string; qr_token: string; ticket_number: string; email_sent_at: string | null }>()
     for (const t of (existingTickets ?? []) as Array<Record<string, unknown>>) {
-      const email = String(t.holder_email ?? '').toLowerCase().trim()
-      if (email) {
-        existingByEmail.set(email, {
-          id: String(t.id),
-          qr_token: String(t.qr_token),
-          ticket_number: String(t.ticket_number),
-          email_sent_at: t.email_sent_at ? String(t.email_sent_at) : null,
-        })
+      const existing = {
+        id: String(t.id),
+        qr_token: String(t.qr_token),
+        ticket_number: String(t.ticket_number),
+        email_sent_at: t.email_sent_at ? String(t.email_sent_at) : null,
       }
+      const metadata = (t.metadata ?? {}) as Record<string, unknown>
+      const source = String(metadata.registration_source ?? '')
+      const registrationId = String(metadata.registration_id ?? '')
+      if (source && registrationId && !existingByRegistration.has(`${source}:${registrationId}`)) {
+        existingByRegistration.set(`${source}:${registrationId}`, existing)
+      }
+      const email = String(t.holder_email ?? '').toLowerCase().trim()
+      if (email && !existingByEmail.has(email)) existingByEmail.set(email, existing)
     }
 
     const stats = { total: inscricoes.length, already_had_ticket: 0, tickets_created: 0, emails_sent: 0, errors: [] as string[] }
@@ -236,7 +250,7 @@ Deno.serve(async (req) => {
 
     for (const inscricao of inscricoes as Inscricao[]) {
       const email = inscricao.email.toLowerCase().trim()
-      const cpfDigits = inscricao.cpf ? inscricao.cpf.replace(/\D/g, '') : null
+      const cpfDigits = normalizeCpfForStorage(inscricao.cpf)
       const armyKey = inscricao.exercito.toUpperCase()
       const config = ARMY_CONFIG[armyKey]
       const ticketMetadata = buildTicketMetadata(inscricao, armyKey)
@@ -250,7 +264,7 @@ Deno.serve(async (req) => {
       let qrToken: string
       let ticketNumber: string
 
-      const existing = existingByEmail.get(email)
+      const existing = existingByRegistration.get(`${inscricao.source}:${inscricao.id}`) ?? existingByEmail.get(email)
 
       if (existing) {
         stats.already_had_ticket++
@@ -280,7 +294,7 @@ Deno.serve(async (req) => {
           buyer_name: inscricao.nome_completo,
           buyer_email: email,
           buyer_phone: inscricao.telefone,
-          buyer_cpf: cpfDigits,
+          buyer_cpf: null,
           subtotal: 0,
           total_amount: 0,
           status: 'paid',
@@ -350,7 +364,9 @@ Deno.serve(async (req) => {
 
         ticketId = (ticketData as Record<string, unknown>).id as string
         stats.tickets_created++
-        existingByEmail.set(email, { id: ticketId, qr_token: qrToken, ticket_number: ticketNumber, email_sent_at: null })
+        const createdTicket = { id: ticketId, qr_token: qrToken, ticket_number: ticketNumber, email_sent_at: null }
+        existingByRegistration.set(`${inscricao.source}:${inscricao.id}`, createdTicket)
+        existingByEmail.set(email, createdTicket)
       }
 
       if (!dryRun) {

@@ -822,7 +822,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const missing: string[] = []
     if (!body.token)             missing.push('token')
     if (!body.full_name)         missing.push('full_name')
-    if (!body.email)             missing.push('email')
+    if (!body.document_number)   missing.push('document_number')
+    if (!body.pix_key)           missing.push('pix_key')
     if (body.terms_accepted !== true) missing.push('terms_accepted (must be true)')
 
     if (missing.length > 0) {
@@ -832,7 +833,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       )
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email!)) {
+    if (body.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
       return Response.json({ error: 'Invalid email format' }, addCors({ status: 400 }))
     }
 
@@ -853,23 +854,37 @@ Deno.serve(async (req: Request): Promise<Response> => {
       }
 
       const cleanPhone = normalizeBsbPhoneDigits(body.phone)
-      if (body.token === 'bsb5' && (cleanPhone.length !== 11 || !cleanPhone.startsWith('61'))) {
+      const cleanCpf = normalizeCPF(body.document_number)
+
+      if (!isValidCPF(cleanCpf)) {
         return Response.json(
-          { error: 'Informe o WhatsApp com DDD 61: (61) 99999-9999.' },
+          { error: 'Informe um CPF valido.' },
           addCors({ status: 400 }),
         )
       }
 
-      const { data: existingStaff } = await admin
-        .from('staff_members')
-        .select('id')
-        .eq('event_id', inviteLink.event_id)
-        .eq('email', body.email!.toLowerCase().trim())
-        .maybeSingle()
+      let existingStaff: { id: string } | null = null
+      if (cleanCpf) {
+        const { data } = await admin
+          .from('staff_members')
+          .select('id')
+          .eq('event_id', inviteLink.event_id)
+          .eq('cpf', cleanCpf)
+          .maybeSingle()
+        existingStaff = data
+      } else if (body.email) {
+        const { data } = await admin
+          .from('staff_members')
+          .select('id')
+          .eq('event_id', inviteLink.event_id)
+          .eq('email', body.email.toLowerCase().trim())
+          .maybeSingle()
+        existingStaff = data
+      }
 
       if (existingStaff) {
         return Response.json(
-          { error: 'Este e-mail já está cadastrado como staff neste evento.' },
+          { error: 'Este cadastro ja existe para este evento.' },
           addCors({ status: 409 }),
         )
       }
@@ -886,16 +901,16 @@ Deno.serve(async (req: Request): Promise<Response> => {
           event_id:         inviteLink.event_id,
           first_name:       firstName,
           last_name:        lastName,
-          email:            body.email!.toLowerCase().trim(),
+          email:            body.email ? body.email.toLowerCase().trim() : null,
           phone:            cleanPhone || body.phone || null,
-          cpf:              body.document_number ?? null,
-          role_title:       body.role_title || inviteLink.role_type || 'staff',
+          cpf:              cleanCpf,
+          role_title:       body.role_title || inviteLink.role_type || 'Staff',
           company:          body.company ?? null,
           pix_key:          body.pix_key ?? null,
           shift_label:      body.shift_label || ((body as Record<string, unknown>).shift_start && (body as Record<string, unknown>).shift_end ? `${(body as Record<string, unknown>).shift_start} - ${(body as Record<string, unknown>).shift_end}` : null),
           status:           'active',
           is_active:        true,
-          notes:            [body.bio, body.t_shirt_size ? `Camiseta: ${body.t_shirt_size}` : null].filter(Boolean).join(' | ') || null,
+          notes:            body.bio ?? null,
           created_at:       now,
           updated_at:       now,
         })
@@ -931,7 +946,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         eventImageUrl: (eventInfo?.cover_url as string | null | undefined) ?? null,
         staffMemberId: staffMember.id,
         staffName: body.full_name!.trim(),
-        staffEmail: body.email!.toLowerCase().trim(),
+        staffEmail: body.email ? body.email.toLowerCase().trim() : '',
         staffPhone: cleanPhone || body.phone || null,
         roleType: inviteLink.role_type,
         teamId: inviteLink.team_id ?? null,

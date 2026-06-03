@@ -141,6 +141,7 @@ function resolveScreen(path: string, navigate: (p: string) => void): React.React
   // Operator
   if (is('/pulse/operator')) return <OperatorHomePage onNavigate={navigate} />
   if (is('/pulse/operator/scanner')) return <ScannerPage onNavigate={navigate} />
+  if (starts('/pulse/scanner/')) return <ScannerPage scannerSlug={path.split('/').pop()!} onNavigate={navigate} />
   if (is('/pulse/operator/manual-check')) return <ManualCheckPage onNavigate={navigate} />
   if (is('/pulse/operator/history')) return <CheckinHistoryPage onNavigate={navigate} />
   if (is('/pulse/operator/flow')) return <FlowPage onNavigate={navigate} />
@@ -232,9 +233,10 @@ export function PulseApp() {
 
       const isOnboardingRoute = path.startsWith('/pulse/select-')
       const isDirectSetupRoute = path === '/pulse/bsb5'
+      const isDirectScannerRoute = path.startsWith('/pulse/scanner/')
 
       // Sessão existe mas sem contexto → onboarding
-      if (!isContextReady && !isOnboardingRoute && !isDirectSetupRoute) {
+      if (!isContextReady && !isOnboardingRoute && !isDirectSetupRoute && !isDirectScannerRoute) {
         replace('/pulse/select-organization')
         return
       }
@@ -266,11 +268,13 @@ export function PulseApp() {
     '/pulse/operator/scanner', // full-screen scanner
     '/pulse/kiosk',            // full-screen kiosk mode
   ]
+  const isDirectScannerRoute = path.startsWith('/pulse/scanner/')
   const showChrome =
     authChecked &&
     isContextReady &&
     context?.mode != null &&
-    !noChromePaths.includes(path)
+    !noChromePaths.includes(path) &&
+    !isDirectScannerRoute
 
   // Aguardando verificação de sessão
   if (!authChecked) {

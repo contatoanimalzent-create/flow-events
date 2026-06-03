@@ -377,6 +377,7 @@ export interface DigitalTicket {
   transferred_to_email?: string | null
   transfer_requested_at?: string | null
   email_sent_at?: string | null
+  metadata?: Record<string, unknown>
   created_at: string
   updated_at: string
 }
@@ -1122,6 +1123,7 @@ export interface CapitalStrikeRegistration {
   mother_name: string
   address: string
   squad?: string | null
+  kit_status?: 'Com kit' | 'Sem kit' | null
   army: CapitalStrikeArmy
   created_at: string
   updated_at?: string | null

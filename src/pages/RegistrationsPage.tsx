@@ -20,6 +20,7 @@ type FactionFilter = 'all' | 'COALIZAO' | 'ALIANCA'
 
 interface Inscricao {
   id: string
+  source: 'inscricoes' | 'capital_strike_registrations'
   nome_completo: string
   cpf: string | null
   email: string
@@ -35,6 +36,23 @@ interface Inscricao {
   tamanho_camiseta: string | null
   confirmado: boolean
   created_at: string
+}
+
+function normalizeArmy(value?: string | null) {
+  const normalized = (value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
+  if (normalized.includes('COALIZ')) return 'COALIZAO'
+  if (normalized.includes('ALIAN')) return 'ALIANCA'
+  return normalized
+}
+
+function dedupeRegistrations(rows: Inscricao[]) {
+  const byEmail = new Map<string, Inscricao>()
+  rows.forEach((row) => {
+    const email = row.email.toLowerCase().trim()
+    if (!email) return
+    if (!byEmail.has(email)) byEmail.set(email, row)
+  })
+  return Array.from(byEmail.values()).sort((a, b) => a.nome_completo.localeCompare(b.nome_completo, 'pt-BR'))
 }
 
 const FACTION_STYLES: Record<string, { bg: string; border: string; text: string; dot: string; label: string; icon: typeof Shield }> = {
@@ -117,13 +135,61 @@ export function RegistrationsPage() {
       setLoading(true)
       setError(null)
       try {
-        const { data, error: fetchError } = await supabase
-          .from('inscricoes')
-          .select('*')
-          .order('nome_completo', { ascending: true })
+        const [legacyResult, capitalResult] = await Promise.all([
+          supabase
+            .from('inscricoes')
+            .select('*')
+            .order('nome_completo', { ascending: true }),
+          supabase
+            .from('capital_strike_registrations')
+            .select('*')
+            .order('full_name', { ascending: true }),
+        ])
 
-        if (fetchError) throw fetchError
-        setRegistrations((data ?? []) as Inscricao[])
+        if (legacyResult.error && legacyResult.error.code !== '42P01') throw legacyResult.error
+        if (capitalResult.error && capitalResult.error.code !== '42P01') throw capitalResult.error
+
+        const legacyRows = ((legacyResult.data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+          id: `inscricoes:${String(row.id)}`,
+          source: 'inscricoes' as const,
+          nome_completo: String(row.nome_completo ?? ''),
+          cpf: row.cpf ? String(row.cpf) : null,
+          email: String(row.email ?? ''),
+          telefone: String(row.telefone ?? ''),
+          nome_mae: String(row.nome_mae ?? ''),
+          endereco: String(row.endereco ?? ''),
+          cidade_estado: String(row.cidade_estado ?? ''),
+          time: row.time ? String(row.time) : null,
+          categoria: String(row.categoria ?? 'OPERADOR'),
+          enfermidade: row.enfermidade ? String(row.enfermidade) : null,
+          contato_emergencia: String(row.contato_emergencia ?? ''),
+          exercito: normalizeArmy(String(row.exercito ?? '')),
+          tamanho_camiseta: row.tamanho_camiseta ? String(row.tamanho_camiseta) : null,
+          confirmado: Boolean(row.confirmado),
+          created_at: String(row.created_at ?? new Date().toISOString()),
+        }))
+
+        const capitalRows = ((capitalResult.data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+          id: `capital_strike_registrations:${String(row.id)}`,
+          source: 'capital_strike_registrations' as const,
+          nome_completo: String(row.full_name ?? ''),
+          cpf: row.cpf ? String(row.cpf) : null,
+          email: String(row.email ?? ''),
+          telefone: String(row.phone ?? ''),
+          nome_mae: String(row.mother_name ?? ''),
+          endereco: String(row.address ?? ''),
+          cidade_estado: '',
+          time: row.squad ? String(row.squad) : null,
+          categoria: row.squad ? String(row.squad) : 'OPERADOR',
+          enfermidade: null,
+          contato_emergencia: '',
+          exercito: normalizeArmy(String(row.army ?? '')),
+          tamanho_camiseta: null,
+          confirmado: true,
+          created_at: String(row.created_at ?? new Date().toISOString()),
+        }))
+
+        setRegistrations(dedupeRegistrations([...legacyRows, ...capitalRows]))
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : 'Erro ao carregar inscrições')
       } finally {

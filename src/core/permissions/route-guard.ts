@@ -34,7 +34,7 @@ export function checkRouteAccess(
   isContextReady: boolean
 ): GuardResult {
   // Onboarding paths are always allowed
-  if (path.startsWith('/pulse/select-') || path === '/pulse/bsb5') {
+  if (path.startsWith('/pulse/select-') || path === '/pulse/bsb5' || path.startsWith('/pulse/scanner/')) {
     return { allowed: true, reason: 'ok' }
   }
 

@@ -13,6 +13,7 @@ interface FormData {
   motherName: string
   address: string
   squad?: string
+  kitStatus: 'Com kit' | 'Sem kit'
 }
 
 interface FormErrors {
@@ -38,6 +39,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
     motherName: '',
     address: '',
     squad: '',
+    kitStatus: 'Sem kit',
   })
 
   const [errors, setErrors] = useState<FormErrors>({})
@@ -160,6 +162,7 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
           mother_name: formData.motherName,
           address: formData.address,
           squad: formData.squad || null,
+          kit_status: formData.kitStatus,
           army,
         },
       ])
@@ -371,6 +374,28 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
                 placeholder="Nome do seu esquadrão"
                 className="mt-2 w-full rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] px-4 py-3 text-[#ebe7e0] placeholder:text-[#4a4540] outline-none transition-all focus:border-[#ae936f]/40"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#f0ebe2]">
+                Kit *
+              </label>
+              <div className="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] p-1">
+                {(['Com kit', 'Sem kit'] as const).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, kitStatus: option }))}
+                    className={`rounded-md px-3 py-2.5 text-sm font-semibold transition-all ${
+                      formData.kitStatus === option
+                        ? 'bg-[#ae936f] text-[#0a0908]'
+                        : 'text-[#9a9088] hover:text-[#f0ebe2]'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Submit */}

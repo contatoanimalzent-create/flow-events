@@ -7,7 +7,20 @@
 import { supabase } from '@/lib/supabase'
 
 export type ValidationResult =
-  | { valid: true; name: string; ticketLabel: string; ticketType: string; attendeeId: string; message: string }
+  | {
+      valid: true
+      name: string
+      ticketLabel: string
+      ticketType: string
+      attendeeId: string
+      message: string
+      cpf?: string | null
+      email?: string | null
+      ticketNumber?: string | null
+      army?: string | null
+      kitStatus?: string | null
+      category?: string | null
+    }
   | { valid: false; reason: 'not_found' | 'already_used' | 'wrong_event' | 'invalid_token' | 'gate_mismatch' | 'unauthorized'; message: string }
 
 export interface CheckinRecord {
@@ -26,7 +39,79 @@ export interface FlowMetrics {
   syncPending: number
 }
 
+export interface ScannerAuthResponse {
+  ok: true
+  masked_email?: string
+  scanner_session?: string
+  expires_at?: string
+  event_id?: string
+  event_name?: string
+}
+
+function normalizeText(value: unknown) {
+  return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
+}
+
+function deriveArmyLabel(...values: unknown[]) {
+  const text = values.map(normalizeText).join(' ')
+  if (text.includes('COALIZ')) return 'Coalizão'
+  if (text.includes('ALIAN')) return 'Aliança'
+  return null
+}
+
+function deriveKitStatus(...values: unknown[]) {
+  const text = values.map(normalizeText).join(' ')
+  if (text.includes('SEM') && text.includes('KIT')) return 'Sem kit'
+  if (text.includes('COM') && text.includes('KIT')) return 'Com kit'
+  if (text.includes('KIT')) return 'Com kit'
+  return null
+}
+
 export const operatorService = {
+  async requestScannerCode(input: { eventId?: string; eventSlug?: string }): Promise<ScannerAuthResponse> {
+    const { data, error } = await supabase.functions.invoke('scanner-auth', {
+      body: {
+        action: 'request_code',
+        event_id: input.eventId,
+        event_slug: input.eventSlug,
+      },
+    })
+
+    if (error) throw new Error(error.message || 'Erro ao enviar código')
+    if ((data as any)?.error) throw new Error((data as any).error)
+    return data as ScannerAuthResponse
+  },
+
+  async verifyScannerCode(input: { eventId?: string; eventSlug?: string; code: string }): Promise<ScannerAuthResponse> {
+    const { data, error } = await supabase.functions.invoke('scanner-auth', {
+      body: {
+        action: 'verify_code',
+        event_id: input.eventId,
+        event_slug: input.eventSlug,
+        code: input.code,
+      },
+    })
+
+    if (error) throw new Error(error.message || 'Erro ao validar código')
+    if ((data as any)?.error) throw new Error((data as any).error)
+    return data as ScannerAuthResponse
+  },
+
+  async checkScannerSession(input: { eventId?: string; eventSlug?: string; scannerSession: string }): Promise<ScannerAuthResponse> {
+    const { data, error } = await supabase.functions.invoke('scanner-auth', {
+      body: {
+        action: 'check_session',
+        event_id: input.eventId,
+        event_slug: input.eventSlug,
+        scanner_session: input.scannerSession,
+      },
+    })
+
+    if (error) throw new Error(error.message || 'Sessão do scanner expirada')
+    if ((data as any)?.error) throw new Error((data as any).error)
+    return data as ScannerAuthResponse
+  },
+
   async validateToken(token: string, eventId: string, gate?: string): Promise<ValidationResult> {
     const { data: ticket, error } = await supabase
       .from('digital_tickets')
@@ -35,9 +120,13 @@ export const operatorService = {
         status,
         event_id,
         qr_token,
+        ticket_number,
         holder_name,
         holder_email,
-        ticket_type:ticket_types(name)
+        holder_cpf,
+        metadata,
+        ticket_type:ticket_types(name),
+        batch:ticket_batches(name)
       `)
       .eq('qr_token', token)
       .maybeSingle()
@@ -92,6 +181,13 @@ export const operatorService = {
 
     const name = (ticket as any).holder_name ?? 'Participante'
     const typeName = ((ticket as any).ticket_type as any)?.name ?? 'Ingresso'
+    const batchName = ((ticket as any).batch as any)?.name ?? ''
+    const metadata = ((ticket as any).metadata ?? {}) as Record<string, unknown>
+    const army = String(metadata.army_label ?? '') || deriveArmyLabel(typeName, batchName)
+    const category =
+      String(metadata.category ?? metadata.registration_category ?? metadata.squad ?? '').trim() ||
+      typeName
+    const kitStatus = String(metadata.kit_status ?? '').trim() || deriveKitStatus(typeName, batchName)
 
     return {
       valid: true,
@@ -100,6 +196,12 @@ export const operatorService = {
       ticketType: typeName,
       attendeeId: (ticket as any).id,
       message: 'Acesso liberado',
+      cpf: (ticket as any).holder_cpf ?? null,
+      email: (ticket as any).holder_email ?? null,
+      ticketNumber: (ticket as any).ticket_number ?? null,
+      army: army || null,
+      kitStatus: kitStatus || 'Não informado',
+      category,
     }
   },
 

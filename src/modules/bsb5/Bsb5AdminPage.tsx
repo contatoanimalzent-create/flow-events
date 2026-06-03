@@ -21,20 +21,12 @@ import { useOrganizations } from '@/core/organizations/organizations.store'
 import { usePermissions } from '@/core/permissions/permissions.store'
 import type { AppMode } from '@/core/context/app-context.types'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
+import { normalizeOperationalRole, OPERATIONAL_STAFF_ROLES } from '@/modules/staff/staffRoles'
 
 const BSB5_SLUG = 'bsb-fight-5'
-const BSB5_JOIN_LINK = 'https://pulse.animalzgroup.com/staff/join/bsb5'
-const BSB5_PONTO_LINK = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
 const ALLOWED_EMAILS = ['walteciojr@gmail.com', 'hds.vieira@gmail.com']
 const DEFAULT_MODES: AppMode[] = ['supervisor', 'operator', 'staff', 'promoter', 'attendee']
 type AdminTab = 'staff' | 'checkins'
-const BSB5_EVENT_DAYS = [
-  { key: '2026-05-28', label: '28/05', title: 'Quinta' },
-  { key: '2026-05-29', label: '29/05', title: 'Sexta' },
-  { key: '2026-05-30', label: '30/05', title: 'Sábado' },
-]
-const BSB5_EVENT_START = '2026-05-28'
-const BSB5_EVENT_END = '2026-05-30'
 
 interface BsbEvent {
   id: string
@@ -80,6 +72,7 @@ interface BsbCheckin {
   id: string
   staff_member_id: string | null
   type: string | null
+  work_role?: string | null
   created_at: string | null
   photo_url: string | null
   latitude: number | null
@@ -99,6 +92,15 @@ function formatDateTime(value: string | null) {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+function formatDateRange(event: BsbEvent | null) {
+  if (!event?.starts_at) return 'Datas a definir'
+  const start = new Date(event.starts_at)
+  const end = event.ends_at ? new Date(event.ends_at) : null
+  const day = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' })
+  if (!end || saoPauloDateKey(event.starts_at) === saoPauloDateKey(event.ends_at)) return day.format(start)
+  return `${day.format(start)} a ${day.format(end)}`
 }
 
 function saoPauloDateKey(value: string | null) {
@@ -123,16 +125,30 @@ function formatDayLabel(key: string) {
   return `${day}/${month}`
 }
 
-function dayPhase(key: string) {
-  if (key < BSB5_EVENT_START) return 'Pré-evento'
-  if (key > BSB5_EVENT_END) return 'Pós-evento'
+function eventDayKeys(event: BsbEvent | null) {
+  if (!event?.starts_at) return []
+  const startKey = saoPauloDateKey(event.starts_at)
+  const endKey = saoPauloDateKey(event.ends_at ?? event.starts_at)
+  const start = new Date(`${startKey}T03:00:00.000Z`)
+  const end = new Date(`${endKey}T03:00:00.000Z`)
+  const keys: string[] = []
+  for (let cursor = start; cursor <= end; cursor = new Date(cursor.getTime() + 24 * 60 * 60 * 1000)) {
+    keys.push(cursor.toISOString().slice(0, 10))
+  }
+  return keys
+}
+
+function dayPhase(key: string, event: BsbEvent | null) {
+  const start = event?.starts_at ? saoPauloDateKey(event.starts_at) : ''
+  const end = event?.ends_at ? saoPauloDateKey(event.ends_at) : start
+  if (start && key < start) return 'Pre-evento'
+  if (end && key > end) return 'Pos-evento'
   return 'Evento'
 }
 
 function dayTitle(key: string) {
-  const known = BSB5_EVENT_DAYS.find((day) => day.key === key)
-  if (known) return known.title
-  return dayPhase(key)
+  return new Intl.DateTimeFormat('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' })
+    .format(new Date(`${key}T12:00:00.000Z`))
 }
 
 function formatCoordinate(value: number | null) {
@@ -144,6 +160,15 @@ function normalizeSearch(value: string | null | undefined) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
+}
+
+function excelEscape(value: unknown) {
+  const text = String(value ?? '')
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 }
 
 function StatusBadge({ staff }: { staff: BsbStaff }) {
@@ -158,7 +183,7 @@ function StatusBadge({ staff }: { staff: BsbStaff }) {
   return <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${tone}`}>{label}</span>
 }
 
-export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
+export default function Bsb5AdminPage({ onNavigate, eventSlug = BSB5_SLUG }: PulsePageProps & { eventSlug?: string }) {
   const [loading, setLoading] = useState(true)
   const [allowed, setAllowed] = useState(false)
   const [authEmail, setAuthEmail] = useState<string | null>(null)
@@ -173,6 +198,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   const [copyLabel, setCopyLabel] = useState<string | null>(null)
   const [selectedDay, setSelectedDay] = useState(todayBsbDay)
   const [staffSearch, setStaffSearch] = useState('')
+  const [sectorFilter, setSectorFilter] = useState('all')
   const [editingStaff, setEditingStaff] = useState<BsbStaff | null>(null)
   const [editDraft, setEditDraft] = useState<Record<string, string>>({})
   const [savingStaff, setSavingStaff] = useState(false)
@@ -180,7 +206,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
   const [adminTab, setAdminTab] = useState<AdminTab>('staff')
   const [manualDraft, setManualDraft] = useState<Record<string, string>>({
     full_name: '',
-    role_title: 'Apoio',
+    role_title: 'Outros',
     phone: '',
     cpf: '',
     email: '',
@@ -189,7 +215,17 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     shift_label: '',
     notes: '',
   })
+  const [manualPointRole, setManualPointRole] = useState('Outros')
+  const [eventDraft, setEventDraft] = useState<Record<string, string>>({
+    name: '',
+    slug: '',
+    starts_at: '',
+    ends_at: '',
+    venue_name: '',
+  })
   const [manualBusy, setManualBusy] = useState<string | null>(null)
+  const joinLink = `${window.location.origin}/staff/join/${eventSlug === 'bsb-fight-5' ? 'bsb5' : eventSlug}`
+  const pointLink = `${window.location.origin}/staff/ponto/${eventSlug}`
 
   const setContext = useAppContext((s) => s.setContext)
   const setAvailableModes = useAppContext((s) => s.setAvailableModes)
@@ -215,10 +251,10 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
       const { data: eventRow, error: eventError } = await supabase
         .from('events')
         .select('id,name,slug,starts_at,ends_at,status,venue_name,cover_url,organization_id')
-        .eq('slug', BSB5_SLUG)
+        .eq('slug', eventSlug)
         .single()
 
-      if (eventError || !eventRow) throw eventError ?? new Error('Evento BSB5 não encontrado')
+      if (eventError || !eventRow) throw eventError ?? new Error('Evento não encontrado')
 
       const bsbEvent = eventRow as BsbEvent
       const { data: orgRow } = await supabase
@@ -267,7 +303,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           .order('first_name', { ascending: true }),
         supabase
           .from('staff_checkins')
-          .select('id,staff_member_id,type,created_at,photo_url,latitude,longitude,accuracy_meters')
+          .select('id,staff_member_id,type,work_role,created_at,photo_url,latitude,longitude,accuracy_meters')
           .eq('event_id', bsbEvent.id)
           .order('created_at', { ascending: false })
           .limit(1000),
@@ -279,7 +315,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     } finally {
       setLoading(false)
     }
-  }, [loadPermissions, setActiveEvent, setActiveOrganization, setAvailableModes, setContext])
+  }, [eventSlug, loadPermissions, setActiveEvent, setActiveOrganization, setAvailableModes, setContext])
 
   useEffect(() => { load() }, [load])
 
@@ -322,9 +358,11 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
 
   const filteredStaff = useMemo(() => {
     const term = normalizeSearch(staffSearch).trim()
-    if (!term) return staff
-
     return staff.filter((member) => {
+      const sector = normalizeOperationalRole(member.role_title)
+      if (sectorFilter !== 'all' && sector !== sectorFilter) return false
+      if (!term) return true
+
       const searchable = [
         fullName(member),
         member.cpf,
@@ -340,12 +378,41 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
 
       return searchable.includes(term)
     })
-  }, [staff, staffSearch])
+  }, [sectorFilter, staff, staffSearch])
+
+  const sectorOptions = useMemo(() => {
+    const sectors = new Set(staff.map((member) => normalizeOperationalRole(member.role_title)))
+    return Array.from(sectors).sort((a, b) => a.localeCompare(b, 'pt-BR'))
+  }, [staff])
+
+  const operationalBySector = useMemo(() => {
+    const checkedStaffIds = new Set(
+      checkins
+        .filter((entry) => entry.type !== 'checkout' && entry.staff_member_id)
+        .map((entry) => entry.staff_member_id as string),
+    )
+    const groups = new Map<string, { sector: string; total: number; checked: number; pending: number; names: string[] }>()
+
+    staff.forEach((member) => {
+      const sector = normalizeOperationalRole(member.role_title)
+      const group = groups.get(sector) ?? { sector, total: 0, checked: 0, pending: 0, names: [] }
+      const hasCheckin = checkedStaffIds.has(member.id)
+      group.total += 1
+      group.checked += hasCheckin ? 1 : 0
+      group.pending += hasCheckin ? 0 : 1
+      group.names.push(fullName(member))
+      groups.set(sector, group)
+    })
+
+    return Array.from(groups.values())
+      .map((group) => ({ ...group, names: group.names.sort((a, b) => a.localeCompare(b, 'pt-BR')) }))
+      .sort((a, b) => a.sector.localeCompare(b.sector, 'pt-BR'))
+  }, [checkins, staff])
 
   const staffByRole = useMemo(() => {
     const groups = new Map<string, BsbStaff[]>()
     filteredStaff.forEach((member) => {
-      const role = member.role_title?.trim() || 'Funcao nao informada'
+      const role = normalizeOperationalRole(member.role_title)
       const list = groups.get(role) ?? []
       list.push(member)
       groups.set(role, list)
@@ -367,7 +434,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
 
   const checkinsByDay = useMemo(() => {
     const grouped = new Map<string, BsbCheckin[]>()
-    BSB5_EVENT_DAYS.forEach((day) => grouped.set(day.key, []))
+    eventDayKeys(event).forEach((key) => grouped.set(key, []))
     checkins.forEach((entry) => {
       const key = saoPauloDateKey(entry.created_at)
       if (!key) return
@@ -376,10 +443,10 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
       grouped.set(key, list)
     })
     return grouped
-  }, [checkins])
+  }, [checkins, event])
 
   const dayOptions = useMemo(() => {
-    const keys = new Set<string>(BSB5_EVENT_DAYS.map((day) => day.key))
+    const keys = new Set<string>(eventDayKeys(event))
     checkins.forEach((entry) => {
       const key = saoPauloDateKey(entry.created_at)
       if (key) keys.add(key)
@@ -388,9 +455,9 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
       key,
       label: formatDayLabel(key),
       title: dayTitle(key),
-      phase: dayPhase(key),
+      phase: dayPhase(key, event),
     }))
-  }, [checkins])
+  }, [checkins, event])
 
   useEffect(() => {
     if (dayOptions.length > 0 && !dayOptions.some((day) => day.key === selectedDay)) {
@@ -408,6 +475,39 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     await navigator.clipboard.writeText(text)
     setCopyLabel(label)
     window.setTimeout(() => setCopyLabel(null), 1600)
+  }
+
+  function exportOperationalExcel() {
+    const staffMap = new Map(staff.map((member) => [member.id, member]))
+    const rows = checkins
+      .filter((entry) => entry.type !== 'checkout' && entry.staff_member_id)
+      .map((entry) => {
+        const member = staffMap.get(entry.staff_member_id as string)
+        const role = normalizeOperationalRole(entry.work_role || member?.role_title)
+        return [
+          formatDayLabel(saoPauloDateKey(entry.created_at)),
+          role,
+          member ? fullName(member) : 'Staff',
+          member?.cpf ?? '',
+          member?.pix_key ?? '',
+          member?.phone ?? '',
+          member?.area ?? '',
+          formatDateTime(entry.created_at),
+        ]
+      })
+      .sort((a, b) => `${a[0]}|${a[1]}|${a[2]}`.localeCompare(`${b[0]}|${b[1]}|${b[2]}`, 'pt-BR'))
+
+    const csv = [
+      ['Dia', 'Função', 'Nome', 'CPF', 'Pix', 'Telefone', 'Área/Base', 'Entrada'],
+      ...rows,
+    ].map((row) => row.map(excelEscape).join(';')).join('\r\n')
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'application/vnd.ms-excel;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = `relacao-${event?.slug ?? eventSlug}-por-funcao.xls`
+    anchor.click()
+    URL.revokeObjectURL(url)
   }
 
   function openStaffEditor(member: BsbStaff) {
@@ -469,12 +569,39 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
 
   async function runAdminAction(action: string, payload: Record<string, unknown>) {
     const { data, error } = await supabase.functions.invoke('bsb5-admin-action', {
-      body: { action, ...payload },
+      body: { action, event_slug: eventSlug, ...payload },
     })
 
     if (error) throw error
     if (data?.error) throw new Error(data.error)
     return data
+  }
+
+  async function createOperationalEvent() {
+    if (!eventDraft.name.trim() || !eventDraft.slug.trim()) {
+      setStaffMessage('Informe nome e slug do evento.')
+      return
+    }
+
+    setManualBusy('create_event')
+    setStaffMessage(null)
+    try {
+      const payload = {
+        ...eventDraft,
+        organization_id: event?.organization_id,
+        starts_at: eventDraft.starts_at ? new Date(eventDraft.starts_at).toISOString() : undefined,
+        ends_at: eventDraft.ends_at ? new Date(eventDraft.ends_at).toISOString() : undefined,
+        geofence_radius_meters: 650,
+      }
+      const data = await runAdminAction('create_event', payload)
+      const slug = data?.event?.slug ?? eventDraft.slug.trim()
+      setStaffMessage(`Evento ${data?.event?.name ?? eventDraft.name} criado.`)
+      window.location.href = `/pulse/${slug}/admin`
+    } catch (error) {
+      setStaffMessage(error instanceof Error ? error.message : 'Erro ao criar evento.')
+    } finally {
+      setManualBusy(null)
+    }
   }
 
   async function createManualStaff() {
@@ -491,7 +618,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
         setStaff((current) => [data.staff as BsbStaff, ...current])
         setManualDraft({
           full_name: '',
-          role_title: 'Apoio',
+          role_title: 'Outros',
           phone: '',
           cpf: '',
           email: '',
@@ -516,6 +643,7 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
     try {
       const data = await runAdminAction(type === 'checkin' ? 'manual_checkin' : 'manual_checkout', {
         staff_member_id: member.id,
+        work_role: manualPointRole,
       })
 
       if (data?.staff) {
@@ -622,17 +750,26 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
                 <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#D4FF00]">Painel direto</p>
                 <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">{event?.name ?? 'BSB FIGHT 5'}</h1>
                 <div className="mt-3 flex flex-wrap gap-3 text-sm text-slate-300">
-                  <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-4 w-4" /> 28, 29 e 30 de maio</span>
-                  <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4" /> Centro Olímpico da Estrutural, Brasília - DF</span>
+                  <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-4 w-4" /> {formatDateRange(event)}</span>
+                  <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {event?.venue_name ?? 'Local a definir'}</span>
                 </div>
               </div>
-              <button
-                onClick={load}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Atualizar
-              </button>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <button
+                  onClick={exportOperationalExcel}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#D4FF00] px-4 py-3 text-sm font-black text-black"
+                >
+                  <Clipboard className="h-4 w-4" />
+                  Exportar Excel
+                </button>
+                <button
+                  onClick={load}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Atualizar
+                </button>
+              </div>
             </div>
           </div>
         </header>
@@ -647,6 +784,52 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           ))}
         </section>
 
+        <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-bold">Operacao por setor</h2>
+              <p className="mt-1 text-xs text-slate-400">Total cadastrado, check-ins realizados e pendentes por funcao.</p>
+            </div>
+            <select
+              value={sectorFilter}
+              onChange={(event) => setSectorFilter(event.target.value)}
+              className="rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+            >
+              <option value="all">Todos os setores</option>
+              {sectorOptions.map((sector) => (
+                <option key={sector} value={sector}>{sector}</option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {operationalBySector.map((group) => (
+              <div key={group.sector} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-black text-white">{group.sector} ({group.total})</h3>
+                    <p className="mt-1 text-xs text-slate-400">{group.names.slice(0, 5).join(', ')}</p>
+                  </div>
+                  <span className="rounded-full bg-[#D4FF00] px-2 py-0.5 text-[11px] font-black text-black">{group.total}</span>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-xl bg-white/[0.04] p-2">
+                    <p className="text-[10px] text-slate-500">Total</p>
+                    <p className="text-lg font-black">{group.total}</p>
+                  </div>
+                  <div className="rounded-xl bg-emerald-400/10 p-2">
+                    <p className="text-[10px] text-emerald-100/60">Check-in</p>
+                    <p className="text-lg font-black text-emerald-100">{group.checked}</p>
+                  </div>
+                  <div className="rounded-xl bg-amber-400/10 p-2">
+                    <p className="text-[10px] text-amber-100/60">Pendentes</p>
+                    <p className="text-lg font-black text-amber-100">{group.pending}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <button onClick={() => onNavigate('/pulse/supervisor/team-live')} className="rounded-2xl bg-[#D4FF00] px-4 py-4 text-left font-bold text-black">
             Ver equipe ao vivo
@@ -654,10 +837,10 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
           <button onClick={() => onNavigate('/pulse/supervisor/summary')} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-left font-semibold text-white">
             Resumo do evento
           </button>
-          <button onClick={() => copy(BSB5_JOIN_LINK, 'cadastro')} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-left font-semibold text-white">
+          <button onClick={() => copy(joinLink, 'cadastro')} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-left font-semibold text-white">
             Copiar link de cadastro
           </button>
-          <button onClick={() => copy(BSB5_PONTO_LINK, 'ponto')} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-left font-semibold text-white">
+          <button onClick={() => copy(pointLink, 'ponto')} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-left font-semibold text-white">
             Copiar link do ponto
           </button>
         </section>
@@ -667,6 +850,44 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
             Link de {copyLabel} copiado.
           </div>
         )}
+
+        <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+          <div className="mb-4">
+            <h2 className="font-bold">Criar novo evento operacional</h2>
+            <p className="mt-1 text-xs text-slate-400">
+              Use para abrir o painel de staff/ponto de qualquer evento, como Capital Strike.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              ['name', 'Nome do evento', 'Capital Strike'],
+              ['slug', 'Slug', 'capital-strike'],
+              ['starts_at', 'Início', '2026-06-10T08:00'],
+              ['ends_at', 'Fim', '2026-06-10T23:59'],
+              ['venue_name', 'Local', 'Arena / endereço'],
+            ].map(([key, label, placeholder]) => (
+              <label key={key} className="space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{label}</span>
+                <input
+                  type={key === 'starts_at' || key === 'ends_at' ? 'datetime-local' : 'text'}
+                  value={eventDraft[key] ?? ''}
+                  onChange={(event) => setEventDraft((draft) => ({ ...draft, [key]: event.target.value }))}
+                  placeholder={placeholder}
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+                />
+              </label>
+            ))}
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={createOperationalEvent}
+              disabled={manualBusy === 'create_event'}
+              className="rounded-2xl bg-[#D4FF00] px-4 py-3 text-sm font-black text-black disabled:opacity-60"
+            >
+              {manualBusy === 'create_event' ? 'Criando...' : 'Criar e abrir painel'}
+            </button>
+          </div>
+        </section>
 
         <section className="grid gap-3 sm:grid-cols-2">
           {[
@@ -791,11 +1012,23 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
             ].map(([key, label]) => (
               <label key={key} className="space-y-1">
                 <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{label}</span>
-                <input
-                  value={manualDraft[key] ?? ''}
-                  onChange={(event) => setManualDraft((draft) => ({ ...draft, [key]: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
-                />
+                {key === 'role_title' ? (
+                  <select
+                    value={manualDraft.role_title ?? ''}
+                    onChange={(event) => setManualDraft((draft) => ({ ...draft, role_title: event.target.value }))}
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+                  >
+                    {OPERATIONAL_STAFF_ROLES.map((role) => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    value={manualDraft[key] ?? ''}
+                    onChange={(event) => setManualDraft((draft) => ({ ...draft, [key]: event.target.value }))}
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-[#D4FF00]"
+                  />
+                )}
               </label>
             ))}
           </div>
@@ -827,14 +1060,28 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
 
         <section className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="font-bold">Staff do BSB5</h2>
+                <h2 className="font-bold">Staff do evento</h2>
                 <p className="mt-1 text-xs text-slate-400">{filteredStaff.length} de {staff.length} colaboradores</p>
               </div>
-              <a href={BSB5_JOIN_LINK} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4FF00]">
-                Cadastro <ExternalLink className="h-3 w-3" />
-              </a>
+              <div className="flex flex-col gap-2 sm:items-end">
+                <a href={joinLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4FF00]">
+                  Cadastro <ExternalLink className="h-3 w-3" />
+                </a>
+                <label className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                  Funcao no ponto manual
+                  <select
+                    value={manualPointRole}
+                    onChange={(event) => setManualPointRole(event.target.value)}
+                    className="rounded-xl border border-white/10 bg-black/30 px-2 py-1.5 text-xs text-white outline-none focus:border-[#D4FF00]"
+                  >
+                    {OPERATIONAL_STAFF_ROLES.map((role) => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
             </div>
             <input
               value={staffSearch}
@@ -914,10 +1161,10 @@ export default function Bsb5AdminPage({ onNavigate }: PulsePageProps) {
               <div>
                 <h2 className="font-bold">Entradas e saídas do dia</h2>
                 <p className="mt-1 text-xs text-slate-400">
-                  {formatDayLabel(selectedDay)} - {dayPhase(selectedDay)}
+                  {formatDayLabel(selectedDay)} - {dayPhase(selectedDay, event)}
                 </p>
               </div>
-              <a href={BSB5_PONTO_LINK} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4FF00]">
+              <a href={pointLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-[#D4FF00]">
                 Ponto <ExternalLink className="h-3 w-3" />
               </a>
             </div>

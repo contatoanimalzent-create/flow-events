@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import {
   AlertCircle,
   CheckCircle2,
@@ -10,7 +10,7 @@ import {
   Users,
 } from 'lucide-react'
 
-// ─── Types ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface InviteInfo {
   event_name: string
@@ -21,39 +21,20 @@ interface InviteInfo {
   shift?: string | null
   shift_starts_at?: string | null
   shift_ends_at?: string | null
-  custom_fields?: CustomField[] | null
   organization_name?: string | null
-}
-
-interface CustomField {
-  key: string
-  label: string
-  type: 'text' | 'textarea' | 'select' | 'checkbox'
-  required?: boolean
-  options?: string[]
 }
 
 type PageState = 'loading' | 'valid' | 'error' | 'success' | 'already_registered'
 
-type TShirtSize = 'PP' | 'P' | 'M' | 'G' | 'GG' | 'XGG'
-
 interface FormData {
   full_name: string
-  email: string
-  phone: string
   cpf: string
   role_title: string
-  company: string
   pix_key: string
   shift_start: string
   shift_end: string
   shift_label: string
-  tshirt_size: TShirtSize | ''
-  bio: string
-  emergency_contact_name: string
-  emergency_contact_phone: string
   terms_accepted: boolean
-  custom_answers: Record<string, string | boolean>
 }
 
 interface StaffRoleOption {
@@ -68,29 +49,10 @@ const BSB5_POINT_URL = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
 function isAlreadyRegisteredResponse(body: Record<string, unknown>): boolean {
   const text = String(body?.error ?? body?.message ?? body?.code ?? '').toLowerCase()
   return (
-    text.includes('já está cadastrado') ||
+    text.includes('jÃ¡ estÃ¡ cadastrado') ||
     text.includes('ja esta cadastrado') ||
     text.includes('already')
   )
-}
-
-function formatPhoneInput(v: string): string {
-  const d = normalizeBsbPhoneDigits(v)
-  if (d.length <= 2) return d
-  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
-  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
-}
-
-function normalizeBsbPhoneDigits(v: string): string {
-  let d = v.replace(/\D/g, '')
-  if (d.startsWith('0055')) d = d.slice(4)
-  if (d.startsWith('55')) d = d.slice(2)
-  return d.slice(0, 11)
-}
-
-function isValidBsbPhone(v: string): boolean {
-  const d = normalizeBsbPhoneDigits(v)
-  return d.length === 11 && d.startsWith('61')
 }
 
 function formatCpfInput(v: string): string {
@@ -102,11 +64,11 @@ function formatCpfInput(v: string): string {
 }
 
 const standardEventStaffSchedule = [
-  'Quinta, 28/05 - 08h às 16h',
-  'Quinta, 28/05 - 16h às 00h',
-  'Sexta, 29/05 - 08h às 16h',
-  'Sexta, 29/05 - 16h às 00h',
-  'Sábado, 30/05 - 16h às 00h',
+  'Quinta, 28/05 - 08h Ã s 16h',
+  'Quinta, 28/05 - 16h Ã s 00h',
+  'Sexta, 29/05 - 08h Ã s 16h',
+  'Sexta, 29/05 - 16h Ã s 00h',
+  'SÃ¡bado, 30/05 - 16h Ã s 00h',
 ]
 
 const STAFF_ROLE_OPTIONS: StaffRoleOption[] = [
@@ -123,43 +85,43 @@ const STAFF_ROLE_OPTIONS: StaffRoleOption[] = [
     shiftLabel: standardEventStaffSchedule.join(' | '),
   },
   {
-    value: 'Produção',
-    label: 'Produção',
+    value: 'ProduÃ§Ã£o',
+    label: 'ProduÃ§Ã£o',
     scheduleLines: standardEventStaffSchedule,
     shiftLabel: standardEventStaffSchedule.join(' | '),
   },
   {
-    value: 'Posto médico e ambulância',
-    label: 'Posto médico e ambulância',
+    value: 'Posto mÃ©dico e ambulÃ¢ncia',
+    label: 'Posto mÃ©dico e ambulÃ¢ncia',
     scheduleLines: [
-      'Quinta, 28/05 - 09h às 21h30',
-      'Sexta, 29/05 - 09h às 15h',
-      'Sábado, 30/05 - 17h às 00h',
+      'Quinta, 28/05 - 09h Ã s 21h30',
+      'Sexta, 29/05 - 09h Ã s 15h',
+      'SÃ¡bado, 30/05 - 17h Ã s 00h',
     ],
-    shiftLabel: 'Quinta, 28/05 - 09h às 21h30 | Sexta, 29/05 - 09h às 15h | Sábado, 30/05 - 17h às 00h',
+    shiftLabel: 'Quinta, 28/05 - 09h Ã s 21h30 | Sexta, 29/05 - 09h Ã s 15h | SÃ¡bado, 30/05 - 17h Ã s 00h',
   },
   {
-    value: 'Segurança eventual',
-    label: 'Segurança eventual',
+    value: 'SeguranÃ§a eventual',
+    label: 'SeguranÃ§a eventual',
     scheduleLines: standardEventStaffSchedule,
     shiftLabel: standardEventStaffSchedule.join(' | '),
   },
   {
-    value: 'Segurança patrimonial',
-    label: 'Segurança patrimonial',
+    value: 'SeguranÃ§a patrimonial',
+    label: 'SeguranÃ§a patrimonial',
     scheduleLines: [
-      'Quinta, 28/05 - 07h às 19h',
-      'Quinta, 28/05 - 19h às 07h',
-      'Sexta, 29/05 - 07h às 19h',
-      'Sexta, 29/05 - 19h às 07h',
-      'Sábado, 30/05 - 07h às 19h',
-      'Sábado, 30/05 - 19h às 07h',
+      'Quinta, 28/05 - 07h Ã s 19h',
+      'Quinta, 28/05 - 19h Ã s 07h',
+      'Sexta, 29/05 - 07h Ã s 19h',
+      'Sexta, 29/05 - 19h Ã s 07h',
+      'SÃ¡bado, 30/05 - 07h Ã s 19h',
+      'SÃ¡bado, 30/05 - 19h Ã s 07h',
     ],
-    shiftLabel: 'Quinta, 28/05 - 07h às 19h | Quinta, 28/05 - 19h às 07h | Sexta, 29/05 - 07h às 19h | Sexta, 29/05 - 19h às 07h | Sábado, 30/05 - 07h às 19h | Sábado, 30/05 - 19h às 07h',
+    shiftLabel: 'Quinta, 28/05 - 07h Ã s 19h | Quinta, 28/05 - 19h Ã s 07h | Sexta, 29/05 - 07h Ã s 19h | Sexta, 29/05 - 19h Ã s 07h | SÃ¡bado, 30/05 - 07h Ã s 19h | SÃ¡bado, 30/05 - 19h Ã s 07h',
   },
 ]
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function getToken(): string | null {
   const pathMatch = window.location.pathname.match(/\/staff\/join\/([^/?#]+)/)
@@ -192,7 +154,7 @@ function formatTimePT(iso?: string | null): string | null {
   }
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function InputField({
   label,
@@ -223,7 +185,7 @@ function InputField({
 const inputClass =
   'w-full rounded-[14px] border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-[#f5f0e8] placeholder-white/28 outline-none transition-all focus:border-[#D4FF00]/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#D4FF00]/10'
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function StaffJoinPage() {
   const [pageState, setPageState] = useState<PageState>('loading')
@@ -234,21 +196,13 @@ export function StaffJoinPage() {
 
   const [form, setForm] = useState<FormData>({
     full_name: '',
-    email: '',
-    phone: '',
     cpf: '',
     role_title: '',
-    company: '',
     pix_key: '',
     shift_start: '',
     shift_end: '',
     shift_label: '',
-    tshirt_size: '',
-    bio: '',
-    emergency_contact_name: '',
-    emergency_contact_phone: '',
     terms_accepted: false,
-    custom_answers: {},
   })
 
   const token = getToken()
@@ -261,7 +215,7 @@ export function StaffJoinPage() {
   // Fetch invite on mount
   useEffect(() => {
     if (!token) {
-      setErrorMessage('Link de convite inválido ou expirado.')
+      setErrorMessage('Link de convite invÃ¡lido ou expirado.')
       setPageState('error')
       return
     }
@@ -281,17 +235,27 @@ export function StaffJoinPage() {
             setPageState('already_registered')
             return
           }
-          setErrorMessage(body?.message ?? 'Este convite é inválido, expirou ou já atingiu o limite de vagas.')
+          setErrorMessage(body?.message ?? 'Este convite Ã© invÃ¡lido, expirou ou jÃ¡ atingiu o limite de vagas.')
           setPageState('error')
           return
         }
 
         const data = await res.json()
-        setInviteInfo(data)
+        setInviteInfo({
+          event_name: data.event_name ?? data.event?.name ?? 'BSB FIGHT 5',
+          event_date: data.event_date ?? data.event?.starts_at ?? null,
+          event_location: data.event_location ?? data.event?.venue_name ?? null,
+          role: data.role ?? data.invite?.role_type ?? null,
+          team: data.team?.name ?? data.team ?? null,
+          shift: data.shift?.name ?? data.shift ?? null,
+          shift_starts_at: data.shift_starts_at ?? data.shift?.starts_at ?? null,
+          shift_ends_at: data.shift_ends_at ?? data.shift?.ends_at ?? null,
+          organization_name: data.organization_name ?? null,
+        })
         setPageState('valid')
       } catch (err: unknown) {
         if ((err as Error)?.name === 'AbortError') return
-        setErrorMessage('Erro ao carregar o convite. Verifique sua conexão e tente novamente.')
+        setErrorMessage('Erro ao carregar o convite. Verifique sua conexÃ£o e tente novamente.')
         setPageState('error')
       }
     }
@@ -323,41 +287,16 @@ export function StaffJoinPage() {
     }))
   }
 
-  function setCustomAnswer(key: string, value: string | boolean) {
-    setForm((prev) => ({
-      ...prev,
-      custom_answers: { ...prev.custom_answers, [key]: value },
-    }))
-    setFieldErrors((prev) => ({ ...prev, [`custom_${key}`]: undefined }))
-  }
-
   function validate(): boolean {
     const errors: Partial<Record<string, string>> = {}
 
-    if (!form.full_name.trim()) errors.full_name = 'Nome completo é obrigatório.'
-    if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) errors.email = 'E-mail inválido.'
-    const phoneDigits = normalizeBsbPhoneDigits(form.phone)
+    if (!form.full_name.trim()) errors.full_name = 'Nome completo Ã© obrigatÃ³rio.'
     const cpfDigits = form.cpf.replace(/\D/g, '')
 
-    if (!form.phone.trim()) errors.phone = 'Telefone é obrigatório.'
-    else if (!isValidBsbPhone(form.phone)) errors.phone = 'Informe o WhatsApp com DDD 61: (61) 99999-9999.'
-    if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
-    else if (cpfDigits.length !== 11) errors.cpf = 'CPF inválido.'
-    if (!form.role_title.trim()) errors.role_title = 'Função no evento é obrigatória.'
-    if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX é obrigatória.'
-    if (!form.shift_label) errors.shift_label = 'Selecione a função para carregar o horário.'
-    if (!form.tshirt_size) errors.tshirt_size = 'Tamanho da camiseta é obrigatório.'
-    if (!form.bio.trim()) errors.bio = 'Experiência / apresentação é obrigatória.'
-    if (form.emergency_contact_phone.trim() && !isValidBsbPhone(form.emergency_contact_phone)) {
-      errors.emergency_contact_phone = 'Informe o telefone com DDD 61: (61) 99999-9999.'
-    }
-    if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
-
-    // All custom fields shown on this form are required for BSB5.
-    for (const field of inviteInfo?.custom_fields ?? []) {
-      const val = form.custom_answers[field.key]
-      if (!val) errors[`custom_${field.key}`] = `${field.label} é obrigatório.`
-    }
+    if (!form.cpf.trim()) errors.cpf = 'CPF Ã© obrigatÃ³rio.'
+    else if (cpfDigits.length !== 11) errors.cpf = 'CPF invÃ¡lido.'
+    if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX Ã© obrigatÃ³ria.'
+    if (!form.terms_accepted) errors.terms_accepted = 'VocÃª deve aceitar os termos para continuar.'
 
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
@@ -369,28 +308,13 @@ export function StaffJoinPage() {
 
     setSubmitting(true)
     try {
-      const phoneDigits = normalizeBsbPhoneDigits(form.phone)
       const payload = {
         token,
         full_name: form.full_name.trim(),
-        email: form.email.trim().toLowerCase(),
-        phone: phoneDigits,
         document_number: form.cpf.replace(/\D/g, '') || undefined,
-        t_shirt_size: form.tshirt_size || undefined,
-        role_title: form.role_title.trim() || undefined,
-        company: form.company.trim(),
+        role_title: 'Staff',
         pix_key: form.pix_key.trim() || undefined,
-        shift_start: form.shift_start || undefined,
-        shift_end: form.shift_end || undefined,
-        shift_label: form.shift_label || undefined,
-        bio: [
-          form.bio.trim(),
-          form.emergency_contact_name.trim() || form.emergency_contact_phone.trim()
-            ? `Contato de emergência: ${form.emergency_contact_name.trim() || '-'} - ${form.emergency_contact_phone.trim() || '-'}`
-            : null,
-        ].filter(Boolean).join(' | '),
         terms_accepted: true,
-        custom_field_answers: form.custom_answers,
       }
 
       const res = await fetch(EDGE_FN_URL, {
@@ -412,14 +336,14 @@ export function StaffJoinPage() {
 
       setPageState('success')
     } catch {
-      setErrorMessage('Erro de conexão. Verifique sua internet e tente novamente.')
+      setErrorMessage('Erro de conexÃ£o. Verifique sua internet e tente novamente.')
       setPageState('error')
     } finally {
       setSubmitting(false)
     }
   }
 
-  // ── Loading state ──────────────────────────────────────────────────────────
+  // â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (pageState === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#06070a]">
@@ -433,7 +357,7 @@ export function StaffJoinPage() {
     )
   }
 
-  // ── Error state ────────────────────────────────────────────────────────────
+  // â”€â”€ Error state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (pageState === 'error') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 text-center">
@@ -442,7 +366,7 @@ export function StaffJoinPage() {
         </div>
         <div className="max-w-md">
           <h1 className="font-display text-[2.4rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
-            Link inválido
+            Link invÃ¡lido
           </h1>
           <p className="mt-3 text-sm leading-7 text-white/56">{errorMessage}</p>
         </div>
@@ -450,13 +374,13 @@ export function StaffJoinPage() {
           href="/"
           className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white/64 transition-all hover:border-white/20 hover:text-white"
         >
-          Voltar ao início
+          Voltar ao inÃ­cio
         </a>
       </div>
     )
   }
 
-  // ── Success state ──────────────────────────────────────────────────────────
+  // â”€â”€ Success state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (pageState === 'already_registered') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 text-center">
@@ -465,10 +389,10 @@ export function StaffJoinPage() {
         </div>
         <div className="max-w-md">
           <h1 className="font-display text-[2.4rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
-            Cadastro já confirmado
+            Cadastro jÃ¡ confirmado
           </h1>
           <p className="mt-4 text-base leading-7 text-white/68">
-            Seus dados já estão no BSB FIGHT 5. Agora use o link de ponto somente quando estiver no local do evento.
+            Seus dados jÃ¡ estÃ£o no BSB FIGHT 5. Agora use o link de ponto somente quando estiver no local do evento.
           </p>
           <p className="mt-3 text-sm leading-6 text-white/48">
             O ponto deve ser batido todos os dias do evento.
@@ -502,10 +426,22 @@ export function StaffJoinPage() {
             Dados confirmados!
           </h1>
           <p className="mt-4 text-base leading-7 text-white/68">
-            Bata seu ponto direto pelo link abaixo quando chegar no local do evento.
+            Cadastro concluido. No dia do evento, use o botao abaixo para acessar seu ponto rapidamente.
           </p>
         </div>
-
+        <a
+          href={BSB5_POINT_URL}
+          className="mt-2 inline-flex items-center gap-2 rounded-full bg-[#D4FF00] px-7 py-3 text-sm font-bold uppercase tracking-[0.12em] text-black transition-all hover:bg-[#e2ff3d]"
+        >
+          Acessar meu ponto
+        </a>
+        <button
+          type="button"
+          onClick={() => navigator.clipboard?.writeText(BSB5_POINT_URL)}
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white/64 transition-all hover:border-white/20 hover:text-white"
+        >
+          Copiar link do ponto
+        </button>
         {inviteInfo && (
           <div className="mt-1 rounded-2xl border border-white/8 bg-white/[0.04] px-6 py-4">
             <p className="text-xs uppercase tracking-[0.18em] text-[#D4FF00]/80">Evento</p>
@@ -519,7 +455,7 @@ export function StaffJoinPage() {
             href={pontoUrl}
             className="block w-full rounded-2xl bg-[#D4FF00] px-6 py-5 text-base font-bold uppercase tracking-[0.14em] text-[#06070a] transition-all hover:-translate-y-0.5 hover:bg-[#c8f200] hover:shadow-[0_12px_36px_rgba(212,255,0,0.24)] active:scale-[0.98]"
           >
-            👉 Bater meu ponto agora
+            ðŸ‘‰ Bater meu ponto agora
           </a>
           <p className="text-xs text-white/50 break-all">
             ou copie o link: <span className="text-white/70">{pontoUrl}</span>
@@ -527,20 +463,20 @@ export function StaffJoinPage() {
         </div>
 
         <div className="mt-2 max-w-md rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 px-5 py-4 text-left">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">⚠️ Atenção</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">âš ï¸ AtenÃ§Ã£o</p>
           <p className="mt-2 text-sm leading-6 text-amber-100">
-            O ponto <strong>SÓ funciona quando você estiver dentro do local do evento</strong>. Ative GPS, câmera e notificações no seu celular. O sistema bloqueia o registro se você estiver longe.
+            O ponto <strong>SÃ“ funciona quando vocÃª estiver dentro do local do evento</strong>. Ative GPS, cÃ¢mera e notificaÃ§Ãµes no seu celular. O sistema bloqueia o registro se vocÃª estiver longe.
           </p>
         </div>
 
         <p className="max-w-md text-xs leading-6 text-white/40">
-          Você também recebeu o link por e-mail e WhatsApp. Bata o ponto todos os dias que trabalhar e mostre o comprovante no credenciamento para retirar sua pulseira.
+          VocÃª tambÃ©m recebeu o link por e-mail e WhatsApp. Bata o ponto todos os dias que trabalhar e mostre o comprovante no credenciamento para retirar sua pulseira.
         </p>
       </div>
     )
   }
 
-  // ── Valid form state ───────────────────────────────────────────────────────
+  // â”€â”€ Valid form state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const info = inviteInfo!
   const eventDate = formatDatePT(info.event_date)
   const shiftStart = formatTimePT(info.shift_starts_at)
@@ -599,7 +535,7 @@ export function StaffJoinPage() {
           <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {info.role && (
               <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/38">Função</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/38">FunÃ§Ã£o</p>
                 <p className="mt-1 text-sm font-semibold text-[#f5f0e8]">{info.role}</p>
               </div>
             )}
@@ -628,7 +564,7 @@ export function StaffJoinPage() {
             Preencha seus dados
           </h2>
           <p className="mt-2 text-sm text-white/48">
-            Campos marcados com <span className="text-[#D4FF00]">*</span> são obrigatórios.
+            Campos marcados com <span className="text-[#D4FF00]">*</span> sÃ£o obrigatÃ³rios.
           </p>
 
           <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-6">
@@ -651,40 +587,8 @@ export function StaffJoinPage() {
                 </InputField>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <InputField label="E-mail" required error={fieldErrors.email}>
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => setField('email', e.target.value)}
-                      placeholder="seu@email.com"
-                      className={inputClass}
-                      autoComplete="email"
-                      required
-                    />
-                  </InputField>
-
-                  <InputField
-                    label="Telefone / WhatsApp"
-                    required
-                    hint="Formato: (11) 91234-5678"
-                    error={fieldErrors.phone}
-                  >
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={(e) => setField('phone', formatPhoneInput(e.target.value))}
-                      placeholder="(11) 91234-5678"
-                      className={inputClass}
-                      autoComplete="tel"
-                      inputMode="numeric"
-                      maxLength={15}
-                      required
-                    />
-                  </InputField>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <InputField label="Função no evento" required error={fieldErrors.role_title}>
+                  {false && (
+                  <InputField label="FunÃ§Ã£o no evento" required error={fieldErrors.role_title}>
                     <div className="relative">
                       <select
                         value={form.role_title}
@@ -693,7 +597,7 @@ export function StaffJoinPage() {
                         style={{ colorScheme: 'dark' }}
                         required
                       >
-                        <option value="" className="bg-[#12161f] text-white/50">Selecione sua função</option>
+                        <option value="" className="bg-[#12161f] text-white/50">Selecione sua funÃ§Ã£o</option>
                         {STAFF_ROLE_OPTIONS.map((role) => (
                           <option key={role.value} value={role.value} className="bg-[#12161f] text-[#f5f0e8]">
                             {role.label}
@@ -703,19 +607,8 @@ export function StaffJoinPage() {
                       <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/38" />
                     </div>
                   </InputField>
+                  )}
 
-                  <InputField label="Empresa" error={fieldErrors.company}>
-                    <input
-                      type="text"
-                      value={form.company}
-                      onChange={(e) => setField('company', e.target.value)}
-                      placeholder="Nome da empresa"
-                      className={inputClass}
-                    />
-                  </InputField>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <InputField label="CPF" required error={fieldErrors.cpf}>
                     <input
                       type="text"
@@ -729,7 +622,7 @@ export function StaffJoinPage() {
                     />
                   </InputField>
 
-                  <InputField label="Chave PIX" required hint="CPF, telefone, e-mail ou chave aleatória" error={fieldErrors.pix_key}>
+                  <InputField label="Chave PIX" required hint="CPF, telefone, e-mail ou chave aleatÃ³ria" error={fieldErrors.pix_key}>
                     <input
                       type="text"
                       value={form.pix_key}
@@ -741,16 +634,17 @@ export function StaffJoinPage() {
                   </InputField>
                 </div>
 
+                {false && (
                 <InputField
-                  label="Horário do trabalho"
+                  label="HorÃ¡rio do trabalho"
                   required
-                  hint="O horário é definido pela função escolhida e não pode ser alterado aqui."
+                  hint="O horÃ¡rio Ã© definido pela funÃ§Ã£o escolhida e nÃ£o pode ser alterado aqui."
                   error={fieldErrors.shift_label}
                 >
                   <div className="rounded-[18px] border border-white/10 bg-white/[0.035] p-4">
                     {selectedRole ? (
                       <div className="space-y-2">
-                        {selectedRole.scheduleLines.map((line) => (
+                        {selectedRole?.scheduleLines.map((line) => (
                           <div key={line} className="flex items-center gap-2 text-sm text-[#f5f0e8]">
                             <Clock className="h-4 w-4 shrink-0 text-[#D4FF00]" />
                             <span>{line}</span>
@@ -758,144 +652,14 @@ export function StaffJoinPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-white/42">Selecione uma função para ver o horário.</p>
+                      <p className="text-sm text-white/42">Selecione uma funÃ§Ã£o para ver o horÃ¡rio.</p>
                     )}
                   </div>
                 </InputField>
+                )}
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <InputField label="Tamanho da camiseta" required error={fieldErrors.tshirt_size}>
-                    <div className="relative">
-                      <select
-                        value={form.tshirt_size}
-                        onChange={(e) => setField('tshirt_size', e.target.value as TShirtSize | '')}
-                        className={`${inputClass} appearance-none pr-10`}
-                        style={{ colorScheme: 'dark' }}
-                        required
-                      >
-                        <option value="" className="bg-[#12161f] text-white/50">Selecione o tamanho</option>
-                        {(['PP', 'P', 'M', 'G', 'GG', 'XGG'] as TShirtSize[]).map((size) => (
-                          <option key={size} value={size} className="bg-[#12161f] text-[#f5f0e8]">
-                            {size}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/38" />
-                    </div>
-                  </InputField>
-                </div>
-
-                <InputField
-                  label="Experiência / Apresentação"
-                  error={fieldErrors.bio}
-                  required
-                >
-                  <textarea
-                    value={form.bio}
-                    onChange={(e) => setField('bio', e.target.value)}
-                    placeholder="Ex: já trabalhei em 5 festivais como coordenador de acesso..."
-                    rows={3}
-                    className={`${inputClass} resize-none`}
-                    required
-                  />
-                </InputField>
               </div>
             </section>
-
-            {/* Emergency contact */}
-            <section>
-              <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-white/38">
-                Contato de emergência
-              </h3>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <InputField label="Nome" error={fieldErrors.emergency_contact_name}>
-                  <input
-                    type="text"
-                    value={form.emergency_contact_name}
-                    onChange={(e) => setField('emergency_contact_name', e.target.value)}
-                    placeholder="Nome do contato"
-                    className={inputClass}
-                  />
-                </InputField>
-                <InputField label="Telefone" error={fieldErrors.emergency_contact_phone}>
-                  <input
-                    type="tel"
-                    value={form.emergency_contact_phone}
-                    onChange={(e) => setField('emergency_contact_phone', formatPhoneInput(e.target.value))}
-                    placeholder="(11) 91234-5678"
-                    className={inputClass}
-                    inputMode="numeric"
-                    maxLength={15}
-                  />
-                </InputField>
-              </div>
-            </section>
-
-            {/* Custom fields */}
-            {(info.custom_fields?.length ?? 0) > 0 && (
-              <section>
-                <h3 className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-white/38">
-                  Informações adicionais
-                </h3>
-                <div className="flex flex-col gap-4">
-                  {info.custom_fields!.map((field) => (
-                    <InputField
-                      key={field.key}
-                      label={field.label}
-                      required
-                      error={fieldErrors[`custom_${field.key}`]}
-                    >
-                      {field.type === 'textarea' ? (
-                        <textarea
-                          value={(form.custom_answers[field.key] as string) ?? ''}
-                          onChange={(e) => setCustomAnswer(field.key, e.target.value)}
-                          rows={3}
-                          className={`${inputClass} resize-none`}
-                          required
-                        />
-                      ) : field.type === 'select' ? (
-                        <div className="relative">
-                          <select
-                            value={(form.custom_answers[field.key] as string) ?? ''}
-                            onChange={(e) => setCustomAnswer(field.key, e.target.value)}
-                            className={`${inputClass} appearance-none pr-10`}
-                            style={{ colorScheme: 'dark' }}
-                            required
-                          >
-                            <option value="" className="bg-[#12161f] text-white/50">Selecione...</option>
-                            {field.options?.map((opt) => (
-                              <option key={opt} value={opt} className="bg-[#12161f] text-[#f5f0e8]">
-                                {opt}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/38" />
-                        </div>
-                      ) : field.type === 'checkbox' ? (
-                        <label className="flex cursor-pointer items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={(form.custom_answers[field.key] as boolean) ?? false}
-                            onChange={(e) => setCustomAnswer(field.key, e.target.checked)}
-                            className="h-4 w-4 rounded border-white/20 accent-[#D4FF00]"
-                            required
-                          />
-                          <span className="text-sm text-white/68">{field.label}</span>
-                        </label>
-                      ) : (
-                        <input
-                          type="text"
-                          value={(form.custom_answers[field.key] as string) ?? ''}
-                          onChange={(e) => setCustomAnswer(field.key, e.target.value)}
-                          className={inputClass}
-                          required
-                        />
-                      )}
-                    </InputField>
-                  ))}
-                </div>
-              </section>
-            )}
 
             {/* Terms */}
             <div className="rounded-[1.4rem] border border-white/8 bg-white/[0.03] p-5">
@@ -914,12 +678,12 @@ export function StaffJoinPage() {
                     </a>{' '}
                     e{' '}
                     <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-white/30 hover:text-[#D4FF00]">
-                      Política de Privacidade
+                      PolÃ­tica de Privacidade
                     </a>
                     . <span className="text-[#D4FF00]">*</span>
                   </span>
                   <span className="text-[11px] leading-relaxed text-white/36">
-                    Em conformidade com a LGPD (Lei 13.709/2018), autorizo a coleta e tratamento dos meus dados pessoais, incluindo nome, CPF, telefone, e-mail e chave PIX, exclusivamente para fins de gestão operacional, credenciamento e pagamento relacionados ao evento. Autorizo também o uso da minha imagem (fotos de check-in/check-out) para fins de controle de presença e segurança do evento. Os dados serão armazenados de forma segura e não serão compartilhados com terceiros sem meu consentimento.
+                    Em conformidade com a LGPD (Lei 13.709/2018), autorizo a coleta e tratamento dos dados informados neste cadastro exclusivamente para gestao operacional, credenciamento, controle de presenca e pagamento relacionados ao evento.
                   </span>
                 </div>
               </label>
@@ -948,7 +712,7 @@ export function StaffJoinPage() {
             </button>
 
             <p className="text-center text-[11px] text-white/30">
-              Depois da confirmação, o ponto digital só registra presença quando você estiver no local do evento.
+              Depois da confirmaÃ§Ã£o, o ponto digital sÃ³ registra presenÃ§a quando vocÃª estiver no local do evento.
             </p>
           </form>
         </div>

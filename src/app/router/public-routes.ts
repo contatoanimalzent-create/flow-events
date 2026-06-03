@@ -34,10 +34,12 @@ export type PublicRoute =
   | 'eventos-categoria'
   | 'delete-account'
   | { type: 'event'; slug: string }
+  | { type: 'staff-admin'; slug: string }
   | { type: 'staff-join'; token: string }
   | { type: 'staff-ponto'; slug: string }
   | { type: 'timeclock'; eventId: string; credentialToken: string }
   | { type: 'kiosk'; slug: string }
+  | { type: 'scanner'; slug: string }
 
 export function getInitialPublicRoute(): PublicRoute {
   const path = window.location.pathname
@@ -73,6 +75,11 @@ export function getInitialPublicRoute(): PublicRoute {
 
   // ── Pulse unified app ──
   if (path === '/pulse/bsb5' || path === '/bsb5-admin' || path === '/admin-bsb5') return 'bsb5-admin'
+  if (path === '/capital-strike/scanner') return { type: 'scanner', slug: 'capital-strike-a-origem' }
+  const directScannerMatch = path.match(/^\/scanner\/([^/]+)$/)
+  if (directScannerMatch) return { type: 'scanner', slug: directScannerMatch[1] }
+  const staffAdminMatch = path.match(/^\/pulse\/([^/]+)\/admin$/)
+  if (staffAdminMatch) return { type: 'staff-admin', slug: staffAdminMatch[1] }
   if (path.startsWith('/pulse')) return 'pulse-app'
 
   // ── Legacy mobile apps ──

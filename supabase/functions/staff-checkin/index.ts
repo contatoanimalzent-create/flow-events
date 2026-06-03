@@ -1,4 +1,4 @@
-import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
+﻿import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -6,14 +6,15 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface CheckinRequestBody {
   staff_member_id: string
   event_id: string
   type: 'checkin' | 'checkout'
+  work_role?: string
   photo_url?: string
   photo_base64?: string
   latitude: number
@@ -21,8 +22,20 @@ interface CheckinRequestBody {
   accuracy_meters?: number
 }
 
-const DEFAULT_GEOFENCE_METERS = 200
-const MAX_ACCURACY_TOLERANCE_METERS = 100
+const DEFAULT_GEOFENCE_METERS = 650
+const MAX_ACCURACY_TOLERANCE_METERS = 250
+const WORK_ROLE_OPTIONS = new Set([
+  'Carregador',
+  'SeguranÃ§a eventual',
+  'SeguranÃ§a patrimonial',
+  'ProduÃ§Ã£o',
+  'Brigadista',
+  'Posto mÃ©dico',
+  'Credenciamento',
+  'Limpeza',
+  'TransmissÃ£o',
+  'Outros',
+])
 const BSB5_RECEIPT_IMAGE_URL =
   'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/staff-documents/bsb5/ponto-pulse.png'
 
@@ -32,9 +45,9 @@ interface EvolutionProvider {
   instance: string
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -48,7 +61,7 @@ function errorResponse(message: string, status: number, code?: string): Response
 }
 
 /**
- * Haversine formula — returns the distance in meters between two lat/lng points.
+ * Haversine formula â€” returns the distance in meters between two lat/lng points.
  */
 function haversineMeters(
   lat1: number,
@@ -135,6 +148,13 @@ function normalizePhoneDigits(phone: string): string {
 function normalizePhone(phone: string): string {
   const digits = normalizePhoneDigits(phone)
   return digits ? `+${digits}` : ''
+}
+
+function normalizeWorkRole(value?: string | null): string | null {
+  const role = (value ?? '').trim()
+  if (!role) return null
+  if (WORK_ROLE_OPTIONS.has(role)) return role
+  return role.slice(0, 80)
 }
 
 function useSmsOnly(): boolean {
@@ -360,9 +380,9 @@ async function sendEvolutionWhatsAppFailover(params: {
   return { ok: false, id: null, error: errors.join(' | ') || 'Evolution providers not configured.' }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GET handler — lookup staff status
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// GET handler â€” lookup staff status
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function handleGet(req: Request): Promise<Response> {
   const url = new URL(req.url)
@@ -371,9 +391,9 @@ async function handleGet(req: Request): Promise<Response> {
   const cpfParam = url.searchParams.get('cpf')
   const phoneParam = url.searchParams.get('phone')
 
-  if (!eventSlug || !emailParam || !cpfParam || !phoneParam) {
+  if (!eventSlug || !cpfParam) {
     return errorResponse(
-      'Preencha e-mail, CPF e WhatsApp.',
+      'Preencha o CPF.',
       400,
       'MISSING_PARAMS',
     )
@@ -393,38 +413,55 @@ async function handleGet(req: Request): Promise<Response> {
   }
 
   if (!event) {
-    return errorResponse('Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
+    return errorResponse('Evento nÃ£o encontrado.', 404, 'EVENT_NOT_FOUND')
   }
 
-  const cleanEmail = emailParam.toLowerCase().trim()
+  const cleanEmail = emailParam?.toLowerCase().trim() ?? ''
   const cleanCpf = cpfParam.replace(/\D/g, '')
-  const cleanPhone = phoneParam.replace(/\D/g, '')
+  const cleanPhone = phoneParam?.replace(/\D/g, '') ?? ''
 
-  const { data: staffMember, error: staffErr } = await admin
+  let staffQuery = admin
     .from('staff_members')
     .select('id, first_name, last_name, email, cpf, phone, role_title, status, checked_in_at, checked_out_at')
     .eq('event_id', event.id)
-    .eq('email', cleanEmail)
-    .maybeSingle()
+    .eq('cpf', cleanCpf)
+
+  if (cleanEmail) staffQuery = staffQuery.eq('email', cleanEmail)
+
+  const { data: staffRows, error: staffErr } = await staffQuery.limit(2)
 
   if (staffErr) {
     console.error('[staff-checkin] Erro ao buscar membro da equipe:', staffErr)
     return errorResponse('Erro interno ao buscar membro da equipe.', 500, 'DB_ERROR')
   }
 
-  if (!staffMember) {
+  if (!staffRows || staffRows.length === 0) {
     return errorResponse(
-      'E-mail não encontrado no cadastro deste evento.',
+      'CPF nÃ£o encontrado no cadastro deste evento.',
       404,
       'STAFF_NOT_FOUND',
     )
   }
 
+  if (staffRows.length > 1) {
+    return errorResponse(
+      'Encontramos mais de um cadastro com este CPF. Procure a coordenacao para liberar o ponto.',
+      409,
+      'DUPLICATE_STAFF_CPF',
+    )
+  }
+
+  const staffMember = staffRows[0]
+
   const memberCpf = (staffMember.cpf ?? '').replace(/\D/g, '')
   const memberPhone = (staffMember.phone ?? '').replace(/\D/g, '')
 
   if (memberCpf && memberCpf !== cleanCpf) {
-    return errorResponse('CPF não confere com o cadastro.', 403, 'CPF_MISMATCH')
+    return errorResponse('CPF nÃ£o confere com o cadastro.', 403, 'CPF_MISMATCH')
+  }
+
+  if (cleanPhone && memberPhone && memberPhone !== cleanPhone && memberPhone !== `55${cleanPhone}`) {
+    return errorResponse('WhatsApp nÃ£o confere com o cadastro.', 403, 'PHONE_MISMATCH')
   }
 
   // 3. Get today's checkins for this staff member
@@ -432,7 +469,7 @@ async function handleGet(req: Request): Promise<Response> {
 
   const { data: todayCheckins, error: checkinsErr } = await admin
     .from('staff_checkins')
-    .select('id, type, created_at, photo_url, latitude, longitude, distance_from_venue_meters')
+    .select('id, type, created_at, photo_url, latitude, longitude, distance_from_venue_meters, work_role')
     .eq('staff_member_id', staffMember.id)
     .gte('created_at', todayStart)
     .order('created_at', { ascending: true })
@@ -446,6 +483,11 @@ async function handleGet(req: Request): Promise<Response> {
   const records = todayCheckins ?? []
   const lastRecord = records.length > 0 ? records[records.length - 1] : null
   const isCheckedIn = lastRecord?.type === 'checkin'
+  const pointStatus = lastRecord?.type === 'checkout'
+    ? 'finished'
+    : isCheckedIn
+      ? 'needs_checkout'
+      : 'needs_checkin'
 
   // 5. Parse venue coordinates
   const venueCoords = parsePoint(event.venue_coordinates)
@@ -463,32 +505,34 @@ async function handleGet(req: Request): Promise<Response> {
       checked_out_at: staffMember.checked_out_at,
     },
     is_checked_in: isCheckedIn,
+    point_status: pointStatus,
     today_checkins: records,
     venue_coordinates: venueCoords,
     geofence_radius_meters: event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS,
   })
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// POST handler — register checkin/checkout
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// POST handler â€” register checkin/checkout
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function handlePost(req: Request): Promise<Response> {
   let body: CheckinRequestBody
   try {
     body = await req.json()
   } catch {
-    return errorResponse('JSON inválido no corpo da requisição.', 400, 'INVALID_JSON')
+    return errorResponse('JSON invÃ¡lido no corpo da requisiÃ§Ã£o.', 400, 'INVALID_JSON')
   }
 
   const { staff_member_id, event_id, type, latitude, longitude, accuracy_meters } = body
+  const workRole = normalizeWorkRole(body.work_role)
 
-  // ── Validate required fields ──────────────────────────────────────────────
+  // â”€â”€ Validate required fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (!staff_member_id || typeof staff_member_id !== 'string') {
-    return errorResponse('Campo obrigatório: staff_member_id.', 400, 'MISSING_STAFF_MEMBER_ID')
+    return errorResponse('Campo obrigatÃ³rio: staff_member_id.', 400, 'MISSING_STAFF_MEMBER_ID')
   }
   if (!event_id || typeof event_id !== 'string') {
-    return errorResponse('Campo obrigatório: event_id.', 400, 'MISSING_EVENT_ID')
+    return errorResponse('Campo obrigatÃ³rio: event_id.', 400, 'MISSING_EVENT_ID')
   }
   if (type !== 'checkin' && type !== 'checkout') {
     return errorResponse(
@@ -499,7 +543,7 @@ async function handlePost(req: Request): Promise<Response> {
   }
   if (typeof latitude !== 'number' || typeof longitude !== 'number') {
     return errorResponse(
-      'Campos obrigatórios: latitude e longitude (numéricos).',
+      'Campos obrigatÃ³rios: latitude e longitude (numÃ©ricos).',
       400,
       'MISSING_COORDINATES',
     )
@@ -507,7 +551,7 @@ async function handlePost(req: Request): Promise<Response> {
 
   const admin = createSupabaseAdminClient()
 
-  // ── 1. Validate staff member exists and is active ─────────────────────────
+  // â”€â”€ 1. Validate staff member exists and is active â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const { data: staffMember, error: staffErr } = await admin
     .from('staff_members')
     .select('id, first_name, last_name, email, phone, role_title, status, event_id')
@@ -520,12 +564,12 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   if (!staffMember) {
-    return errorResponse('Membro da equipe não encontrado.', 404, 'STAFF_NOT_FOUND')
+    return errorResponse('Membro da equipe nÃ£o encontrado.', 404, 'STAFF_NOT_FOUND')
   }
 
   if (staffMember.status !== 'active' && staffMember.status !== 'confirmed') {
     return errorResponse(
-      `Membro da equipe não está ativo (status atual: ${staffMember.status}).`,
+      `Membro da equipe nÃ£o estÃ¡ ativo (status atual: ${staffMember.status}).`,
       403,
       'STAFF_INACTIVE',
     )
@@ -533,13 +577,13 @@ async function handlePost(req: Request): Promise<Response> {
 
   if (staffMember.event_id !== event_id) {
     return errorResponse(
-      'Membro da equipe não pertence a este evento.',
+      'Membro da equipe nÃ£o pertence a este evento.',
       403,
       'STAFF_EVENT_MISMATCH',
     )
   }
 
-  // ── 2. Get event venue coordinates ────────────────────────────────────────
+  // â”€â”€ 2. Get event venue coordinates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const { data: event, error: eventErr } = await admin
     .from('events')
     .select('id, name, venue_name, venue_address, venue_coordinates, geofence_radius_meters')
@@ -552,14 +596,14 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   if (!event) {
-    return errorResponse('Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
+    return errorResponse('Evento nÃ£o encontrado.', 404, 'EVENT_NOT_FOUND')
   }
 
-  // ── 3. Calculate distance from venue ──────────────────────────────────────
+  // â”€â”€ 3. Calculate distance from venue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const venueCoords = parsePoint(event.venue_coordinates)
   let distanceFromVenueMeters: number | null = null
 
-  const configuredMaxDist = event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS
+  const configuredMaxDist = Math.max(event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS, DEFAULT_GEOFENCE_METERS)
   const accuracyTolerance = typeof accuracy_meters === 'number'
     ? Math.min(Math.max(accuracy_meters, 0), MAX_ACCURACY_TOLERANCE_METERS)
     : 0
@@ -571,7 +615,7 @@ async function handlePost(req: Request): Promise<Response> {
     )
     if (distanceFromVenueMeters > maxDist) {
       return errorResponse(
-        'Para registrar o ponto, é necessário estar no local do evento.',
+        'Para registrar o ponto, Ã© necessÃ¡rio estar no local do evento.',
         403,
         'TOO_FAR_FROM_VENUE',
       )
@@ -579,10 +623,10 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   if (!body.photo_base64 && !body.photo_url) {
-    return errorResponse('Foto obrigatória para registrar o ponto.', 400, 'PHOTO_REQUIRED')
+    return errorResponse('Foto obrigatÃ³ria para registrar o ponto.', 400, 'PHOTO_REQUIRED')
   }
 
-  // ── 4/5/6. Check for open checkin today ───────────────────────────────────
+  // â”€â”€ 4/5/6. Check for open checkin today â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const todayStart = todayStartUTC()
 
   const { data: todayRecords, error: recordsErr } = await admin
@@ -600,10 +644,22 @@ async function handlePost(req: Request): Promise<Response> {
 
   const lastRecord = todayRecords && todayRecords.length > 0 ? todayRecords[0] : null
   const hasOpenCheckin = lastRecord?.type === 'checkin'
+  const hasFinishedToday = lastRecord?.type === 'checkout'
+
+  if (type === 'checkin' && hasFinishedToday) {
+    return errorResponse(
+      'Ponto finalizado hoje. A entrada nao pode ser registrada novamente.',
+      409,
+      'POINT_ALREADY_FINISHED',
+    )
+  }
+  if (!workRole && type === 'checkin') {
+    return errorResponse('Selecione a funÃ§Ã£o do ponto de hoje.', 400, 'MISSING_WORK_ROLE')
+  }
 
   if (type === 'checkin' && hasOpenCheckin) {
     return errorResponse(
-      'Já existe um check-in aberto hoje. Faça o checkout primeiro.',
+      'JÃ¡ existe um check-in aberto hoje. FaÃ§a o checkout primeiro.',
       409,
       'ALREADY_CHECKED_IN',
     )
@@ -611,13 +667,13 @@ async function handlePost(req: Request): Promise<Response> {
 
   if (type === 'checkout' && !hasOpenCheckin) {
     return errorResponse(
-      'Não há check-in aberto hoje. Faça o check-in primeiro.',
+      'NÃ£o hÃ¡ check-in aberto hoje. FaÃ§a o check-in primeiro.',
       409,
       'NOT_CHECKED_IN',
     )
   }
 
-  // ── Handle photo upload (base64 → Supabase Storage) ───────────────────────
+  // â”€â”€ Handle photo upload (base64 â†’ Supabase Storage) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let photoUrl = body.photo_url ?? null
 
   if (body.photo_base64) {
@@ -652,14 +708,14 @@ async function handlePost(req: Request): Promise<Response> {
         photoUrl = publicUrlData?.publicUrl ?? null
       }
     } catch (uploadException) {
-      console.error('[staff-checkin] Exceção no upload da foto:', uploadException)
+      console.error('[staff-checkin] ExceÃ§Ã£o no upload da foto:', uploadException)
       return errorResponse('Erro ao processar a foto do ponto. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
     }
   }
 
-  // ── 7. Insert into staff_checkins ─────────────────────────────────────────
+  // â”€â”€ 7. Insert into staff_checkins â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (!photoUrl) {
-    return errorResponse('Foto obrigatória não foi salva. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
+    return errorResponse('Foto obrigatÃ³ria nÃ£o foi salva. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
   }
 
   const { data: checkinRecord, error: insertErr } = await admin
@@ -669,6 +725,7 @@ async function handlePost(req: Request): Promise<Response> {
       event_id,
       type,
       photo_url: photoUrl,
+      work_role: workRole,
       latitude,
       longitude,
       accuracy_meters: accuracy_meters ?? null,
@@ -687,7 +744,7 @@ async function handlePost(req: Request): Promise<Response> {
     )
   }
 
-  // ── 8/9. Update staff_members checked_in_at / checked_out_at ──────────────
+  // â”€â”€ 8/9. Update staff_members checked_in_at / checked_out_at â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const updateField = type === 'checkin' ? 'checked_in_at' : 'checked_out_at'
   const staffUpdate = type === 'checkin'
     ? { checked_in_at: new Date().toISOString(), checked_out_at: null }
@@ -702,14 +759,14 @@ async function handlePost(req: Request): Promise<Response> {
     // Non-fatal: the checkin record was already created
   }
 
-  // ── 10. Return success ────────────────────────────────────────────────────
+  // â”€â”€ 10. Return success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (type === 'checkin' && staffMember.phone) {
     const staffName = [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')
     const venueAddress = event.venue_address as Record<string, unknown> | null
     const addressParts = venueAddress
       ? [venueAddress.street, venueAddress.city, venueAddress.state].filter(Boolean).join(', ')
       : ''
-    const venueLabel = [event.venue_name, addressParts].filter(Boolean).join(' - ') || 'Centro Olímpico da Estrutural, Brasília - DF'
+    const venueLabel = [event.venue_name, addressParts].filter(Boolean).join(' - ') || 'Centro OlÃ­mpico da Estrutural, BrasÃ­lia - DF'
     const receiptCode = String(checkinRecord.id).slice(0, 8).toUpperCase()
     const receiptMessage = [
       `COMPROVANTE DE PONTO - ${event.name ?? 'BSB FIGHT 5'}`,
@@ -719,7 +776,7 @@ async function handlePost(req: Request): Promise<Response> {
       `Data/hora: ${saoPauloDateTime(new Date(checkinRecord.created_at))}`,
       `Local: ${venueLabel}`,
       `Coordenadas: ${Number(latitude).toFixed(6)}, ${Number(longitude).toFixed(6)}`,
-      `Código: ${receiptCode}`,
+      `CÃ³digo: ${receiptCode}`,
       '',
       'PONTO REGISTRADO. Dirija-se agora ao credenciamento para retirar sua pulseira.',
       'Mostre este comprovante para a equipe no credenciamento.',
@@ -781,12 +838,12 @@ async function handlePost(req: Request): Promise<Response> {
   })
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Main Handler
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  // ── CORS preflight ──────────────────────────────────────────────────────
+  // â”€â”€ CORS preflight â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -800,7 +857,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return await handlePost(req)
     }
 
-    return errorResponse('Método não permitido. Use GET ou POST.', 405, 'METHOD_NOT_ALLOWED')
+    return errorResponse('MÃ©todo nÃ£o permitido. Use GET ou POST.', 405, 'METHOD_NOT_ALLOWED')
   } catch (err) {
     console.error('[staff-checkin] Erro inesperado:', err)
     return errorResponse(

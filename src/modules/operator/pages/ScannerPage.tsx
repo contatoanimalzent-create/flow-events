@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { X, CheckCircle, XCircle, Loader2, Keyboard, Camera, AlertTriangle } from 'lucide-react'
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { X, CheckCircle, XCircle, Loader2, Keyboard, Camera, AlertTriangle, Mail, ShieldCheck, KeyRound, Lock } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 import { useAppContext } from '@/core/context/app-context.store'
 import { useOffline } from '@/core/offline/offline.store'
 import { operatorService } from '@/core/operator/operator.service'
@@ -13,9 +14,28 @@ interface ScanResult {
   name: string
   ticketLabel: string
   message: string
+  cpf?: string | null
+  email?: string | null
+  ticketNumber?: string | null
+  army?: string | null
+  kitStatus?: string | null
+  category?: string | null
 }
 
-export default function ScannerPage({ onNavigate }: PulsePageProps) {
+interface DirectScannerEvent {
+  id: string
+  name: string
+  slug: string
+}
+
+interface ScannerPageProps extends PulsePageProps {
+  scannerSlug?: string
+  standalone?: boolean
+}
+
+type AuthStep = 'email' | 'code' | 'unlocked'
+
+export default function ScannerPage({ onNavigate, scannerSlug, standalone = false }: ScannerPageProps) {
   const [scanState, setScanState] = useState<ScanState>('idle')
   const [result, setResult] = useState<ScanResult | null>(null)
   const [inputMode, setInputMode] = useState<InputMode>('camera')
@@ -23,6 +43,13 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
   const [scanCount, setScanCount] = useState(0)
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [scannerReady, setScannerReady] = useState(false)
+  const [directEvent, setDirectEvent] = useState<DirectScannerEvent | null>(null)
+  const [directEventLoading, setDirectEventLoading] = useState(Boolean(scannerSlug))
+  const [authCode, setAuthCode] = useState('')
+  const [authStep, setAuthStep] = useState<AuthStep>('email')
+  const [authLoading, setAuthLoading] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [maskedEmail, setMaskedEmail] = useState<string | null>(null)
 
   const context = useAppContext((s) => s.context)
   const { isOnline, enqueue } = useOffline()
@@ -32,6 +59,64 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
   const Html5QrcodeScannerRef = useRef<any>(null)
   const linePos = useRef(0)
   const [linePct, setLinePct] = useState(0)
+
+  const activeEventId = directEvent?.id ?? context?.eventId ?? null
+  const activeEventName = directEvent?.name ?? context?.eventName ?? 'Scanner'
+  const scannerAuthKey = useMemo(
+    () => activeEventId ? `pulse-scanner-auth:${activeEventId}` : null,
+    [activeEventId],
+  )
+
+  useEffect(() => {
+    if (!scannerSlug) return
+    let cancelled = false
+    setDirectEventLoading(true)
+    async function loadDirectEvent() {
+      const { data } = await supabase
+        .from('events')
+        .select('id,name,slug')
+        .eq('slug', scannerSlug)
+        .maybeSingle()
+      if (cancelled) return
+      setDirectEvent(data as DirectScannerEvent | null)
+      setDirectEventLoading(false)
+    }
+    void loadDirectEvent()
+    return () => { cancelled = true }
+  }, [scannerSlug])
+
+  useEffect(() => {
+    if (!scannerAuthKey || (!activeEventId && !scannerSlug)) return
+    let cancelled = false
+    try {
+      const raw = window.localStorage.getItem(scannerAuthKey)
+      if (!raw) return
+      const saved = JSON.parse(raw) as { expires_at?: string; email?: string; session?: string }
+      if (saved.expires_at && new Date(saved.expires_at).getTime() > Date.now()) {
+        if (!saved.session) {
+          window.localStorage.removeItem(scannerAuthKey)
+          return
+        }
+        setAuthLoading(true)
+        operatorService.checkScannerSession({
+          eventId: activeEventId ?? undefined,
+          eventSlug: scannerSlug,
+          scannerSession: saved.session,
+        }).then(() => {
+          if (!cancelled) setAuthStep('unlocked')
+        }).catch(() => {
+          window.localStorage.removeItem(scannerAuthKey)
+        }).finally(() => {
+          if (!cancelled) setAuthLoading(false)
+        })
+      } else {
+        window.localStorage.removeItem(scannerAuthKey)
+      }
+    } catch {
+      window.localStorage.removeItem(scannerAuthKey)
+    }
+    return () => { cancelled = true }
+  }, [activeEventId, scannerAuthKey, scannerSlug])
 
   // Animate scan line
   useEffect(() => {
@@ -64,7 +149,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
 
   // Start html5-qrcode camera scanner
   useEffect(() => {
-    if (inputMode !== 'camera' || !scannerReady || !Html5QrcodeScannerRef.current) return
+    if (authStep !== 'unlocked' || inputMode !== 'camera' || !scannerReady || !Html5QrcodeScannerRef.current) return
 
     const scanner = new Html5QrcodeScannerRef.current(
       'qr-reader',
@@ -89,24 +174,30 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       scanner.clear().catch(() => {})
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputMode, scannerReady])
+  }, [authStep, inputMode, scannerReady])
 
   const handleScan = useCallback(async (token: string) => {
-    if (!token.trim() || scanState === 'processing') return
+    if (!token.trim() || scanState === 'processing' || authStep !== 'unlocked') return
     setScanState('processing')
     clearTimeout(resultTimerRef.current)
 
     try {
       let res: ScanResult
 
-      if (isOnline && context?.eventId) {
-        const validation = await operatorService.validateToken(token.trim(), context.eventId)
+      if (isOnline && activeEventId) {
+        const validation = await operatorService.validateToken(token.trim(), activeEventId)
         if (validation.valid) {
           res = {
             valid: true,
             name: validation.name,
             ticketLabel: validation.ticketLabel,
             message: validation.message,
+            cpf: validation.cpf,
+            email: validation.email,
+            ticketNumber: validation.ticketNumber,
+            army: validation.army,
+            kitStatus: validation.kitStatus,
+            category: validation.category,
           }
           setScanCount((c) => c + 1)
         } else {
@@ -120,7 +211,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       } else {
         // Offline: queue for later sync
         enqueue('checkin', {
-          eventId: context?.eventId,
+          eventId: activeEventId,
           token,
           timestamp: Date.now(),
         })
@@ -144,16 +235,186 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
       setScanState('idle')
       setResult(null)
       setManualCode('')
-    }, 2_800)
-  }, [context?.eventId, isOnline, enqueue, scanState])
+    }, 6_000)
+  }, [activeEventId, authStep, context?.eventId, isOnline, enqueue, scanState])
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     handleScan(manualCode)
   }
 
+  const handleRequestCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!activeEventId && !scannerSlug) {
+      setAuthError('Evento não encontrado para liberar o scanner.')
+      return
+    }
+    setAuthLoading(true)
+    setAuthError(null)
+    try {
+      const response = await operatorService.requestScannerCode({
+        eventId: activeEventId ?? undefined,
+        eventSlug: scannerSlug,
+      })
+      setMaskedEmail(response.masked_email ?? null)
+      setAuthStep('code')
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Não foi possível enviar o código.')
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!activeEventId && !scannerSlug) {
+      setAuthError('Evento não encontrado para liberar o scanner.')
+      return
+    }
+    setAuthLoading(true)
+    setAuthError(null)
+    try {
+      const response = await operatorService.verifyScannerCode({
+        eventId: activeEventId ?? undefined,
+        eventSlug: scannerSlug,
+        code: authCode,
+      })
+      if (scannerAuthKey) {
+        window.localStorage.setItem(scannerAuthKey, JSON.stringify({
+          session: response.scanner_session,
+          expires_at: response.expires_at,
+        }))
+      }
+      setAuthStep('unlocked')
+      setAuthCode('')
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Código inválido.')
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const handleLockScanner = () => {
+    if (scannerAuthKey) window.localStorage.removeItem(scannerAuthKey)
+    setAuthStep('email')
+    setAuthCode('')
+    setScanCount(0)
+  }
+
   const isResultShown = scanState === 'valid' || scanState === 'invalid'
   const accent = '#0057E7'
+
+  if (directEventLoading) {
+    return (
+      <div className="flex h-full items-center justify-center bg-[#050816] text-white">
+        <Loader2 size={28} className="animate-spin text-blue-400" />
+      </div>
+    )
+  }
+
+  if (scannerSlug && !directEvent) {
+    return (
+      <div className="flex h-full items-center justify-center bg-[#050816] px-6 text-center text-white">
+        <div>
+          <AlertTriangle size={34} className="mx-auto mb-3 text-amber-400" />
+          <h1 className="text-lg font-bold">Evento não encontrado</h1>
+          <p className="mt-2 text-sm text-slate-400">Confira o link do scanner e tente novamente.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (authStep !== 'unlocked') {
+    return (
+      <div className="flex h-full flex-col bg-[#050816] px-5 py-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300">Scanner seguro</p>
+            <h1 className="mt-1 text-xl font-bold">{activeEventName}</h1>
+          </div>
+          {!standalone && (
+            <button
+              onClick={() => onNavigate('/pulse/operator')}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10"
+              aria-label="Fechar"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+
+        <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-300">
+            {authStep === 'email' ? <Mail size={22} /> : <KeyRound size={22} />}
+          </div>
+          <h2 className="text-lg font-bold">
+            {authStep === 'email' ? 'Solicitar codigo ao produtor' : 'Digite o codigo liberado'}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            {authStep === 'email'
+              ? 'O codigo vai para o e-mail do produtor do evento. Ele repassa para a equipe autorizada.'
+              : `O codigo foi enviado para ${maskedEmail ?? 'o produtor do evento'}.`}
+          </p>
+
+          <label className="mt-5 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            Evento
+          </label>
+          <select
+            value={scannerSlug ?? activeEventId ?? ''}
+            disabled
+            className="mt-2 w-full rounded-xl border border-white/15 bg-black/30 px-4 py-3 text-sm font-semibold text-white outline-none"
+          >
+            <option value={scannerSlug ?? activeEventId ?? ''}>{activeEventName}</option>
+          </select>
+
+          {authStep === 'email' ? (
+            <form onSubmit={handleRequestCode} className="mt-5 space-y-3">
+              <button
+                type="submit"
+                disabled={authLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-semibold disabled:opacity-45"
+              >
+                {authLoading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
+                Enviar codigo ao produtor
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyCode} className="mt-5 space-y-3">
+              <input
+                value={authCode}
+                onChange={(e) => setAuthCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                className="w-full rounded-xl border border-white/15 bg-black/30 px-4 py-3 text-center font-mono text-2xl tracking-[0.35em] text-white placeholder-slate-700 outline-none focus:border-blue-400"
+              />
+              <button
+                type="submit"
+                disabled={authLoading || authCode.length !== 6}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-semibold disabled:opacity-45"
+              >
+                {authLoading ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} />}
+                Abrir scanner
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthStep('email')}
+                className="w-full py-2 text-sm text-slate-400"
+              >
+                Solicitar novo codigo
+              </button>
+            </form>
+          )}
+
+          {authError && (
+            <div className="mt-4 rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+              {authError}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full bg-black select-none">
@@ -163,7 +424,7 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', paddingBottom: 12 }}
       >
         <div className="bg-black/70 backdrop-blur-sm rounded-xl px-3 py-1.5">
-          <p className="text-white text-xs font-semibold">{context?.eventName ?? 'Scanner'}</p>
+          <p className="text-white text-xs font-semibold">{activeEventName}</p>
           {!isOnline && (
             <p className="text-amber-400 text-[10px]">⚡ Offline, gravando localmente</p>
           )}
@@ -174,11 +435,20 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
             <span className="text-white text-xs font-bold">{scanCount}</span>
           </div>
           <button
-            onClick={() => onNavigate('/pulse/operator')}
+            onClick={handleLockScanner}
             className="w-9 h-9 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center"
+            aria-label="Bloquear scanner"
           >
-            <X size={18} className="text-white" />
+            <Lock size={15} className="text-white" />
           </button>
+          {!standalone && (
+            <button
+              onClick={() => onNavigate('/pulse/operator')}
+              className="w-9 h-9 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center"
+            >
+              <X size={18} className="text-white" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -300,21 +570,46 @@ export default function ScannerPage({ onNavigate }: PulsePageProps) {
         {/* Result card */}
         {isResultShown && result && (
           <div
-            className="absolute left-6 right-6 rounded-2xl p-4 border z-20"
+            className="absolute left-4 right-4 rounded-2xl p-4 border z-20"
             style={{
-              bottom: 100,
+              bottom: 88,
               backgroundColor: result.valid ? '#052e16' : '#450a0a',
               borderColor: result.valid ? '#22C55E44' : '#EF444444',
             }}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-start gap-3">
               {result.valid
                 ? <CheckCircle size={28} className="text-green-400 shrink-0" />
                 : <XCircle size={28} className="text-red-400 shrink-0" />
               }
-              <div>
-                <p className="text-white font-bold">{result.name}</p>
-                <p className="text-slate-400 text-xs">{result.ticketLabel}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-white font-bold leading-tight">{result.name}</p>
+                {result.valid && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {result.army && (
+                      <span className="rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                        {result.army}
+                      </span>
+                    )}
+                    {result.kitStatus && (
+                      <span className={`rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
+                        result.kitStatus.toLowerCase().includes('sem')
+                          ? 'bg-amber-400/18 text-amber-200'
+                          : result.kitStatus.toLowerCase().includes('não') || result.kitStatus.toLowerCase().includes('nao')
+                            ? 'bg-slate-400/15 text-slate-200'
+                          : 'bg-emerald-400/18 text-emerald-200'
+                      }`}>
+                        {result.kitStatus}
+                      </span>
+                    )}
+                  </div>
+                )}
+                <div className="mt-2 space-y-0.5 text-xs text-slate-300">
+                  <p>{result.category || result.ticketLabel}</p>
+                  {result.cpf && <p className="font-mono text-slate-400">CPF {result.cpf}</p>}
+                  {result.email && <p className="truncate text-slate-400">{result.email}</p>}
+                  {result.ticketNumber && <p className="font-mono text-[11px] text-slate-500">{result.ticketNumber}</p>}
+                </div>
                 <p className={`text-xs mt-0.5 ${result.valid ? 'text-green-300' : 'text-red-300'}`}>{result.message}</p>
               </div>
             </div>

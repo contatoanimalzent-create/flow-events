@@ -7,10 +7,9 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-const BSB5_SLUG = 'bsb-fight-5'
 const ALLOWED_EMAILS = new Set(['walteciojr@gmail.com', 'hds.vieira@gmail.com'])
 
-type Action = 'create_staff' | 'manual_checkin' | 'manual_checkout'
+type Action = 'create_staff' | 'manual_checkin' | 'manual_checkout' | 'create_event'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -51,6 +50,11 @@ function normalizePhone(value?: string | null): string | null {
   if (!digits) return null
   if (digits.startsWith('55') && digits.length >= 12) return digits.slice(2)
   return digits.slice(0, 11)
+}
+
+function normalizeWorkRole(value?: unknown): string {
+  const role = typeof value === 'string' ? value.trim() : ''
+  return role ? role.slice(0, 80) : 'Outros'
 }
 
 function parsePoint(raw: unknown): { latitude: number; longitude: number } | null {
@@ -102,14 +106,64 @@ Deno.serve(async (req) => {
   const admin = createSupabaseAdminClient()
   const body = await req.json().catch(() => ({})) as Record<string, unknown>
   const action = body.action as Action | undefined
+  const eventSlug = typeof body.event_slug === 'string' && body.event_slug.trim()
+    ? body.event_slug.trim()
+    : 'bsb-fight-5'
+
+  if (action === 'create_event') {
+    const name = typeof body.name === 'string' && body.name.trim() ? body.name.trim() : null
+    const slug = typeof body.slug === 'string' && body.slug.trim() ? body.slug.trim() : null
+    if (!name || !slug) return json({ error: 'Informe nome e slug do evento.' }, 400)
+
+    const now = new Date().toISOString()
+    const organizationId = typeof body.organization_id === 'string' && body.organization_id.trim()
+      ? body.organization_id.trim()
+      : '00000000-0000-0000-0000-000000000001'
+    const { data, error } = await admin
+      .from('events')
+      .insert({
+        organization_id: organizationId,
+        name,
+        slug,
+        status: 'active',
+        starts_at: typeof body.starts_at === 'string' && body.starts_at.trim() ? body.starts_at.trim() : now,
+        ends_at: typeof body.ends_at === 'string' && body.ends_at.trim() ? body.ends_at.trim() : null,
+        venue_name: typeof body.venue_name === 'string' && body.venue_name.trim() ? body.venue_name.trim() : null,
+        venue_coordinates: typeof body.venue_coordinates === 'string' && body.venue_coordinates.trim() ? body.venue_coordinates.trim() : null,
+        geofence_radius_meters: typeof body.geofence_radius_meters === 'number' ? body.geofence_radius_meters : 650,
+        created_at: now,
+        updated_at: now,
+      })
+      .select('id,organization_id,name,slug,starts_at,ends_at,status,venue_name,venue_coordinates')
+      .single()
+
+    if (error) return json({ error: error.message }, 400)
+
+    const { error: inviteError } = await admin
+      .from('staff_invite_links')
+      .upsert({
+        organization_id: data.organization_id,
+        event_id: data.id,
+        token: data.slug,
+        role_type: 'staff',
+        role: 'staff',
+        is_active: true,
+        max_uses: null,
+        expires_at: null,
+        updated_at: now,
+      }, { onConflict: 'token' })
+
+    if (inviteError) return json({ error: `Evento criado, mas o link de cadastro falhou: ${inviteError.message}` }, 400)
+    return json({ event: data })
+  }
 
   const { data: event, error: eventError } = await admin
     .from('events')
     .select('id, organization_id, name, venue_coordinates')
-    .eq('slug', BSB5_SLUG)
+    .eq('slug', eventSlug)
     .maybeSingle()
 
-  if (eventError || !event) return json({ error: 'Evento BSB FIGHT 5 não encontrado.' }, 404)
+  if (eventError || !event) return json({ error: 'Evento não encontrado.' }, 404)
 
   if (action === 'create_staff') {
     const { firstName, lastName } = splitName(String(body.full_name ?? ''))
@@ -172,7 +226,11 @@ Deno.serve(async (req) => {
     if (recordsError) return json({ error: recordsError.message }, 500)
     const last = todayRecords?.[0] ?? null
     const hasOpenCheckin = last?.type === 'checkin'
+    const hasFinishedToday = last?.type === 'checkout'
 
+    if (type === 'checkin' && hasFinishedToday) {
+      return json({ error: 'Ponto ja finalizado hoje para essa pessoa.' }, 409)
+    }
     if (type === 'checkin' && hasOpenCheckin) {
       return json({ error: 'Essa pessoa já tem entrada aberta hoje. Registre a saída antes de nova entrada.' }, 409)
     }
@@ -193,6 +251,7 @@ Deno.serve(async (req) => {
         longitude: venue?.longitude ?? 0,
         accuracy_meters: null,
         distance_from_venue_meters: 0,
+        work_role: normalizeWorkRole(body.work_role),
         created_at: now,
       })
       .select()

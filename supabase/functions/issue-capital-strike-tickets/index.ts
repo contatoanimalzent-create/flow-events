@@ -35,6 +35,7 @@ interface Inscricao {
   cpf: string | null
   exercito: string
   categoria: string
+  kit_status: string
   confirmado: boolean
 }
 
@@ -71,7 +72,8 @@ function buildTicketMetadata(inscricao: Inscricao, armyKey: string) {
     army_key: armyKey,
     army_label: armyLabelFromKey(armyKey),
     category: inscricao.categoria,
-    kit_status: deriveKitStatus(inscricao.categoria),
+    registration_category: inscricao.categoria,
+    kit_status: inscricao.kit_status,
   }
 }
 
@@ -107,6 +109,7 @@ async function fetchLegacyInscricoes(supabase: ReturnType<typeof createSupabaseA
     cpf: row.cpf ? String(row.cpf) : null,
     exercito: normalizeArmy(String(row.exercito ?? '')),
     categoria: String(row.categoria ?? 'OPERADOR'),
+    kit_status: deriveKitStatus(String(row.categoria ?? '')),
     confirmado: Boolean(row.confirmado),
   }))
 }
@@ -133,7 +136,8 @@ async function fetchCapitalStrikeRegistrations(supabase: ReturnType<typeof creat
     telefone: String(row.phone ?? ''),
     cpf: row.cpf ? String(row.cpf) : null,
     exercito: normalizeArmy(String(row.army ?? '')),
-    categoria: String(row.kit_status ?? 'Não informado'),
+    categoria: String(row.squad ?? 'OPERADOR'),
+    kit_status: String(row.kit_status ?? 'Não informado'),
     confirmado: true,
   }))
 }
@@ -178,6 +182,7 @@ Deno.serve(async (req) => {
           cpf: null,
           exercito: 'COALIZAO',
           categoria: 'OPERADOR',
+          kit_status: 'Não informado',
           confirmado: true,
         },
         {
@@ -189,6 +194,7 @@ Deno.serve(async (req) => {
           cpf: null,
           exercito: 'ALIANCA',
           categoria: 'OPERADOR',
+          kit_status: 'Não informado',
           confirmado: true,
         },
       ]

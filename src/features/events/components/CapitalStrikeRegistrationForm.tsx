@@ -49,6 +49,68 @@ export function CapitalStrikeRegistrationForm({ army, onBack }: CapitalStrikeReg
   const armyColor = army === 'coalizao' ? '#FFC107' : '#2196F3'
   const armyLabel = army === 'coalizao' ? 'COALIZÃO' : 'ALIANÇA'
 
+  return (
+    <section className="min-h-screen bg-[#0a0908] px-5 py-12 md:px-10 lg:px-16">
+      <div className="mx-auto max-w-2xl">
+        <button
+          onClick={onBack}
+          className="mb-8 flex items-center gap-2 text-[#9a9088] transition-colors hover:text-[#f0ebe2]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
+        </button>
+
+        <div className="overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[#0f0e0d]">
+          <div
+            className="h-1.5"
+            style={{ background: `linear-gradient(90deg, transparent, ${armyColor}, transparent)` }}
+          />
+
+          <div className="p-8 text-center md:p-12">
+            <div
+              className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border"
+              style={{ borderColor: `${armyColor}55`, backgroundColor: `${armyColor}18` }}
+            >
+              <Check className="h-8 w-8" style={{ color: armyColor }} />
+            </div>
+
+            <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.38em] text-[#ae936f]">
+              Capital Strike - A Origem
+            </p>
+
+            <h1 className="mt-3 font-display text-3xl font-semibold leading-tight text-[#f0ebe2] md:text-4xl">
+              Operação encerrada
+            </h1>
+
+            <p className="mt-4 text-base leading-7 text-[#9a9088]">
+              As inscrições e a lista de espera para o <span className="font-semibold text-[#ebe7e0]">Capital Strike - A Origem</span> foram finalizadas.
+            </p>
+
+            <p className="mt-3 text-sm leading-6 text-[#6a6058]">
+              A tropa foi formada e o credenciamento seguirá apenas para operadores já confirmados.
+            </p>
+
+            <div className="mt-8 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] px-5 py-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#6a6058]">
+                Exército selecionado
+              </p>
+              <p className="mt-2 text-sm font-bold tracking-[0.18em]" style={{ color: armyColor }}>
+                {armyLabel}
+              </p>
+            </div>
+
+            <button
+              onClick={onBack}
+              className="mt-8 w-full rounded-full bg-[#d62a0b] py-3 text-sm font-semibold text-[#ebe7e0] transition-all hover:-translate-y-0.5"
+            >
+              Voltar para home
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
 

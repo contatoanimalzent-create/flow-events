@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
-import { X, CheckCircle, XCircle, Loader2, Keyboard, Camera, AlertTriangle, Mail, ShieldCheck, KeyRound, Lock } from 'lucide-react'
+import { X, CheckCircle, XCircle, Loader2, Keyboard, Camera, AlertTriangle, Mail, ShieldCheck, KeyRound, Lock, ListChecks, Search } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAppContext } from '@/core/context/app-context.store'
 import { useOffline } from '@/core/offline/offline.store'
 import { operatorService } from '@/core/operator/operator.service'
+import type { OperatorTicketListItem } from '@/core/operator/operator.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
 type ScanState = 'idle' | 'scanning' | 'processing' | 'valid' | 'invalid'
-type InputMode = 'camera' | 'manual'
+type InputMode = 'camera' | 'manual' | 'list'
 type CameraPermissionState = 'idle' | 'requesting' | 'granted'
 
 interface ScanResult {
@@ -18,6 +19,7 @@ interface ScanResult {
   cpf?: string | null
   email?: string | null
   ticketNumber?: string | null
+  manualCode?: string | null
   army?: string | null
   kitStatus?: string | null
   category?: string | null
@@ -52,6 +54,9 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
   const [maskedEmail, setMaskedEmail] = useState<string | null>(null)
+  const [attendees, setAttendees] = useState<OperatorTicketListItem[]>([])
+  const [attendeesLoading, setAttendeesLoading] = useState(false)
+  const [attendeeSearch, setAttendeeSearch] = useState('')
 
   const context = useAppContext((s) => s.context)
   const { isOnline, enqueue } = useOffline()
@@ -68,6 +73,17 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     () => activeEventId ? `pulse-scanner-auth:${activeEventId}` : null,
     [activeEventId],
   )
+
+  const loadAttendees = useCallback(async () => {
+    if (!activeEventId || authStep !== 'unlocked') return
+    setAttendeesLoading(true)
+    try {
+      const list = await operatorService.listEventTickets(activeEventId)
+      setAttendees(list)
+    } finally {
+      setAttendeesLoading(false)
+    }
+  }, [activeEventId, authStep])
 
   useEffect(() => {
     if (!scannerSlug) return
@@ -197,11 +213,13 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
             cpf: validation.cpf,
             email: validation.email,
             ticketNumber: validation.ticketNumber,
+            manualCode: validation.manualCode,
             army: validation.army,
             kitStatus: validation.kitStatus,
             category: validation.category,
           }
           setScanCount((c) => c + 1)
+          void loadAttendees()
         } else {
           res = {
             valid: false,
@@ -238,7 +256,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       setResult(null)
       setManualCode('')
     }, 6_000)
-  }, [activeEventId, authStep, context?.eventId, isOnline, enqueue, scanState])
+  }, [activeEventId, authStep, context?.eventId, isOnline, enqueue, loadAttendees, scanState])
 
   const stopCameraScanner = useCallback(async () => {
     const scanner = scannerRef.current
@@ -307,6 +325,14 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       setCameraPermission('idle')
     }
   }, [authStep, inputMode, stopCameraScanner])
+
+  useEffect(() => {
+    if (authStep === 'unlocked') void loadAttendees()
+  }, [authStep, loadAttendees])
+
+  useEffect(() => {
+    if (inputMode === 'list') void loadAttendees()
+  }, [inputMode, loadAttendees])
 
   useEffect(() => () => { void stopCameraScanner() }, [stopCameraScanner])
 
@@ -377,6 +403,26 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
   const isResultShown = scanState === 'valid' || scanState === 'invalid'
   const accent = '#0057E7'
+  const attendeeStats = useMemo(() => {
+    const checked = attendees.filter((item) => item.checkedIn).length
+    return { total: attendees.length, checked, pending: attendees.length - checked }
+  }, [attendees])
+  const filteredAttendees = useMemo(() => {
+    const q = attendeeSearch.trim().toLowerCase()
+    if (!q) return attendees
+    return attendees.filter((item) => {
+      const haystack = [
+        item.name,
+        item.cpf,
+        item.email,
+        item.army,
+        item.category,
+        item.manualCode,
+        item.ticketNumber,
+      ].join(' ').toLowerCase()
+      return haystack.includes(q)
+    })
+  }, [attendeeSearch, attendees])
 
   if (directEventLoading) {
     return (
@@ -570,6 +616,12 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
           >
             <Keyboard size={12} /> Manual
           </button>
+          <button
+            onClick={() => setInputMode('list')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${inputMode === 'list' ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
+          >
+            <ListChecks size={12} /> Lista
+          </button>
         </div>
       </div>
 
@@ -671,7 +723,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
               </p>
             )}
           </>
-        ) : (
+        ) : inputMode === 'manual' ? (
           /* Manual entry */
           <div className="w-full px-8 z-10">
             <p className="text-white font-semibold text-center mb-4">Digite o código do ingresso</p>
@@ -679,8 +731,8 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
               <input
                 autoFocus
                 value={manualCode}
-                onChange={(e) => setManualCode(e.target.value.toUpperCase())}
-                placeholder="Ex: TKT-ABC123"
+                onChange={(e) => setManualCode(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''))}
+                placeholder="Ex: A1B2C3D4"
                 className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-center text-lg font-mono placeholder-slate-600 focus:outline-none focus:border-blue-500"
               />
               <button
@@ -692,6 +744,67 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
                 Validar
               </button>
             </form>
+          </div>
+        ) : (
+          <div className="z-10 flex h-full w-full flex-col px-4 pb-24 pt-32 text-white">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-xl bg-white/10 px-3 py-2 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-slate-400">Total</p>
+                <p className="text-lg font-bold">{attendeeStats.total}</p>
+              </div>
+              <div className="rounded-xl bg-green-500/15 px-3 py-2 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-green-200/70">OK</p>
+                <p className="text-lg font-bold text-green-300">{attendeeStats.checked}</p>
+              </div>
+              <div className="rounded-xl bg-amber-500/15 px-3 py-2 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-amber-200/70">Pendentes</p>
+                <p className="text-lg font-bold text-amber-300">{attendeeStats.pending}</p>
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-center gap-2 rounded-xl border border-white/10 bg-black/45 px-3 py-2">
+              <Search size={15} className="text-slate-500" />
+              <input
+                value={attendeeSearch}
+                onChange={(e) => setAttendeeSearch(e.target.value)}
+                placeholder="Buscar nome, CPF, exercito ou codigo"
+                className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-600"
+              />
+            </div>
+
+            <div className="mt-3 min-h-0 flex-1 overflow-y-auto rounded-2xl border border-white/10 bg-black/45">
+              {attendeesLoading ? (
+                <div className="flex h-32 items-center justify-center">
+                  <Loader2 size={22} className="animate-spin text-blue-300" />
+                </div>
+              ) : filteredAttendees.length === 0 ? (
+                <div className="flex h-32 items-center justify-center px-5 text-center text-sm text-slate-500">
+                  Nenhum inscrito encontrado.
+                </div>
+              ) : (
+                filteredAttendees.map((item) => (
+                  <div key={item.id} className="border-b border-white/8 px-3 py-3 last:border-b-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-white">{item.name}</p>
+                        <p className="mt-1 text-[11px] text-slate-400">
+                          {[item.army, item.category, item.kitStatus].filter(Boolean).join(' - ')}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2 font-mono text-[11px] text-slate-400">
+                          {item.manualCode && <span className="rounded bg-white/10 px-2 py-0.5 text-blue-200">{item.manualCode}</span>}
+                          {item.cpf && <span>{item.cpf}</span>}
+                        </div>
+                      </div>
+                      <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                        item.checkedIn ? 'bg-green-400/18 text-green-200' : 'bg-amber-400/18 text-amber-200'
+                      }`}>
+                        {item.checkedIn ? 'OK' : 'Pendente'}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         )}
 
@@ -736,6 +849,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
                   <p>{result.category || result.ticketLabel}</p>
                   {result.cpf && <p className="font-mono text-slate-400">CPF {result.cpf}</p>}
                   {result.email && <p className="truncate text-slate-400">{result.email}</p>}
+                  {result.manualCode && <p className="font-mono text-blue-200">Codigo {result.manualCode}</p>}
                   {result.ticketNumber && <p className="font-mono text-[11px] text-slate-500">{result.ticketNumber}</p>}
                 </div>
                 <p className={`text-xs mt-0.5 ${result.valid ? 'text-green-300' : 'text-red-300'}`}>{result.message}</p>

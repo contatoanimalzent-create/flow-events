@@ -69,7 +69,11 @@ function normalizeCpfForStorage(value?: string | null) {
   return digits.length === 11 ? digits : null
 }
 
-function buildTicketMetadata(inscricao: Inscricao, armyKey: string) {
+function buildShortCode(qrToken: string) {
+  return qrToken.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase()
+}
+
+function buildTicketMetadata(inscricao: Inscricao, armyKey: string, qrToken?: string) {
   return {
     event_key: 'capital-strike-a-origem',
     registration_id: inscricao.id,
@@ -79,6 +83,7 @@ function buildTicketMetadata(inscricao: Inscricao, armyKey: string) {
     category: inscricao.categoria,
     registration_category: inscricao.categoria,
     kit_status: inscricao.kit_status,
+    short_code: qrToken ? buildShortCode(qrToken) : null,
   }
 }
 
@@ -253,7 +258,6 @@ Deno.serve(async (req) => {
       const cpfDigits = normalizeCpfForStorage(inscricao.cpf)
       const armyKey = inscricao.exercito.toUpperCase()
       const config = ARMY_CONFIG[armyKey]
-      const ticketMetadata = buildTicketMetadata(inscricao, armyKey)
 
       if (!config) {
         stats.errors.push(`Exército desconhecido para ${inscricao.nome_completo}: ${inscricao.exercito}`)
@@ -286,6 +290,7 @@ Deno.serve(async (req) => {
         const orderItemId = crypto.randomUUID()
         qrToken = crypto.randomUUID()
         ticketNumber = `CS-${Date.now()}-${crypto.randomUUID().slice(0, 6).toUpperCase()}`
+        const newTicketMetadata = buildTicketMetadata(inscricao, armyKey, qrToken)
 
         const { error: orderError } = await supabase.from('orders').insert({
           id: orderId,
@@ -354,7 +359,7 @@ Deno.serve(async (req) => {
           holder_cpf: cpfDigits,
           status: 'confirmed',
           is_vip: false,
-          metadata: ticketMetadata,
+          metadata: newTicketMetadata,
         }).select('id').single()
 
         if (ticketError) {
@@ -368,6 +373,8 @@ Deno.serve(async (req) => {
         existingByRegistration.set(`${inscricao.source}:${inscricao.id}`, createdTicket)
         existingByEmail.set(email, createdTicket)
       }
+
+      const ticketMetadata = buildTicketMetadata(inscricao, armyKey, qrToken)
 
       if (!dryRun) {
         await supabase
@@ -395,6 +402,7 @@ Deno.serve(async (req) => {
             exercitoBg: armyBg,
             categoria: inscricao.categoria,
             ticketNumber,
+            manualCode: buildShortCode(qrToken),
             qrToken,
             qrUrl,
             armyGroupLink: armyKey === 'COALIZAO' ? GROUP_LINKS.COALIZAO : GROUP_LINKS.ALIANCA,
@@ -406,7 +414,7 @@ Deno.serve(async (req) => {
             to: deliveryEmail,
             subject: `${testSend ? '[TESTE] ' : ''}Seu QR Code - Capital Strike: A Origem | ${armyLabel}`,
             html,
-            text: `Ola ${inscricao.nome_completo},\n\nSeu credenciamento para Capital Strike - A Origem esta confirmado!\nExercito: ${armyLabel}\nCategoria: ${inscricao.categoria}\nTicket: ${ticketNumber}\n\nQR Code: ${qrUrl ?? qrToken}\n\nEntre nos grupos oficiais:\nGrupo ${armyLabel}: ${armyKey === 'COALIZAO' ? GROUP_LINKS.COALIZAO : GROUP_LINKS.ALIANCA}\nGrupo Operadores: ${GROUP_LINKS.OPERADORES}\n\nApresente o QR Code deste email na entrada do evento.\n\nNos vemos no campo de batalha!`,
+            text: `Ola ${inscricao.nome_completo},\n\nSeu credenciamento para Capital Strike - A Origem esta confirmado!\nExercito: ${armyLabel}\nCategoria: ${inscricao.categoria}\nTicket: ${ticketNumber}\nCodigo manual: ${buildShortCode(qrToken)}\n\nQR Code: ${qrUrl ?? qrToken}\n\nEntre nos grupos oficiais:\nGrupo ${armyLabel}: ${armyKey === 'COALIZAO' ? GROUP_LINKS.COALIZAO : GROUP_LINKS.ALIANCA}\nGrupo Operadores: ${GROUP_LINKS.OPERADORES}\n\nApresente o QR Code deste email na entrada do evento.\n\nNos vemos no campo de batalha!`,
           })
 
           if (result.status === 'sent') {
@@ -450,12 +458,13 @@ function buildCapitalStrikeEmail(params: {
   exercitoBg: string
   categoria: string
   ticketNumber: string
+  manualCode: string
   qrToken: string
   qrUrl: string | null
   armyGroupLink: string
   operatorsGroupLink: string
 }) {
-  const { nome, exercito, exercitoColor, exercitoBg, categoria, ticketNumber, qrToken, qrUrl, armyGroupLink, operatorsGroupLink } = params
+  const { nome, exercito, exercitoColor, exercitoBg, categoria, ticketNumber, manualCode, qrToken, qrUrl, armyGroupLink, operatorsGroupLink } = params
   const firstName = nome.split(' ')[0]
   const isCoalizao = exercito === 'Coalizão'
   const accentDark = isCoalizao ? '#92400E' : '#1E3A8A'
@@ -626,6 +635,9 @@ function buildCapitalStrikeEmail(params: {
       <!-- Ticket number -->
       <div style="margin-top:8px;font-size:13px;color:rgba(255,255,255,0.35);font-family:'Courier New',Courier,monospace;letter-spacing:2px;">
         ${ticketNumber}
+      </div>
+      <div style="margin-top:10px;display:inline-block;padding:8px 14px;border-radius:10px;background:${exercitoColor}22;border:1px solid ${exercitoColor}55;font-size:14px;font-weight:900;color:#FFFFFF;font-family:'Courier New',Courier,monospace;letter-spacing:3px;">
+        ${manualCode}
       </div>
       <!-- Status badge -->
       <div style="margin-top:20px;">

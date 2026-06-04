@@ -1,5 +1,4 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
-import { requireAuth } from '../_shared/auth-guard.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 import { sendResendEmail } from '../_shared/transactional-email.ts'
 
@@ -18,8 +17,6 @@ const SESSION_TTL_MS = 8 * 60 * 60 * 1000
 const MAX_REQUESTS_WINDOW_MS = 15 * 60 * 1000
 const MAX_REQUESTS_PER_WINDOW = 5
 const DEFAULT_PRODUCER_EMAIL = 'walteciojr@gmail.com'
-const ALLOWED_ROLES = new Set(['super_admin', 'org_admin', 'org_manager', 'checkin_operator'])
-const ALLOWED_MEMBER_ROLES = new Set(['owner', 'admin', 'manager', 'checkin_operator'])
 
 function json(req: Request, body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -85,9 +82,6 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: getCorsHeaders(req) })
   if (req.method !== 'POST') return json(req, { error: 'Method not allowed' }, 405)
 
-  const auth = await requireAuth(req)
-  if (!auth.ok) return auth.response
-
   let body: RequestBody
   try {
     body = await req.json()
@@ -117,23 +111,6 @@ Deno.serve(async (req) => {
     return json(req, { error: 'E-mail do produtor nao configurado para este evento.' }, 400)
   }
 
-  const [{ data: profile }, { data: member }] = await Promise.all([
-    admin.from('profiles').select('role,is_active').eq('id', auth.userId).maybeSingle(),
-    admin
-      .from('organization_members')
-      .select('role,is_active')
-      .eq('organization_id', event.organization_id)
-      .eq('user_id', auth.userId)
-      .maybeSingle(),
-  ])
-
-  const profileAllowed = Boolean(profile?.is_active !== false && ALLOWED_ROLES.has(String(profile?.role ?? '')))
-  const memberAllowed = Boolean(member?.is_active !== false && ALLOWED_MEMBER_ROLES.has(String(member?.role ?? '')))
-
-  if (!profileAllowed && !memberAllowed) {
-    return json(req, { error: 'Usuario sem permissao para solicitar o scanner deste evento.' }, 403)
-  }
-
   if (body.action === 'request_code') {
     const since = new Date(Date.now() - MAX_REQUESTS_WINDOW_MS).toISOString()
     const { count } = await admin
@@ -153,7 +130,7 @@ Deno.serve(async (req) => {
 
     const { error: insertError } = await admin.from('scanner_auth_codes').insert({
       event_id: event.id,
-      user_id: auth.userId,
+      user_id: null,
       email: producerEmail,
       code_hash: codeHash,
       expires_at: expiresAt,

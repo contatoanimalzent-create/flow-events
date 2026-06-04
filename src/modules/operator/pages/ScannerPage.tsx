@@ -8,6 +8,7 @@ import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
 type ScanState = 'idle' | 'scanning' | 'processing' | 'valid' | 'invalid'
 type InputMode = 'camera' | 'manual'
+type CameraPermissionState = 'idle' | 'requesting' | 'granted'
 
 interface ScanResult {
   valid: boolean
@@ -42,6 +43,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   const [manualCode, setManualCode] = useState('')
   const [scanCount, setScanCount] = useState(0)
   const [cameraError, setCameraError] = useState<string | null>(null)
+  const [cameraPermission, setCameraPermission] = useState<CameraPermissionState>('idle')
   const [scannerReady, setScannerReady] = useState(false)
   const [directEvent, setDirectEvent] = useState<DirectScannerEvent | null>(null)
   const [directEventLoading, setDirectEventLoading] = useState(Boolean(scannerSlug))
@@ -56,7 +58,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
   const resultTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const scannerRef = useRef<any>(null)
-  const Html5QrcodeScannerRef = useRef<any>(null)
+  const Html5QrcodeRef = useRef<any>(null)
   const linePos = useRef(0)
   const [linePct, setLinePct] = useState(0)
 
@@ -137,7 +139,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     import('html5-qrcode')
       .then((mod) => {
         if (!cancelled) {
-          Html5QrcodeScannerRef.current = mod.Html5QrcodeScanner
+          Html5QrcodeRef.current = mod.Html5Qrcode
           setScannerReady(true)
         }
       })
@@ -149,9 +151,9 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
   // Start html5-qrcode camera scanner
   useEffect(() => {
-    if (authStep !== 'unlocked' || inputMode !== 'camera' || !scannerReady || !Html5QrcodeScannerRef.current) return
+    return
 
-    const scanner = new Html5QrcodeScannerRef.current(
+    const scanner = new Html5QrcodeRef.current(
       'qr-reader',
       { fps: 10, qrbox: { width: 220, height: 220 }, rememberLastUsedCamera: true },
       false
@@ -238,6 +240,76 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     }, 6_000)
   }, [activeEventId, authStep, context?.eventId, isOnline, enqueue, scanState])
 
+  const stopCameraScanner = useCallback(async () => {
+    const scanner = scannerRef.current
+    scannerRef.current = null
+    if (!scanner) return
+    try {
+      await scanner.stop()
+    } catch {
+      // Already stopped.
+    }
+    try {
+      await scanner.clear()
+    } catch {
+      // The camera element may already be gone.
+    }
+  }, [])
+
+  const startCameraScanner = useCallback(async () => {
+    if (authStep !== 'unlocked' || inputMode !== 'camera') return
+    if (!scannerReady || !Html5QrcodeRef.current) {
+      setCameraError('Scanner QR ainda carregando. Tente novamente em alguns segundos.')
+      return
+    }
+
+    setCameraError(null)
+    setCameraPermission('requesting')
+
+    try {
+      if (!window.isSecureContext) throw new Error('Abra o scanner em HTTPS para liberar a câmera.')
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error('Este navegador não liberou acesso à câmera.')
+
+      const permissionStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      })
+      permissionStream.getTracks().forEach((track) => track.stop())
+
+      await stopCameraScanner()
+      const scanner = new Html5QrcodeRef.current('qr-reader')
+      scannerRef.current = scanner
+
+      await scanner.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 240, height: 240 }, aspectRatio: 1 },
+        (decodedText: string) => {
+          if (scanState !== 'processing') handleScan(decodedText)
+        },
+        () => {},
+      )
+
+      setCameraPermission('granted')
+    } catch (err) {
+      await stopCameraScanner()
+      setCameraPermission('idle')
+      setCameraError(
+        err instanceof Error
+          ? err.message
+          : 'Não foi possível abrir a câmera. Autorize a câmera no navegador e tente novamente.',
+      )
+    }
+  }, [authStep, handleScan, inputMode, scanState, scannerReady, stopCameraScanner])
+
+  useEffect(() => {
+    if (authStep !== 'unlocked' || inputMode !== 'camera') {
+      void stopCameraScanner()
+      setCameraPermission('idle')
+    }
+  }, [authStep, inputMode, stopCameraScanner])
+
+  useEffect(() => () => { void stopCameraScanner() }, [stopCameraScanner])
+
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     handleScan(manualCode)
@@ -295,10 +367,12 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   }
 
   const handleLockScanner = () => {
+    void stopCameraScanner()
     if (scannerAuthKey) window.localStorage.removeItem(scannerAuthKey)
     setAuthStep('email')
     setAuthCode('')
     setScanCount(0)
+    setCameraPermission('idle')
   }
 
   const isResultShown = scanState === 'valid' || scanState === 'invalid'
@@ -326,7 +400,8 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
   if (authStep !== 'unlocked') {
     return (
-      <div className="flex h-full flex-col bg-[#050816] px-5 py-6 text-white">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#050816] px-5 py-6 text-white">
+        <div className="w-full max-w-xl">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300">Scanner seguro</p>
@@ -343,7 +418,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
           )}
         </div>
 
-        <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/30">
           <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-300">
             {authStep === 'email' ? <Mail size={22} /> : <KeyRound size={22} />}
           </div>
@@ -412,12 +487,13 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
             </div>
           )}
         </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-full bg-black select-none">
+    <div className="flex min-h-screen flex-col bg-black select-none">
       {/* Top overlay */}
       <div
         className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4"
@@ -471,18 +547,43 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       </div>
 
       {/* Camera view */}
-      <div className="flex-1 relative flex items-center justify-center bg-[#0a0f1e]">
+      <div className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden bg-[#0a0f1e]">
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50" />
 
         {inputMode === 'camera' ? (
           <>
             {/* html5-qrcode mounts here */}
-            {scannerReady && !cameraError && (
-              <div id="qr-reader" className="w-full h-full absolute inset-0 opacity-0" />
+            <div
+              id="qr-reader"
+              className={`absolute inset-0 h-full w-full overflow-hidden transition-opacity duration-300 [&_button]:hidden [&_div]:border-0 [&_img]:hidden [&_span]:hidden [&_video]:h-full [&_video]:w-full [&_video]:object-cover ${
+                cameraPermission === 'granted' ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+            {cameraPermission !== 'granted' && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center px-6">
+                <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-black/70 p-5 text-center shadow-2xl shadow-black/50 backdrop-blur-md">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-300">
+                    <Camera size={26} />
+                  </div>
+                  <h2 className="text-lg font-bold text-white">Abrir câmera</h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                    Toque no botão e permita o acesso à câmera para escanear o QR Code.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void startCameraScanner()}
+                    disabled={cameraPermission === 'requesting' || !scannerReady}
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white transition-all active:scale-[0.98] disabled:opacity-50"
+                  >
+                    {cameraPermission === 'requesting' ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+                    {cameraPermission === 'requesting' ? 'Solicitando permissão...' : 'Permitir câmera'}
+                  </button>
+                </div>
+              </div>
             )}
 
             {/* Visual frame */}
-            <div className="relative w-56 h-56 z-10">
+            <div className={`relative z-10 h-60 w-60 ${cameraPermission === 'granted' ? 'block' : 'hidden'}`}>
               {(['tl', 'tr', 'bl', 'br'] as const).map((c) => (
                 <div
                   key={c}

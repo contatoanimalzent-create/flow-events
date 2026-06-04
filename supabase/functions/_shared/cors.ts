@@ -26,7 +26,7 @@ export function getCorsHeaders(req?: Request) {
   const allowed = isAllowedOrigin(origin) ? origin : PRODUCTION_FALLBACK
   return {
     'Access-Control-Allow-Origin': allowed,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature, x-cron-secret',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, x-request-timeout, apikey, content-type, stripe-signature, x-cron-secret',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Vary': 'Origin',
   }
@@ -36,7 +36,7 @@ export function getCorsHeaders(req?: Request) {
 // Prefira getCorsHeaders(req) em codigo novo para validar origin.
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature, x-cron-secret',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, x-request-timeout, apikey, content-type, stripe-signature, x-cron-secret',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Vary': 'Origin',
 }

@@ -282,7 +282,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
       await scanner.start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 240, height: 240 }, aspectRatio: 1 },
+        { fps: 10 },
         (decodedText: string) => {
           if (scanState !== 'processing') handleScan(decodedText)
         },
@@ -494,6 +494,33 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
   return (
     <div className="flex min-h-screen flex-col bg-black select-none">
+      <style>{`
+        #qr-reader,
+        #qr-reader > div,
+        #qr-reader__scan_region {
+          position: absolute !important;
+          inset: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          overflow: hidden !important;
+          border: 0 !important;
+        }
+
+        #qr-reader video {
+          position: absolute !important;
+          inset: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
+        }
+
+        #qr-reader__dashboard,
+        #qr-reader__dashboard_section,
+        #qr-reader__camera_selection,
+        #qr-shaded-region {
+          display: none !important;
+        }
+      `}</style>
       {/* Top overlay */}
       <div
         className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4"

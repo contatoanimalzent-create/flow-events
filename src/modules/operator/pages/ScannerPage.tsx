@@ -208,7 +208,12 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       let res: ScanResult
 
       if (isOnline && activeEventId) {
-        const validation = await operatorService.validateToken(token.trim(), activeEventId, undefined, scannerSession ?? undefined)
+        const scannedToken = token.trim()
+        let validation = await operatorService.validateToken(scannedToken, activeEventId, undefined, scannerSession ?? undefined)
+        const fallbackManualCode = scannedToken.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase()
+        if (!validation.valid && validation.reason === 'not_found' && fallbackManualCode.length === 8) {
+          validation = await operatorService.validateToken(fallbackManualCode, activeEventId, undefined, scannerSession ?? undefined)
+        }
         if (validation.valid) {
           res = {
             valid: true,

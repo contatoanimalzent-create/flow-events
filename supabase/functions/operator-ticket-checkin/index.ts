@@ -171,6 +171,7 @@ async function findTicket(
   lookup: string,
 ) {
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(lookup)
+  const looksLikeUuidPrefix = /^[0-9a-f-]{8,35}$/i.test(lookup)
 
   if (isUuid) {
     const { data: byQr } = await admin
@@ -190,6 +191,18 @@ async function findTicket(
       .limit(1)
       .maybeSingle()
     if (byId) return byId as Record<string, unknown>
+  }
+
+  if (!isUuid && looksLikeUuidPrefix) {
+    const { data: prefixMatches } = await admin
+      .from('digital_tickets')
+      .select(ticketSelect)
+      .eq('event_id', eventId)
+      .ilike('qr_token', `${lookup.toLowerCase()}%`)
+      .limit(2)
+
+    const matches = (prefixMatches ?? []) as Array<Record<string, unknown>>
+    if (matches.length === 1) return matches[0]
   }
 
   const { data } = await admin

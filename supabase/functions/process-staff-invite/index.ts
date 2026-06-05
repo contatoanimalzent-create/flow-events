@@ -823,6 +823,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const missing: string[] = []
     if (!body.token)             missing.push('token')
     if (!body.full_name)         missing.push('full_name')
+    if (!body.email)             missing.push('email')
     if (!body.document_number)   missing.push('document_number')
     if (!body.pix_key)           missing.push('pix_key')
     if (body.terms_accepted !== true) missing.push('terms_accepted (must be true)')
@@ -834,7 +835,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
       )
     }
 
-    if (body.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+    const normalizedEmail = String(body.email ?? '').toLowerCase().trim()
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       return Response.json({ error: 'Invalid email format' }, addCors({ status: 400 }))
     }
 
@@ -873,12 +876,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
           .eq('cpf', cleanCpf)
           .maybeSingle()
         existingStaff = data
-      } else if (body.email) {
+      } else {
         const { data } = await admin
           .from('staff_members')
           .select('id')
           .eq('event_id', inviteLink.event_id)
-          .eq('email', body.email.toLowerCase().trim())
+          .eq('email', normalizedEmail)
           .maybeSingle()
         existingStaff = data
       }
@@ -902,7 +905,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
           event_id:         inviteLink.event_id,
           first_name:       firstName,
           last_name:        lastName,
-          email:            body.email ? body.email.toLowerCase().trim() : null,
+          email:            normalizedEmail,
           phone:            cleanPhone || body.phone || null,
           cpf:              cleanCpf,
           role_title:       body.role_title || inviteLink.role_type || 'Staff',
@@ -947,7 +950,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         eventImageUrl: (eventInfo?.cover_url as string | null | undefined) ?? null,
         staffMemberId: staffMember.id,
         staffName: body.full_name!.trim(),
-        staffEmail: body.email ? body.email.toLowerCase().trim() : '',
+        staffEmail: normalizedEmail,
         staffPhone: cleanPhone || body.phone || null,
         roleType: inviteLink.role_type,
         teamId: inviteLink.team_id ?? null,

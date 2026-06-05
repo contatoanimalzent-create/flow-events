@@ -29,6 +29,7 @@ type PageState = 'loading' | 'valid' | 'error' | 'success' | 'already_registered
 
 interface FormData {
   full_name: string
+  email: string
   cpf: string
   role_title: string
   pix_key: string
@@ -200,6 +201,7 @@ export function StaffJoinPage() {
 
   const [form, setForm] = useState<FormData>({
     full_name: '',
+    email: '',
     cpf: '',
     role_title: '',
     pix_key: '',
@@ -296,6 +298,9 @@ export function StaffJoinPage() {
     const errors: Partial<Record<string, string>> = {}
 
     if (!form.full_name.trim()) errors.full_name = 'Nome completo Ã© obrigatÃ³rio.'
+    const email = form.email.trim().toLowerCase()
+    if (!email) errors.email = 'E-mail obrigatorio.'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'E-mail invalido.'
     const cpfDigits = form.cpf.replace(/\D/g, '')
 
     if (!form.cpf.trim()) errors.cpf = 'CPF Ã© obrigatÃ³rio.'
@@ -316,6 +321,7 @@ export function StaffJoinPage() {
       const payload = {
         token,
         full_name: form.full_name.trim(),
+        email: form.email.trim().toLowerCase(),
         document_number: form.cpf.replace(/\D/g, '') || undefined,
         role_title: 'Staff',
         pix_key: form.pix_key.trim() || undefined,
@@ -588,6 +594,19 @@ export function StaffJoinPage() {
                       placeholder="Seu nome completo"
                       className={inputClass}
                       autoComplete="name"
+                      required
+                    />
+                </InputField>
+
+                <InputField label="E-mail" required error={fieldErrors.email}>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setField('email', e.target.value)}
+                      placeholder="seu@email.com"
+                      className={inputClass}
+                      autoComplete="email"
+                      inputMode="email"
                       required
                     />
                 </InputField>

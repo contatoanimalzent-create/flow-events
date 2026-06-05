@@ -54,6 +54,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
   const [maskedEmail, setMaskedEmail] = useState<string | null>(null)
+  const [scannerSession, setScannerSession] = useState<string | null>(null)
   const [attendees, setAttendees] = useState<OperatorTicketListItem[]>([])
   const [attendeesLoading, setAttendeesLoading] = useState(false)
   const [attendeeSearch, setAttendeeSearch] = useState('')
@@ -78,12 +79,12 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     if (!activeEventId || authStep !== 'unlocked') return
     setAttendeesLoading(true)
     try {
-      const list = await operatorService.listEventTickets(activeEventId)
+      const list = await operatorService.listEventTickets(activeEventId, scannerSession ?? undefined)
       setAttendees(list)
     } finally {
       setAttendeesLoading(false)
     }
-  }, [activeEventId, authStep])
+  }, [activeEventId, authStep, scannerSession])
 
   useEffect(() => {
     if (!scannerSlug) return
@@ -121,9 +122,13 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
           eventSlug: scannerSlug,
           scannerSession: saved.session,
         }).then(() => {
-          if (!cancelled) setAuthStep('unlocked')
+          if (!cancelled) {
+            setScannerSession(saved.session ?? null)
+            setAuthStep('unlocked')
+          }
         }).catch(() => {
           window.localStorage.removeItem(scannerAuthKey)
+          if (!cancelled) setScannerSession(null)
         }).finally(() => {
           if (!cancelled) setAuthLoading(false)
         })
@@ -203,7 +208,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       let res: ScanResult
 
       if (isOnline && activeEventId) {
-        const validation = await operatorService.validateToken(token.trim(), activeEventId)
+        const validation = await operatorService.validateToken(token.trim(), activeEventId, undefined, scannerSession ?? undefined)
         if (validation.valid) {
           res = {
             valid: true,
@@ -256,7 +261,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       setResult(null)
       setManualCode('')
     }, 6_000)
-  }, [activeEventId, authStep, context?.eventId, isOnline, enqueue, loadAttendees, scanState])
+  }, [activeEventId, authStep, context?.eventId, isOnline, enqueue, loadAttendees, scanState, scannerSession])
 
   const stopCameraScanner = useCallback(async () => {
     const scanner = scannerRef.current
@@ -383,6 +388,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
           expires_at: response.expires_at,
         }))
       }
+      setScannerSession(response.scanner_session ?? null)
       setAuthStep('unlocked')
       setAuthCode('')
     } catch (err) {
@@ -395,6 +401,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   const handleLockScanner = () => {
     void stopCameraScanner()
     if (scannerAuthKey) window.localStorage.removeItem(scannerAuthKey)
+    setScannerSession(null)
     setAuthStep('email')
     setAuthCode('')
     setScanCount(0)

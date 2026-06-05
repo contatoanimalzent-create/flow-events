@@ -199,128 +199,33 @@ export const operatorService = {
     return data as ScannerAuthResponse
   },
 
-  async validateToken(token: string, eventId: string, gate?: string): Promise<ValidationResult> {
-    const lookup = normalizeLookup(token)
-    let ticket: Record<string, unknown> | null = null
-    let lookupError: unknown = null
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(lookup)
-
-    if (isUuid) {
-      const { data, error } = await supabase
-        .from('digital_tickets')
-        .select(ticketSelect)
-        .eq('qr_token', lookup)
-        .maybeSingle()
-      ticket = data as Record<string, unknown> | null
-      lookupError = error
-    }
-
-    if (!ticket && !lookupError) {
-      const { data, error } = await supabase
-        .from('digital_tickets')
-        .select(ticketSelect)
-        .eq('event_id', eventId)
-        .limit(2000)
-
-      lookupError = error
-      ticket = ((data ?? []) as Array<Record<string, unknown>>).find((item) => {
-        const qrToken = String(item.qr_token ?? '').toLowerCase()
-        const ticketNumber = String(item.ticket_number ?? '').toUpperCase()
-        const manualCode = ticketManualCode(item)
-        return qrToken === lookup.toLowerCase()
-          || ticketNumber === lookup
-          || ticketNumber.endsWith(`-${lookup}`)
-          || manualCode === lookup
-      }) ?? null
-    }
-
-    if (lookupError || !ticket) {
-      return { valid: false, reason: 'not_found', message: 'Ingresso nao encontrado' }
-    }
-
-    if (ticket.event_id !== eventId) {
-      return { valid: false, reason: 'wrong_event', message: 'Ingresso de outro evento' }
-    }
-
-    const ticketStatus = ticket.status as string
-    if (ticketStatus === 'used') {
-      return { valid: false, reason: 'already_used', message: 'Ingresso ja utilizado' }
-    }
-
-    if (ticketStatus !== 'confirmed' && ticketStatus !== 'active' && ticketStatus !== 'paid') {
-      return { valid: false, reason: 'invalid_token', message: `Ingresso invalido (${ticketStatus})` }
-    }
-
-    const { count: existingCheckins } = await supabase
-      .from('checkins')
-      .select('id', { count: 'exact', head: true })
-      .eq('digital_ticket_id', ticket.id as string)
-      .eq('result', 'success')
-      .eq('is_exit', false)
-
-    if ((existingCheckins ?? 0) > 0) {
-      return { valid: false, reason: 'already_used', message: 'Ingresso ja utilizado (check-in duplicado)' }
-    }
-
-    const checkedInAt = new Date().toISOString()
-    const { data: lockedTicket, error: lockError } = await supabase
-      .from('digital_tickets')
-      .update({ status: 'used', checked_in_at: checkedInAt })
-      .eq('id', ticket.id as string)
-      .is('checked_in_at', null)
-      .in('status', ['confirmed', 'active', 'paid'])
-      .select(ticketSelect)
-      .maybeSingle()
-
-    if (lockError || !lockedTicket) {
-      return { valid: false, reason: 'already_used', message: 'Ingresso ja utilizado' }
-    }
-
-    const { error: checkinError } = await supabase.from('checkins').insert({
-      event_id: eventId,
-      digital_ticket_id: ticket.id,
-      gate_id: gate ?? null,
-      result: 'success',
-      reason_code: 'ticket_valid',
-      is_exit: false,
-      was_offline: false,
-      checked_in_at: checkedInAt,
+  async validateToken(token: string, eventId: string, gate?: string, scannerSession?: string): Promise<ValidationResult> {
+    const { data, error } = await supabase.functions.invoke('operator-ticket-checkin', {
+      body: {
+        action: 'validate',
+        event_id: eventId,
+        token,
+        gate_id: gate ?? null,
+        scanner_session: scannerSession,
+      },
     })
 
-    if (checkinError) {
-      return { valid: false, reason: 'unauthorized', message: 'Erro ao registrar check-in' }
-    }
-
-    const mapped = mapTicketListItem(lockedTicket as Record<string, unknown>)
-    const typeName = ((lockedTicket as Record<string, unknown>).ticket_type as any)?.name ?? 'Ingresso'
-
-    return {
-      valid: true,
-      name: mapped.name,
-      ticketLabel: typeName,
-      ticketType: typeName,
-      attendeeId: mapped.id,
-      message: 'Acesso liberado',
-      cpf: mapped.cpf,
-      email: mapped.email,
-      ticketNumber: mapped.ticketNumber,
-      manualCode: mapped.manualCode,
-      army: mapped.army,
-      kitStatus: mapped.kitStatus,
-      category: mapped.category,
-    }
+    if (error) return { valid: false, reason: 'unauthorized', message: error.message || 'Erro na validacao' }
+    if ((data as any)?.error) return { valid: false, reason: 'unauthorized', message: (data as any).error }
+    return data as ValidationResult
   },
 
-  async listEventTickets(eventId: string): Promise<OperatorTicketListItem[]> {
-    const { data } = await supabase
-      .from('digital_tickets')
-      .select(ticketSelect)
-      .eq('event_id', eventId)
-      .order('holder_name', { ascending: true })
-      .limit(2000)
+  async listEventTickets(eventId: string, scannerSession?: string): Promise<OperatorTicketListItem[]> {
+    const { data, error } = await supabase.functions.invoke('operator-ticket-checkin', {
+      body: {
+        action: 'list',
+        event_id: eventId,
+        scanner_session: scannerSession,
+      },
+    })
 
-    if (!data) return []
-    return (data as Array<Record<string, unknown>>).map(mapTicketListItem)
+    if (error || (data as any)?.error) return []
+    return ((data as any)?.tickets ?? []) as OperatorTicketListItem[]
   },
 
   async searchAttendee(query: string, eventId: string): Promise<Array<{

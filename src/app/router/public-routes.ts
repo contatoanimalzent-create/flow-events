@@ -43,6 +43,7 @@ export type PublicRoute =
 
 export function getInitialPublicRoute(): PublicRoute {
   const path = window.location.pathname
+  const normalizedPath = path.replace(/\/+$/, '') || '/'
 
   // ── Existing routes ──
   if (path === '/terms' || path === '/termos') return 'terms'
@@ -75,7 +76,7 @@ export function getInitialPublicRoute(): PublicRoute {
 
   // ── Pulse unified app ──
   if (path === '/pulse/bsb5' || path === '/bsb5-admin' || path === '/admin-bsb5') return 'bsb5-admin'
-  if (path === '/capital-strike/scanner') return { type: 'scanner', slug: 'capital-strike-a-origem' }
+  if (normalizedPath === '/capital-strike/scanner') return { type: 'scanner', slug: 'capital-strike-a-origem' }
   const directScannerMatch = path.match(/^\/scanner\/([^/]+)$/)
   if (directScannerMatch) return { type: 'scanner', slug: directScannerMatch[1] }
   const staffAdminMatch = path.match(/^\/pulse\/([^/]+)\/admin$/)

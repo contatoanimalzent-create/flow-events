@@ -25,9 +25,7 @@ const ticketSelect = `
   holder_name,
   holder_email,
   holder_cpf,
-  metadata,
-  ticket_type:ticket_types(name),
-  batch:ticket_batches(name)
+  metadata
 `
 
 function json(req: Request, body: unknown, status = 200) {
@@ -65,6 +63,7 @@ function normalizeLookup(rawToken: string) {
 
   const uuid = trimmed.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)?.[0]
   if (uuid) return uuid.toLowerCase()
+  if (/^[0-9a-f]{8}(?:-[0-9a-f]{0,4}){0,4}$/i.test(trimmed)) return trimmed.toLowerCase()
   return trimmed.replace(/^CS[-\s]?/i, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
 }
 

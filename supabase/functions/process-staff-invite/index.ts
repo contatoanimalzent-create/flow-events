@@ -719,7 +719,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       const { data: event } = await admin
         .from('events')
-        .select('id, name, starts_at, ends_at, venue_name, cover_url')
+        .select('id, name, slug, starts_at, ends_at, venue_name, cover_url')
         .eq('id', inviteLink.event_id)
         .single()
 
@@ -749,6 +749,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
             ? {
                 id:              event.id,
                 name:            event.name,
+                slug:            event.slug,
                 starts_at:       event.starts_at,
                 ends_at:         event.ends_at,
                 venue_name:      event.venue_name,

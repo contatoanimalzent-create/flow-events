@@ -14,6 +14,7 @@ import {
 
 interface InviteInfo {
   event_name: string
+  event_slug?: string | null
   event_date?: string | null
   event_location?: string | null
   role?: string | null
@@ -44,7 +45,10 @@ interface StaffRoleOption {
   shiftLabel: string
 }
 
-const BSB5_POINT_URL = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
+function getPointUrl(inviteInfo?: InviteInfo | null, token?: string | null): string {
+  const slug = inviteInfo?.event_slug || (token === 'bsb5' ? 'bsb-fight-5' : token)
+  return `https://pulse.animalzgroup.com/staff/ponto/${slug || 'bsb-fight-5'}`
+}
 
 function isAlreadyRegisteredResponse(body: Record<string, unknown>): boolean {
   const text = String(body?.error ?? body?.message ?? body?.code ?? '').toLowerCase()
@@ -243,6 +247,7 @@ export function StaffJoinPage() {
         const data = await res.json()
         setInviteInfo({
           event_name: data.event_name ?? data.event?.name ?? 'BSB FIGHT 5',
+          event_slug: data.event_slug ?? data.event?.slug ?? null,
           event_date: data.event_date ?? data.event?.starts_at ?? null,
           event_location: data.event_location ?? data.event?.venue_name ?? null,
           role: data.role ?? data.invite?.role_type ?? null,
@@ -382,6 +387,7 @@ export function StaffJoinPage() {
 
   // â”€â”€ Success state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (pageState === 'already_registered') {
+    const pontoUrl = getPointUrl(inviteInfo, token)
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#D4FF00]/20 bg-[#D4FF00]/10">
@@ -392,30 +398,30 @@ export function StaffJoinPage() {
             Cadastro jÃ¡ confirmado
           </h1>
           <p className="mt-4 text-base leading-7 text-white/68">
-            Seus dados jÃ¡ estÃ£o no BSB FIGHT 5. Agora use o link de ponto somente quando estiver no local do evento.
+            Seus dados jÃ¡ estÃ£o no evento. Agora use o link de ponto somente quando estiver no local.
           </p>
           <p className="mt-3 text-sm leading-6 text-white/48">
             O ponto deve ser batido todos os dias do evento.
           </p>
         </div>
         <a
-          href={BSB5_POINT_URL}
+          href={pontoUrl}
           className="mt-2 inline-flex items-center gap-2 rounded-full bg-[#D4FF00] px-7 py-3 text-sm font-bold uppercase tracking-[0.12em] text-black transition-all hover:bg-[#e2ff3d]"
         >
           Bater ponto
         </a>
         <a
-          href={BSB5_POINT_URL}
+          href={pontoUrl}
           className="break-all text-sm font-medium text-[#D4FF00] underline underline-offset-4"
         >
-          {BSB5_POINT_URL}
+          {pontoUrl}
         </a>
       </div>
     )
   }
 
   if (pageState === 'success') {
-    const pontoUrl = 'https://pulse.animalzgroup.com/staff/ponto/bsb-fight-5'
+    const pontoUrl = getPointUrl(inviteInfo, token)
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 py-8 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#D4FF00]/20 bg-[#D4FF00]/10">
@@ -430,14 +436,14 @@ export function StaffJoinPage() {
           </p>
         </div>
         <a
-          href={BSB5_POINT_URL}
+          href={pontoUrl}
           className="mt-2 inline-flex items-center gap-2 rounded-full bg-[#D4FF00] px-7 py-3 text-sm font-bold uppercase tracking-[0.12em] text-black transition-all hover:bg-[#e2ff3d]"
         >
           Acessar meu ponto
         </a>
         <button
           type="button"
-          onClick={() => navigator.clipboard?.writeText(BSB5_POINT_URL)}
+          onClick={() => navigator.clipboard?.writeText(pontoUrl)}
           className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white/64 transition-all hover:border-white/20 hover:text-white"
         >
           Copiar link do ponto

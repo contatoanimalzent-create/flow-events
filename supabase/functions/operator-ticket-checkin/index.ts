@@ -44,6 +44,14 @@ function normalizeText(value: unknown) {
 function normalizeLookup(rawToken: string) {
   const trimmed = rawToken.trim()
   try {
+    const parsed = JSON.parse(trimmed)
+    const fromJson = parsed?.token ?? parsed?.qr_token ?? parsed?.qrToken ?? parsed?.code ?? parsed?.id
+    if (fromJson) return normalizeLookup(String(fromJson))
+  } catch {
+    // Plain token or URL.
+  }
+
+  try {
     const url = new URL(trimmed)
     const fromQuery = url.searchParams.get('token') ?? url.searchParams.get('qr_token') ?? url.searchParams.get('code')
     if (fromQuery) return normalizeLookup(fromQuery)
@@ -134,9 +142,11 @@ async function assertScannerSession(
 ) {
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
   const bearer = req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '').trim()
-  if (serviceRoleKey && bearer === serviceRoleKey) return { ok: true }
+  const apiKey = req.headers.get('apikey')?.trim()
+  if (serviceRoleKey && (bearer === serviceRoleKey || apiKey === serviceRoleKey)) return { ok: true }
 
   const session = String(scannerSession ?? '').trim()
+  if (serviceRoleKey && session === serviceRoleKey) return { ok: true }
   if (!session) return { ok: false, error: 'Sessao do scanner nao informada.' }
 
   const producerEmail = await resolveProducerEmail(admin, event)
@@ -188,7 +198,8 @@ async function findTicket(
     .eq('event_id', eventId)
     .limit(3000)
 
-  return ((data ?? []) as Array<Record<string, unknown>>).find((item) => {
+  const tickets = (data ?? []) as Array<Record<string, unknown>>
+  const exactMatch = tickets.find((item) => {
     const qrToken = String(item.qr_token ?? '').toLowerCase()
     const ticketNumber = String(item.ticket_number ?? '').toUpperCase()
     const manualCode = ticketManualCode(item)
@@ -196,7 +207,19 @@ async function findTicket(
       || ticketNumber === lookup
       || ticketNumber.endsWith(`-${lookup}`)
       || manualCode === lookup
-  }) ?? null
+  })
+  if (exactMatch) return exactMatch
+
+  const compactLookup = lookup.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+  if (compactLookup.length >= 8) {
+    const prefixMatches = tickets.filter((item) => {
+      const compactQr = String(item.qr_token ?? '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+      return compactQr.startsWith(compactLookup)
+    })
+    if (prefixMatches.length === 1) return prefixMatches[0]
+  }
+
+  return null
 }
 
 Deno.serve(async (req) => {

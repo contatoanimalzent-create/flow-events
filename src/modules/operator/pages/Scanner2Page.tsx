@@ -29,6 +29,7 @@ type Scanner2Result =
       manualCode?: string | null
       army?: string | null
       kitStatus?: string | null
+      shirtSize?: string | null
       category?: string | null
     }
 
@@ -52,6 +53,7 @@ function resultFromValidation(validation: ValidationResult) {
     manualCode: validation.manualCode,
     army: validation.army,
     kitStatus: validation.kitStatus,
+    shirtSize: validation.shirtSize,
     category: validation.category,
   }
 }
@@ -120,6 +122,7 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
       item.army,
       item.category,
       item.kitStatus,
+      item.shirtSize,
       item.manualCode,
       item.ticketNumber,
     ].filter(Boolean).join(' ').toLowerCase().includes(query))
@@ -423,7 +426,7 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold">{item.name}</p>
-                    <p className="mt-1 text-[11px] text-slate-400">{[item.army, item.category, item.kitStatus].filter(Boolean).join(' - ')}</p>
+                    <p className="mt-1 text-[11px] text-slate-400">{[item.army, item.category, item.kitStatus, item.shirtSize && `Camisa ${item.shirtSize}`].filter(Boolean).join(' - ')}</p>
                     <div className="mt-2 flex flex-wrap gap-2 font-mono text-[11px] text-slate-400">
                       {item.manualCode && <span className="rounded bg-blue-500/15 px-2 py-0.5 text-blue-200">{item.manualCode}</span>}
                       {item.cpf && <span>{item.cpf}</span>}
@@ -445,6 +448,18 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
             {result.valid ? <CheckCircle2 className="h-8 w-8 shrink-0 text-green-300" /> : <XCircle className="h-8 w-8 shrink-0 text-red-300" />}
             <div className="min-w-0 flex-1">
               <p className="font-black">{result.name}</p>
+              {('army' in result || 'shirtSize' in result) && (
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-3">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">Exercito</div>
+                    <div className="mt-1 text-lg font-black uppercase text-white">{('army' in result && result.army) ? result.army : 'Nao informado'}</div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-3">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">Camisa</div>
+                    <div className="mt-1 text-lg font-black uppercase text-white">{('shirtSize' in result && result.shirtSize) ? result.shirtSize : 'Nao informado'}</div>
+                  </div>
+                </div>
+              )}
               {('kitStatus' in result || 'category' in result || 'ticketLabel' in result) && (() => {
                 const kit = kitDisplay(
                   'kitStatus' in result ? result.kitStatus : null,
@@ -458,10 +473,11 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
                   </div>
                 )
               })()}
-              {('army' in result || 'kitStatus' in result) && (
+              {('army' in result || 'kitStatus' in result || 'shirtSize' in result) && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {'army' in result && result.army && <span className="rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase">{result.army}</span>}
                   {'kitStatus' in result && result.kitStatus && <span className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold uppercase ${kitTone(result.kitStatus)}`}>{result.kitStatus}</span>}
+                  {'shirtSize' in result && result.shirtSize && <span className="rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase">Camisa {result.shirtSize}</span>}
                 </div>
               )}
               {'category' in result && result.category && <p className="mt-2 text-xs text-slate-300">{result.category}</p>}

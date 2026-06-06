@@ -36,6 +36,7 @@ interface Inscricao {
   exercito: string
   categoria: string
   kit_status: string
+  shirt_size?: string | null
   confirmado: boolean
 }
 
@@ -83,6 +84,8 @@ function buildTicketMetadata(inscricao: Inscricao, armyKey: string, qrToken?: st
     category: inscricao.categoria,
     registration_category: inscricao.categoria,
     kit_status: inscricao.kit_status,
+    shirt_size: inscricao.shirt_size ?? null,
+    tamanho_camiseta: inscricao.shirt_size ?? null,
     short_code: qrToken ? buildShortCode(qrToken) : null,
   }
 }
@@ -104,7 +107,7 @@ async function fetchLegacyInscricoes(
   if (ids && ids.length === 0) return []
   let query = supabase
     .from('inscricoes')
-    .select('id, nome_completo, email, telefone, cpf, exercito, categoria, confirmado')
+    .select('id, nome_completo, email, telefone, cpf, exercito, categoria, tamanho_camiseta, confirmado')
     .order('nome_completo', { ascending: true })
 
   if (!includeUnconfirmed) query = query.eq('confirmado', true)
@@ -126,6 +129,7 @@ async function fetchLegacyInscricoes(
     exercito: normalizeArmy(String(row.exercito ?? '')),
     categoria: String(row.categoria ?? 'OPERADOR'),
     kit_status: deriveKitStatus(String(row.categoria ?? '')),
+    shirt_size: row.tamanho_camiseta ? String(row.tamanho_camiseta) : null,
     confirmado: Boolean(row.confirmado),
   }))
 }
@@ -155,6 +159,7 @@ async function fetchCapitalStrikeRegistrations(supabase: ReturnType<typeof creat
     exercito: normalizeArmy(String(row.army ?? '')),
     categoria: String(row.squad ?? 'OPERADOR'),
     kit_status: String(row.kit_status ?? 'Não informado'),
+    shirt_size: null,
     confirmado: true,
   }))
 }

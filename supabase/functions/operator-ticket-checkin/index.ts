@@ -103,6 +103,10 @@ function readKitStatus(metadata: Record<string, unknown>, ...fallbackValues: unk
   return deriveKitStatus(...fallbackValues)
 }
 
+function readShirtSize(metadata: Record<string, unknown>) {
+  return String(metadata.shirt_size ?? metadata.tamanho_camiseta ?? metadata.shirtSize ?? '').trim() || null
+}
+
 function mapTicket(ticket: Record<string, unknown>) {
   const typeName = (ticket.ticket_type as any)?.name ?? 'Ingresso'
   const batchName = (ticket.batch as any)?.name ?? ''
@@ -110,6 +114,7 @@ function mapTicket(ticket: Record<string, unknown>) {
   const army = String(metadata.army_label ?? '') || deriveArmyLabel(typeName, batchName)
   const category = String(metadata.category ?? metadata.registration_category ?? metadata.squad ?? '').trim() || typeName
   const kitStatus = readKitStatus(metadata, category, typeName, batchName)
+  const shirtSize = readShirtSize(metadata)
   const checkedInAt = (ticket.checked_in_at as string | null) ?? null
   const status = String(ticket.status ?? '')
   const checkedIn = status === 'used' || Boolean(checkedInAt)
@@ -122,6 +127,7 @@ function mapTicket(ticket: Record<string, unknown>) {
     army: army || null,
     category,
     kitStatus: kitStatus || 'Nao informado',
+    shirtSize: shirtSize || 'Nao informado',
     ticketNumber: (ticket.ticket_number as string | null) ?? null,
     manualCode: ticketManualCode(ticket),
     status,
@@ -353,6 +359,7 @@ Deno.serve(async (req) => {
       manualCode: mapped.manualCode,
       army: mapped.army,
       kitStatus: mapped.kitStatus,
+      shirtSize: mapped.shirtSize,
       category: mapped.category,
     })
   }
@@ -372,6 +379,7 @@ Deno.serve(async (req) => {
       manualCode: mapped.manualCode,
       army: mapped.army,
       kitStatus: mapped.kitStatus,
+      shirtSize: mapped.shirtSize,
       category: mapped.category,
     })
   }
@@ -418,10 +426,11 @@ Deno.serve(async (req) => {
         cpf: mapped.cpf,
         email: mapped.email,
         ticketNumber: mapped.ticketNumber,
-        manualCode: mapped.manualCode,
-        army: mapped.army,
-        kitStatus: mapped.kitStatus,
-        category: mapped.category,
+      manualCode: mapped.manualCode,
+      army: mapped.army,
+      kitStatus: mapped.kitStatus,
+      shirtSize: mapped.shirtSize,
+      category: mapped.category,
       })
     }
   }
@@ -455,6 +464,7 @@ Deno.serve(async (req) => {
     manualCode: checkedMapped.manualCode,
     army: checkedMapped.army,
     kitStatus: checkedMapped.kitStatus,
+    shirtSize: checkedMapped.shirtSize,
     category: checkedMapped.category,
   })
 })

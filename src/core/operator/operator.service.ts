@@ -20,6 +20,7 @@ export type ValidationResult =
       manualCode?: string | null
       army?: string | null
       kitStatus?: string | null
+      shirtSize?: string | null
       category?: string | null
     }
   | {
@@ -34,6 +35,7 @@ export type ValidationResult =
       manualCode?: string | null
       army?: string | null
       kitStatus?: string | null
+      shirtSize?: string | null
       category?: string | null
     }
 
@@ -70,6 +72,7 @@ export interface OperatorTicketListItem {
   army: string | null
   category: string
   kitStatus: string | null
+  shirtSize: string | null
   ticketNumber: string | null
   manualCode: string | null
   status: string
@@ -100,6 +103,10 @@ function readKitStatus(metadata: Record<string, unknown>, ...fallbackValues: unk
   const explicit = String(metadata.kit_status ?? '').trim()
   if (explicit && !['NAO INFORMADO', 'NÃO INFORMADO'].includes(normalizeText(explicit))) return explicit
   return deriveKitStatus(...fallbackValues)
+}
+
+function readShirtSize(metadata: Record<string, unknown>) {
+  return String(metadata.shirt_size ?? metadata.tamanho_camiseta ?? metadata.shirtSize ?? '').trim() || null
 }
 
 function normalizeLookup(rawToken: string) {
@@ -153,6 +160,7 @@ function mapTicketListItem(ticket: Record<string, unknown>): OperatorTicketListI
   const army = String(metadata.army_label ?? '') || deriveArmyLabel(typeName, batchName)
   const category = String(metadata.category ?? metadata.registration_category ?? metadata.squad ?? '').trim() || typeName
   const kitStatus = readKitStatus(metadata, category, typeName, batchName)
+  const shirtSize = readShirtSize(metadata)
   const checkedInAt = (ticket.checked_in_at as string | null) ?? null
   const status = String(ticket.status ?? '')
   const checkedIn = status === 'used' || Boolean(checkedInAt)
@@ -165,6 +173,7 @@ function mapTicketListItem(ticket: Record<string, unknown>): OperatorTicketListI
     army: army || null,
     category,
     kitStatus: kitStatus || 'Nao informado',
+    shirtSize: shirtSize || 'Nao informado',
     ticketNumber: (ticket.ticket_number as string | null) ?? null,
     manualCode: ticketManualCode(ticket),
     status,

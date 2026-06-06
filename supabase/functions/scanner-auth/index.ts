@@ -12,8 +12,8 @@ interface RequestBody {
   scanner_session?: string
 }
 
-const CODE_TTL_MS = 10 * 60 * 1000
-const SESSION_TTL_MS = 8 * 60 * 60 * 1000
+const CODE_TTL_MS = 24 * 60 * 60 * 1000
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const MAX_REQUESTS_WINDOW_MS = 15 * 60 * 1000
 const MAX_REQUESTS_PER_WINDOW = 5
 const DEFAULT_PRODUCER_EMAIL = 'walteciojr@gmail.com'
@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
         <h1 style="font-size:22px;margin:0 0 12px">Codigo do scanner Pulse</h1>
         <p style="color:#cbd5e1;margin:0 0 18px">Use este codigo para liberar o scanner do evento <strong>${event.name}</strong>.</p>
         <div style="font-size:34px;letter-spacing:8px;font-weight:800;background:#111827;border:1px solid #334155;border-radius:12px;padding:18px;text-align:center">${code}</div>
-        <p style="color:#94a3b8;font-size:12px;margin-top:18px">O codigo expira em 10 minutos. Entregue somente para a equipe autorizada.</p>
+        <p style="color:#94a3b8;font-size:12px;margin-top:18px">O codigo vale por 24 horas. Entregue somente para a equipe autorizada.</p>
       </div>
     `
 
@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
       to: producerEmail,
       subject: `Codigo do scanner - ${event.name}`,
       html,
-      text: `Codigo do scanner Pulse para ${event.name}: ${code}. Expira em 10 minutos.`,
+      text: `Codigo do scanner Pulse para ${event.name}: ${code}. Valido por 24 horas.`,
     })
 
     return json(req, { ok: true, masked_email: maskEmail(producerEmail), expires_in_seconds: CODE_TTL_MS / 1000 })

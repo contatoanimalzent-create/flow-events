@@ -1,504 +1,458 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import jsQR from 'jsqr'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AlertTriangle, Camera, CheckCircle2, Keyboard, ListChecks, Loader2, Lock, Search, XCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { operatorService, type OperatorTicketListItem, type ValidationResult } from '@/core/operator/operator.service'
 
-type ValidationResult = {
-  valid: boolean
-  reason?: string
-  message?: string
-  name?: string
-  ticketLabel?: string
-  ticketType?: string
-  attendeeId?: string
-  ticketNumber?: string
-  manualCode?: string
-  email?: string
-  cpf?: string
-  army?: string
-  kitStatus?: string
-  category?: string
-  debug_lookup?: string
-  dryRun?: boolean
-}
-
-type AttendeeListItem = {
-  id: string
-  name: string
-  email?: string | null
-  ticketNumber?: string | null
-  manualCode?: string | null
-  army?: string | null
-  category?: string | null
-  kitStatus?: string | null
-  status?: string
-  checkedIn?: boolean
-  checkedInAt?: string | null
-}
+type Mode = 'camera' | 'manual' | 'list'
+type JsQR = (data: Uint8ClampedArray, width: number, height: number, opts?: Record<string, unknown>) => { data: string } | null
 
 interface Scanner2PageProps {
   scannerSlug: string
 }
 
-const SCANNER2_AUTH_STORAGE = 'scanner2.auth'
-const SCANNER2_PASS_KEY = 'CSTRIKE-2026' // shared key (organizador-only)
-
-const PULSE = {
-  bg: '#06070a',
-  surface: '#0d1118',
-  text: '#f5f0e8',
-  accent: '#D4FF00',
-  success: '#22c55e',
-  danger: '#ef4444',
-  warning: '#f59e0b',
-  muted: 'rgba(245,240,232,0.55)',
+interface EventInfo {
+  id: string
+  name: string
+  slug: string
 }
 
-function tone(label?: string | null) {
-  const v = (label ?? '').toLowerCase()
-  if (v.includes('coaliz')) return { bg: '#2563eb', fg: '#fff', label: 'Coalizão' }
-  if (v.includes('alian')) return { bg: '#dc2626', fg: '#fff', label: 'Aliança' }
-  return null
+type Scanner2Result =
+  | Extract<ValidationResult, { valid: true }>
+  | {
+      valid: false
+      name: string
+      ticketLabel: string
+      message: string
+    }
+
+const ACCESS_PASSWORD = 'CSTRIKE-2026'
+const STORAGE_KEY_PREFIX = 'pulse-scanner2-auth'
+
+function compact(value: string) {
+  return value.trim().replace(/\s+/g, '')
 }
 
-function kitTone(label?: string | null) {
-  const v = (label ?? '').toLowerCase()
-  if (v.includes('sem')) return { bg: '#1f2937', fg: '#fca5a5', text: 'SEM KIT' }
-  if (v.includes('com')) return { bg: '#064e3b', fg: '#86efac', text: 'COM KIT' }
-  return { bg: '#262626', fg: '#a3a3a3', text: 'KIT N/I' }
+function resultFromValidation(validation: ValidationResult) {
+  if (validation.valid) return validation
+  return {
+    valid: false as const,
+    name: '-',
+    ticketLabel: validation.reason,
+    message: validation.message,
+  }
+}
+
+function kitTone(kit?: string | null) {
+  const normalized = String(kit ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  if (normalized.includes('sem')) return 'bg-red-500/18 text-red-200 border-red-400/25'
+  if (normalized.includes('com')) return 'bg-green-500/18 text-green-200 border-green-400/25'
+  return 'bg-slate-500/18 text-slate-200 border-slate-400/20'
 }
 
 export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
+  const [eventInfo, setEventInfo] = useState<EventInfo | null>(null)
+  const [loadingEvent, setLoadingEvent] = useState(true)
   const [unlocked, setUnlocked] = useState(false)
-  const [passInput, setPassInput] = useState('')
-  const [passError, setPassError] = useState<string | null>(null)
-
-  const [eventId, setEventId] = useState<string | null>(null)
-  const [eventName, setEventName] = useState<string>('')
-
-  const [mode, setMode] = useState<'camera' | 'manual' | 'list'>('camera')
-  const [scanState, setScanState] = useState<'idle' | 'scanning' | 'processing' | 'success' | 'fail'>('idle')
-
-  const [result, setResult] = useState<ValidationResult | null>(null)
-  const [manualInput, setManualInput] = useState('')
-  const [searchInput, setSearchInput] = useState('')
-
-  const [attendees, setAttendees] = useState<AttendeeListItem[]>([])
+  const [password, setPassword] = useState('')
+  const [mode, setMode] = useState<Mode>('camera')
+  const [manualCode, setManualCode] = useState('')
+  const [result, setResult] = useState<Scanner2Result | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [cameraError, setCameraError] = useState<string | null>(null)
+  const [cameraActive, setCameraActive] = useState(false)
+  const [jsQrReady, setJsQrReady] = useState(false)
+  const [attendees, setAttendees] = useState<OperatorTicketListItem[]>([])
   const [attendeesLoading, setAttendeesLoading] = useState(false)
+  const [search, setSearch] = useState('')
   const [scanCount, setScanCount] = useState(0)
 
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const jsQrRef = useRef<JsQR | null>(null)
   const rafRef = useRef<number | null>(null)
-  const lastScannedRef = useRef<string>('')
-  const lastScannedAtRef = useRef<number>(0)
-  const processingRef = useRef(false)
+  const lastScanRef = useRef<{ token: string; at: number }>({ token: '', at: 0 })
+  const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // ─── Bootstrap event id ──────────────────────────────────────────────────
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      const { data } = await supabase
-        .from('events')
-        .select('id,name')
-        .eq('slug', scannerSlug)
-        .single()
-      if (!cancelled && data) {
-        setEventId(data.id)
-        setEventName(data.name ?? scannerSlug)
-      }
-    }
-    void load()
-    return () => { cancelled = true }
-  }, [scannerSlug])
+  const storageKey = `${STORAGE_KEY_PREFIX}:${scannerSlug}`
+  const scannerSession = ACCESS_PASSWORD
 
-  // ─── Restore unlock from storage ─────────────────────────────────────────
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(SCANNER2_AUTH_STORAGE)
-      if (saved === SCANNER2_PASS_KEY) setUnlocked(true)
-    } catch { /* ignore */ }
-  }, [])
+  const stats = useMemo(() => {
+    const checked = attendees.filter((item) => item.checkedIn).length
+    return { total: attendees.length, checked, pending: attendees.length - checked }
+  }, [attendees])
 
-  function handleUnlock(e: React.FormEvent) {
-    e.preventDefault()
-    if (passInput.trim().toUpperCase() === SCANNER2_PASS_KEY) {
-      try { window.localStorage.setItem(SCANNER2_AUTH_STORAGE, SCANNER2_PASS_KEY) } catch { /* ignore */ }
-      setUnlocked(true)
-      setPassError(null)
-    } else {
-      setPassError('Senha incorreta')
-    }
-  }
+  const filteredAttendees = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    if (!query) return attendees
+    return attendees.filter((item) => [
+      item.name,
+      item.email,
+      item.cpf,
+      item.army,
+      item.category,
+      item.kitStatus,
+      item.manualCode,
+      item.ticketNumber,
+    ].filter(Boolean).join(' ').toLowerCase().includes(query))
+  }, [attendees, search])
 
-  // ─── Validation via edge (with service-role-key bypass session) ──────────
-  const validate = useCallback(async (rawToken: string): Promise<ValidationResult> => {
-    if (!eventId) return { valid: false, reason: 'no_event', message: 'Evento não carregado' }
-    try {
-      const { data, error } = await supabase.functions.invoke('operator-ticket-checkin', {
-        body: {
-          action: 'validate',
-          event_id: eventId,
-          token: rawToken,
-          scanner_session: 'test-session-debug-12345', // shared scanner2 session
-        },
-      })
-      if (error) return { valid: false, reason: 'error', message: error.message || 'Erro de rede' }
-      return data as ValidationResult
-    } catch (e: any) {
-      return { valid: false, reason: 'error', message: e?.message ?? 'Erro inesperado' }
-    }
-  }, [eventId])
-
-  const handleToken = useCallback(async (token: string, source: 'camera' | 'manual') => {
-    const cleaned = token.trim()
-    if (!cleaned) return
-    const now = Date.now()
-    if (source === 'camera' && cleaned === lastScannedRef.current && (now - lastScannedAtRef.current) < 3000) return
-    if (processingRef.current) return
-    processingRef.current = true
-    lastScannedRef.current = cleaned
-    lastScannedAtRef.current = now
-
-    setScanState('processing')
-    const res = await validate(cleaned)
-    setResult(res)
-    setScanState(res.valid ? 'success' : 'fail')
-    if (res.valid) setScanCount((c) => c + 1)
-    setTimeout(() => {
-      setScanState('idle')
-      processingRef.current = false
-      if (!res.valid) setResult(null)
-    }, res.valid ? 5000 : 4000)
-  }, [validate])
-
-  // ─── Camera scanner using jsQR ───────────────────────────────────────────
   const stopCamera = useCallback(() => {
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current)
-      rafRef.current = null
-    }
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    rafRef.current = null
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop())
+      streamRef.current.getTracks().forEach((track) => track.stop())
       streamRef.current = null
     }
+    setCameraActive(false)
   }, [])
 
-  const startCamera = useCallback(async () => {
-    if (mode !== 'camera' || !unlocked) return
+  const loadAttendees = useCallback(async () => {
+    if (!eventInfo?.id || !unlocked) return
+    setAttendeesLoading(true)
     try {
+      const list = await operatorService.listEventTickets(eventInfo.id, scannerSession)
+      setAttendees(list)
+    } finally {
+      setAttendeesLoading(false)
+    }
+  }, [eventInfo?.id, unlocked])
+
+  const validateToken = useCallback(async (rawToken: string) => {
+    const token = compact(rawToken)
+    if (!eventInfo?.id || !token || busy) return
+
+    const now = Date.now()
+    if (lastScanRef.current.token === token && now - lastScanRef.current.at < 3000) return
+    lastScanRef.current = { token, at: now }
+
+    setBusy(true)
+    if (clearTimerRef.current) clearTimeout(clearTimerRef.current)
+    try {
+      const validation = await operatorService.validateToken(token, eventInfo.id, undefined, scannerSession)
+      const mapped = resultFromValidation(validation)
+      setResult(mapped)
+      if (validation.valid) {
+        setScanCount((current) => current + 1)
+        void loadAttendees()
+      }
+    } catch (error) {
+      setResult({
+        valid: false,
+        name: '-',
+        ticketLabel: 'erro',
+        message: error instanceof Error ? error.message : 'Erro ao validar ingresso',
+      })
+    } finally {
+      setBusy(false)
+      clearTimerRef.current = setTimeout(() => setResult(null), 7000)
+    }
+  }, [busy, eventInfo?.id, loadAttendees])
+
+  const scanFrame = useCallback(() => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    const jsQR = jsQrRef.current
+    if (!video || !canvas || !jsQR || video.readyState !== video.HAVE_ENOUGH_DATA) {
+      rafRef.current = requestAnimationFrame(scanFrame)
+      return
+    }
+
+    const width = video.videoWidth
+    const height = video.videoHeight
+    if (!width || !height) {
+      rafRef.current = requestAnimationFrame(scanFrame)
+      return
+    }
+
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
+    if (!ctx) return
+    ctx.drawImage(video, 0, 0, width, height)
+    const imageData = ctx.getImageData(0, 0, width, height)
+    const code = jsQR(imageData.data, width, height, { inversionAttempts: 'attemptBoth' })
+    if (code?.data) void validateToken(code.data)
+    rafRef.current = requestAnimationFrame(scanFrame)
+  }, [validateToken])
+
+  const startCamera = useCallback(async () => {
+    if (!jsQrReady) {
+      setCameraError('Leitor QR ainda carregando. Tente de novo em alguns segundos.')
+      return
+    }
+    setCameraError(null)
+    try {
+      if (!window.isSecureContext) throw new Error('Abra em HTTPS para liberar a câmera.')
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       })
       streamRef.current = stream
-      const video = videoRef.current
-      if (!video) return
-      video.srcObject = stream
-      video.setAttribute('playsinline', 'true')
-      await video.play()
-      setScanState('scanning')
-
-      const tick = () => {
-        if (!videoRef.current || !canvasRef.current || !streamRef.current) {
-          rafRef.current = null
-          return
-        }
-        const vw = videoRef.current.videoWidth
-        const vh = videoRef.current.videoHeight
-        if (vw > 0 && vh > 0 && !processingRef.current) {
-          const canvas = canvasRef.current
-          canvas.width = vw
-          canvas.height = vh
-          const ctx = canvas.getContext('2d', { willReadFrequently: true })
-          if (ctx) {
-            ctx.drawImage(videoRef.current, 0, 0, vw, vh)
-            const img = ctx.getImageData(0, 0, vw, vh)
-            const code = jsQR(img.data, img.width, img.height, { inversionAttempts: 'attemptBoth' })
-            if (code?.data) {
-              void handleToken(code.data, 'camera')
-            }
-          }
-        }
-        rafRef.current = requestAnimationFrame(tick)
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        await videoRef.current.play()
       }
-      rafRef.current = requestAnimationFrame(tick)
-    } catch (err: any) {
-      setResult({ valid: false, reason: 'camera', message: err?.message ?? 'Erro ao abrir câmera' })
-      setScanState('fail')
-    }
-  }, [handleToken, mode, unlocked])
-
-  useEffect(() => {
-    if (mode === 'camera' && unlocked) {
-      void startCamera()
-    } else {
+      setCameraActive(true)
+      rafRef.current = requestAnimationFrame(scanFrame)
+    } catch (error) {
       stopCamera()
+      setCameraError(error instanceof Error ? error.message : 'Não foi possível abrir a câmera.')
     }
-    return () => { stopCamera() }
-  }, [mode, unlocked, startCamera, stopCamera])
-
-  // ─── Attendee list ───────────────────────────────────────────────────────
-  const loadAttendees = useCallback(async () => {
-    if (!eventId) return
-    setAttendeesLoading(true)
-    try {
-      const { data } = await supabase.functions.invoke('operator-ticket-checkin', {
-        body: {
-          action: 'list',
-          event_id: eventId,
-          scanner_session: 'test-session-debug-12345',
-        },
-      })
-      const list = ((data as any)?.tickets ?? []) as AttendeeListItem[]
-      setAttendees(list)
-    } finally {
-      setAttendeesLoading(false)
-    }
-  }, [eventId])
+  }, [jsQrReady, scanFrame, stopCamera])
 
   useEffect(() => {
-    if (unlocked && eventId) void loadAttendees()
-  }, [unlocked, eventId, loadAttendees, scanCount])
+    let cancelled = false
+    setLoadingEvent(true)
 
-  // ─── Render: Lock screen ────────────────────────────────────────────────
+    async function loadEvent() {
+      try {
+        const { data } = await supabase
+          .from('events')
+          .select('id,name,slug')
+          .eq('slug', scannerSlug)
+          .maybeSingle()
+        if (!cancelled) setEventInfo((data as EventInfo | null) ?? null)
+      } finally {
+        if (!cancelled) setLoadingEvent(false)
+      }
+    }
+
+    void loadEvent()
+    return () => { cancelled = true }
+  }, [scannerSlug])
+
+  useEffect(() => {
+    setUnlocked(window.localStorage.getItem(storageKey) === 'ok')
+  }, [storageKey])
+
+  useEffect(() => {
+    const existing = (window as unknown as { jsQR?: JsQR }).jsQR
+    if (existing) {
+      jsQrRef.current = existing
+      setJsQrReady(true)
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'
+    script.async = true
+    script.onload = () => {
+      jsQrRef.current = (window as unknown as { jsQR?: JsQR }).jsQR ?? null
+      setJsQrReady(Boolean(jsQrRef.current))
+    }
+    script.onerror = () => setCameraError('Não foi possível carregar o leitor QR. Use Manual ou Lista.')
+    document.body.appendChild(script)
+    return () => { script.remove() }
+  }, [])
+
+  useEffect(() => {
+    if (unlocked) void loadAttendees()
+  }, [unlocked, loadAttendees])
+
+  useEffect(() => {
+    if (mode !== 'camera') stopCamera()
+  }, [mode, stopCamera])
+
+  useEffect(() => () => {
+    stopCamera()
+    if (clearTimerRef.current) clearTimeout(clearTimerRef.current)
+  }, [stopCamera])
+
+  function unlock(event: React.FormEvent) {
+    event.preventDefault()
+    if (password.trim() !== ACCESS_PASSWORD) return
+    window.localStorage.setItem(storageKey, 'ok')
+    setUnlocked(true)
+  }
+
+  function submitManual(event: React.FormEvent) {
+    event.preventDefault()
+    void validateToken(manualCode)
+    setManualCode('')
+  }
+
+  if (loadingEvent) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
+      </div>
+    )
+  }
+
+  if (!eventInfo) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black px-6 text-center text-white">
+        <div>
+          <AlertTriangle className="mx-auto h-10 w-10 text-amber-300" />
+          <h1 className="mt-4 text-xl font-bold">Evento não encontrado</h1>
+          <p className="mt-2 text-sm text-slate-400">Confira o link do scanner.</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!unlocked) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-5" style={{ background: PULSE.bg, color: PULSE.text }}>
-        <form onSubmit={handleUnlock} className="w-full max-w-sm space-y-5">
-          <div className="text-center">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em]" style={{ color: PULSE.accent }}>Scanner 2.0</p>
-            <h1 className="mt-2 text-2xl font-black">Capital Strike</h1>
-            <p className="mt-2 text-sm" style={{ color: PULSE.muted }}>Acesso restrito da operação</p>
+      <div className="flex min-h-screen items-center justify-center bg-[#050816] px-5 text-white">
+        <form onSubmit={unlock} className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/40">
+          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-200">
+            <Lock className="h-6 w-6" />
           </div>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-300">Scanner 2.0</p>
+          <h1 className="mt-2 text-xl font-bold">{eventInfo.name}</h1>
           <input
-            type="password"
-            value={passInput}
-            onChange={(e) => setPassInput(e.target.value)}
-            placeholder="Senha da operação"
+            value={password}
+            onChange={(event) => setPassword(event.target.value.toUpperCase())}
+            placeholder="Senha operacional"
+            className="mt-5 w-full rounded-xl border border-white/15 bg-black/35 px-4 py-3 text-center font-mono text-white outline-none focus:border-blue-400"
             autoFocus
-            className="w-full rounded-2xl border px-4 py-4 text-base outline-none"
-            style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: PULSE.text }}
           />
-          {passError && <p className="text-sm" style={{ color: PULSE.danger }}>{passError}</p>}
-          <button
-            type="submit"
-            className="w-full rounded-2xl py-4 text-sm font-bold uppercase tracking-[0.2em]"
-            style={{ background: PULSE.accent, color: PULSE.bg }}
-          >Entrar</button>
-          <p className="text-xs text-center" style={{ color: PULSE.muted }}>
-            Pegue a senha com o organizador
-          </p>
+          <button className="mt-3 w-full rounded-xl bg-blue-600 py-3.5 text-sm font-bold text-white disabled:opacity-50" disabled={password.trim() !== ACCESS_PASSWORD}>
+            Abrir scanner
+          </button>
         </form>
       </div>
     )
   }
 
-  // ─── Render: Main scanner UI ────────────────────────────────────────────
-  const army = result?.valid ? tone(result.army) : null
-  const kit = result?.valid ? kitTone(result.kitStatus) : null
-
   return (
-    <div className="min-h-screen pb-24" style={{ background: PULSE.bg, color: PULSE.text }}>
-      {/* Header */}
-      <header className="px-5 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: PULSE.accent }}>Scanner 2.0</p>
-            <h1 className="text-base font-bold leading-tight">{eventName || scannerSlug}</h1>
+    <div className="min-h-screen bg-black text-white">
+      <div className="sticky top-0 z-20 border-b border-white/10 bg-black/85 px-4 py-3 backdrop-blur">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold">{eventInfo.name}</p>
+            <p className="text-[11px] text-slate-500">Scanner 2.0</p>
           </div>
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-widest" style={{ color: PULSE.muted }}>Check-ins hoje</p>
-            <p className="text-2xl font-mono font-bold tabular-nums" style={{ color: PULSE.accent }}>{scanCount}</p>
+          <div className="rounded-full bg-green-500/15 px-3 py-1 text-sm font-black text-green-200">
+            {scanCount}
           </div>
         </div>
-      </header>
 
-      {/* Mode tabs */}
-      <div className="px-5 py-3 flex gap-2">
-        {(['camera', 'manual', 'list'] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className="flex-1 rounded-xl px-3 py-2.5 text-xs font-bold uppercase tracking-wider"
-            style={{
-              background: mode === m ? PULSE.accent : 'rgba(255,255,255,0.05)',
-              color: mode === m ? PULSE.bg : PULSE.text,
-            }}
-          >
-            {m === 'camera' ? '📷 Câmera' : m === 'manual' ? '⌨️ Manual' : '🔍 Lista'}
-          </button>
-        ))}
+        <div className="mt-3 grid grid-cols-3 gap-2 rounded-2xl bg-white/8 p-1">
+          {([
+            ['camera', Camera, 'Câmera'],
+            ['manual', Keyboard, 'Manual'],
+            ['list', ListChecks, 'Lista'],
+          ] as const).map(([key, Icon, label]) => (
+            <button
+              key={key}
+              onClick={() => setMode(key)}
+              className={`flex items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-xs font-bold ${mode === key ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Result card (always visible when has result) */}
-      {result && (
-        <div className="px-5 pb-3">
-          <div
-            className="rounded-2xl border-2 p-4"
-            style={{
-              borderColor: result.valid ? PULSE.success : PULSE.danger,
-              background: result.valid ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="h-12 w-12 shrink-0 rounded-full flex items-center justify-center text-2xl font-bold"
-                style={{ background: result.valid ? PULSE.success : PULSE.danger, color: '#fff' }}
-              >{result.valid ? '✓' : '✗'}</div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: result.valid ? PULSE.success : PULSE.danger }}>
-                  {result.valid ? 'Check-in liberado' : result.message ?? 'Inválido'}
-                </p>
-                <p className="text-lg font-bold leading-tight truncate">{result.name ?? '-'}</p>
-                {result.email && <p className="text-xs truncate" style={{ color: PULSE.muted }}>{result.email}</p>}
-              </div>
-            </div>
-            {result.valid && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {army && (
-                  <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: army.bg, color: army.fg }}>
-                    {army.label}
-                  </span>
-                )}
-                {result.category && (
-                  <span className="rounded-full px-3 py-1 text-xs font-bold border" style={{ borderColor: 'rgba(255,255,255,0.15)', color: PULSE.text }}>
-                    {result.category}
-                  </span>
-                )}
-                {kit && (
-                  <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: kit.bg, color: kit.fg }}>
-                    {kit.text}
-                  </span>
-                )}
-              </div>
-            )}
-            {!result.valid && result.debug_lookup && (
-              <p className="mt-2 text-[10px] font-mono" style={{ color: PULSE.muted }}>
-                Lido: {result.debug_lookup}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Camera mode */}
       {mode === 'camera' && (
-        <div className="px-5">
-          <div className="relative rounded-2xl overflow-hidden border-2" style={{ borderColor: 'rgba(255,255,255,0.08)', aspectRatio: '1 / 1' }}>
-            <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" muted playsInline />
-            <canvas ref={canvasRef} className="hidden" />
-            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-              <div className="h-2/3 w-2/3 border-4 rounded-2xl" style={{ borderColor: PULSE.accent }} />
-            </div>
-            <div className="absolute top-3 left-3 right-3 flex justify-between text-xs font-mono">
-              <span className="px-2 py-1 rounded" style={{ background: 'rgba(0,0,0,0.5)', color: PULSE.accent }}>jsQR</span>
-              <span className="px-2 py-1 rounded" style={{ background: 'rgba(0,0,0,0.5)', color: PULSE.text }}>
-                {scanState === 'processing' ? 'validando…' : scanState === 'scanning' ? 'lendo' : scanState}
-              </span>
-            </div>
-          </div>
-          <p className="mt-3 text-center text-xs" style={{ color: PULSE.muted }}>
-            Aponte para o QR code do ingresso. Se não funcionar, use Manual ou Lista.
-          </p>
-        </div>
-      )}
+        <section className="relative flex min-h-[calc(100vh-124px)] items-center justify-center overflow-hidden bg-[#070b15]">
+          <video ref={videoRef} playsInline muted className={`absolute inset-0 h-full w-full object-cover ${cameraActive ? 'opacity-100' : 'opacity-0'}`} />
+          <canvas ref={canvasRef} className="hidden" />
 
-      {/* Manual mode */}
-      {mode === 'manual' && (
-        <div className="px-5">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              void handleToken(manualInput, 'manual')
-              setManualInput('')
-            }}
-            className="space-y-3"
-          >
-            <label className="text-xs font-bold uppercase tracking-widest" style={{ color: PULSE.muted }}>
-              Cole/digite o código do QR ou ticket
-            </label>
-            <input
-              type="text"
-              value={manualInput}
-              onChange={(e) => setManualInput(e.target.value)}
-              placeholder="Ex: aa9f8e4f-4575-... ou CS-12345... ou AA9F8E4F"
-              autoFocus
-              autoComplete="off"
-              className="w-full rounded-2xl border px-4 py-4 text-base font-mono outline-none"
-              style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: PULSE.text }}
-            />
-            <button
-              type="submit"
-              disabled={!manualInput.trim() || scanState === 'processing'}
-              className="w-full rounded-2xl py-4 text-sm font-bold uppercase tracking-[0.2em] disabled:opacity-40"
-              style={{ background: PULSE.accent, color: PULSE.bg }}
-            >Validar ingresso</button>
-          </form>
-        </div>
-      )}
-
-      {/* List mode */}
-      {mode === 'list' && (
-        <div className="px-5 space-y-3">
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Buscar por nome, email ou código..."
-            autoComplete="off"
-            className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
-            style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: PULSE.text }}
-          />
-          {attendeesLoading && <p className="text-center text-sm" style={{ color: PULSE.muted }}>Carregando…</p>}
-          {!attendeesLoading && (
-            <div className="space-y-2 max-h-[60vh] overflow-y-auto pb-4">
-              {attendees
-                .filter((a) => {
-                  const q = searchInput.trim().toLowerCase()
-                  if (!q) return true
-                  return [a.name, a.email, a.ticketNumber, a.manualCode]
-                    .filter(Boolean)
-                    .some((v) => String(v).toLowerCase().includes(q))
-                })
-                .slice(0, 60)
-                .map((a) => {
-                  const at = tone(a.army)
-                  const kt = kitTone(a.kitStatus)
-                  return (
-                    <button
-                      key={a.id}
-                      onClick={() => void handleToken(a.manualCode ?? a.ticketNumber ?? a.id, 'manual')}
-                      disabled={Boolean(a.checkedIn)}
-                      className="w-full text-left rounded-xl border p-3 transition-all"
-                      style={{
-                        borderColor: a.checkedIn ? PULSE.success : 'rgba(255,255,255,0.08)',
-                        background: a.checkedIn ? 'rgba(34,197,94,0.06)' : 'rgba(255,255,255,0.03)',
-                        opacity: a.checkedIn ? 0.65 : 1,
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <p className="flex-1 font-bold text-sm truncate">{a.name}</p>
-                        {a.checkedIn && (
-                          <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: PULSE.success, color: '#000' }}>
-                            ✓ Check-in
-                          </span>
-                        )}
-                      </div>
-                      {a.email && <p className="text-[11px] truncate" style={{ color: PULSE.muted }}>{a.email}</p>}
-                      <div className="mt-1.5 flex flex-wrap gap-1.5">
-                        {at && <span className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: at.bg, color: at.fg }}>{at.label}</span>}
-                        {a.category && <span className="rounded-full border px-2 py-0.5 text-[10px]" style={{ borderColor: 'rgba(255,255,255,0.15)' }}>{a.category}</span>}
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: kt.bg, color: kt.fg }}>{kt.text}</span>
-                      </div>
-                    </button>
-                  )
-                })}
-              {attendees.length === 0 && !attendeesLoading && (
-                <p className="text-center text-sm py-8" style={{ color: PULSE.muted }}>Nenhum inscrito carregado</p>
-              )}
+          {!cameraActive && (
+            <div className="relative z-10 w-full max-w-sm px-5 text-center">
+              <div className="rounded-2xl border border-white/10 bg-black/70 p-5 backdrop-blur">
+                <Camera className="mx-auto h-10 w-10 text-blue-300" />
+                <h2 className="mt-3 text-lg font-bold">Abrir câmera</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-300">Permita a câmera e aponte para o QR Code.</p>
+                <button onClick={() => void startCamera()} className="mt-5 w-full rounded-xl bg-blue-600 py-3.5 text-sm font-bold disabled:opacity-50" disabled={!jsQrReady}>
+                  {jsQrReady ? 'Permitir câmera' : 'Carregando leitor...'}
+                </button>
+                {cameraError && <p className="mt-3 text-sm text-amber-200">{cameraError}</p>}
+              </div>
             </div>
           )}
+
+          {cameraActive && (
+            <>
+              <div className="relative z-10 h-64 w-64">
+                <div className="absolute left-0 top-0 h-10 w-10 border-l-4 border-t-4 border-blue-500" />
+                <div className="absolute right-0 top-0 h-10 w-10 border-r-4 border-t-4 border-blue-500" />
+                <div className="absolute bottom-0 left-0 h-10 w-10 border-b-4 border-l-4 border-blue-500" />
+                <div className="absolute bottom-0 right-0 h-10 w-10 border-b-4 border-r-4 border-blue-500" />
+              </div>
+              <p className="absolute bottom-16 z-10 text-sm text-white/60">Aponte para o QR Code</p>
+            </>
+          )}
+        </section>
+      )}
+
+      {mode === 'manual' && (
+        <section className="px-5 py-8">
+          <form onSubmit={submitManual} className="mx-auto max-w-md">
+            <label className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Código, UUID ou ticket</label>
+            <input
+              value={manualCode}
+              onChange={(event) => setManualCode(event.target.value.toUpperCase())}
+              placeholder="Ex: 33F4F9BB"
+              className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-4 text-center font-mono text-lg text-white outline-none focus:border-blue-400"
+              autoFocus
+            />
+            <button disabled={!manualCode.trim() || busy} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 py-4 text-sm font-bold disabled:opacity-50">
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+              Validar
+            </button>
+          </form>
+        </section>
+      )}
+
+      {mode === 'list' && (
+        <section className="px-4 py-4">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-white/10 p-3 text-center"><p className="text-[10px] text-slate-400">Total</p><strong>{stats.total}</strong></div>
+            <div className="rounded-xl bg-green-500/15 p-3 text-center"><p className="text-[10px] text-green-200/70">OK</p><strong className="text-green-200">{stats.checked}</strong></div>
+            <div className="rounded-xl bg-amber-500/15 p-3 text-center"><p className="text-[10px] text-amber-200/70">Pendentes</p><strong className="text-amber-200">{stats.pending}</strong></div>
+          </div>
+
+          <div className="mt-3 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2">
+            <Search className="h-4 w-4 text-slate-500" />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar nome, CPF, exército ou código" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-600" />
+          </div>
+
+          <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+            {attendeesLoading ? (
+              <div className="flex h-32 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-blue-300" /></div>
+            ) : filteredAttendees.map((item) => (
+              <button key={item.id} onClick={() => item.manualCode && validateToken(item.manualCode)} className="block w-full border-b border-white/8 px-3 py-3 text-left last:border-b-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold">{item.name}</p>
+                    <p className="mt-1 text-[11px] text-slate-400">{[item.army, item.category, item.kitStatus].filter(Boolean).join(' - ')}</p>
+                    <div className="mt-2 flex flex-wrap gap-2 font-mono text-[11px] text-slate-400">
+                      {item.manualCode && <span className="rounded bg-blue-500/15 px-2 py-0.5 text-blue-200">{item.manualCode}</span>}
+                      {item.cpf && <span>{item.cpf}</span>}
+                    </div>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-bold ${item.checkedIn ? 'bg-green-500/18 text-green-200' : 'bg-amber-500/18 text-amber-200'}`}>
+                    {item.checkedIn ? 'OK' : 'Pendente'}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {result && (
+        <div className="fixed bottom-4 left-4 right-4 z-30 rounded-2xl border p-4 shadow-2xl shadow-black/60" style={{ background: result.valid ? '#052e16' : '#450a0a', borderColor: result.valid ? '#22c55e55' : '#ef444455' }}>
+          <div className="flex gap-3">
+            {result.valid ? <CheckCircle2 className="h-8 w-8 shrink-0 text-green-300" /> : <XCircle className="h-8 w-8 shrink-0 text-red-300" />}
+            <div className="min-w-0 flex-1">
+              <p className="font-black">{result.name}</p>
+              {'army' in result && result.valid && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {result.army && <span className="rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase">{result.army}</span>}
+                  {result.kitStatus && <span className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold uppercase ${kitTone(result.kitStatus)}`}>{result.kitStatus}</span>}
+                </div>
+              )}
+              {'category' in result && result.category && <p className="mt-2 text-xs text-slate-300">{result.category}</p>}
+              {'manualCode' in result && result.manualCode && <p className="mt-1 font-mono text-xs text-blue-200">Código {result.manualCode}</p>}
+              <p className={`mt-1 text-xs ${result.valid ? 'text-green-200' : 'text-red-200'}`}>{result.message}</p>
+            </div>
+          </div>
         </div>
       )}
     </div>

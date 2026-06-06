@@ -96,14 +96,18 @@ function parseRequestedIds(ids: string[] | null, source: Inscricao['source']) {
   return parsed.length > 0 ? parsed : []
 }
 
-async function fetchLegacyInscricoes(supabase: ReturnType<typeof createSupabaseAdminClient>, ids: string[] | null): Promise<Inscricao[]> {
+async function fetchLegacyInscricoes(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  ids: string[] | null,
+  includeUnconfirmed = false,
+): Promise<Inscricao[]> {
   if (ids && ids.length === 0) return []
   let query = supabase
     .from('inscricoes')
     .select('id, nome_completo, email, telefone, cpf, exercito, categoria, confirmado')
-    .eq('confirmado', true)
     .order('nome_completo', { ascending: true })
 
+  if (!includeUnconfirmed) query = query.eq('confirmado', true)
   if (ids && ids.length > 0) query = query.in('id', ids)
 
   const { data, error } = await query
@@ -165,6 +169,32 @@ function dedupeByEmail(inscricoes: Inscricao[]) {
   return Array.from(byEmail.values()).sort((a, b) => a.nome_completo.localeCompare(b.nome_completo, 'pt-BR'))
 }
 
+function sortRegistrations(inscricoes: Inscricao[]) {
+  return [...inscricoes].sort((a, b) => a.nome_completo.localeCompare(b.nome_completo, 'pt-BR'))
+}
+
+async function fetchExistingTickets(supabase: ReturnType<typeof createSupabaseAdminClient>) {
+  const pageSize = 1000
+  const rows: Array<Record<string, unknown>> = []
+
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await supabase
+      .from('digital_tickets')
+      .select('id, holder_email, qr_token, ticket_number, email_sent_at, metadata, created_at')
+      .eq('event_id', EVENT_ID)
+      .order('created_at', { ascending: true })
+      .range(from, from + pageSize - 1)
+
+    if (error) throw new Error(`Erro ao buscar tickets existentes: ${error.message}`)
+
+    const page = (data ?? []) as Array<Record<string, unknown>>
+    rows.push(...page)
+    if (page.length < pageSize) break
+  }
+
+  return rows
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -178,6 +208,7 @@ Deno.serve(async (req) => {
     const dryRun: boolean = body.dry_run ?? false
     const testSend: boolean = body.test_send === true
     const testDeliveryEmail = typeof body.test_email === 'string' ? body.test_email.toLowerCase().trim() : ''
+    const includeUnconfirmed: boolean = body.include_unconfirmed === true
 
     let inscricoes: Inscricao[]
     if (testSend) {
@@ -213,10 +244,11 @@ Deno.serve(async (req) => {
       ]
     } else {
       const [legacyInscricoes, capitalRegistrations] = await Promise.all([
-        fetchLegacyInscricoes(supabase, parseRequestedIds(inscricaoIds, 'inscricoes')),
+        fetchLegacyInscricoes(supabase, parseRequestedIds(inscricaoIds, 'inscricoes'), includeUnconfirmed),
         fetchCapitalStrikeRegistrations(supabase, parseRequestedIds(inscricaoIds, 'capital_strike_registrations')),
       ])
-      inscricoes = dedupeByEmail([...legacyInscricoes, ...capitalRegistrations])
+      const allRegistrations = [...legacyInscricoes, ...capitalRegistrations]
+      inscricoes = includeUnconfirmed ? sortRegistrations(allRegistrations) : dedupeByEmail(allRegistrations)
     }
 
     if (inscricoes.length === 0) {
@@ -225,11 +257,7 @@ Deno.serve(async (req) => {
 
     // 2. Check which inscricoes already have digital_tickets.
     // registration_source + registration_id is the stable idempotency key; email is fallback only.
-    const { data: existingTickets } = await supabase
-      .from('digital_tickets')
-      .select('id, holder_email, qr_token, ticket_number, email_sent_at, metadata, created_at')
-      .eq('event_id', EVENT_ID)
-      .order('created_at', { ascending: true })
+    const existingTickets = await fetchExistingTickets(supabase)
 
     const existingByEmail = new Map<string, { id: string; qr_token: string; ticket_number: string; email_sent_at: string | null }>()
     const existingByRegistration = new Map<string, { id: string; qr_token: string; ticket_number: string; email_sent_at: string | null }>()
@@ -388,7 +416,8 @@ Deno.serve(async (req) => {
       let qrUrlForResult: string | null = null
       if (mode !== 'generate' && !dryRun) {
         try {
-          const qrUrl = await generateQRCodeUrl(qrToken)
+          const manualCode = buildShortCode(qrToken)
+          const qrUrl = await generateQRCodeUrl(manualCode)
           qrUrlForResult = qrUrl
 
           const armyLabel = armyLabelFromKey(armyKey)
@@ -402,7 +431,7 @@ Deno.serve(async (req) => {
             exercitoBg: armyBg,
             categoria: inscricao.categoria,
             ticketNumber,
-            manualCode: buildShortCode(qrToken),
+            manualCode,
             qrToken,
             qrUrl,
             armyGroupLink: armyKey === 'COALIZAO' ? GROUP_LINKS.COALIZAO : GROUP_LINKS.ALIANCA,
@@ -414,7 +443,7 @@ Deno.serve(async (req) => {
             to: deliveryEmail,
             subject: `${testSend ? '[TESTE] ' : ''}Seu QR Code - Capital Strike: A Origem | ${armyLabel}`,
             html,
-            text: `Ola ${inscricao.nome_completo},\n\nSeu credenciamento para Capital Strike - A Origem esta confirmado!\nExercito: ${armyLabel}\nCategoria: ${inscricao.categoria}\nTicket: ${ticketNumber}\nCodigo manual: ${buildShortCode(qrToken)}\n\nQR Code: ${qrUrl ?? qrToken}\n\nEntre nos grupos oficiais:\nGrupo ${armyLabel}: ${armyKey === 'COALIZAO' ? GROUP_LINKS.COALIZAO : GROUP_LINKS.ALIANCA}\nGrupo Operadores: ${GROUP_LINKS.OPERADORES}\n\nApresente o QR Code deste email na entrada do evento.\n\nNos vemos no campo de batalha!`,
+            text: `Ola ${inscricao.nome_completo},\n\nSeu credenciamento para Capital Strike - A Origem esta confirmado!\nExercito: ${armyLabel}\nCategoria: ${inscricao.categoria}\nTicket: ${ticketNumber}\nCodigo manual: ${manualCode}\n\nQR Code: ${qrUrl ?? manualCode}\n\nEntre nos grupos oficiais:\nGrupo ${armyLabel}: ${armyKey === 'COALIZAO' ? GROUP_LINKS.COALIZAO : GROUP_LINKS.ALIANCA}\nGrupo Operadores: ${GROUP_LINKS.OPERADORES}\n\nApresente o QR Code deste email na entrada do evento.\n\nNos vemos no campo de batalha!`,
           })
 
           if (result.status === 'sent') {
@@ -476,12 +505,12 @@ function buildCapitalStrikeEmail(params: {
           Abrir link do QR Code
         </a>
       </div>`
-    : `<div style="margin-top:16px;font-size:12px;color:${exercitoColor};font-weight:800;letter-spacing:1px;">Codigo: ${qrToken}</div>`
+    : `<div style="margin-top:16px;font-size:12px;color:${exercitoColor};font-weight:800;letter-spacing:1px;">Codigo: ${manualCode}</div>`
 
   const qrImage = qrUrl
     ? `<img src="${qrUrl}" alt="QR Code" width="240" height="240" style="display:block;border-radius:12px;" />`
     : `<div style="width:240px;height:240px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;">
-        <span style="font-size:20px;font-weight:900;color:#000;letter-spacing:3px;">${qrToken.slice(0, 8).toUpperCase()}</span>
+        <span style="font-size:20px;font-weight:900;color:#000;letter-spacing:3px;">${manualCode}</span>
       </div>`
 
   return `<!DOCTYPE html>

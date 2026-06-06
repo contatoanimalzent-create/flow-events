@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, Camera, CheckCircle2, Keyboard, ListChecks, Loader2, Lock, Search, XCircle } from 'lucide-react'
+import jsQR from 'jsqr'
 import { supabase } from '@/lib/supabase'
 import { operatorService, type OperatorTicketListItem, type ValidationResult } from '@/core/operator/operator.service'
 
 type Mode = 'camera' | 'manual' | 'list'
-type JsQR = (data: Uint8ClampedArray, width: number, height: number, opts?: Record<string, unknown>) => { data: string } | null
 
 interface Scanner2PageProps {
   scannerSlug: string
@@ -60,7 +60,7 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
   const [busy, setBusy] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [cameraActive, setCameraActive] = useState(false)
-  const [jsQrReady, setJsQrReady] = useState(false)
+  const jsQrReady = true
   const [attendees, setAttendees] = useState<OperatorTicketListItem[]>([])
   const [attendeesLoading, setAttendeesLoading] = useState(false)
   const [search, setSearch] = useState('')
@@ -69,7 +69,6 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
-  const jsQrRef = useRef<JsQR | null>(null)
   const rafRef = useRef<number | null>(null)
   const lastScanRef = useRef<{ token: string; at: number }>({ token: '', at: 0 })
   const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -152,8 +151,7 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
   const scanFrame = useCallback(() => {
     const video = videoRef.current
     const canvas = canvasRef.current
-    const jsQR = jsQrRef.current
-    if (!video || !canvas || !jsQR || video.readyState !== video.HAVE_ENOUGH_DATA) {
+    if (!video || !canvas || video.readyState !== video.HAVE_ENOUGH_DATA) {
       rafRef.current = requestAnimationFrame(scanFrame)
       return
     }
@@ -177,10 +175,6 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
   }, [validateToken])
 
   const startCamera = useCallback(async () => {
-    if (!jsQrReady) {
-      setCameraError('Leitor QR ainda carregando. Tente de novo em alguns segundos.')
-      return
-    }
     setCameraError(null)
     try {
       if (!window.isSecureContext) throw new Error('Abra em HTTPS para liberar a câmera.')
@@ -199,7 +193,7 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
       stopCamera()
       setCameraError(error instanceof Error ? error.message : 'Não foi possível abrir a câmera.')
     }
-  }, [jsQrReady, scanFrame, stopCamera])
+  }, [scanFrame, stopCamera])
 
   useEffect(() => {
     let cancelled = false
@@ -225,26 +219,6 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
   useEffect(() => {
     setUnlocked(window.localStorage.getItem(storageKey) === 'ok')
   }, [storageKey])
-
-  useEffect(() => {
-    const existing = (window as unknown as { jsQR?: JsQR }).jsQR
-    if (existing) {
-      jsQrRef.current = existing
-      setJsQrReady(true)
-      return
-    }
-
-    const script = document.createElement('script')
-    script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'
-    script.async = true
-    script.onload = () => {
-      jsQrRef.current = (window as unknown as { jsQR?: JsQR }).jsQR ?? null
-      setJsQrReady(Boolean(jsQrRef.current))
-    }
-    script.onerror = () => setCameraError('Não foi possível carregar o leitor QR. Use Manual ou Lista.')
-    document.body.appendChild(script)
-    return () => { script.remove() }
-  }, [])
 
   useEffect(() => {
     if (unlocked) void loadAttendees()

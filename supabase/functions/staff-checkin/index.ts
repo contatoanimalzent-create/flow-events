@@ -456,20 +456,23 @@ async function handleGet(req: Request): Promise<Response> {
   const cleanCpf = cpfParam.replace(/\D/g, '')
   const cleanPhone = phoneParam?.replace(/\D/g, '') ?? ''
 
-  let staffQuery = admin
+  // CPF in DB may be stored with or without mask — normalize both sides.
+  const { data: allStaffRows, error: staffErr } = await admin
     .from('staff_members')
     .select('id, first_name, last_name, email, cpf, phone, role_title, status, checked_in_at, checked_out_at')
     .eq('event_id', event.id)
-    .eq('cpf', cleanCpf)
-
-  if (cleanEmail) staffQuery = staffQuery.eq('email', cleanEmail)
-
-  const { data: staffRows, error: staffErr } = await staffQuery.limit(2)
 
   if (staffErr) {
     console.error('[staff-checkin] Erro ao buscar membro da equipe:', staffErr)
     return errorResponse('Erro interno ao buscar membro da equipe.', 500, 'DB_ERROR')
   }
+
+  const staffRows = (allStaffRows ?? []).filter((s) => {
+    const memberCpfClean = (s.cpf ?? '').replace(/\D/g, '')
+    if (memberCpfClean !== cleanCpf) return false
+    if (cleanEmail) return (s.email ?? '').toLowerCase().trim() === cleanEmail
+    return true
+  })
 
   if (!staffRows || staffRows.length === 0) {
     return errorResponse(

@@ -215,6 +215,42 @@ function parseEvolutionProviders(): EvolutionProvider[] {
   return uniqueEvolutionProviders(providers)
 }
 
+async function sendResendEmail(params: {
+  to: string
+  subject: string
+  html: string
+  text: string
+}): Promise<{ ok: boolean; id: string | null; error: string | null }> {
+  const apiKey = Deno.env.get('RESEND_API_KEY') ?? ''
+  const from = Deno.env.get('RESEND_FROM_EMAIL') ?? 'Pulse <ponto@pulse.animalzgroup.com>'
+  if (!apiKey || !params.to) {
+    return { ok: false, id: null, error: 'Resend not configured.' }
+  }
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to: [params.to],
+        subject: params.subject,
+        html: params.html,
+        text: params.text,
+      }),
+    })
+    const data = (await res.json().catch(() => ({}))) as { id?: string; message?: string }
+    if (!res.ok) {
+      return { ok: false, id: null, error: `Resend HTTP ${res.status}: ${data?.message ?? JSON.stringify(data)}` }
+    }
+    return { ok: true, id: data.id ?? null, error: null }
+  } catch (err: unknown) {
+    return { ok: false, id: null, error: err instanceof Error ? err.message : String(err) }
+  }
+}
+
 async function sendTwilioSms(params: {
   to: string
   body: string
@@ -586,7 +622,7 @@ async function handlePost(req: Request): Promise<Response> {
   // â”€â”€ 2. Get event venue coordinates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const { data: event, error: eventErr } = await admin
     .from('events')
-    .select('id, name, venue_name, venue_address, venue_coordinates, geofence_radius_meters')
+    .select('id, name, slug, venue_name, venue_address, venue_coordinates, geofence_radius_meters')
     .eq('id', event_id)
     .maybeSingle()
 
@@ -822,6 +858,73 @@ async function handlePost(req: Request): Promise<Response> {
         }
       }
     }
+    }
+  }
+
+  // ── Email lembrete da saída (após checkin, mesmo sem WhatsApp) ─────────────
+  if (type === 'checkin' && staffMember.email) {
+    const staffNameEmail = [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')
+    const venueAddressEmail = event.venue_address as Record<string, unknown> | null
+    const addressPartsEmail = venueAddressEmail
+      ? [venueAddressEmail.street, venueAddressEmail.city, venueAddressEmail.state].filter(Boolean).join(', ')
+      : ''
+    const venueLabelEmail = [event.venue_name, addressPartsEmail].filter(Boolean).join(' - ') || 'Local do evento'
+    const receiptCodeEmail = String(checkinRecord.id).slice(0, 8).toUpperCase()
+    const checkinTimeEmail = saoPauloDateTime(new Date(checkinRecord.created_at))
+    const pontoUrlEmail = `https://pulse.animalzgroup.com/staff/ponto/${event.slug ?? ''}`
+    const emailHtml = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#06070a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#06070a;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#0d1118;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;">
+        <tr><td style="padding:32px 28px 8px 28px;">
+          <p style="margin:0 0 8px 0;color:#D4FF00;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Ponto registrado</p>
+          <h1 style="margin:0 0 16px 0;color:#f5f0e8;font-size:24px;line-height:1.2;font-weight:800;">Entrada confirmada, ${staffNameEmail}!</h1>
+          <p style="margin:0 0 8px 0;color:rgba(245,240,232,0.7);font-size:15px;line-height:1.6;">Sua entrada no <strong style="color:#f5f0e8;">${event.name}</strong> foi registrada às <strong style="color:#D4FF00;">${checkinTimeEmail}</strong>.</p>
+          <p style="margin:0 0 24px 0;color:rgba(245,240,232,0.7);font-size:15px;line-height:1.6;">Dirija-se ao credenciamento para retirar sua pulseira. Mostre esta confirmação para a equipe.</p>
+        </td></tr>
+        <tr><td style="padding:0 28px 8px 28px;">
+          <div style="background:rgba(212,255,0,0.08);border:1px solid rgba(212,255,0,0.25);border-radius:12px;padding:16px 18px;">
+            <p style="margin:0 0 6px 0;color:#D4FF00;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">⏰ Não esqueça</p>
+            <p style="margin:0;color:#f5f0e8;font-size:14px;line-height:1.6;">Ao fim do seu turno, bata a <strong>saída</strong> no mesmo link. Sem a saída registrada, o ponto fica incompleto.</p>
+          </div>
+        </td></tr>
+        <tr><td style="padding:24px 28px 8px 28px;" align="center">
+          <a href="${pontoUrlEmail}" style="display:inline-block;background:#D4FF00;color:#06070a;font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:14px 28px;border-radius:999px;text-decoration:none;">Bater saída no fim do turno</a>
+        </td></tr>
+        <tr><td style="padding:16px 28px 28px 28px;" align="center">
+          <p style="margin:0;color:rgba(245,240,232,0.42);font-size:11px;line-height:1.6;word-break:break-all;">${pontoUrlEmail}</p>
+        </td></tr>
+        <tr><td style="padding:0 28px 28px 28px;">
+          <hr style="border:0;border-top:1px solid rgba(255,255,255,0.08);margin:0 0 16px 0;">
+          <p style="margin:0;color:rgba(245,240,232,0.4);font-size:11px;line-height:1.6;">Código do ponto: ${receiptCodeEmail} · Local: ${venueLabelEmail}</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`
+    const emailText = [
+      `Entrada confirmada, ${staffNameEmail}!`,
+      '',
+      `Sua entrada no ${event.name} foi registrada às ${checkinTimeEmail}.`,
+      'Dirija-se ao credenciamento para retirar sua pulseira.',
+      '',
+      '⏰ NÃO ESQUEÇA: ao fim do seu turno, bata a SAÍDA no mesmo link:',
+      pontoUrlEmail,
+      '',
+      `Código do ponto: ${receiptCodeEmail}`,
+      `Local: ${venueLabelEmail}`,
+    ].join('\n')
+
+    const emailResult = await sendResendEmail({
+      to: staffMember.email,
+      subject: `Ponto registrado | ${event.name} — lembre da saída`,
+      html: emailHtml,
+      text: emailText,
+    })
+    if (!emailResult.ok) {
+      console.warn('[staff-checkin] Falha ao enviar email de lembrete:', emailResult.error)
     }
   }
 

@@ -23,6 +23,13 @@ type Scanner2Result =
       name: string
       ticketLabel: string
       message: string
+      cpf?: string | null
+      email?: string | null
+      ticketNumber?: string | null
+      manualCode?: string | null
+      army?: string | null
+      kitStatus?: string | null
+      category?: string | null
     }
 
 const ACCESS_PASSWORD = 'CSTRIKE-2026'
@@ -36,9 +43,16 @@ function resultFromValidation(validation: ValidationResult) {
   if (validation.valid) return validation
   return {
     valid: false as const,
-    name: '-',
-    ticketLabel: validation.reason,
+    name: validation.name ?? '-',
+    ticketLabel: validation.ticketLabel ?? validation.reason,
     message: validation.message,
+    cpf: validation.cpf,
+    email: validation.email,
+    ticketNumber: validation.ticketNumber,
+    manualCode: validation.manualCode,
+    army: validation.army,
+    kitStatus: validation.kitStatus,
+    category: validation.category,
   }
 }
 
@@ -47,6 +61,21 @@ function kitTone(kit?: string | null) {
   if (normalized.includes('sem')) return 'bg-red-500/18 text-red-200 border-red-400/25'
   if (normalized.includes('com')) return 'bg-green-500/18 text-green-200 border-green-400/25'
   return 'bg-slate-500/18 text-slate-200 border-slate-400/20'
+}
+
+function kitDisplay(kit?: string | null, ...fallbackValues: Array<string | null | undefined>) {
+  const raw = [kit, ...fallbackValues].filter(Boolean).join(' ')
+  const normalized = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  if (normalized.includes('sem') && normalized.includes('kit')) {
+    return { label: 'SEM KIT', detail: 'Nao habilitado para entrega de kit', enabled: false }
+  }
+  if (normalized.includes('com') && normalized.includes('kit')) {
+    return { label: 'COM KIT', detail: 'Habilitado para entrega de kit', enabled: true }
+  }
+  if (normalized.includes('kit')) {
+    return { label: 'COM KIT', detail: 'Habilitado para entrega de kit', enabled: true }
+  }
+  return { label: 'SEM KIT', detail: 'Nao habilitado para entrega de kit', enabled: false }
 }
 
 export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
@@ -416,10 +445,23 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
             {result.valid ? <CheckCircle2 className="h-8 w-8 shrink-0 text-green-300" /> : <XCircle className="h-8 w-8 shrink-0 text-red-300" />}
             <div className="min-w-0 flex-1">
               <p className="font-black">{result.name}</p>
-              {'army' in result && result.valid && (
+              {('kitStatus' in result || 'category' in result || 'ticketLabel' in result) && (() => {
+                const kit = kitDisplay(
+                  'kitStatus' in result ? result.kitStatus : null,
+                  'category' in result ? result.category : null,
+                  result.ticketLabel,
+                )
+                return (
+                  <div className={`mt-3 rounded-2xl border px-3 py-3 ${kit.enabled ? 'border-green-300/35 bg-green-400/15 text-green-100' : 'border-red-300/35 bg-red-400/15 text-red-100'}`}>
+                    <div className="text-2xl font-black leading-none">{kit.label}</div>
+                    <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.16em]">{kit.detail}</div>
+                  </div>
+                )
+              })()}
+              {('army' in result || 'kitStatus' in result) && (
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {result.army && <span className="rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase">{result.army}</span>}
-                  {result.kitStatus && <span className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold uppercase ${kitTone(result.kitStatus)}`}>{result.kitStatus}</span>}
+                  {'army' in result && result.army && <span className="rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase">{result.army}</span>}
+                  {'kitStatus' in result && result.kitStatus && <span className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold uppercase ${kitTone(result.kitStatus)}`}>{result.kitStatus}</span>}
                 </div>
               )}
               {'category' in result && result.category && <p className="mt-2 text-xs text-slate-300">{result.category}</p>}

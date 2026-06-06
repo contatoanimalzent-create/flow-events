@@ -97,13 +97,19 @@ function deriveKitStatus(...values: unknown[]) {
   return null
 }
 
+function readKitStatus(metadata: Record<string, unknown>, ...fallbackValues: unknown[]) {
+  const explicit = String(metadata.kit_status ?? '').trim()
+  if (explicit && !['NAO INFORMADO', 'NÃO INFORMADO'].includes(normalizeText(explicit))) return explicit
+  return deriveKitStatus(...fallbackValues)
+}
+
 function mapTicket(ticket: Record<string, unknown>) {
   const typeName = (ticket.ticket_type as any)?.name ?? 'Ingresso'
   const batchName = (ticket.batch as any)?.name ?? ''
   const metadata = (ticket.metadata ?? {}) as Record<string, unknown>
   const army = String(metadata.army_label ?? '') || deriveArmyLabel(typeName, batchName)
   const category = String(metadata.category ?? metadata.registration_category ?? metadata.squad ?? '').trim() || typeName
-  const kitStatus = String(metadata.kit_status ?? '').trim() || deriveKitStatus(typeName, batchName)
+  const kitStatus = readKitStatus(metadata, category, typeName, batchName)
   const checkedInAt = (ticket.checked_in_at as string | null) ?? null
   const status = String(ticket.status ?? '')
   const checkedIn = status === 'used' || Boolean(checkedInAt)
@@ -333,7 +339,22 @@ Deno.serve(async (req) => {
     .eq('is_exit', false)
 
   if ((existingCheckins ?? 0) > 0) {
-    return json(req, { valid: false, reason: 'already_used', message: 'Ingresso ja utilizado (check-in duplicado)' })
+    return json(req, {
+      valid: false,
+      reason: 'already_used',
+      message: 'Ingresso ja utilizado (check-in duplicado)',
+      name: mapped.name,
+      ticketLabel: mapped.ticketLabel,
+      ticketType: mapped.ticketLabel,
+      attendeeId: mapped.id,
+      cpf: mapped.cpf,
+      email: mapped.email,
+      ticketNumber: mapped.ticketNumber,
+      manualCode: mapped.manualCode,
+      army: mapped.army,
+      kitStatus: mapped.kitStatus,
+      category: mapped.category,
+    })
   }
 
   if (body.dry_run) {
@@ -386,7 +407,22 @@ Deno.serve(async (req) => {
     }
 
     if (lockError || !lockedTicket) {
-      return json(req, { valid: false, reason: 'already_used', message: 'Ingresso ja utilizado' })
+      return json(req, {
+        valid: false,
+        reason: 'already_used',
+        message: 'Ingresso ja utilizado',
+        name: mapped.name,
+        ticketLabel: mapped.ticketLabel,
+        ticketType: mapped.ticketLabel,
+        attendeeId: mapped.id,
+        cpf: mapped.cpf,
+        email: mapped.email,
+        ticketNumber: mapped.ticketNumber,
+        manualCode: mapped.manualCode,
+        army: mapped.army,
+        kitStatus: mapped.kitStatus,
+        category: mapped.category,
+      })
     }
   }
 

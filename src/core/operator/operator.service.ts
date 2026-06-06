@@ -22,7 +22,20 @@ export type ValidationResult =
       kitStatus?: string | null
       category?: string | null
     }
-  | { valid: false; reason: 'not_found' | 'already_used' | 'wrong_event' | 'invalid_token' | 'gate_mismatch' | 'unauthorized'; message: string }
+  | {
+      valid: false
+      reason: 'not_found' | 'already_used' | 'wrong_event' | 'invalid_token' | 'gate_mismatch' | 'unauthorized'
+      message: string
+      name?: string
+      ticketLabel?: string
+      cpf?: string | null
+      email?: string | null
+      ticketNumber?: string | null
+      manualCode?: string | null
+      army?: string | null
+      kitStatus?: string | null
+      category?: string | null
+    }
 
 export interface CheckinRecord {
   id: string
@@ -83,6 +96,12 @@ function deriveKitStatus(...values: unknown[]) {
   return null
 }
 
+function readKitStatus(metadata: Record<string, unknown>, ...fallbackValues: unknown[]) {
+  const explicit = String(metadata.kit_status ?? '').trim()
+  if (explicit && !['NAO INFORMADO', 'NÃO INFORMADO'].includes(normalizeText(explicit))) return explicit
+  return deriveKitStatus(...fallbackValues)
+}
+
 function normalizeLookup(rawToken: string) {
   const trimmed = rawToken.trim()
   try {
@@ -133,7 +152,7 @@ function mapTicketListItem(ticket: Record<string, unknown>): OperatorTicketListI
   const metadata = (ticket.metadata ?? {}) as Record<string, unknown>
   const army = String(metadata.army_label ?? '') || deriveArmyLabel(typeName, batchName)
   const category = String(metadata.category ?? metadata.registration_category ?? metadata.squad ?? '').trim() || typeName
-  const kitStatus = String(metadata.kit_status ?? '').trim() || deriveKitStatus(typeName, batchName)
+  const kitStatus = readKitStatus(metadata, category, typeName, batchName)
   const checkedInAt = (ticket.checked_in_at as string | null) ?? null
   const status = String(ticket.status ?? '')
   const checkedIn = status === 'used' || Boolean(checkedInAt)

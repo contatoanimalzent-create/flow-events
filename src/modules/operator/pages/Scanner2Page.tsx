@@ -102,6 +102,8 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
   const streamRef = useRef<MediaStream | null>(null)
   const rafRef = useRef<number | null>(null)
   const lastScanRef = useRef<{ token: string; at: number }>({ token: '', at: 0 })
+  const lastDecodeAtRef = useRef(0)
+  const decodeFrameRef = useRef(0)
   const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const storageKey = `${STORAGE_KEY_PREFIX}:${scannerSlug}`
@@ -183,10 +185,12 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
   const scanFrame = useCallback(() => {
     const video = videoRef.current
     const canvas = canvasRef.current
-    if (!video || !canvas || video.readyState !== video.HAVE_ENOUGH_DATA) {
+    const now = performance.now()
+    if (!video || !canvas || busy || now - lastDecodeAtRef.current < 90 || video.readyState !== video.HAVE_ENOUGH_DATA) {
       rafRef.current = requestAnimationFrame(scanFrame)
       return
     }
+    lastDecodeAtRef.current = now
 
     const width = video.videoWidth
     const height = video.videoHeight
@@ -195,23 +199,32 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
       return
     }
 
-    canvas.width = width
-    canvas.height = height
+    const sourceSize = Math.floor(Math.min(width, height) * 0.78)
+    const sourceX = Math.floor((width - sourceSize) / 2)
+    const sourceY = Math.floor((height - sourceSize) / 2)
+    const targetSize = Math.min(640, sourceSize)
+
+    canvas.width = targetSize
+    canvas.height = targetSize
     const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
-    ctx.drawImage(video, 0, 0, width, height)
-    const imageData = ctx.getImageData(0, 0, width, height)
-    const code = jsQR(imageData.data, width, height, { inversionAttempts: 'attemptBoth' })
+    ctx.drawImage(video, sourceX, sourceY, sourceSize, sourceSize, 0, 0, targetSize, targetSize)
+    const imageData = ctx.getImageData(0, 0, targetSize, targetSize)
+    decodeFrameRef.current += 1
+    const fastCode = jsQR(imageData.data, targetSize, targetSize, { inversionAttempts: 'dontInvert' })
+    const code = fastCode ?? (decodeFrameRef.current % 8 === 0
+      ? jsQR(imageData.data, targetSize, targetSize, { inversionAttempts: 'attemptBoth' })
+      : null)
     if (code?.data) void validateToken(code.data)
     rafRef.current = requestAnimationFrame(scanFrame)
-  }, [validateToken])
+  }, [busy, validateToken])
 
   const startCamera = useCallback(async () => {
     setCameraError(null)
     try {
       if (!window.isSecureContext) throw new Error('Abra em HTTPS para liberar a câmera.')
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 960 }, height: { ideal: 540 } },
         audio: false,
       })
       streamRef.current = stream

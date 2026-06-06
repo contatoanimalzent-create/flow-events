@@ -40,6 +40,7 @@ export type PublicRoute =
   | { type: 'timeclock'; eventId: string; credentialToken: string }
   | { type: 'kiosk'; slug: string }
   | { type: 'scanner'; slug: string }
+  | { type: 'scanner2'; slug: string }
 
 export function getInitialPublicRoute(): PublicRoute {
   const path = window.location.pathname
@@ -77,6 +78,8 @@ export function getInitialPublicRoute(): PublicRoute {
   // ── Pulse unified app ──
   if (path === '/pulse/bsb5' || path === '/bsb5-admin' || path === '/admin-bsb5') return 'bsb5-admin'
   if (normalizedPath === '/capital-strike/scanner') return { type: 'scanner', slug: 'capital-strike-a-origem' }
+  const directScanner2Match = path.match(/^\/scanner2\/([^/]+)$/)
+  if (directScanner2Match) return { type: 'scanner2', slug: directScanner2Match[1] }
   const directScannerMatch = path.match(/^\/scanner\/([^/]+)$/)
   if (directScannerMatch) return { type: 'scanner', slug: directScannerMatch[1] }
   const staffAdminMatch = path.match(/^\/pulse\/([^/]+)\/admin$/)

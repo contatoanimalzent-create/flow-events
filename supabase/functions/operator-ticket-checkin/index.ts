@@ -161,7 +161,26 @@ async function assertScannerSession(
     .limit(1)
     .maybeSingle()
 
-  return data?.id ? { ok: true } : { ok: false, error: 'Sessao do scanner expirada.' }
+  if (data?.id) return { ok: true }
+
+  // Diagnostic: see if there is ANY non-expired session for this event+email
+  // and if the session token even hashes against a non-expired row
+  const { data: anyValid } = await admin
+    .from('scanner_auth_codes')
+    .select('id, session_expires_at')
+    .eq('event_id', event.id)
+    .eq('email', producerEmail)
+    .gte('session_expires_at', new Date().toISOString())
+    .limit(1)
+    .maybeSingle()
+
+  if (!anyValid?.id) {
+    console.warn('[operator-ticket-checkin] no valid session row for event', event.id, 'email', producerEmail)
+    return { ok: false, error: 'Sessao do scanner expirada. Faca login novamente.' }
+  }
+
+  console.warn('[operator-ticket-checkin] valid session row exists but token hash mismatch — session likely from a different SCANNER_AUTH_SECRET/SERVICE_ROLE_KEY rotation. event', event.id)
+  return { ok: false, error: 'Sessao do scanner invalida. Sai e entra de novo.' }
 }
 
 async function findTicket(
@@ -279,7 +298,14 @@ Deno.serve(async (req) => {
   if (!lookup) return json(req, { valid: false, reason: 'invalid_token', message: 'Codigo invalido' }, 400)
 
   const ticket = await findTicket(admin, event.id, lookup)
-  if (!ticket) return json(req, { valid: false, reason: 'not_found', message: 'Ingresso nao encontrado' })
+  if (!ticket) {
+    console.warn('[operator-ticket-checkin] ticket not found', {
+      raw_token: String(body.token ?? '').slice(0, 120),
+      normalized_lookup: lookup,
+      event_id: event.id,
+    })
+    return json(req, { valid: false, reason: 'not_found', message: 'Ingresso nao encontrado', debug_lookup: lookup })
+  }
   if (ticket.event_id !== event.id) return json(req, { valid: false, reason: 'wrong_event', message: 'Ingresso de outro evento' })
 
   const mapped = mapTicket(ticket)

@@ -46,6 +46,7 @@ const OperatorApp = lazy(() => import('@/features/mobile/operator/OperatorApp').
 const PulseApp = lazy(() => import('@/features/pulse/PulseApp').then((m) => ({ default: m.PulseApp })))
 const Bsb5AdminPage = lazy(() => import('@/modules/bsb5/Bsb5AdminPage'))
 const ScannerPage = lazy(() => import('@/modules/operator/pages/ScannerPage'))
+const Scanner2Page = lazy(() => import('@/modules/operator/pages/Scanner2Page'))
 
 function PublicFallback() {
   return <LoadingState title="Loading" description="" className="min-h-screen" />
@@ -79,6 +80,13 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
         <div className="h-screen">
           <ScannerPage scannerSlug={route.slug} standalone onNavigate={() => {}} />
         </div>
+      </Suspense>
+    )
+  }
+  if (typeof route === 'object' && route.type === 'scanner2') {
+    return (
+      <Suspense fallback={<MobileLoader />}>
+        <Scanner2Page scannerSlug={route.slug} />
       </Suspense>
     )
   }

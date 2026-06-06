@@ -13,7 +13,12 @@ interface RequestBody {
   dry_run?: boolean
 }
 
-const ACTIVE_STATUSES = ['confirmed', 'active', 'paid']
+// IMPORTANT: ticket_status is an ENUM with values:
+// pending, confirmed, cancelled, refunded, used, transferred, expired.
+// 'active' and 'paid' DO NOT exist in the enum — including them in .in()
+// makes Postgres reject the predicate, the atomic UPDATE matches zero
+// rows, and the check-in silently fails with "Ingresso ja utilizado".
+const ACTIVE_STATUSES = ['confirmed']
 
 const ticketSelect = `
   id,

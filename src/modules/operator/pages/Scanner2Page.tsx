@@ -169,6 +169,20 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
         setScanCount((current) => current + 1)
         void loadAttendees()
       }
+      // Beep curto pra feedback sem precisar olhar a tela
+      try {
+        const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext
+        if (AudioCtx) {
+          const ctx = new AudioCtx()
+          const osc = ctx.createOscillator()
+          const gain = ctx.createGain()
+          osc.connect(gain); gain.connect(ctx.destination)
+          osc.frequency.value = validation.valid ? 880 : 220
+          gain.gain.setValueAtTime(0.18, ctx.currentTime)
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18)
+          osc.start(); osc.stop(ctx.currentTime + 0.2)
+        }
+      } catch { /* no-op */ }
     } catch (error) {
       setResult({
         valid: false,
@@ -178,9 +192,19 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
       })
     } finally {
       setBusy(false)
-      clearTimerRef.current = setTimeout(() => setResult(null), 7000)
+      // NÃO limpa automaticamente — operador clica "Próximo" pra liberar nova leitura.
+      // Isso evita perder a info do kit/camisa enquanto o staff atende o cliente.
     }
   }, [busy, eventInfo?.id, loadAttendees])
+
+  function clearResult() {
+    if (clearTimerRef.current) {
+      clearTimeout(clearTimerRef.current)
+      clearTimerRef.current = null
+    }
+    setResult(null)
+    lastScanRef.current = { token: '', at: 0 }
+  }
 
   const scanFrame = useCallback(() => {
     const video = videoRef.current
@@ -496,6 +520,18 @@ export default function Scanner2Page({ scannerSlug }: Scanner2PageProps) {
               {'category' in result && result.category && <p className="mt-2 text-xs text-slate-300">{result.category}</p>}
               {'manualCode' in result && result.manualCode && <p className="mt-1 font-mono text-xs text-blue-200">Código {result.manualCode}</p>}
               <p className={`mt-1 text-xs ${result.valid ? 'text-green-200' : 'text-red-200'}`}>{result.message}</p>
+              {/* Botão Próximo libera nova leitura — substitui o auto-clear de 7s */}
+              <button
+                type="button"
+                onClick={clearResult}
+                className="mt-4 w-full rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-[0.18em]"
+                style={{
+                  background: result.valid ? '#D4FF00' : 'rgba(255,255,255,0.12)',
+                  color: result.valid ? '#06070a' : '#fff',
+                }}
+              >
+                {result.valid ? '✓ Próximo' : 'Tentar de novo'}
+              </button>
             </div>
           </div>
         </div>

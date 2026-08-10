@@ -46,6 +46,13 @@ Deno.serve(async (req) => {
     const supabase = createSupabaseAdminClient()
     const email = payload.email.trim().toLowerCase()
 
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .select('id,organization_id,name,starts_at,venue_name,venue_address,cover_url,settings')
+      .eq('slug', EVENT_SLUG)
+      .single()
+    if (eventError || !event) throw new Error('Evento Nocaute nao configurado no Pulse')
+
     const { data: existing } = await supabase
       .from('digital_tickets')
       .select('id,ticket_number,qr_token,qr_url,email_sent_at')
@@ -54,22 +61,51 @@ Deno.serve(async (req) => {
       .maybeSingle()
 
     if (existing?.id) {
+      let emailStatus = existing.email_sent_at ? 'sent' : 'pending'
+      let qrUrl = existing.qr_url as string | null
+
+      if (!existing.email_sent_at) {
+        qrUrl = qrUrl ?? await generateQRCodeUrl(existing.qr_token)
+        const address = event.venue_address as Record<string, string> | null
+        const theme = (event.settings as { email_theme?: Record<string, string> } | null)?.email_theme
+        const content = await buildOrderConfirmationWithQREmail({
+          orderId: payload.registrationId,
+          eventName: event.name,
+          buyerName: payload.fullName,
+          buyerEmail: email,
+          recipientName: payload.fullName,
+          totalAmount: 0,
+          eventDate: '29 de agosto de 2026, as 10h',
+          eventLocation: `${event.venue_name ?? 'Cais do Lago'} - ${address?.district ?? 'Setor de Clubes Sul'}, Brasilia/DF`,
+          exerciseType: payload.modality ?? undefined,
+          coverUrl: event.cover_url ?? undefined,
+          emailTheme: theme,
+          tickets: [{
+            ticketNumber: existing.ticket_number,
+            holderName: payload.fullName,
+            holderEmail: email,
+            qrToken: existing.qr_token,
+            status: 'confirmed',
+          }],
+        })
+        const delivery = await sendResendEmail({ to: email, ...content })
+        emailStatus = delivery.status
+        await supabase.from('digital_tickets').update({
+          qr_url: qrUrl,
+          email_sent_at: delivery.status === 'sent' ? new Date().toISOString() : null,
+          last_resent_at: new Date().toISOString(),
+        }).eq('id', existing.id)
+      }
+
       return json({
         ok: true,
         already: true,
         ticketId: existing.id,
         ticketNumber: existing.ticket_number,
-        qrUrl: existing.qr_url,
-        emailStatus: existing.email_sent_at ? 'sent' : 'pending',
+        qrUrl,
+        emailStatus,
       })
     }
-
-    const { data: event, error: eventError } = await supabase
-      .from('events')
-      .select('id,organization_id,name,starts_at,venue_name,venue_address,cover_url,settings')
-      .eq('slug', EVENT_SLUG)
-      .single()
-    if (eventError || !event) throw new Error('Evento Nocaute nao configurado no Pulse')
 
     const { data: ticketType, error: typeError } = await supabase
       .from('ticket_types')

@@ -168,7 +168,10 @@ Deno.serve(async (req) => {
     const ticketId = crypto.randomUUID()
     const qrToken = crypto.randomUUID()
     const ticketNumber = payload.registrationCode
-    const cpf = payload.cpf?.replace(/\D/g, '') || null
+    // O cadastro de origem continua sendo a fonte de verdade do CPF. O Pulse
+    // não duplica esse dado porque a normalização legada da tabela de pedidos
+    // conflita com a constraint que exige somente dígitos.
+    const cpf = null
     const metadata = {
       external_source: SOURCE,
       external_registration_id: payload.registrationId,

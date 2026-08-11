@@ -53,7 +53,7 @@ function buildNocauteEmail(params: {
 <div style="margin-top:8px;font-size:14px;color:#b5b5b5;">${name}${modality ? ` &middot; ${modality}` : ''}</div></td></tr>
 <tr><td style="padding:32px;"><div style="background:#1a1a1a;border-left:4px solid #e50914;padding:20px 22px;color:#d0d0d0;font-size:14px;line-height:1.7;"><strong style="color:#fff;">No dia:</strong> abra este e-mail no celular e apresente o QR Code no credenciamento. O c&oacute;digo &eacute; pessoal e intransfer&iacute;vel.</div></td></tr>
 <tr><td align="center" style="padding:0 32px 34px;"><a href="${NOCAUTE_SITE}" style="display:inline-block;background:#e50914;color:#ffffff;text-decoration:none;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:15px 24px;">Ver o evento</a></td></tr>
-<tr><td style="padding:22px 32px;border-top:1px solid #2b2b2b;color:#686868;font-size:10px;line-height:1.6;text-align:center;">SEMIN&Aacute;RIOS NOCAUTE &middot; PRODU&Ccedil;&Atilde;O ANIMALZ<br>Credencial e check-in emitidos pelo Pulse.</td></tr>
+<tr><td style="padding:22px 32px;border-top:1px solid #2b2b2b;color:#686868;font-size:10px;line-height:1.6;text-align:center;">SEMIN&Aacute;RIOS NOCAUTE<br>Credencial e check-in emitidos pelo Pulse.</td></tr>
 </table></td></tr></table></body></html>`,
     text: `SEMINÁRIOS NOCAUTE — INSCRIÇÃO CONFIRMADA\n\nOlá, ${params.fullName}.\nSua vaga para o seminário com Fabrício Werdum está confirmada.\n\n29 de agosto de 2026, às 10h\nCais do Lago — Setor de Clubes Sul, Brasília/DF\n\nCódigo: ${params.registrationCode}\nQR Code: ${params.qrUrl ?? params.qrToken}\n\nApresente este e-mail no credenciamento.\n${NOCAUTE_SITE}`,
   }

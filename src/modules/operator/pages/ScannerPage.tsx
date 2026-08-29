@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { X, CheckCircle, XCircle, Loader2, Keyboard, Camera, AlertTriangle, Mail, ShieldCheck, KeyRound, Lock, ListChecks, Search } from 'lucide-react'
+import jsQR from 'jsqr'
 import { supabase } from '@/lib/supabase'
 import { useAppContext } from '@/core/context/app-context.store'
 import { useOffline } from '@/core/offline/offline.store'
@@ -46,7 +47,6 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   const [scanCount, setScanCount] = useState(0)
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [cameraPermission, setCameraPermission] = useState<CameraPermissionState>('idle')
-  const [scannerReady, setScannerReady] = useState(false)
   const [directEvent, setDirectEvent] = useState<DirectScannerEvent | null>(null)
   const [directEventLoading, setDirectEventLoading] = useState(Boolean(scannerSlug))
   const [authCode, setAuthCode] = useState('')
@@ -63,8 +63,15 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   const { isOnline, enqueue } = useOffline()
 
   const resultTimerRef = useRef<ReturnType<typeof setTimeout>>()
-  const scannerRef = useRef<any>(null)
-  const Html5QrcodeRef = useRef<any>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const lastDecodeAtRef = useRef(0)
+  const decodeFrameRef = useRef(0)
+  const processingRef = useRef(false)
+  const resultVisibleUntilRef = useRef(0)
+  const lastScanRef = useRef<{ token: string; at: number }>({ token: '', at: 0 })
   const linePos = useRef(0)
   const [linePct, setLinePct] = useState(0)
 
@@ -154,53 +161,14 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     return () => clearInterval(interval)
   }, [scanState])
 
-  // Load html5-qrcode dynamically (ESM compatible)
-  useEffect(() => {
-    let cancelled = false
-    import('html5-qrcode')
-      .then((mod) => {
-        if (!cancelled) {
-          Html5QrcodeRef.current = mod.Html5Qrcode
-          setScannerReady(true)
-        }
-      })
-      .catch(() => {
-        setCameraError('Scanner QR não disponível, use entrada manual')
-      })
-    return () => { cancelled = true }
-  }, [])
-
-  // Start html5-qrcode camera scanner
-  useEffect(() => {
-    return
-
-    const scanner = new Html5QrcodeRef.current(
-      'qr-reader',
-      { fps: 10, qrbox: { width: 220, height: 220 }, rememberLastUsedCamera: true },
-      false
-    )
-
-    scanner.render(
-      (decodedText: string) => {
-        if (scanState === 'processing') return
-        handleScan(decodedText)
-      },
-      (err: string) => {
-        if (!err.includes('No MultiFormat')) {
-          setCameraError('Câmera não disponível, use entrada manual')
-        }
-      }
-    )
-
-    scannerRef.current = scanner
-    return () => {
-      scanner.clear().catch(() => {})
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authStep, inputMode, scannerReady])
-
   const handleScan = useCallback(async (token: string) => {
-    if (!token.trim() || scanState === 'processing' || authStep !== 'unlocked') return
+    const normalizedToken = token.trim()
+    const now = Date.now()
+    if (!normalizedToken || processingRef.current || now < resultVisibleUntilRef.current || authStep !== 'unlocked') return
+    if (lastScanRef.current.token === normalizedToken && now - lastScanRef.current.at < 8_000) return
+
+    lastScanRef.current = { token: normalizedToken, at: now }
+    processingRef.current = true
     setScanState('processing')
     clearTimeout(resultTimerRef.current)
 
@@ -208,9 +176,8 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       let res: ScanResult
 
       if (isOnline && activeEventId) {
-        const scannedToken = token.trim()
-        let validation = await operatorService.validateToken(scannedToken, activeEventId, undefined, scannerSession ?? undefined)
-        const fallbackManualCode = scannedToken.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase()
+        let validation = await operatorService.validateToken(normalizedToken, activeEventId, undefined, scannerSession ?? undefined)
+        const fallbackManualCode = normalizedToken.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase()
         if (!validation.valid && validation.reason === 'not_found' && fallbackManualCode.length === 8) {
           validation = await operatorService.validateToken(fallbackManualCode, activeEventId, undefined, scannerSession ?? undefined)
         }
@@ -234,7 +201,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
           res = {
             valid: false,
             name: '-',
-            ticketLabel: token.slice(0, 16),
+            ticketLabel: normalizedToken.slice(0, 16),
             message: validation.message,
           }
         }
@@ -242,7 +209,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
         // Offline: queue for later sync
         enqueue('checkin', {
           eventId: activeEventId,
-          token,
+          token: normalizedToken,
           timestamp: Date.now(),
         })
         res = {
@@ -257,39 +224,82 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       setResult(res)
       setScanState(res.valid ? 'valid' : 'invalid')
     } catch (err) {
-      setResult({ valid: false, name: '-', ticketLabel: token.slice(0, 16), message: 'Erro na válidação' })
+      setResult({ valid: false, name: '-', ticketLabel: normalizedToken.slice(0, 16), message: 'Erro na válidação' })
       setScanState('invalid')
+    } finally {
+      processingRef.current = false
+      resultVisibleUntilRef.current = Date.now() + 5_800
     }
 
     resultTimerRef.current = setTimeout(() => {
+      resultVisibleUntilRef.current = 0
       setScanState('idle')
       setResult(null)
       setManualCode('')
     }, 6_000)
-  }, [activeEventId, authStep, context?.eventId, isOnline, enqueue, loadAttendees, scanState, scannerSession])
+  }, [activeEventId, authStep, isOnline, enqueue, loadAttendees, scannerSession])
 
   const stopCameraScanner = useCallback(async () => {
-    const scanner = scannerRef.current
-    scannerRef.current = null
-    if (!scanner) return
-    try {
-      await scanner.stop()
-    } catch {
-      // Already stopped.
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
     }
-    try {
-      await scanner.clear()
-    } catch {
-      // The camera element may already be gone.
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop())
+      streamRef.current = null
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
     }
   }, [])
 
-  const startCameraScanner = useCallback(async () => {
-    if (authStep !== 'unlocked' || inputMode !== 'camera') return
-    if (!scannerReady || !Html5QrcodeRef.current) {
-      setCameraError('Scanner QR ainda carregando. Tente novamente em alguns segundos.')
+  const scanCameraFrame = useCallback(() => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    const now = performance.now()
+
+    if (!video || !canvas || processingRef.current || now - lastDecodeAtRef.current < 80 || video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
+      animationFrameRef.current = requestAnimationFrame(scanCameraFrame)
       return
     }
+
+    lastDecodeAtRef.current = now
+    const videoWidth = video.videoWidth
+    const videoHeight = video.videoHeight
+    if (!videoWidth || !videoHeight) {
+      animationFrameRef.current = requestAnimationFrame(scanCameraFrame)
+      return
+    }
+
+    // Recorta a área central e limita a resolução para manter leitura rápida
+    // mesmo em celulares que entregam vídeo 4K.
+    const sourceSize = Math.floor(Math.min(videoWidth, videoHeight) * 0.88)
+    const sourceX = Math.floor((videoWidth - sourceSize) / 2)
+    const sourceY = Math.floor((videoHeight - sourceSize) / 2)
+    const targetSize = Math.min(760, sourceSize)
+    canvas.width = targetSize
+    canvas.height = targetSize
+
+    const context2d = canvas.getContext('2d', { willReadFrequently: true })
+    if (!context2d) {
+      setCameraError('Não foi possível preparar a leitura da câmera. Use a entrada manual.')
+      return
+    }
+
+    context2d.drawImage(video, sourceX, sourceY, sourceSize, sourceSize, 0, 0, targetSize, targetSize)
+    const imageData = context2d.getImageData(0, 0, targetSize, targetSize)
+    decodeFrameRef.current += 1
+    const fastResult = jsQR(imageData.data, targetSize, targetSize, { inversionAttempts: 'dontInvert' })
+    const decoded = fastResult ?? (decodeFrameRef.current % 6 === 0
+      ? jsQR(imageData.data, targetSize, targetSize, { inversionAttempts: 'attemptBoth' })
+      : null)
+
+    if (decoded?.data) void handleScan(decoded.data)
+    animationFrameRef.current = requestAnimationFrame(scanCameraFrame)
+  }, [handleScan])
+
+  const startCameraScanner = useCallback(async () => {
+    if (authStep !== 'unlocked' || inputMode !== 'camera') return
 
     setCameraError(null)
     setCameraPermission('requesting')
@@ -298,26 +308,22 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       if (!window.isSecureContext) throw new Error('Abra o scanner em HTTPS para liberar a câmera.')
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('Este navegador não liberou acesso à câmera.')
 
-      const permissionStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' } },
+      await stopCameraScanner()
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
       })
-      permissionStream.getTracks().forEach((track) => track.stop())
-
-      await stopCameraScanner()
-      const scanner = new Html5QrcodeRef.current('qr-reader')
-      scannerRef.current = scanner
-
-      await scanner.start(
-        { facingMode: 'environment' },
-        { fps: 10 },
-        (decodedText: string) => {
-          if (scanState !== 'processing') handleScan(decodedText)
-        },
-        () => {},
-      )
+      streamRef.current = stream
+      if (!videoRef.current) throw new Error('A câmera ainda não está pronta. Tente novamente.')
+      videoRef.current.srcObject = stream
+      await videoRef.current.play()
 
       setCameraPermission('granted')
+      animationFrameRef.current = requestAnimationFrame(scanCameraFrame)
     } catch (err) {
       await stopCameraScanner()
       setCameraPermission('idle')
@@ -327,7 +333,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
           : 'Não foi possível abrir a câmera. Autorize a câmera no navegador e tente novamente.',
       )
     }
-  }, [authStep, handleScan, inputMode, scanState, scannerReady, stopCameraScanner])
+  }, [authStep, inputMode, scanCameraFrame, stopCameraScanner])
 
   useEffect(() => {
     if (authStep !== 'unlocked' || inputMode !== 'camera') {
@@ -553,17 +559,6 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   return (
     <div className="flex min-h-screen flex-col bg-black select-none">
       <style>{`
-        #qr-reader,
-        #qr-reader > div,
-        #qr-reader__scan_region {
-          position: absolute !important;
-          inset: 0 !important;
-          width: 100% !important;
-          height: 100% !important;
-          overflow: hidden !important;
-          border: 0 !important;
-        }
-
         #qr-reader video {
           position: absolute !important;
           inset: 0 !important;
@@ -572,12 +567,6 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
           object-fit: cover !important;
         }
 
-        #qr-reader__dashboard,
-        #qr-reader__dashboard_section,
-        #qr-reader__camera_selection,
-        #qr-shaded-region {
-          display: none !important;
-        }
       `}</style>
       {/* Top overlay */}
       <div
@@ -643,13 +632,15 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
         {inputMode === 'camera' ? (
           <>
-            {/* html5-qrcode mounts here */}
             <div
               id="qr-reader"
-              className={`absolute inset-0 h-full w-full overflow-hidden transition-opacity duration-300 [&_button]:hidden [&_div]:border-0 [&_img]:hidden [&_span]:hidden [&_video]:h-full [&_video]:w-full [&_video]:object-cover ${
+              className={`absolute inset-0 h-full w-full overflow-hidden transition-opacity duration-300 ${
                 cameraPermission === 'granted' ? 'opacity-100' : 'opacity-0'
               }`}
-            />
+            >
+              <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+              <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
+            </div>
             {cameraPermission !== 'granted' && (
               <div className="absolute inset-0 z-10 flex items-center justify-center px-6">
                 <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-black/70 p-5 text-center shadow-2xl shadow-black/50 backdrop-blur-md">
@@ -663,7 +654,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
                   <button
                     type="button"
                     onClick={() => void startCameraScanner()}
-                    disabled={cameraPermission === 'requesting' || !scannerReady}
+                    disabled={cameraPermission === 'requesting'}
                     className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white transition-all active:scale-[0.98] disabled:opacity-50"
                   >
                     {cameraPermission === 'requesting' ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}

@@ -25,6 +25,41 @@ interface OrderEmailPayload {
   tickets: TicketSummary[]
 }
 
+function escapeHtml(value = '') {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+function splitDisplayName(name = '') {
+  const clean = String(name).trim().replace(/\s+/g, ' ').toUpperCase()
+  if (clean.length <= 34) return [clean]
+
+  const words = clean.split(' ')
+  const lines = ['']
+  for (const word of words) {
+    const current = lines[lines.length - 1]
+    const next = `${current} ${word}`.trim()
+    if (next.length <= 34 || lines.length === 1) {
+      lines[lines.length - 1] = next
+    } else if (lines.length < 2) {
+      lines.push(word)
+    } else {
+      lines[1] = `${lines[1]} ${word}`.trim()
+    }
+  }
+
+  if (lines[1]?.length > 38) lines[1] = `${lines[1].slice(0, 35).trim()}...`
+  return lines.filter(Boolean)
+}
+
+function buildBsbFightQrPayload(ticket: Pick<TicketSummary, 'ticketNumber' | 'qrToken'>) {
+  return `BSB7|TICKET:${ticket.ticketNumber}|TOKEN:${ticket.qrToken || ticket.ticketNumber}|EVENTO:BSB-FIGHT-7`
+}
+
 export interface EmailSendResult {
   status: 'sent' | 'skipped'
   providerMessageId: string | null
@@ -376,6 +411,72 @@ export async function buildOrderConfirmationWithQREmail(
       </html>
     `,
     text: `PULSE, Ingresso Confirmado\n\nOla ${payload.recipientName || payload.buyerName},\n\nSua compra para o evento foi confirmada com sucesso!\n${payload.totalAmount > 0 ? `Total pago: ${formatCurrency(payload.totalAmount)}\n` : ''}\n=== ${payload.eventName.toUpperCase()} ===\n${payload.eventDate ? `Data: ${payload.eventDate}\n` : ''}${payload.eventLocation ? `Local: ${payload.eventLocation}\n` : ''}${payload.exerciseType ? `Modalidade: ${payload.exerciseType}\n` : ''}Pedido: #${payload.orderId.slice(0, 8).toUpperCase()}\nIngressos: ${payload.tickets.length}\n\n=== SEU QR CODE ===\nAcesse a versao HTML deste email para ver o QR code.\nTokens: ${payload.tickets.map((t) => t.qrToken.slice(0, 8).toUpperCase()).join(', ')}\n\n=== NO DIA DO EVENTO ===\n1. Chegue com antecedencia\n2. Abra este email no celular\n3. Apresente o QR code no check-in\n4. Aproveite!\n\nQR code pessoal e intransferivel.\n\npulse.events`,
+  }
+}
+
+
+export async function buildBsbFight7TicketEmail(
+  payload: OrderEmailPayload & {
+    recipientName?: string
+    eventDate?: string
+    eventLocation?: string
+    coverUrl?: string
+  },
+): Promise<EmailContent> {
+  const ticket = payload.tickets[0]
+  const ticketNumber = ticket?.ticketNumber || `BSB7-${payload.orderId.slice(0, 5).toUpperCase()}`
+  const holderName = ticket?.holderName || payload.recipientName || payload.buyerName || 'Titular confirmado'
+  const qrToken = ticket?.qrToken || ticketNumber
+  const qrUrl = await generateQRCodeUrl(buildBsbFightQrPayload({ ticketNumber, qrToken }))
+  const heroUrl = payload.coverUrl || 'https://bsbfight.com.br/bsb-fight-7-email-hero.png'
+  const safeTicket = escapeHtml(ticketNumber)
+  const safeName = escapeHtml(holderName)
+  const safeEmail = escapeHtml(payload.buyerEmail)
+  const nameHtml = splitDisplayName(holderName).map((line) => `<span style="display:block;">${escapeHtml(line)}</span>`).join('')
+  const qrImage = qrUrl
+    ? `<img src="${qrUrl}" width="236" height="236" alt="QR Code do ingresso ${safeTicket}" style="display:block;width:236px;height:236px;border:2px solid #111;border-radius:14px;background:#fff;padding:8px;">`
+    : `<div style="width:236px;height:236px;border:2px solid #111;border-radius:14px;background:#fff;color:#111;font-family:Arial,sans-serif;font-weight:900;font-size:18px;line-height:236px;text-align:center;">${escapeHtml(qrToken.slice(0, 8).toUpperCase())}</div>`
+
+  return {
+    subject: `Seu ingresso BSB Fight 7 está confirmado — ${ticketNumber}`,
+    html: `<!doctype html>
+<html lang="pt-BR">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting"><title>Ingresso BSB Fight 7</title></head>
+  <body style="margin:0;padding:0;background:#070000;color:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Acesso confirmado para o BSB Fight 7. Guarde seu QR Code e apresente documento oficial com foto.</div>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#070000;margin:0;padding:0;"><tr><td align="center" style="padding:28px 14px;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:760px;background:#100101;border:1px solid #3d0706;border-radius:28px;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,.55);">
+        <tr><td style="background:#120101;"><img src="${heroUrl}" width="760" alt="BSB Fight 7 — 24, 25 e 26 de setembro, Samambaia Distrito Federal" style="width:100%;max-width:760px;height:auto;display:block;border:0;"></td></tr>
+        <tr><td style="height:6px;background:#ff1f16;line-height:6px;font-size:0;">&nbsp;</td></tr>
+        <tr><td style="padding:34px 34px 20px;background:linear-gradient(135deg,#120101 0%,#210202 52%,#070000 100%);">
+          <div style="display:inline-block;background:#d20806;color:#fff;border-radius:999px;padding:11px 22px;font-size:12px;line-height:1;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">Acesso confirmado</div>
+          <h1 style="margin:18px 0 8px;color:#fff;font-family:Impact,Arial Black,Arial,sans-serif;font-size:46px;line-height:1.05;letter-spacing:.02em;text-transform:uppercase;text-shadow:0 2px 0 #750000;">Seu ingresso digital chegou.</h1>
+          <p style="margin:0;color:#f6d8d0;font-size:16px;line-height:1.55;">Guarde este e-mail. Ele contém o QR Code que será validado na entrada do evento.</p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;border-spacing:0 16px;margin-top:18px;"><tr><td style="background:#050505;border:1px solid #ff2a22;border-radius:24px;padding:26px;" valign="top">
+            <div style="font-size:13px;font-weight:800;color:#ffd6cf;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">Código do ingresso</div>
+            <div style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:58px;line-height:1;color:#fff;letter-spacing:.03em;text-shadow:0 2px 0 #7d0000;">${safeTicket}</div>
+            <div style="height:2px;background:#f01812;margin:18px 0 20px;line-height:2px;font-size:0;">&nbsp;</div>
+            <div style="font-size:13px;font-weight:800;color:#ffd6cf;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Nome do titular</div>
+            <div style="font-size:28px;line-height:1.18;font-weight:900;color:#fff;text-transform:uppercase;word-break:break-word;overflow-wrap:anywhere;">${nameHtml}</div>
+            <div style="margin-top:12px;color:#f0c8bf;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;">Ingresso nominal • 1 por CPF</div>
+          </td></tr></table>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f7f2e9;border-radius:26px;overflow:hidden;border:3px solid #ff2a22;margin-top:6px;">
+            <tr><td colspan="2" style="background:#cf0805;padding:18px 24px;color:#fff;"><span style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;">QR CODE</span><span style="font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-left:14px;vertical-align:8px;">Ingresso digital</span></td></tr>
+            <tr><td width="278" valign="top" style="padding:26px 16px 28px 26px;">${qrImage}</td><td valign="top" style="padding:34px 28px 28px 8px;color:#160b08;">
+              <div style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;color:#090909;">${safeTicket}</div>
+              <div style="font-size:18px;line-height:1.28;font-weight:900;color:#4a1f18;text-transform:uppercase;margin-top:12px;">Titular confirmado</div>
+              <div style="height:2px;background:#d70b08;margin:18px 0 20px;line-height:2px;font-size:0;">&nbsp;</div>
+              <div style="font-size:14px;line-height:1.8;font-weight:900;color:#733227;text-transform:uppercase;">Apresente na entrada<br>QR Code + documento<br>Lote gratuito</div>
+            </td></tr>
+          </table>
+          <div style="margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;color:#f9ddd6;font-size:15px;line-height:1.65;"><strong style="color:#fff;">Como usar:</strong> apresente este QR Code na entrada junto com um documento oficial com foto. O ingresso é pessoal, gratuito e vinculado ao titular cadastrado.</div>
+          <p style="margin:22px 0 0;color:#b98f86;font-size:12px;line-height:1.55;text-align:center;">Enviado para ${safeEmail}. Se você não solicitou este ingresso, ignore esta mensagem.</p>
+        </td></tr>
+      </table>
+    </td></tr></table>
+  </body>
+</html>`,
+    text: `BSB FIGHT 7 — INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026 — Samambaia, Distrito Federal\n\nApresente o QR Code deste e-mail junto com documento oficial com foto na entrada.\nIngresso nominal, gratuito e limitado a 1 por CPF.`,
   }
 }
 

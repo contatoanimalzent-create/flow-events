@@ -3,6 +3,7 @@ import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 import { requireAuth } from '../_shared/auth-guard.ts'
 import {
   buildOrderConfirmationEmail,
+  buildBsbFight7TicketEmail,
   buildOrderConfirmationWithQREmail,
   buildTicketsEmail,
   sendResendEmail,
@@ -12,6 +13,7 @@ type TransactionalTemplateKey =
   | 'order-confirmation'
   | 'order-confirmation-with-qr'
   | 'tickets-issued'
+  | 'bsb-fight-7-ticket'
 
 async function buildTemplatePayload(
   templateKey: TransactionalTemplateKey,
@@ -37,6 +39,19 @@ async function buildTemplatePayload(
   },
 ) {
   switch (templateKey) {
+    case 'bsb-fight-7-ticket':
+      return await buildBsbFight7TicketEmail({
+        orderId: data.orderId,
+        eventName: data.eventName,
+        buyerName: data.buyerName,
+        buyerEmail: data.buyerEmail,
+        totalAmount: data.totalAmount,
+        recipientName: data.recipientName,
+        eventDate: data.eventDate,
+        eventLocation: data.eventLocation,
+        coverUrl: data.coverUrl,
+        tickets: data.tickets,
+      })
     case 'order-confirmation-with-qr':
       return await buildOrderConfirmationWithQREmail({
         orderId: data.orderId,

@@ -32,6 +32,11 @@ export async function requireAuth(req: Request): Promise<AuthSuccess | AuthFailu
     }
   }
 
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  if (serviceRoleKey && jwt === serviceRoleKey) {
+    return { ok: true, userId: 'service-role', email: null, jwt }
+  }
+
   const client = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_ANON_KEY')!,

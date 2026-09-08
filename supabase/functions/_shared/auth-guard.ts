@@ -37,6 +37,12 @@ export async function requireAuth(req: Request): Promise<AuthSuccess | AuthFailu
     return { ok: true, userId: 'service-role', email: null, jwt }
   }
 
+  const transactionalSecret = Deno.env.get('PULSE_TRANSACTIONAL_SECRET') ?? ''
+  const incomingTransactionalSecret = req.headers.get('x-pulse-transactional-secret') ?? ''
+  if (transactionalSecret && incomingTransactionalSecret === transactionalSecret && jwt === transactionalSecret) {
+    return { ok: true, userId: 'transactional-service', email: null, jwt }
+  }
+
   const client = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_ANON_KEY')!,

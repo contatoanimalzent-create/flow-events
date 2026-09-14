@@ -96,7 +96,11 @@ export async function generateQRCodeUrl(qrToken: string): Promise<string | null>
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
-    const filePath = `qr-codes/${qrToken}.png`
+    const safeFileName = qrToken
+      .replace(/[^a-zA-Z0-9._-]/g, '-')
+      .replace(/-+/g, '-')
+      .slice(0, 160)
+    const filePath = `qr-codes/${safeFileName}.png`
 
     const { error: uploadError } = await supabase.storage
       .from('tickets')

@@ -433,6 +433,9 @@ export async function buildBsbFight7TicketEmail(
   const qrToken = ticket?.qrToken || ticketNumber
   const qrUrl = await generateQRCodeUrl(buildBsbFightQrPayload({ ticketNumber, qrToken }))
   const heroUrl = payload.coverUrl || 'https://bsbfight.com.br/bsb-fight-7-email-hero.png'
+  const mapsUrl =
+    'https://www.google.com/maps/dir//-15.8812771,-48.0815353/@-15.8812771,-48.0841102,632m/data=!3m1!1e3!4m6!1m5!3m4!2zMTXCsDUyJzUyLjYiUyA0OMKwMDQnNTMuNSJX!8m2!3d-15.8812771!4d-48.0815353?hl=pt-BR&entry=ttu'
+  const wazeUrl = 'https://waze.com/ul?ll=-15.8812771,-48.0815353&navigate=yes'
   const safeTicket = escapeHtml(ticketNumber)
   const safeName = escapeHtml(holderName)
   const safeEmail = escapeHtml(payload.buyerEmail)
@@ -474,13 +477,17 @@ export async function buildBsbFight7TicketEmail(
             </td></tr>
           </table>
           <div style="margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;color:#f9ddd6;font-size:15px;line-height:1.65;"><strong style="color:#fff;">Como usar:</strong> apresente este QR Code na entrada junto com um documento oficial com foto. Local: Centro Urbano, Quadra 302, Conjunto 3 – Samambaia Sul/DF. Referência: em frente à Igreja da Barca. O ingresso é pessoal, gratuito e vinculado ao titular cadastrado.</div>
+          <div style="margin-top:14px;">
+            <a href="${mapsUrl}" target="_blank" style="display:inline-block;background:#cf0805;color:#fff;text-decoration:none;border-radius:999px;padding:15px 20px;margin:0 8px 10px 0;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;">Abrir no Google Maps</a>
+            <a href="${wazeUrl}" target="_blank" style="display:inline-block;background:#f7f2e9;color:#160b08;text-decoration:none;border-radius:999px;padding:15px 20px;margin:0 0 10px 0;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;">Abrir no Waze</a>
+          </div>
           <p style="margin:22px 0 0;color:#b98f86;font-size:12px;line-height:1.55;text-align:center;">Enviado para ${safeEmail}. Se você não solicitou este ingresso, ignore esta mensagem.</p>
         </td></tr>
       </table>
     </td></tr></table>
   </body>
 </html>`,
-    text: `BSB FIGHT 7 — INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026 — Centro Urbano, Quadra 302, Conjunto 3 – Samambaia Sul/DF. Referência: em frente à Igreja da Barca\n\nApresente o QR Code deste e-mail junto com documento oficial com foto na entrada.\nIngresso nominal, gratuito e limitado a 1 por CPF.`,
+    text: `BSB FIGHT 7 — INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026 — Centro Urbano, Quadra 302, Conjunto 3 – Samambaia Sul/DF. Referência: em frente à Igreja da Barca\n\nGoogle Maps: ${mapsUrl}\nWaze: ${wazeUrl}\n\nApresente o QR Code deste e-mail junto com documento oficial com foto na entrada.\nIngresso nominal, gratuito e limitado a 1 por CPF.`,
   }
 }
 

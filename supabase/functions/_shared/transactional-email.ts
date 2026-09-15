@@ -450,7 +450,7 @@ export async function buildBsbFight7TicketEmail(
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Acesso confirmado para o BSB Fight 7. Guarde seu QR Code e apresente documento oficial com foto.</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#070000;margin:0;padding:0;"><tr><td align="center" style="padding:28px 14px;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:760px;background:#100101;border:1px solid #3d0706;border-radius:28px;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,.55);">
-        <tr><td style="background:#120101;"><img src="${heroUrl}" width="760" alt="BSB Fight 7 — 24, 25 e 26 de setembro, Samambaia Distrito Federal" style="width:100%;max-width:760px;height:auto;display:block;border:0;"></td></tr>
+        <tr><td style="background:#120101;"><img src="${heroUrl}" width="760" alt="BSB Fight 7 — 24, 25 e 26 de setembro, Samambaia Sul/DF" style="width:100%;max-width:760px;height:auto;display:block;border:0;"></td></tr>
         <tr><td style="height:6px;background:#ff1f16;line-height:6px;font-size:0;">&nbsp;</td></tr>
         <tr><td style="padding:34px 34px 20px;background:linear-gradient(135deg,#120101 0%,#210202 52%,#070000 100%);">
           <div style="display:inline-block;background:#d20806;color:#fff;border-radius:999px;padding:11px 22px;font-size:12px;line-height:1;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">Acesso confirmado</div>
@@ -470,17 +470,17 @@ export async function buildBsbFight7TicketEmail(
               <div style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;color:#090909;">${safeTicket}</div>
               <div style="font-size:18px;line-height:1.28;font-weight:900;color:#4a1f18;text-transform:uppercase;margin-top:12px;">Titular confirmado</div>
               <div style="height:2px;background:#d70b08;margin:18px 0 20px;line-height:2px;font-size:0;">&nbsp;</div>
-              <div style="font-size:14px;line-height:1.8;font-weight:900;color:#733227;text-transform:uppercase;">Apresente na entrada<br>QR Code + documento<br>Lote gratuito</div>
+              <div style="font-size:14px;line-height:1.8;font-weight:900;color:#733227;text-transform:uppercase;">Apresente na entrada<br>QR Code + documento<br>Samambaia Sul/DF</div>
             </td></tr>
           </table>
-          <div style="margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;color:#f9ddd6;font-size:15px;line-height:1.65;"><strong style="color:#fff;">Como usar:</strong> apresente este QR Code na entrada junto com um documento oficial com foto. O ingresso é pessoal, gratuito e vinculado ao titular cadastrado.</div>
+          <div style="margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;color:#f9ddd6;font-size:15px;line-height:1.65;"><strong style="color:#fff;">Como usar:</strong> apresente este QR Code na entrada junto com um documento oficial com foto. Local: Centro Urbano, Quadra 302, Conjunto 3 – Samambaia Sul/DF. Referência: em frente à Igreja da Barca. O ingresso é pessoal, gratuito e vinculado ao titular cadastrado.</div>
           <p style="margin:22px 0 0;color:#b98f86;font-size:12px;line-height:1.55;text-align:center;">Enviado para ${safeEmail}. Se você não solicitou este ingresso, ignore esta mensagem.</p>
         </td></tr>
       </table>
     </td></tr></table>
   </body>
 </html>`,
-    text: `BSB FIGHT 7 — INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026 — Samambaia, Distrito Federal\n\nApresente o QR Code deste e-mail junto com documento oficial com foto na entrada.\nIngresso nominal, gratuito e limitado a 1 por CPF.`,
+    text: `BSB FIGHT 7 — INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026 — Centro Urbano, Quadra 302, Conjunto 3 – Samambaia Sul/DF. Referência: em frente à Igreja da Barca\n\nApresente o QR Code deste e-mail junto com documento oficial com foto na entrada.\nIngresso nominal, gratuito e limitado a 1 por CPF.`,
   }
 }
 
@@ -522,3 +522,4 @@ export async function sendResendEmail({ to, subject, html, text }: SendEmailPara
     providerMessageId: data.id ?? null,
   }
 }
+

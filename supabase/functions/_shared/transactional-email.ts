@@ -419,6 +419,13 @@ export async function buildOrderConfirmationWithQREmail(
 }
 
 
+const BSB_FIGHT_7_VENUE = {
+  address: 'Centro Urbano, Samambaia Sul, Quadra 302, Conjunto 9, Samambaia/DF',
+  coordinates: '15°52\'38.3"S 48°05\'12.0"W',
+  mapsUrl: 'https://www.google.com/maps?q=-15.877252578735352,-48.086490631103516&z=17&hl=pt-BR',
+  wazeUrl: 'https://waze.com/ul?ll=-15.877252578735352,-48.086490631103516&navigate=yes',
+}
+
 export async function buildBsbFight7TicketEmail(
   payload: OrderEmailPayload & {
     recipientName?: string
@@ -433,9 +440,9 @@ export async function buildBsbFight7TicketEmail(
   const qrToken = ticket?.qrToken || ticketNumber
   const qrUrl = await generateQRCodeUrl(buildBsbFightQrPayload({ ticketNumber, qrToken }))
   const heroUrl = payload.coverUrl || 'https://bsbfight.com.br/bsb-fight-7-email-hero.png'
-  const mapsUrl =
-    'https://www.google.com/maps/dir//-15.8812771,-48.0815353/@-15.8812771,-48.0841102,632m/data=!3m1!1e3!4m6!1m5!3m4!2zMTXCsDUyJzUyLjYiUyA0OMKwMDQnNTMuNSJX!8m2!3d-15.8812771!4d-48.0815353?hl=pt-BR&entry=ttu'
-  const wazeUrl = 'https://waze.com/ul?ll=-15.8812771,-48.0815353&navigate=yes'
+  const venueAddress = BSB_FIGHT_7_VENUE.address
+  const mapsUrl = BSB_FIGHT_7_VENUE.mapsUrl
+  const wazeUrl = BSB_FIGHT_7_VENUE.wazeUrl
   const safeTicket = escapeHtml(ticketNumber)
   const safeName = escapeHtml(holderName)
   const safeEmail = escapeHtml(payload.buyerEmail)
@@ -445,7 +452,7 @@ export async function buildBsbFight7TicketEmail(
     : `<div style="width:236px;height:236px;border:2px solid #111;border-radius:14px;background:#fff;color:#111;font-family:Arial,sans-serif;font-weight:900;font-size:18px;line-height:236px;text-align:center;">${escapeHtml(qrToken.slice(0, 8).toUpperCase())}</div>`
 
   return {
-    subject: `Seu ingresso BSB Fight 7 está confirmado — ${ticketNumber}`,
+    subject: `Seu ingresso BSB Fight 7 está confirmado: ${ticketNumber}`,
     html: `<!doctype html>
 <html lang="pt-BR">
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting"><title>Ingresso BSB Fight 7</title></head>
@@ -453,7 +460,7 @@ export async function buildBsbFight7TicketEmail(
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Acesso confirmado para o BSB Fight 7. Guarde seu QR Code e apresente documento oficial com foto.</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#070000;margin:0;padding:0;"><tr><td align="center" style="padding:28px 14px;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:760px;background:#100101;border:1px solid #3d0706;border-radius:28px;overflow:hidden;box-shadow:0 26px 80px rgba(0,0,0,.55);">
-        <tr><td style="background:#120101;"><img src="${heroUrl}" width="760" alt="BSB Fight 7 — 24, 25 e 26 de setembro, Samambaia Sul/DF" style="width:100%;max-width:760px;height:auto;display:block;border:0;"></td></tr>
+        <tr><td style="background:#120101;"><img src="${heroUrl}" width="760" alt="BSB Fight 7, 24, 25 e 26 de setembro, Samambaia/DF" style="width:100%;max-width:760px;height:auto;display:block;border:0;"></td></tr>
         <tr><td style="height:6px;background:#ff1f16;line-height:6px;font-size:0;">&nbsp;</td></tr>
         <tr><td style="padding:34px 34px 20px;background:linear-gradient(135deg,#120101 0%,#210202 52%,#070000 100%);">
           <div style="display:inline-block;background:#d20806;color:#fff;border-radius:999px;padding:11px 22px;font-size:12px;line-height:1;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">Acesso confirmado</div>
@@ -473,10 +480,10 @@ export async function buildBsbFight7TicketEmail(
               <div style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;color:#090909;">${safeTicket}</div>
               <div style="font-size:18px;line-height:1.28;font-weight:900;color:#4a1f18;text-transform:uppercase;margin-top:12px;">Titular confirmado</div>
               <div style="height:2px;background:#d70b08;margin:18px 0 20px;line-height:2px;font-size:0;">&nbsp;</div>
-              <div style="font-size:14px;line-height:1.8;font-weight:900;color:#733227;text-transform:uppercase;">Apresente na entrada<br>QR Code + documento<br>Samambaia Sul/DF</div>
+              <div style="font-size:14px;line-height:1.8;font-weight:900;color:#733227;text-transform:uppercase;">Apresente na entrada<br>QR Code + documento<br>Samambaia/DF</div>
             </td></tr>
           </table>
-          <div style="margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;color:#f9ddd6;font-size:15px;line-height:1.65;"><strong style="color:#fff;">Como usar:</strong> apresente este QR Code na entrada junto com um documento oficial com foto. Local: Centro Urbano, Quadra 302, Conjunto 3 – Samambaia Sul/DF. Referência: em frente à Igreja da Barca. O ingresso é pessoal, gratuito e vinculado ao titular cadastrado.</div>
+          <div style="margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;color:#f9ddd6;font-size:15px;line-height:1.65;"><strong style="color:#fff;">Como usar:</strong> apresente este QR Code na entrada junto com um documento oficial com foto. Local: ${escapeHtml(venueAddress)}. Coordenadas: ${escapeHtml(BSB_FIGHT_7_VENUE.coordinates)}. O ingresso é pessoal, gratuito e vinculado ao titular cadastrado.</div>
           <div style="margin-top:14px;">
             <a href="${mapsUrl}" target="_blank" style="display:inline-block;background:#cf0805;color:#fff;text-decoration:none;border-radius:999px;padding:15px 20px;margin:0 8px 10px 0;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;">Abrir no Google Maps</a>
             <a href="${wazeUrl}" target="_blank" style="display:inline-block;background:#f7f2e9;color:#160b08;text-decoration:none;border-radius:999px;padding:15px 20px;margin:0 0 10px 0;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;">Abrir no Waze</a>
@@ -487,7 +494,7 @@ export async function buildBsbFight7TicketEmail(
     </td></tr></table>
   </body>
 </html>`,
-    text: `BSB FIGHT 7 — INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026 — Centro Urbano, Quadra 302, Conjunto 3 – Samambaia Sul/DF. Referência: em frente à Igreja da Barca\n\nGoogle Maps: ${mapsUrl}\nWaze: ${wazeUrl}\n\nApresente o QR Code deste e-mail junto com documento oficial com foto na entrada.\nIngresso nominal, gratuito e limitado a 1 por CPF.`,
+    text: `BSB FIGHT 7: INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026\nLocal: ${venueAddress}\nCoordenadas: ${BSB_FIGHT_7_VENUE.coordinates}\n\nGoogle Maps: ${mapsUrl}\nWaze: ${wazeUrl}\n\nApresente o QR Code deste e-mail junto com documento oficial com foto na entrada.\nIngresso nominal, gratuito e limitado a 1 por CPF.`,
   }
 }
 

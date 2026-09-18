@@ -447,12 +447,42 @@ export async function buildBsbFight7TicketEmail(
   const safeName = escapeHtml(holderName)
   const safeEmail = escapeHtml(payload.buyerEmail)
   const nameHtml = splitDisplayName(holderName).map((line) => `<span style="display:block;">${escapeHtml(line)}</span>`).join('')
-  const qrImage = qrUrl
-    ? `<img src="${qrUrl}" width="236" height="236" alt="QR Code do ingresso ${safeTicket}" style="display:block;width:236px;height:236px;border:2px solid #111;border-radius:14px;background:#fff;padding:8px;">`
-    : `<div style="width:236px;height:236px;border:2px solid #111;border-radius:14px;background:#fff;color:#111;font-family:Arial,sans-serif;font-weight:900;font-size:18px;line-height:236px;text-align:center;">${escapeHtml(qrToken.slice(0, 8).toUpperCase())}</div>`
+  const orderTickets = payload.tickets.length
+    ? payload.tickets
+    : [{ ticketNumber, holderName, holderEmail: null, qrToken, status: 'confirmed' }]
+  const ticketCount = orderTickets.length
+  const qrUrls = await Promise.all(
+    orderTickets.map((item, index) =>
+      index === 0
+        ? Promise.resolve(qrUrl)
+        : generateQRCodeUrl(buildBsbFightQrPayload({ ticketNumber: item.ticketNumber, qrToken: item.qrToken })),
+    ),
+  )
+  const qrBlocks = orderTickets
+    .map((item, index) => {
+      const itemTicket = escapeHtml(item.ticketNumber)
+      const itemToken = item.qrToken || item.ticketNumber
+      const itemRole = index === 0 ? 'Titular' : `Acompanhante ${index}`
+      const image = qrUrls[index]
+        ? `<img src="${qrUrls[index]}" width="236" height="236" alt="QR Code do ingresso ${itemTicket}" style="display:block;width:236px;height:236px;border:2px solid #111;border-radius:14px;background:#fff;padding:8px;">`
+        : `<div style="width:236px;height:236px;border:2px solid #111;border-radius:14px;background:#fff;color:#111;font-family:Arial,sans-serif;font-weight:900;font-size:18px;line-height:236px;text-align:center;">${escapeHtml(itemToken.slice(0, 8).toUpperCase())}</div>`
+      return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f7f2e9;border-radius:26px;overflow:hidden;border:3px solid #ff2a22;margin-top:${index === 0 ? 6 : 18}px;">
+            <tr><td colspan="2" style="background:#cf0805;padding:18px 24px;color:#fff;"><span style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;">QR CODE</span><span style="font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-left:14px;vertical-align:8px;">${ticketCount > 1 ? `Ingresso ${index + 1} de ${ticketCount}` : 'Ingresso digital'}</span></td></tr>
+            <tr><td width="278" valign="top" style="padding:26px 16px 28px 26px;">${image}</td><td valign="top" style="padding:34px 28px 28px 8px;color:#160b08;">
+              <div style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;color:#090909;">${itemTicket}</div>
+              <div style="font-size:18px;line-height:1.28;font-weight:900;color:#4a1f18;text-transform:uppercase;margin-top:12px;">${itemRole}</div>
+              <div style="height:2px;background:#d70b08;margin:18px 0 20px;line-height:2px;font-size:0;">&nbsp;</div>
+              <div style="font-size:14px;line-height:1.8;font-weight:900;color:#733227;text-transform:uppercase;">1 QR por pessoa<br>Apresente na entrada<br>Samambaia/DF</div>
+            </td></tr>
+          </table>`
+    })
+    .join('\n          ')
 
   return {
-    subject: `Seu ingresso BSB Fight 7 está confirmado: ${ticketNumber}`,
+    subject:
+      ticketCount > 1
+        ? `Seus ${ticketCount} ingressos BSB Fight 7 estão confirmados: ${ticketNumber}`
+        : `Seu ingresso BSB Fight 7 está confirmado: ${ticketNumber}`,
     html: `<!doctype html>
 <html lang="pt-BR">
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting"><title>Ingresso BSB Fight 7</title></head>
@@ -464,26 +494,18 @@ export async function buildBsbFight7TicketEmail(
         <tr><td style="height:6px;background:#ff1f16;line-height:6px;font-size:0;">&nbsp;</td></tr>
         <tr><td style="padding:34px 34px 20px;background:linear-gradient(135deg,#120101 0%,#210202 52%,#070000 100%);">
           <div style="display:inline-block;background:#d20806;color:#fff;border-radius:999px;padding:11px 22px;font-size:12px;line-height:1;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">Acesso confirmado</div>
-          <h1 style="margin:18px 0 8px;color:#fff;font-family:Impact,Arial Black,Arial,sans-serif;font-size:46px;line-height:1.05;letter-spacing:.02em;text-transform:uppercase;text-shadow:0 2px 0 #750000;">Seu ingresso digital chegou.</h1>
-          <p style="margin:0;color:#f6d8d0;font-size:16px;line-height:1.55;">Guarde este e-mail. Ele contém o QR Code que será validado na entrada do evento.</p>
+          <h1 style="margin:18px 0 8px;color:#fff;font-family:Impact,Arial Black,Arial,sans-serif;font-size:46px;line-height:1.05;letter-spacing:.02em;text-transform:uppercase;text-shadow:0 2px 0 #750000;">${ticketCount > 1 ? 'Seus ingressos digitais chegaram.' : 'Seu ingresso digital chegou.'}</h1>
+          <p style="margin:0;color:#f6d8d0;font-size:16px;line-height:1.55;">Guarde este e-mail. ${ticketCount > 1 ? `Ele contém ${ticketCount} QR Codes, um para cada pessoa, que serão validados` : 'Ele contém o QR Code que será validado'} na entrada do evento.</p>
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;border-spacing:0 16px;margin-top:18px;"><tr><td style="background:#050505;border:1px solid #ff2a22;border-radius:24px;padding:26px;" valign="top">
             <div style="font-size:13px;font-weight:800;color:#ffd6cf;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">Código do ingresso</div>
             <div style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:58px;line-height:1;color:#fff;letter-spacing:.03em;text-shadow:0 2px 0 #7d0000;">${safeTicket}</div>
             <div style="height:2px;background:#f01812;margin:18px 0 20px;line-height:2px;font-size:0;">&nbsp;</div>
             <div style="font-size:13px;font-weight:800;color:#ffd6cf;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Nome do titular</div>
             <div style="font-size:28px;line-height:1.18;font-weight:900;color:#fff;text-transform:uppercase;word-break:break-word;overflow-wrap:anywhere;">${nameHtml}</div>
-            <div style="margin-top:12px;color:#f0c8bf;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;">Ingresso nominal • 1 por CPF</div>
+            <div style="margin-top:12px;color:#f0c8bf;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;">${ticketCount > 1 ? `${ticketCount} ingressos neste pedido` : 'Ingresso nominal'} • até 3 por CPF</div>
           </td></tr></table>
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f7f2e9;border-radius:26px;overflow:hidden;border:3px solid #ff2a22;margin-top:6px;">
-            <tr><td colspan="2" style="background:#cf0805;padding:18px 24px;color:#fff;"><span style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;">QR CODE</span><span style="font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-left:14px;vertical-align:8px;">Ingresso digital</span></td></tr>
-            <tr><td width="278" valign="top" style="padding:26px 16px 28px 26px;">${qrImage}</td><td valign="top" style="padding:34px 28px 28px 8px;color:#160b08;">
-              <div style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;color:#090909;">${safeTicket}</div>
-              <div style="font-size:18px;line-height:1.28;font-weight:900;color:#4a1f18;text-transform:uppercase;margin-top:12px;">Titular confirmado</div>
-              <div style="height:2px;background:#d70b08;margin:18px 0 20px;line-height:2px;font-size:0;">&nbsp;</div>
-              <div style="font-size:14px;line-height:1.8;font-weight:900;color:#733227;text-transform:uppercase;">Apresente na entrada<br>QR Code + documento<br>Samambaia/DF</div>
-            </td></tr>
-          </table>
-          <div style="margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;color:#f9ddd6;font-size:15px;line-height:1.65;"><strong style="color:#fff;">Como usar:</strong> apresente este QR Code na entrada junto com um documento oficial com foto. Local: ${escapeHtml(venueAddress)}. Coordenadas: ${escapeHtml(BSB_FIGHT_7_VENUE.coordinates)}. O ingresso é pessoal, gratuito e vinculado ao titular cadastrado.</div>
+          ${qrBlocks}
+          <div style="margin-top:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;color:#f9ddd6;font-size:15px;line-height:1.65;"><strong style="color:#fff;">Como usar:</strong> ${ticketCount > 1 ? 'cada pessoa entra com o seu próprio QR Code. O titular apresenta documento oficial com foto.' : 'apresente este QR Code na entrada junto com um documento oficial com foto.'} Local: ${escapeHtml(venueAddress)}. Coordenadas: ${escapeHtml(BSB_FIGHT_7_VENUE.coordinates)}. Os ingressos são gratuitos e vinculados ao titular cadastrado.</div>
           <div style="margin-top:14px;">
             <a href="${mapsUrl}" target="_blank" style="display:inline-block;background:#cf0805;color:#fff;text-decoration:none;border-radius:999px;padding:15px 20px;margin:0 8px 10px 0;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;">Abrir no Google Maps</a>
             <a href="${wazeUrl}" target="_blank" style="display:inline-block;background:#f7f2e9;color:#160b08;text-decoration:none;border-radius:999px;padding:15px 20px;margin:0 0 10px 0;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;">Abrir no Waze</a>
@@ -494,7 +516,7 @@ export async function buildBsbFight7TicketEmail(
     </td></tr></table>
   </body>
 </html>`,
-    text: `BSB FIGHT 7: INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026\nLocal: ${venueAddress}\nCoordenadas: ${BSB_FIGHT_7_VENUE.coordinates}\n\nGoogle Maps: ${mapsUrl}\nWaze: ${wazeUrl}\n\nApresente o QR Code deste e-mail junto com documento oficial com foto na entrada.\nIngresso nominal, gratuito e limitado a 1 por CPF.`,
+    text: `BSB FIGHT 7: INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026\nLocal: ${venueAddress}\nCoordenadas: ${BSB_FIGHT_7_VENUE.coordinates}\n\nGoogle Maps: ${mapsUrl}\nWaze: ${wazeUrl}\n\nIngressos:\n${orderTickets.map((item, index) => `${item.ticketNumber} (${index === 0 ? 'titular' : `acompanhante ${index}`})`).join('\n')}\n\nCada pessoa entra com o seu próprio QR Code. O titular apresenta documento oficial com foto.\nIngressos gratuitos, até 3 por CPF.`,
   }
 }
 

@@ -471,6 +471,7 @@ export async function buildBsbFight7TicketEmail(
             <tr><td width="278" valign="top" style="padding:26px 16px 28px 26px;">${image}</td><td valign="top" style="padding:34px 28px 28px 8px;color:#160b08;">
               <div style="font-family:Impact,Arial Black,Arial,sans-serif;font-size:42px;line-height:1;letter-spacing:.02em;color:#090909;">${itemTicket}</div>
               <div style="font-size:18px;line-height:1.28;font-weight:900;color:#4a1f18;text-transform:uppercase;margin-top:12px;">${itemRole}</div>
+              <div style="font-size:16px;line-height:1.3;font-weight:800;color:#160b08;text-transform:uppercase;margin-top:6px;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(item.holderName || (index === 0 ? holderName : ''))}</div>
               <div style="height:2px;background:#d70b08;margin:18px 0 20px;line-height:2px;font-size:0;">&nbsp;</div>
               <div style="font-size:14px;line-height:1.8;font-weight:900;color:#733227;text-transform:uppercase;">1 QR por pessoa<br>Apresente na entrada<br>Samambaia/DF</div>
             </td></tr>
@@ -516,7 +517,7 @@ export async function buildBsbFight7TicketEmail(
     </td></tr></table>
   </body>
 </html>`,
-    text: `BSB FIGHT 7: INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026\nLocal: ${venueAddress}\nCoordenadas: ${BSB_FIGHT_7_VENUE.coordinates}\n\nGoogle Maps: ${mapsUrl}\nWaze: ${wazeUrl}\n\nIngressos:\n${orderTickets.map((item, index) => `${item.ticketNumber} (${index === 0 ? 'titular' : `acompanhante ${index}`})`).join('\n')}\n\nCada pessoa entra com o seu próprio QR Code. O titular apresenta documento oficial com foto.\nIngressos gratuitos, até 3 por CPF.`,
+    text: `BSB FIGHT 7: INGRESSO CONFIRMADO\n\nCódigo: ${ticketNumber}\nTitular: ${holderName}\nEvento: 24, 25 e 26 de setembro de 2026\nLocal: ${venueAddress}\nCoordenadas: ${BSB_FIGHT_7_VENUE.coordinates}\n\nGoogle Maps: ${mapsUrl}\nWaze: ${wazeUrl}\n\nIngressos:\n${orderTickets.map((item, index) => `${item.ticketNumber} (${index === 0 ? 'titular' : `acompanhante ${index}`}): ${item.holderName || holderName}`).join('\n')}\n\nCada pessoa entra com o seu próprio QR Code. O titular apresenta documento oficial com foto.\nIngressos gratuitos, até 3 por CPF.`,
   }
 }
 

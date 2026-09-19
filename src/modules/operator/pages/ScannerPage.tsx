@@ -8,6 +8,23 @@ import { operatorService } from '@/core/operator/operator.service'
 import type { OperatorTicketListItem } from '@/core/operator/operator.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
+const RESULT_HOLD_VALID_MS = 1_800
+const RESULT_HOLD_INVALID_MS = 3_500
+const JSQR_TARGET_SIZE = 560
+
+// Leitor nativo do navegador (Chrome no Android). Bem mais rápido que o jsQR,
+// que fica como plano B no iPhone e em navegadores sem suporte.
+type NativeBarcodeDetector = { detect: (source: CanvasImageSource) => Promise<Array<{ rawValue: string }>> }
+function createNativeQrDetector(): NativeBarcodeDetector | null {
+  const Detector = (window as unknown as { BarcodeDetector?: new (opts: { formats: string[] }) => NativeBarcodeDetector }).BarcodeDetector
+  if (!Detector) return null
+  try {
+    return new Detector({ formats: ['qr_code'] })
+  } catch {
+    return null
+  }
+}
+
 type ScanState = 'idle' | 'scanning' | 'processing' | 'valid' | 'invalid'
 type InputMode = 'camera' | 'manual' | 'list'
 type CameraPermissionState = 'idle' | 'requesting' | 'granted'
@@ -72,8 +89,8 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   const processingRef = useRef(false)
   const resultVisibleUntilRef = useRef(0)
   const lastScanRef = useRef<{ token: string; at: number }>({ token: '', at: 0 })
-  const linePos = useRef(0)
-  const [linePct, setLinePct] = useState(0)
+  const nativeDetectorRef = useRef<NativeBarcodeDetector | null | undefined>(undefined)
+  const nativeDetectBusyRef = useRef(false)
 
   const activeEventId = directEvent?.id ?? context?.eventId ?? null
   const activeEventName = directEvent?.name ?? context?.eventName ?? 'Scanner'
@@ -148,18 +165,13 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     return () => { cancelled = true }
   }, [activeEventId, scannerAuthKey, scannerSlug])
 
-  // Animate scan line
-  useEffect(() => {
-    if (scanState !== 'idle' && scanState !== 'scanning') return
-    let dir = 1
-    const interval = setInterval(() => {
-      linePos.current = linePos.current + dir * 1.5
-      if (linePos.current >= 100) dir = -1
-      if (linePos.current <= 0) dir = 1
-      setLinePct(linePos.current)
-    }, 16)
-    return () => clearInterval(interval)
-  }, [scanState])
+  const dismissResult = useCallback(() => {
+    clearTimeout(resultTimerRef.current)
+    resultVisibleUntilRef.current = 0
+    setScanState('idle')
+    setResult(null)
+    setManualCode('')
+  }, [])
 
   const handleScan = useCallback(async (token: string) => {
     const normalizedToken = token.trim()
@@ -171,6 +183,8 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     processingRef.current = true
     setScanState('processing')
     clearTimeout(resultTimerRef.current)
+    // Liberado some rápido para a fila andar; recusado fica mais tempo para o operador ler o motivo.
+    let holdMs = RESULT_HOLD_INVALID_MS
 
     try {
       let res: ScanResult
@@ -196,7 +210,14 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
             category: validation.category,
           }
           setScanCount((c) => c + 1)
-          void loadAttendees()
+          // Atualiza a lista localmente em vez de baixar todos os inscritos a cada leitura.
+          const checkedAt = new Date().toISOString()
+          setAttendees((list) => list.map((item) => (
+            item.ticketNumber && item.ticketNumber === validation.ticketNumber
+              ? { ...item, checkedIn: true, checkedInAt: checkedAt, status: 'used' }
+              : item
+          )))
+          navigator.vibrate?.(120)
         } else {
           res = {
             valid: false,
@@ -223,21 +244,18 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
       setResult(res)
       setScanState(res.valid ? 'valid' : 'invalid')
+      if (res.valid) holdMs = RESULT_HOLD_VALID_MS
+      else navigator.vibrate?.([80, 60, 80])
     } catch (err) {
       setResult({ valid: false, name: '-', ticketLabel: normalizedToken.slice(0, 16), message: 'Erro na válidação' })
       setScanState('invalid')
     } finally {
       processingRef.current = false
-      resultVisibleUntilRef.current = Date.now() + 5_800
+      resultVisibleUntilRef.current = Date.now() + holdMs - 200
     }
 
-    resultTimerRef.current = setTimeout(() => {
-      resultVisibleUntilRef.current = 0
-      setScanState('idle')
-      setResult(null)
-      setManualCode('')
-    }, 6_000)
-  }, [activeEventId, authStep, isOnline, enqueue, loadAttendees, scannerSession])
+    resultTimerRef.current = setTimeout(dismissResult, holdMs)
+  }, [activeEventId, authStep, isOnline, enqueue, scannerSession, dismissResult])
 
   const stopCameraScanner = useCallback(async () => {
     if (animationFrameRef.current !== null) {
@@ -258,12 +276,32 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     const canvas = canvasRef.current
     const now = performance.now()
 
-    if (!video || !canvas || processingRef.current || now - lastDecodeAtRef.current < 80 || video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
+    if (!video || !canvas || processingRef.current || now - lastDecodeAtRef.current < 60 || video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
       animationFrameRef.current = requestAnimationFrame(scanCameraFrame)
       return
     }
 
     lastDecodeAtRef.current = now
+
+    if (nativeDetectorRef.current === undefined) nativeDetectorRef.current = createNativeQrDetector()
+    const nativeDetector = nativeDetectorRef.current
+    if (nativeDetector) {
+      if (!nativeDetectBusyRef.current) {
+        nativeDetectBusyRef.current = true
+        nativeDetector.detect(video)
+          .then((codes) => {
+            const value = codes.find((code) => code.rawValue)?.rawValue
+            if (value) void handleScan(value)
+          })
+          .catch(() => {
+            // Detector nativo falhou neste aparelho: volta para o jsQR.
+            nativeDetectorRef.current = null
+          })
+          .finally(() => { nativeDetectBusyRef.current = false })
+      }
+      animationFrameRef.current = requestAnimationFrame(scanCameraFrame)
+      return
+    }
     const videoWidth = video.videoWidth
     const videoHeight = video.videoHeight
     if (!videoWidth || !videoHeight) {
@@ -276,7 +314,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     const sourceSize = Math.floor(Math.min(videoWidth, videoHeight) * 0.88)
     const sourceX = Math.floor((videoWidth - sourceSize) / 2)
     const sourceY = Math.floor((videoHeight - sourceSize) / 2)
-    const targetSize = Math.min(760, sourceSize)
+    const targetSize = Math.min(JSQR_TARGET_SIZE, sourceSize)
     canvas.width = targetSize
     canvas.height = targetSize
 
@@ -321,6 +359,13 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
       if (!videoRef.current) throw new Error('A câmera ainda não está pronta. Tente novamente.')
       videoRef.current.srcObject = stream
       await videoRef.current.play()
+
+      // Foco contínuo onde o aparelho suporta: o QR entra em foco sem precisar afastar o celular.
+      const [track] = stream.getVideoTracks()
+      const focusModes = (track?.getCapabilities?.() as { focusMode?: string[] } | undefined)?.focusMode
+      if (track && focusModes?.includes('continuous')) {
+        track.applyConstraints({ advanced: [{ focusMode: 'continuous' } as MediaTrackConstraintSet] }).catch(() => {})
+      }
 
       setCameraPermission('granted')
       animationFrameRef.current = requestAnimationFrame(scanCameraFrame)
@@ -666,6 +711,11 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
             {/* Visual frame */}
             <div className={`relative z-10 h-60 w-60 ${cameraPermission === 'granted' ? 'block' : 'hidden'}`}>
+              <style>{`
+                @keyframes scanner-line-sweep { from { transform: translateY(0) } to { transform: translateY(15rem) } }
+                .scanner-line { animation: scanner-line-sweep 1.1s ease-in-out infinite alternate; will-change: transform }
+                @media (prefers-reduced-motion: reduce) { .scanner-line { animation: none; top: 50% } }
+              `}</style>
               {(['tl', 'tr', 'bl', 'br'] as const).map((c) => (
                 <div
                   key={c}
@@ -685,9 +735,8 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
 
               {!isResultShown && scanState !== 'processing' && (
                 <div
-                  className="absolute left-1 right-1 h-0.5 transition-none"
+                  className="scanner-line absolute left-1 right-1 top-0 h-0.5"
                   style={{
-                    top: `${linePct}%`,
                     background: accent,
                     boxShadow: `0 0 8px 2px ${accent}99`,
                   }}
@@ -814,7 +863,11 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
         {/* Result card */}
         {isResultShown && result && (
           <div
-            className="absolute left-4 right-4 rounded-2xl p-4 border z-20"
+            role="button"
+            tabIndex={0}
+            onClick={dismissResult}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') dismissResult() }}
+            className="absolute left-4 right-4 cursor-pointer rounded-2xl p-4 border z-20"
             style={{
               bottom: 88,
               backgroundColor: result.valid ? '#052e16' : '#450a0a',

@@ -8,7 +8,10 @@ import { operatorService } from '@/core/operator/operator.service'
 import type { OperatorTicketListItem } from '@/core/operator/operator.service'
 import type { PulsePageProps } from '@/features/pulse/pulse.utils'
 
-const RESULT_HOLD_VALID_MS = 1_800
+// Liberado sai rapido: o operador ja tem o verde e a vibracao como confirmacao,
+// e segurar a tela trava a fila. Recusado fica bem mais tempo para dar tempo de
+// ler o motivo.
+const RESULT_HOLD_VALID_MS = 700
 const RESULT_HOLD_INVALID_MS = 3_500
 const JSQR_TARGET_SIZE = 560
 

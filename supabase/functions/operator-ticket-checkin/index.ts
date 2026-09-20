@@ -309,6 +309,16 @@ Deno.serve(async (req) => {
   const event = Array.isArray(events) ? events[0] : null
   if (eventError || !event) return json(req, { error: 'Evento nao encontrado.' }, 404)
 
+  // A busca do ingresso nao depende da sessao, entao dispara junto com a
+  // checagem de auth e economiza uma ida ao banco por leitura. O resultado so e
+  // lido depois que a sessao foi validada.
+  const validateLookup = body.action === 'validate'
+    ? normalizeLookup(String(body.token ?? ''))
+    : ''
+  const ticketPromise = validateLookup
+    ? findTicket(admin, event.id, validateLookup).catch(() => null)
+    : null
+
   const session = await assertScannerSession(admin, event, req, body.scanner_session)
   if (!session.ok) return json(req, { valid: false, reason: 'unauthorized', message: session.error }, 401)
 
@@ -364,10 +374,10 @@ Deno.serve(async (req) => {
 
   if (body.action !== 'validate') return json(req, { error: 'Acao invalida.' }, 400)
 
-  const lookup = normalizeLookup(String(body.token ?? ''))
+  const lookup = validateLookup
   if (!lookup) return json(req, { valid: false, reason: 'invalid_token', message: 'Codigo invalido' }, 400)
 
-  const ticket = await findTicket(admin, event.id, lookup)
+  const ticket = await ticketPromise
   if (!ticket) {
     console.warn('[operator-ticket-checkin] ticket not found', {
       raw_token: String(body.token ?? '').slice(0, 120),

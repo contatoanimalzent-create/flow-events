@@ -47,7 +47,7 @@ function normalizeCornerColor(value?: string | null): CornerColor | null {
     .trim()
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
   if (raw === 'azul' || raw === 'blue') return 'azul'
   if (raw === 'vermelho' || raw === 'red') return 'vermelho'
   return null
@@ -173,7 +173,7 @@ async function handleGet(req: Request): Promise<Response> {
     console.error('[event-athlete-register] erro ao buscar evento:', eventErr)
     return fail(req, 'Erro interno ao buscar o evento.', 500, 'DB_ERROR')
   }
-  if (!event) return fail(req, 'Evento nao encontrado.', 404, 'EVENT_NOT_FOUND')
+  if (!event) return fail(req, 'Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
 
   if (!athleteCode) {
     return json(req, {
@@ -198,7 +198,7 @@ async function handleGet(req: Request): Promise<Response> {
     .maybeSingle()
 
   if (!athlete) {
-    return fail(req, 'Codigo de atleta nao encontrado. Confira com o seu atleta.', 404, 'ATHLETE_CODE_NOT_FOUND')
+    return fail(req, 'Código de atleta não encontrado. Confira com o seu atleta.', 404, 'ATHLETE_CODE_NOT_FOUND')
   }
 
   const { data: corners } = await admin
@@ -228,12 +228,12 @@ async function handlePost(req: Request): Promise<Response> {
   try {
     body = await req.json()
   } catch {
-    return fail(req, 'Corpo da requisicao invalido.', 400, 'INVALID_JSON')
+    return fail(req, 'Corpo da requisição inválido.', 400, 'INVALID_JSON')
   }
 
   const kind = body.kind
   if (kind !== 'athlete' && kind !== 'corner') {
-    return fail(req, 'Informe se o cadastro e de atleta ou de corner.', 400, 'INVALID_KIND')
+    return fail(req, 'Informe se o cadastro é de atleta ou de corner.', 400, 'INVALID_KIND')
   }
 
   const fullName = (body.full_name ?? '').trim().replace(/\s+/g, ' ')
@@ -243,7 +243,7 @@ async function handlePost(req: Request): Promise<Response> {
 
   const cpf = normalizeCpf(body.cpf)
   if (!isValidCpf(cpf)) {
-    return fail(req, 'Informe um CPF valido.', 400, 'INVALID_CPF')
+    return fail(req, 'Informe um CPF válido.', 400, 'INVALID_CPF')
   }
 
   const admin = createSupabaseAdminClient()
@@ -258,7 +258,7 @@ async function handlePost(req: Request): Promise<Response> {
     console.error('[event-athlete-register] erro ao buscar evento:', eventErr)
     return fail(req, 'Erro interno ao buscar o evento.', 500, 'DB_ERROR')
   }
-  if (!event) return fail(req, 'Evento nao encontrado.', 404, 'EVENT_NOT_FOUND')
+  if (!event) return fail(req, 'Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
 
   const { data: existing } = await admin
     .from('event_athletes')
@@ -272,7 +272,7 @@ async function handlePost(req: Request): Promise<Response> {
     return json(req, {
       code: 'already_registered',
       already_registered: true,
-      message: 'Este CPF ja esta cadastrado neste evento.',
+      message: 'Este CPF já está cadastrado neste evento.',
       kind: existing.kind,
       full_name: existing.full_name,
       athlete_code: existing.athlete_code,
@@ -295,11 +295,11 @@ async function handlePost(req: Request): Promise<Response> {
   // ── Corner ────────────────────────────────────────────────────────────────
   if (kind === 'corner') {
     const code = normalizeCode(body.athlete_code)
-    if (!code) return fail(req, 'Informe o codigo do seu atleta.', 400, 'MISSING_ATHLETE_CODE')
+    if (!code) return fail(req, 'Informe o código do seu atleta.', 400, 'MISSING_ATHLETE_CODE')
 
     const cornerColor = normalizeCornerColor(body.corner_color)
     if (!cornerColor) {
-      return fail(req, 'Escolha se voce e corner azul ou corner vermelho.', 400, 'MISSING_CORNER_COLOR')
+      return fail(req, 'Escolha se você é corner azul ou corner vermelho.', 400, 'MISSING_CORNER_COLOR')
     }
 
     const { data: athlete } = await admin
@@ -312,7 +312,7 @@ async function handlePost(req: Request): Promise<Response> {
       .maybeSingle()
 
     if (!athlete) {
-      return fail(req, 'Codigo de atleta nao encontrado. Confira com o seu atleta.', 404, 'ATHLETE_CODE_NOT_FOUND')
+      return fail(req, 'Código de atleta não encontrado. Confira com o seu atleta.', 404, 'ATHLETE_CODE_NOT_FOUND')
     }
 
     const { data: corner, error: cornerErr } = await admin
@@ -324,13 +324,13 @@ async function handlePost(req: Request): Promise<Response> {
     if (cornerErr || !corner) {
       const msg = cornerErr?.message ?? ''
       if (msg.includes('ja tem 2 corners')) {
-        return fail(req, `${athlete.full_name} ja tem 2 corners cadastrados. Fale com a producao.`, 409, 'CORNER_LIMIT_REACHED')
+        return fail(req, `${athlete.full_name} já tem 2 corners cadastrados. Fale com a produção.`, 409, 'CORNER_LIMIT_REACHED')
       }
       if (cornerErr?.code === '23505') {
-        return fail(req, 'Este CPF ja esta cadastrado neste evento.', 409, 'ALREADY_REGISTERED')
+        return fail(req, 'Este CPF já está cadastrado neste evento.', 409, 'ALREADY_REGISTERED')
       }
       console.error('[event-athlete-register] erro ao inserir corner:', cornerErr)
-      return fail(req, 'Nao foi possivel concluir o cadastro. Tente novamente.', 500, 'INSERT_ERROR')
+      return fail(req, 'Não foi possível concluir o cadastro. Tente novamente.', 500, 'INSERT_ERROR')
     }
 
     return json(req, {
@@ -355,7 +355,7 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   if (!photoUrl) {
-    return fail(req, 'A foto do atleta e obrigatoria.', 400, 'PHOTO_REQUIRED')
+    return fail(req, 'A foto do atleta é obrigatória.', 400, 'PHOTO_REQUIRED')
   }
 
   const athleteRow = {
@@ -395,14 +395,14 @@ async function handlePost(req: Request): Promise<Response> {
     if (isCodeCollision) continue
 
     if (insertErr?.code === '23505') {
-      return fail(req, 'Este CPF ja esta cadastrado neste evento.', 409, 'ALREADY_REGISTERED')
+      return fail(req, 'Este CPF já está cadastrado neste evento.', 409, 'ALREADY_REGISTERED')
     }
 
     console.error('[event-athlete-register] erro ao inserir atleta:', insertErr)
-    return fail(req, 'Nao foi possivel concluir o cadastro. Tente novamente.', 500, 'INSERT_ERROR')
+    return fail(req, 'Não foi possível concluir o cadastro. Tente novamente.', 500, 'INSERT_ERROR')
   }
 
-  return fail(req, 'Nao foi possivel gerar o codigo do atleta. Tente novamente.', 500, 'CODE_GENERATION_FAILED')
+  return fail(req, 'Não foi possível gerar o código do atleta. Tente novamente.', 500, 'CODE_GENERATION_FAILED')
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
@@ -413,7 +413,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   try {
     if (req.method === 'GET') return await handleGet(req)
     if (req.method === 'POST') return await handlePost(req)
-    return fail(req, 'Metodo nao permitido.', 405, 'METHOD_NOT_ALLOWED')
+    return fail(req, 'Método não permitido.', 405, 'METHOD_NOT_ALLOWED')
   } catch (err) {
     console.error('[event-athlete-register] erro inesperado:', err)
     return fail(req, 'Erro interno. Tente novamente.', 500, 'INTERNAL_ERROR')

@@ -56,7 +56,7 @@ function getPointUrl(inviteInfo?: InviteInfo | null, token?: string | null): str
 }
 
 function stripAccents(value: string): string {
-  return value.normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
 function isAlreadyRegisteredResponse(body: Record<string, unknown>, status?: number): boolean {

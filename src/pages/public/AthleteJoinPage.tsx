@@ -46,8 +46,8 @@ const WEIGHT_CLASSES = [
   'Peso galo',
   'Peso pena',
   'Peso leve',
-  'Peso meio-medio',
-  'Peso medio',
+  'Peso meio-médio',
+  'Peso médio',
   'Peso meio-pesado',
   'Peso pesado',
   'Casadinha / peso combinado',
@@ -96,10 +96,10 @@ function isValidCpf(value: string): boolean {
 function shrinkImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onerror = () => reject(new Error('Nao foi possivel ler a imagem.'))
+    reader.onerror = () => reject(new Error('Não foi possível ler a imagem.'))
     reader.onload = () => {
       const img = new Image()
-      img.onerror = () => reject(new Error('Arquivo de imagem invalido.'))
+      img.onerror = () => reject(new Error('Arquivo de imagem inválido.'))
       img.onload = () => {
         const scale = Math.min(1, MAX_PHOTO_EDGE / Math.max(img.width, img.height))
         const canvas = document.createElement('canvas')
@@ -107,7 +107,7 @@ function shrinkImage(file: File): Promise<string> {
         canvas.height = Math.round(img.height * scale)
         const ctx = canvas.getContext('2d')
         if (!ctx) {
-          reject(new Error('Nao foi possivel processar a imagem.'))
+          reject(new Error('Não foi possível processar a imagem.'))
           return
         }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
@@ -200,7 +200,7 @@ export function AthleteJoinPage() {
   // ── Carrega o evento ──────────────────────────────────────────────────────
   useEffect(() => {
     if (!eventSlug) {
-      setErrorMessage('Link invalido.')
+      setErrorMessage('Link inválido.')
       setPageState('error')
       return
     }
@@ -208,13 +208,13 @@ export function AthleteJoinPage() {
     fetch(`${EDGE_FN_URL}?event_slug=${encodeURIComponent(eventSlug)}`, { signal: controller.signal })
       .then(async (res) => {
         const body = await res.json().catch(() => ({}))
-        if (!res.ok) throw new Error(body?.error ?? 'Evento nao encontrado.')
+        if (!res.ok) throw new Error(body?.error ?? 'Evento não encontrado.')
         setEvent(body.event)
         setPageState('choose')
       })
       .catch((err: Error) => {
         if (err.name === 'AbortError') return
-        setErrorMessage(err.message || 'Nao foi possivel carregar o evento.')
+        setErrorMessage(err.message || 'Não foi possível carregar o evento.')
         setPageState('error')
       })
     return () => controller.abort()
@@ -236,7 +236,7 @@ export function AthleteJoinPage() {
       })
         .then(async (res) => {
           const body = await res.json().catch(() => ({}))
-          if (!res.ok) throw new Error(body?.error ?? 'Codigo nao encontrado.')
+          if (!res.ok) throw new Error(body?.error ?? 'Código não encontrado.')
           setLookup({
             full_name: body.athlete.full_name,
             gym: body.athlete.gym ?? null,
@@ -277,16 +277,16 @@ export function AthleteJoinPage() {
   function validate(): boolean {
     const errors: Record<string, string> = {}
     if (form.full_name.trim().split(/\s+/).length < 2) errors.full_name = 'Informe nome e sobrenome.'
-    if (!isValidCpf(form.cpf)) errors.cpf = 'CPF invalido.'
+    if (!isValidCpf(form.cpf)) errors.cpf = 'CPF inválido.'
 
     if (kind === 'athlete') {
-      if (!photoPreview) errors.photo = 'A foto do atleta e obrigatoria.'
+      if (!photoPreview) errors.photo = 'A foto do atleta é obrigatória.'
       if (!form.birth_date) errors.birth_date = 'Informe a data de nascimento.'
-      if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'E-mail invalido.'
+      if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'E-mail inválido.'
     } else {
-      if (rawCode.length !== 6) errors.athlete_code = 'O codigo tem 6 caracteres.'
-      else if (lookupState === 'fail') errors.athlete_code = 'Codigo nao encontrado.'
-      else if (lookup && lookup.corners_left === 0) errors.athlete_code = 'Este atleta ja tem 2 corners.'
+      if (rawCode.length !== 6) errors.athlete_code = 'O código tem 6 caracteres.'
+      else if (lookupState === 'fail') errors.athlete_code = 'Código não encontrado.'
+      else if (lookup && lookup.corners_left === 0) errors.athlete_code = 'Este atleta já tem 2 corners.'
       if (!cornerColor) errors.corner_color = 'Escolha o lado: azul ou vermelho.'
     }
 
@@ -340,13 +340,13 @@ export function AthleteJoinPage() {
 
       if (res.status === 409 && body?.already_registered) {
         setResult({ code: body.athlete_code, athleteName: body.full_name })
-        setErrorMessage('Este CPF ja esta cadastrado neste evento.')
+        setErrorMessage('Este CPF já está cadastrado neste evento.')
         setPageState('success')
         return
       }
 
       if (!res.ok) {
-        setErrorMessage(body?.error ?? 'Nao foi possivel concluir o cadastro. Tente novamente.')
+        setErrorMessage(body?.error ?? 'Não foi possível concluir o cadastro. Tente novamente.')
         setPageState('form')
         return
       }
@@ -358,7 +358,7 @@ export function AthleteJoinPage() {
       })
       setPageState('success')
     } catch {
-      setErrorMessage('Erro de conexao. Verifique sua internet e tente novamente.')
+      setErrorMessage('Erro de conexão. Verifique sua internet e tente novamente.')
       setPageState('form')
     }
   }
@@ -387,7 +387,7 @@ export function AthleteJoinPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-[#06070a] px-5 text-center">
         <AlertCircle className="h-14 w-14 text-red-400" />
-        <h1 className="font-display text-3xl uppercase tracking-wide text-[#f5f0e8]">Link indisponivel</h1>
+        <h1 className="font-display text-3xl uppercase tracking-wide text-[#f5f0e8]">Link indisponível</h1>
         <p className="max-w-sm text-sm leading-6 text-white/64">{errorMessage}</p>
       </div>
     )
@@ -405,7 +405,7 @@ export function AthleteJoinPage() {
         </div>
 
         <h1 className="font-display text-[2.4rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
-          {errorMessage ? 'Ja cadastrado' : 'Cadastro confirmado'}
+          {errorMessage ? 'Já cadastrado' : 'Cadastro confirmado'}
         </h1>
 
         {errorMessage && <p className="max-w-md text-sm leading-6 text-amber-300">{errorMessage}</p>}
@@ -413,12 +413,12 @@ export function AthleteJoinPage() {
         {isAthlete ? (
           <div className="w-full max-w-md space-y-4">
             <p className="text-base leading-7 text-white/68">
-              Guarde o codigo abaixo. Seus corners precisam dele para se cadastrar.
-              Cada atleta pode ter no maximo <strong className="text-[#f5f0e8]">2 corners</strong>.
+              Guarde o código abaixo. Seus corners precisam dele para se cadastrar.
+              Cada atleta pode ter no máximo <strong className="text-[#f5f0e8]">2 corners</strong>.
             </p>
             <div className="rounded-[20px] border border-white/10 bg-white/[0.04] p-6">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
-                Codigo do atleta
+                Código do atleta
               </p>
               <p
                 className="mt-2 font-mono text-[2.6rem] font-bold leading-none tracking-[0.2em]"
@@ -436,7 +436,7 @@ export function AthleteJoinPage() {
                 className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-white/64 transition-all hover:border-white/20 hover:text-white"
               >
                 <Copy className="h-3.5 w-3.5" />
-                {copied ? 'Copiado' : 'Copiar codigo'}
+                {copied ? 'Copiado' : 'Copiar código'}
               </button>
             </div>
           </div>
@@ -472,7 +472,7 @@ export function AthleteJoinPage() {
         <div className="max-w-md rounded-[18px] border border-amber-400/25 bg-amber-400/[0.07] p-5 text-left">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">No dia do evento</p>
           <p className="mt-2 text-sm leading-6 text-white/72">
-            Leve um documento com foto. No credenciamento voce retira a camisa e as pulseiras.
+            Leve um documento com foto. No credenciamento você retira a camisa e as pulseiras.
           </p>
         </div>
       </div>
@@ -500,7 +500,7 @@ export function AthleteJoinPage() {
             </p>
           )}
 
-          <p className="mt-8 text-base leading-7 text-white/68">Quem esta se cadastrando?</p>
+          <p className="mt-8 text-base leading-7 text-white/68">Quem está se cadastrando?</p>
 
           <div className="mt-6 grid gap-4">
             <button
@@ -521,7 +521,7 @@ export function AthleteJoinPage() {
                   Sou atleta
                 </span>
                 <span className="mt-1 block text-[13px] leading-5 text-white/56">
-                  Cadastro completo e foto. Voce recebe um codigo para passar aos seus corners.
+                  Cadastro completo e foto. Você recebe um código para passar aos seus corners.
                 </span>
               </span>
             </button>
@@ -544,7 +544,7 @@ export function AthleteJoinPage() {
                   Sou corner
                 </span>
                 <span className="mt-1 block text-[13px] leading-5 text-white/56">
-                  Peca o codigo ao seu atleta. Sao no maximo 2 corners por atleta.
+                  Peça o código ao seu atleta. São no máximo 2 corners por atleta.
                 </span>
               </span>
             </button>
@@ -587,7 +587,7 @@ export function AthleteJoinPage() {
         <form onSubmit={handleSubmit} className="mt-7 space-y-5">
           {kind === 'corner' && (
             <Field
-              label="Codigo do atleta"
+              label="Código do atleta"
               required
               hint="Seis caracteres, fornecidos pelo atleta no cadastro dele."
               error={fieldErrors.athlete_code}
@@ -604,7 +604,7 @@ export function AthleteJoinPage() {
               />
               {lookupState === 'loading' && (
                 <p className="flex items-center gap-2 text-[11px] text-white/42">
-                  <Loader2 className="h-3 w-3 animate-spin" /> Conferindo o codigo...
+                  <Loader2 className="h-3 w-3 animate-spin" /> Conferindo o código...
                 </p>
               )}
               {lookupState === 'ok' && lookup && (
@@ -619,7 +619,7 @@ export function AthleteJoinPage() {
                     <br />
                     {lookup.corners_left > 0
                       ? `${lookup.corners_left === 1 ? 'Resta 1 vaga' : 'Restam 2 vagas'} de corner.`
-                      : 'Este atleta ja tem 2 corners cadastrados.'}
+                      : 'Este atleta já tem 2 corners cadastrados.'}
                   </p>
                 </div>
               )}
@@ -714,7 +714,7 @@ export function AthleteJoinPage() {
 
           {kind === 'athlete' && (
             <>
-              <Field label="Foto do atleta" required hint="Rosto visivel, sem bone e sem oculos escuros." error={fieldErrors.photo}>
+              <Field label="Foto do atleta" required hint="Rosto visível, sem boné e sem óculos escuros." error={fieldErrors.photo}>
                 <input
                   ref={fileRef}
                   type="file"
@@ -805,7 +805,7 @@ export function AthleteJoinPage() {
                 </Field>
               </div>
 
-              <Field label="Cartel" hint="Vitorias, derrotas e empates.">
+              <Field label="Cartel" hint="Vitórias, derrotas e empates.">
                 <div className="grid grid-cols-3 gap-3">
                   {([
                     ['record_wins', 'V'],
@@ -833,7 +833,7 @@ export function AthleteJoinPage() {
                   <input
                     value={form.city}
                     onChange={(e) => setField('city', e.target.value)}
-                    placeholder="Brasilia"
+                    placeholder="Brasília"
                     className={inputClass}
                   />
                 </Field>
@@ -852,7 +852,7 @@ export function AthleteJoinPage() {
                 </Field>
               </div>
 
-              <Field label="Instagram" hint="So o @ ou o link do perfil." error={fieldErrors.instagram}>
+              <Field label="Instagram" hint="Só o @ ou o link do perfil." error={fieldErrors.instagram}>
                 <input
                   value={form.instagram}
                   onChange={(e) => setField('instagram', e.target.value)}
@@ -890,8 +890,8 @@ export function AthleteJoinPage() {
           </button>
 
           <p className="pb-4 text-center text-[11px] leading-5 text-white/38">
-            Em conformidade com a LGPD (Lei 13.709/2018), os dados informados sao usados apenas para
-            credenciamento, controle de acesso e producao deste evento.
+            Em conformidade com a LGPD (Lei 13.709/2018), os dados informados são usados apenas para
+            credenciamento, controle de acesso e produção deste evento.
           </p>
         </form>
       </div>

@@ -152,3 +152,22 @@ create policy event_athletes_org_all on public.event_athletes
 
 comment on table public.event_athletes is
   'Atletas e corners de um evento. Corner se liga ao atleta por athlete_id; o limite de 2 e garantido pelo trigger enforce_corner_limit.';
+
+-- ── Lado do corner: azul ou vermelho ─────────────────────────────────────────
+
+alter table public.event_athletes
+  add column if not exists corner_color text;
+
+alter table public.event_athletes drop constraint if exists event_athletes_corner_color_chk;
+alter table public.event_athletes add constraint event_athletes_corner_color_chk check (
+  (kind = 'corner' and corner_color in ('azul', 'vermelho'))
+  or
+  (kind = 'athlete' and corner_color is null)
+);
+
+create index if not exists event_athletes_corner_color_idx
+  on public.event_athletes (event_id, corner_color)
+  where corner_color is not null;
+
+comment on column public.event_athletes.corner_color is
+  'Lado do corner na luta: azul ou vermelho. Obrigatorio para kind=corner, nulo para kind=athlete.';

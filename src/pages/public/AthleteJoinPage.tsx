@@ -21,12 +21,20 @@ interface EventInfo {
   venue_name?: string | null
 }
 
+type CornerColor = 'azul' | 'vermelho'
+
 interface AthleteLookup {
   full_name: string
   gym: string | null
   corners_left: number
   corners_used: number
+  corner_color: CornerColor | null
 }
+
+const CORNER_COLORS: Array<{ value: CornerColor; label: string; hex: string }> = [
+  { value: 'azul', label: 'Corner azul', hex: '#2E6BFF' },
+  { value: 'vermelho', label: 'Corner vermelho', hex: '#FF3B3B' },
+]
 
 const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/event-athlete-register`
 const ACCENT = '#D4FF00'
@@ -167,6 +175,7 @@ export function AthleteJoinPage() {
     sherdog_url: '',
     athlete_code: '',
   })
+  const [cornerColor, setCornerColor] = useState<CornerColor | ''>('')
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoBusy, setPhotoBusy] = useState(false)
@@ -175,7 +184,7 @@ export function AthleteJoinPage() {
   const [lookup, setLookup] = useState<AthleteLookup | null>(null)
   const [lookupState, setLookupState] = useState<'idle' | 'loading' | 'ok' | 'fail'>('idle')
 
-  const [result, setResult] = useState<{ code?: string; athleteName?: string } | null>(null)
+  const [result, setResult] = useState<{ code?: string; athleteName?: string; cornerColor?: CornerColor } | null>(null)
   const [copied, setCopied] = useState(false)
 
   function setField(key: keyof typeof form, value: string) {
@@ -233,8 +242,11 @@ export function AthleteJoinPage() {
             gym: body.athlete.gym ?? null,
             corners_left: body.corners_left,
             corners_used: body.corners_used,
+            corner_color: body.corner_color ?? null,
           })
           setLookupState('ok')
+          // O outro corner do mesmo atleta ja escolheu o lado: sugere o mesmo.
+          if (body.corner_color) setCornerColor(body.corner_color)
         })
         .catch((err: Error) => {
           if (err.name === 'AbortError') return
@@ -275,6 +287,7 @@ export function AthleteJoinPage() {
       if (rawCode.length !== 6) errors.athlete_code = 'O codigo tem 6 caracteres.'
       else if (lookupState === 'fail') errors.athlete_code = 'Codigo nao encontrado.'
       else if (lookup && lookup.corners_left === 0) errors.athlete_code = 'Este atleta ja tem 2 corners.'
+      if (!cornerColor) errors.corner_color = 'Escolha o lado: azul ou vermelho.'
     }
 
     setFieldErrors(errors)
@@ -314,6 +327,7 @@ export function AthleteJoinPage() {
       })
     } else {
       payload.athlete_code = rawCode
+      payload.corner_color = cornerColor
     }
 
     try {
@@ -337,7 +351,11 @@ export function AthleteJoinPage() {
         return
       }
 
-      setResult({ code: body.athlete_code, athleteName: body.athlete_name })
+      setResult({
+        code: body.athlete_code,
+        athleteName: body.athlete_name,
+        cornerColor: body.corner_color ?? undefined,
+      })
       setPageState('success')
     } catch {
       setErrorMessage('Erro de conexao. Verifique sua internet e tente novamente.')
@@ -423,15 +441,32 @@ export function AthleteJoinPage() {
             </div>
           </div>
         ) : (
-          <p className="max-w-md text-base leading-7 text-white/68">
-            Cadastro de corner confirmado
-            {result?.athleteName ? (
-              <>
-                {' '}para <strong className="text-[#f5f0e8]">{result.athleteName}</strong>
-              </>
-            ) : null}
-            .
-          </p>
+          <div className="max-w-md space-y-4">
+            {result?.cornerColor && (
+              <span
+                className="inline-flex items-center gap-2.5 rounded-full border px-5 py-2 text-sm font-bold uppercase tracking-[0.12em] text-[#f5f0e8]"
+                style={{
+                  borderColor: result.cornerColor === 'azul' ? '#2E6BFF' : '#FF3B3B',
+                  background: result.cornerColor === 'azul' ? '#2E6BFF26' : '#FF3B3B26',
+                }}
+              >
+                <span
+                  className="h-3.5 w-3.5 rounded-full"
+                  style={{ background: result.cornerColor === 'azul' ? '#2E6BFF' : '#FF3B3B' }}
+                />
+                Corner {result.cornerColor}
+              </span>
+            )}
+            <p className="text-base leading-7 text-white/68">
+              Cadastro de corner confirmado
+              {result?.athleteName ? (
+                <>
+                  {' '}para <strong className="text-[#f5f0e8]">{result.athleteName}</strong>
+                </>
+              ) : null}
+              .
+            </p>
+          </div>
         )}
 
         <div className="max-w-md rounded-[18px] border border-amber-400/25 bg-amber-400/[0.07] p-5 text-left">
@@ -588,6 +623,57 @@ export function AthleteJoinPage() {
                   </p>
                 </div>
               )}
+            </Field>
+          )}
+
+          {kind === 'corner' && (
+            <Field
+              label="Lado do corner"
+              required
+              hint={
+                lookup?.corner_color
+                  ? `O outro corner deste atleta se cadastrou como ${lookup.corner_color}.`
+                  : 'O mesmo lado do seu atleta na luta.'
+              }
+              error={fieldErrors.corner_color}
+            >
+              <div className="grid grid-cols-2 gap-3">
+                {CORNER_COLORS.map((option) => {
+                  const active = cornerColor === option.value
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setCornerColor(option.value)
+                        setFieldErrors((prev) => {
+                          if (!prev.corner_color) return prev
+                          const next = { ...prev }
+                          delete next.corner_color
+                          return next
+                        })
+                      }}
+                      aria-pressed={active}
+                      className="flex items-center justify-center gap-2.5 rounded-[14px] border px-4 py-4 text-sm font-bold uppercase tracking-[0.1em] transition-all"
+                      style={{
+                        borderColor: active ? option.hex : 'rgba(255,255,255,0.10)',
+                        background: active ? `${option.hex}26` : 'rgba(255,255,255,0.05)',
+                        color: active ? '#f5f0e8' : 'rgba(245,240,232,0.56)',
+                        boxShadow: active ? `0 0 0 1px ${option.hex}` : 'none',
+                      }}
+                    >
+                      <span
+                        className="h-4 w-4 shrink-0 rounded-full"
+                        style={{
+                          background: option.hex,
+                          boxShadow: active ? `0 0 12px ${option.hex}` : 'none',
+                        }}
+                      />
+                      {option.value === 'azul' ? 'Azul' : 'Vermelho'}
+                    </button>
+                  )
+                })}
+              </div>
             </Field>
           )}
 

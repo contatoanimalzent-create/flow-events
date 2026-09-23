@@ -37,6 +37,20 @@ interface AthleteBody {
   photo_base64?: string
   // corner
   athlete_code?: string
+  corner_color?: string
+}
+
+type CornerColor = 'azul' | 'vermelho'
+
+function normalizeCornerColor(value?: string | null): CornerColor | null {
+  const raw = (value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+  if (raw === 'azul' || raw === 'blue') return 'azul'
+  if (raw === 'vermelho' || raw === 'red') return 'vermelho'
+  return null
 }
 
 function json(req: Request, body: unknown, status = 200): Response {
@@ -187,20 +201,23 @@ async function handleGet(req: Request): Promise<Response> {
     return fail(req, 'Codigo de atleta nao encontrado. Confira com o seu atleta.', 404, 'ATHLETE_CODE_NOT_FOUND')
   }
 
-  const { count } = await admin
+  const { data: corners } = await admin
     .from('event_athletes')
-    .select('id', { count: 'exact', head: true })
+    .select('id, full_name, corner_color')
     .eq('athlete_id', athlete.id)
     .eq('kind', 'corner')
     .eq('status', 'active')
 
-  const used = count ?? 0
+  const used = corners?.length ?? 0
 
   return json(req, {
     event: { id: event.id, name: event.name, slug: event.slug },
     athlete: { full_name: athlete.full_name, gym: athlete.gym },
     corners_used: used,
     corners_left: Math.max(0, 2 - used),
+    // O lado ja escolhido por quem se cadastrou antes, para o proximo corner do
+    // mesmo atleta nao divergir sem querer.
+    corner_color: corners?.find((c) => c.corner_color)?.corner_color ?? null,
   })
 }
 
@@ -280,6 +297,11 @@ async function handlePost(req: Request): Promise<Response> {
     const code = normalizeCode(body.athlete_code)
     if (!code) return fail(req, 'Informe o codigo do seu atleta.', 400, 'MISSING_ATHLETE_CODE')
 
+    const cornerColor = normalizeCornerColor(body.corner_color)
+    if (!cornerColor) {
+      return fail(req, 'Escolha se voce e corner azul ou corner vermelho.', 400, 'MISSING_CORNER_COLOR')
+    }
+
     const { data: athlete } = await admin
       .from('event_athletes')
       .select('id, full_name')
@@ -295,8 +317,8 @@ async function handlePost(req: Request): Promise<Response> {
 
     const { data: corner, error: cornerErr } = await admin
       .from('event_athletes')
-      .insert({ ...common, kind: 'corner', athlete_id: athlete.id })
-      .select('id')
+      .insert({ ...common, kind: 'corner', athlete_id: athlete.id, corner_color: cornerColor })
+      .select('id, corner_color')
       .single()
 
     if (cornerErr || !corner) {
@@ -316,7 +338,8 @@ async function handlePost(req: Request): Promise<Response> {
       kind: 'corner',
       id: corner.id,
       athlete_name: athlete.full_name,
-      message: `Cadastro de corner confirmado para ${athlete.full_name}.`,
+      corner_color: corner.corner_color,
+      message: `Cadastro de corner ${cornerColor} confirmado para ${athlete.full_name}.`,
     }, 201)
   }
 

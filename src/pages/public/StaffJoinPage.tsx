@@ -82,11 +82,11 @@ function formatCpfInput(v: string): string {
 }
 
 const standardEventStaffSchedule = [
-  'Quinta, 28/05 - 08h Ã s 16h',
-  'Quinta, 28/05 - 16h Ã s 00h',
-  'Sexta, 29/05 - 08h Ã s 16h',
-  'Sexta, 29/05 - 16h Ã s 00h',
-  'SÃ¡bado, 30/05 - 16h Ã s 00h',
+  'Quinta, 28/05 - 08h às 16h',
+  'Quinta, 28/05 - 16h às 00h',
+  'Sexta, 29/05 - 08h às 16h',
+  'Sexta, 29/05 - 16h às 00h',
+  'Sábado, 30/05 - 16h às 00h',
 ]
 
 const STAFF_ROLE_OPTIONS: StaffRoleOption[] = [
@@ -103,39 +103,39 @@ const STAFF_ROLE_OPTIONS: StaffRoleOption[] = [
     shiftLabel: standardEventStaffSchedule.join(' | '),
   },
   {
-    value: 'ProduÃ§Ã£o',
-    label: 'ProduÃ§Ã£o',
+    value: 'Produção',
+    label: 'Produção',
     scheduleLines: standardEventStaffSchedule,
     shiftLabel: standardEventStaffSchedule.join(' | '),
   },
   {
-    value: 'Posto mÃ©dico e ambulÃ¢ncia',
-    label: 'Posto mÃ©dico e ambulÃ¢ncia',
+    value: 'Posto médico e ambulância',
+    label: 'Posto médico e ambulância',
     scheduleLines: [
-      'Quinta, 28/05 - 09h Ã s 21h30',
-      'Sexta, 29/05 - 09h Ã s 15h',
-      'SÃ¡bado, 30/05 - 17h Ã s 00h',
+      'Quinta, 28/05 - 09h às 21h30',
+      'Sexta, 29/05 - 09h às 15h',
+      'Sábado, 30/05 - 17h às 00h',
     ],
-    shiftLabel: 'Quinta, 28/05 - 09h Ã s 21h30 | Sexta, 29/05 - 09h Ã s 15h | SÃ¡bado, 30/05 - 17h Ã s 00h',
+    shiftLabel: 'Quinta, 28/05 - 09h às 21h30 | Sexta, 29/05 - 09h às 15h | Sábado, 30/05 - 17h às 00h',
   },
   {
-    value: 'SeguranÃ§a eventual',
-    label: 'SeguranÃ§a eventual',
+    value: 'Segurança eventual',
+    label: 'Segurança eventual',
     scheduleLines: standardEventStaffSchedule,
     shiftLabel: standardEventStaffSchedule.join(' | '),
   },
   {
-    value: 'SeguranÃ§a patrimonial',
-    label: 'SeguranÃ§a patrimonial',
+    value: 'Segurança patrimonial',
+    label: 'Segurança patrimonial',
     scheduleLines: [
-      'Quinta, 28/05 - 07h Ã s 19h',
-      'Quinta, 28/05 - 19h Ã s 07h',
-      'Sexta, 29/05 - 07h Ã s 19h',
-      'Sexta, 29/05 - 19h Ã s 07h',
-      'SÃ¡bado, 30/05 - 07h Ã s 19h',
-      'SÃ¡bado, 30/05 - 19h Ã s 07h',
+      'Quinta, 28/05 - 07h às 19h',
+      'Quinta, 28/05 - 19h às 07h',
+      'Sexta, 29/05 - 07h às 19h',
+      'Sexta, 29/05 - 19h às 07h',
+      'Sábado, 30/05 - 07h às 19h',
+      'Sábado, 30/05 - 19h às 07h',
     ],
-    shiftLabel: 'Quinta, 28/05 - 07h Ã s 19h | Quinta, 28/05 - 19h Ã s 07h | Sexta, 29/05 - 07h Ã s 19h | Sexta, 29/05 - 19h Ã s 07h | SÃ¡bado, 30/05 - 07h Ã s 19h | SÃ¡bado, 30/05 - 19h Ã s 07h',
+    shiftLabel: 'Quinta, 28/05 - 07h às 19h | Quinta, 28/05 - 19h às 07h | Sexta, 29/05 - 07h às 19h | Sexta, 29/05 - 19h às 07h | Sábado, 30/05 - 07h às 19h | Sábado, 30/05 - 19h às 07h',
   },
 ]
 
@@ -234,7 +234,7 @@ export function StaffJoinPage() {
   // Fetch invite on mount
   useEffect(() => {
     if (!token) {
-      setErrorMessage('Link de convite invÃ¡lido ou expirado.')
+      setErrorMessage('Link de convite inválido ou expirado.')
       setPageState('error')
       return
     }
@@ -254,7 +254,7 @@ export function StaffJoinPage() {
             setPageState('already_registered')
             return
           }
-          setErrorMessage(body?.message ?? 'Este convite Ã© invÃ¡lido, expirou ou jÃ¡ atingiu o limite de vagas.')
+          setErrorMessage(body?.message ?? 'Este convite é inválido, expirou ou já atingiu o limite de vagas.')
           setPageState('error')
           return
         }
@@ -275,7 +275,7 @@ export function StaffJoinPage() {
         setPageState('valid')
       } catch (err: unknown) {
         if ((err as Error)?.name === 'AbortError') return
-        setErrorMessage('Erro ao carregar o convite. Verifique sua conexÃ£o e tente novamente.')
+        setErrorMessage('Erro ao carregar o convite. Verifique sua conexão e tente novamente.')
         setPageState('error')
       }
     }
@@ -310,16 +310,16 @@ export function StaffJoinPage() {
   function validate(): boolean {
     const errors: Partial<Record<string, string>> = {}
 
-    if (!form.full_name.trim()) errors.full_name = 'Nome completo Ã© obrigatÃ³rio.'
+    if (!form.full_name.trim()) errors.full_name = 'Nome completo é obrigatório.'
     const email = form.email.trim().toLowerCase()
     if (!email) errors.email = 'E-mail obrigatorio.'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'E-mail invalido.'
     const cpfDigits = form.cpf.replace(/\D/g, '')
 
-    if (!form.cpf.trim()) errors.cpf = 'CPF Ã© obrigatÃ³rio.'
-    else if (cpfDigits.length !== 11) errors.cpf = 'CPF invÃ¡lido.'
-    if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX Ã© obrigatÃ³ria.'
-    if (!form.terms_accepted) errors.terms_accepted = 'VocÃª deve aceitar os termos para continuar.'
+    if (!form.cpf.trim()) errors.cpf = 'CPF é obrigatório.'
+    else if (cpfDigits.length !== 11) errors.cpf = 'CPF inválido.'
+    if (!form.pix_key.trim()) errors.pix_key = 'Chave PIX é obrigatória.'
+    if (!form.terms_accepted) errors.terms_accepted = 'Você deve aceitar os termos para continuar.'
 
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
@@ -360,7 +360,7 @@ export function StaffJoinPage() {
 
       setPageState('success')
     } catch {
-      setErrorMessage('Erro de conexÃ£o. Verifique sua internet e tente novamente.')
+      setErrorMessage('Erro de conexão. Verifique sua internet e tente novamente.')
       setPageState('error')
     } finally {
       setSubmitting(false)
@@ -390,7 +390,7 @@ export function StaffJoinPage() {
         </div>
         <div className="max-w-md">
           <h1 className="font-display text-[2.4rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
-            Link invÃ¡lido
+            Link inválido
           </h1>
           <p className="mt-3 text-sm leading-7 text-white/56">{errorMessage}</p>
         </div>
@@ -398,7 +398,7 @@ export function StaffJoinPage() {
           href="/"
           className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white/64 transition-all hover:border-white/20 hover:text-white"
         >
-          Voltar ao inÃ­cio
+          Voltar ao início
         </a>
       </div>
     )
@@ -414,10 +414,10 @@ export function StaffJoinPage() {
         </div>
         <div className="max-w-md">
           <h1 className="font-display text-[2.4rem] uppercase leading-none tracking-wide text-[#f5f0e8]">
-            Cadastro jÃ¡ confirmado
+            Cadastro já confirmado
           </h1>
           <p className="mt-4 text-base leading-7 text-white/68">
-            Seus dados jÃ¡ estÃ£o no evento. Agora use o link de ponto somente quando estiver no local.
+            Seus dados já estão no evento. Agora use o link de ponto somente quando estiver no local.
           </p>
           <p className="mt-3 text-sm leading-6 text-white/48">
             O ponto deve ser batido todos os dias do evento.
@@ -488,14 +488,14 @@ export function StaffJoinPage() {
         </div>
 
         <div className="mt-2 max-w-md rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 px-5 py-4 text-left">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">âš ï¸ AtenÃ§Ã£o</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">âš ï¸ Atenção</p>
           <p className="mt-2 text-sm leading-6 text-amber-100">
-            O ponto <strong>SÃ“ funciona quando vocÃª estiver dentro do local do evento</strong>. Ative GPS, cÃ¢mera e notificaÃ§Ãµes no seu celular. O sistema bloqueia o registro se vocÃª estiver longe.
+            O ponto <strong>SÃ“ funciona quando você estiver dentro do local do evento</strong>. Ative GPS, câmera e notificações no seu celular. O sistema bloqueia o registro se você estiver longe.
           </p>
         </div>
 
         <p className="max-w-md text-xs leading-6 text-white/40">
-          VocÃª tambÃ©m recebeu o link por e-mail e WhatsApp. Bata o ponto todos os dias que trabalhar e mostre o comprovante no credenciamento para retirar sua pulseira.
+          Você também recebeu o link por e-mail e WhatsApp. Bata o ponto todos os dias que trabalhar e mostre o comprovante no credenciamento para retirar sua pulseira.
         </p>
       </div>
     )
@@ -560,7 +560,7 @@ export function StaffJoinPage() {
           <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {info.role && (
               <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/38">FunÃ§Ã£o</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/38">Função</p>
                 <p className="mt-1 text-sm font-semibold text-[#f5f0e8]">{info.role}</p>
               </div>
             )}
@@ -589,7 +589,7 @@ export function StaffJoinPage() {
             Preencha seus dados
           </h2>
           <p className="mt-2 text-sm text-white/48">
-            Campos marcados com <span className="text-[#D4FF00]">*</span> sÃ£o obrigatÃ³rios.
+            Campos marcados com <span className="text-[#D4FF00]">*</span> são obrigatórios.
           </p>
 
           <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-6">
@@ -626,7 +626,7 @@ export function StaffJoinPage() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {false && (
-                  <InputField label="FunÃ§Ã£o no evento" required error={fieldErrors.role_title}>
+                  <InputField label="Função no evento" required error={fieldErrors.role_title}>
                     <div className="relative">
                       <select
                         value={form.role_title}
@@ -635,7 +635,7 @@ export function StaffJoinPage() {
                         style={{ colorScheme: 'dark' }}
                         required
                       >
-                        <option value="" className="bg-[#12161f] text-white/50">Selecione sua funÃ§Ã£o</option>
+                        <option value="" className="bg-[#12161f] text-white/50">Selecione sua função</option>
                         {STAFF_ROLE_OPTIONS.map((role) => (
                           <option key={role.value} value={role.value} className="bg-[#12161f] text-[#f5f0e8]">
                             {role.label}
@@ -660,7 +660,7 @@ export function StaffJoinPage() {
                     />
                   </InputField>
 
-                  <InputField label="Chave PIX" required hint="CPF, telefone, e-mail ou chave aleatÃ³ria" error={fieldErrors.pix_key}>
+                  <InputField label="Chave PIX" required hint="CPF, telefone, e-mail ou chave aleatória" error={fieldErrors.pix_key}>
                     <input
                       type="text"
                       value={form.pix_key}
@@ -674,9 +674,9 @@ export function StaffJoinPage() {
 
                 {false && (
                 <InputField
-                  label="HorÃ¡rio do trabalho"
+                  label="Horário do trabalho"
                   required
-                  hint="O horÃ¡rio Ã© definido pela funÃ§Ã£o escolhida e nÃ£o pode ser alterado aqui."
+                  hint="O horário é definido pela função escolhida e não pode ser alterado aqui."
                   error={fieldErrors.shift_label}
                 >
                   <div className="rounded-[18px] border border-white/10 bg-white/[0.035] p-4">
@@ -690,7 +690,7 @@ export function StaffJoinPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-white/42">Selecione uma funÃ§Ã£o para ver o horÃ¡rio.</p>
+                      <p className="text-sm text-white/42">Selecione uma função para ver o horário.</p>
                     )}
                   </div>
                 </InputField>
@@ -716,7 +716,7 @@ export function StaffJoinPage() {
                     </a>{' '}
                     e{' '}
                     <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline decoration-white/30 hover:text-[#D4FF00]">
-                      PolÃ­tica de Privacidade
+                      Política de Privacidade
                     </a>
                     . <span className="text-[#D4FF00]">*</span>
                   </span>
@@ -750,7 +750,7 @@ export function StaffJoinPage() {
             </button>
 
             <p className="text-center text-[11px] text-white/30">
-              Depois da confirmaÃ§Ã£o, o ponto digital sÃ³ registra presenÃ§a quando vocÃª estiver no local do evento.
+              Depois da confirmação, o ponto digital só registra presença quando você estiver no local do evento.
             </p>
           </form>
         </div>

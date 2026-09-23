@@ -47,3 +47,6 @@ supabase/.temp/
 .capacitor/
 
 .vercel
+
+# arquivo de rascunho, nao referenciado por nenhum import
+src/pages/public/kiosk-offline.ts

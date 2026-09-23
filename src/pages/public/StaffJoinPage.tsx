@@ -46,16 +46,29 @@ interface StaffRoleOption {
   shiftLabel: string
 }
 
-function getPointUrl(inviteInfo?: InviteInfo | null, token?: string | null): string {
-  const slug = inviteInfo?.event_slug || (token === 'bsb5' ? 'bsb-fight-5' : token)
-  return `https://pulse.animalzgroup.com/staff/ponto/${slug || 'bsb-fight-5'}`
+const LEGACY_TOKEN_SLUGS: Record<string, string> = {
+  bsb5: 'bsb-fight-5',
 }
 
-function isAlreadyRegisteredResponse(body: Record<string, unknown>): boolean {
-  const text = String(body?.error ?? body?.message ?? body?.code ?? '').toLowerCase()
+function getPointUrl(inviteInfo?: InviteInfo | null, token?: string | null): string {
+  const slug = inviteInfo?.event_slug || (token ? LEGACY_TOKEN_SLUGS[token] ?? token : null)
+  return slug ? `https://pulse.animalzgroup.com/staff/ponto/${slug}` : ''
+}
+
+function stripAccents(value: string): string {
+  return value.normalize('NFD').replace(/[̀-ͯ]/g, '')
+}
+
+function isAlreadyRegisteredResponse(body: Record<string, unknown>, status?: number): boolean {
+  if (status === 409) return true
+
+  const text = stripAccents(
+    String(body?.error ?? body?.message ?? body?.code ?? ''),
+  ).toLowerCase()
+
   return (
-    text.includes('jÃ¡ estÃ¡ cadastrado') ||
     text.includes('ja esta cadastrado') ||
+    text.includes('ja existe') ||
     text.includes('already')
   )
 }
@@ -237,7 +250,7 @@ export function StaffJoinPage() {
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({}))
-          if (isAlreadyRegisteredResponse(body)) {
+          if (isAlreadyRegisteredResponse(body, res.status)) {
             setPageState('already_registered')
             return
           }
@@ -336,7 +349,7 @@ export function StaffJoinPage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        if (isAlreadyRegisteredResponse(body)) {
+        if (isAlreadyRegisteredResponse(body, res.status)) {
           setPageState('already_registered')
           return
         }

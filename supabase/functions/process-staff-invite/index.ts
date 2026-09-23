@@ -1,5 +1,6 @@
-﻿import { corsHeaders } from '../_shared/cors.ts'
+import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
+import { sendResendEmail } from '../_shared/transactional-email.ts'
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
@@ -50,6 +51,13 @@ interface BatchResult {
   target_email: string | null
   status: 'sent' | 'failed' | 'skipped' | 'expired' | 'already_sent'
   error?: string
+}
+
+function renderNotificationTemplate(template: string, variables: Record<string, unknown>) {
+  return template.replace(/{{\s*([\w.]+)\s*}}/g, (_match, key: string) => {
+    const value = variables[key]
+    return value === null || value === undefined ? '' : String(value)
+  })
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -185,7 +193,7 @@ async function queueStaffConfirmationNotifications(
     message: 'Ative câmera, localização e notificações. O ponto digital deve ser usado somente quando você estiver no local do evento.',
   }
 
-  await admin.from('email_templates').upsert({
+  const emailTemplate = {
     organization_id: params.organizationId,
     key: templateKey,
     subject: '{{event_name}} | Dados confirmados e ponto digital',
@@ -296,9 +304,22 @@ async function queueStaffConfirmationNotifications(
       </html>
     `.trim(),
     text: 'Olá, {{first_name}}. Seus dados para trabalhar no evento {{event_name}} foram confirmados. Local: {{venue_name}}. Link do ponto: {{point_url}}. Use o ponto somente quando estiver no local do evento. Ative câmera, localização e notificações. O ponto deve ser batido em todos os dias em que você trabalhar. Depois da entrada, apresente o comprovante no credenciamento para retirar sua pulseira.',
-  }, { onConflict: 'organization_id,key' }).then(({ error }) => {
+  }
+
+  await admin.from('email_templates').upsert(emailTemplate, { onConflict: 'organization_id,key' }).then(({ error }) => {
     if (error) console.warn('[process-staff-invite] email template upsert failed:', error.message)
   })
+
+  const directEmailResult = await sendResendEmail({
+    to: params.staffEmail,
+    subject: renderNotificationTemplate(emailTemplate.subject, variables),
+    html: renderNotificationTemplate(emailTemplate.html, variables),
+    text: renderNotificationTemplate(emailTemplate.text, variables),
+  })
+  const directEmailSent = directEmailResult.status === 'sent'
+  if (!directEmailSent) {
+    console.warn('[process-staff-invite] direct confirmation email nao enviado, status:', directEmailResult.status)
+  }
 
   await admin.from('whatsapp_templates').upsert({
     organization_id: params.organizationId,
@@ -333,7 +354,7 @@ async function queueStaffConfirmationNotifications(
   }
 
   const jobs = [
-    {
+    ...(!directEmailSent ? [{
       organization_id: params.organizationId,
       template_key: templateKey,
       audience_segment_id: segment.id,
@@ -343,7 +364,7 @@ async function queueStaffConfirmationNotifications(
       event_id: params.eventId,
       variables,
       created_at: params.now,
-    },
+    }] : []),
     ...(audiencePhones.length > 0 ? [{
       organization_id: params.organizationId,
       template_key: templateKey,
@@ -357,9 +378,25 @@ async function queueStaffConfirmationNotifications(
     }] : []),
   ]
 
-  await admin.from('notification_jobs').insert(jobs).then(({ error }) => {
-    if (error) console.warn('[process-staff-invite] notification_jobs insert failed:', error.message)
-  })
+  if (jobs.length > 0) {
+    await admin.from('notification_jobs').insert(jobs).then(({ error }) => {
+      if (error) console.warn('[process-staff-invite] notification_jobs insert failed:', error.message)
+    })
+  }
+}
+
+function canonicalizeInviteToken(value?: string | null): string {
+  const normalized = (value ?? '').trim().toLowerCase().replace(/\s+/g, '-')
+  const compact = normalized.replace(/[^a-z0-9]/g, '')
+  if (compact === 'bsb6' || compact === 'bsbfight6') return 'bsb-fight-6'
+  if (compact === 'bsb5' || compact === 'bsbfight5') return 'bsb5'
+  return normalized
+}
+
+function pointUrlForSlug(slug?: string | null): string | null {
+  if (!slug) return null
+  const appUrl = Deno.env.get('APP_URL') || 'https://pulse.animalzgroup.com'
+  return `${appUrl}/staff/ponto/${slug}`
 }
 
 async function triggerNotificationProcessor() {
@@ -392,13 +429,13 @@ function validateTokenRecord(
   token: InviteToken,
 ): { valid: true } | { valid: false; error: string; status: number } {
   if (!token.is_active) {
-    return { valid: false, error: 'This invite link is no longer active', status: 410 }
+    return { valid: false, error: 'Este link de cadastro não está mais ativo.', status: 410 }
   }
   if (token.expires_at && new Date(token.expires_at) < new Date()) {
-    return { valid: false, error: 'This invite link has expired', status: 410 }
+    return { valid: false, error: 'Este link de cadastro expirou.', status: 410 }
   }
   if (token.max_uses !== null && token.used_count >= token.max_uses) {
-    return { valid: false, error: 'This invite link has reached its maximum number of uses', status: 410 }
+    return { valid: false, error: 'Este link atingiu o limite de cadastros.', status: 410 }
   }
   return { valid: true }
 }
@@ -689,7 +726,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   // =========================================================================
   if (req.method === 'GET') {
     const url = new URL(req.url)
-    const tokenParam = url.searchParams.get('token')
+    const tokenParam = canonicalizeInviteToken(url.searchParams.get('token'))
     const runParam   = url.searchParams.get('run')
 
     // Cron trigger: GET ?run=batch
@@ -698,7 +735,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
 
     if (!tokenParam) {
-      return Response.json({ error: 'token query parameter is required' }, addCors({ status: 400 }))
+      return Response.json({ error: 'O identificador do link de cadastro é obrigatório.' }, addCors({ status: 400 }))
     }
 
     try {
@@ -709,7 +746,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         .single()
 
       if (error || !inviteLink) {
-        return Response.json({ error: 'Invite link not found' }, addCors({ status: 404 }))
+        return Response.json({ error: 'Este link de cadastro não foi encontrado.' }, addCors({ status: 404 }))
       }
 
       const check = validateTokenRecord(inviteLink as InviteToken)
@@ -758,13 +795,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
             : null,
           team,
           shift,
+          point_url: pointUrlForSlug(event?.slug),
         },
         addCors({ status: 200 }),
       )
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unexpected error'
       console.error('[process-staff-invite] GET error:', err)
-      return Response.json({ error: message }, addCors({ status: 500 }))
+      return Response.json({ error: 'Não foi possível carregar o cadastro agora. Tente novamente.' }, addCors({ status: 500 }))
     }
   }
 
@@ -776,16 +813,16 @@ Deno.serve(async (req: Request): Promise<Response> => {
     try {
       rawBody = await req.json()
     } catch {
-      // Empty body â†’ treat as batch trigger
-      rawBody = {}
+      return jsonResponse(
+        { code: 'invalid_json', error: 'Corpo da requisição inválido.' },
+        400,
+      )
     }
 
     const action = rawBody.action as string | undefined
 
     // â”€â”€ Mode 1: run-batch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const looksLikeStaffSubmission = Boolean(rawBody.token || rawBody.full_name || rawBody.email)
-
-    if (action === 'run-batch' || (!action && !looksLikeStaffSubmission)) {
+    if (action === 'run-batch') {
       return await runBatch(admin)
     }
 
@@ -819,6 +856,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     // â”€â”€ Mode 3: submit application â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const body = rawBody as Partial<ApplicationBody>
+    body.token = canonicalizeInviteToken(body.token)
 
     const missing: string[] = []
     if (!body.token)             missing.push('token')
@@ -830,7 +868,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     if (missing.length > 0) {
       return Response.json(
-        { error: `Missing required fields: ${missing.join(', ')}` },
+        { error: 'Preencha todos os campos obrigatórios antes de continuar.', fields: missing },
         addCors({ status: 400 }),
       )
     }
@@ -838,7 +876,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const normalizedEmail = String(body.email ?? '').toLowerCase().trim()
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      return Response.json({ error: 'Invalid email format' }, addCors({ status: 400 }))
+      return Response.json({ error: 'Informe um e-mail válido.' }, addCors({ status: 400 }))
     }
 
     try {
@@ -849,7 +887,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         .single()
 
       if (inviteError || !inviteLink) {
-        return Response.json({ error: 'Invite link not found' }, addCors({ status: 404 }))
+        return Response.json({ error: 'Este link de cadastro não foi encontrado.' }, addCors({ status: 404 }))
       }
 
       const check = validateTokenRecord(inviteLink as InviteToken)
@@ -857,8 +895,21 @@ Deno.serve(async (req: Request): Promise<Response> => {
         return Response.json({ error: check.error }, addCors({ status: check.status }))
       }
 
+      const { data: eventInfo } = await admin
+        .from('events')
+        .select('name, slug, venue_name, venue_address, cover_url')
+        .eq('id', inviteLink.event_id)
+        .maybeSingle()
+
       const cleanPhone = normalizeBsbPhoneDigits(body.phone)
       const cleanCpf = normalizeCPF(body.document_number)
+
+      if (cleanPhone && cleanPhone.length !== 10 && cleanPhone.length !== 11) {
+        return Response.json(
+          { error: 'Informe um WhatsApp válido com DDD.' },
+          addCors({ status: 400 }),
+        )
+      }
 
       if (!isValidCPF(cleanCpf)) {
         return Response.json(
@@ -867,28 +918,42 @@ Deno.serve(async (req: Request): Promise<Response> => {
         )
       }
 
-      let existingStaff: { id: string } | null = null
-      if (cleanCpf) {
-        const { data } = await admin
+      const formattedCpf = formatCPF(cleanCpf)
+      const [cpfLookup, emailLookup, phoneLookup] = await Promise.all([
+        admin
           .from('staff_members')
           .select('id')
           .eq('event_id', inviteLink.event_id)
-          .eq('cpf', cleanCpf)
-          .maybeSingle()
-        existingStaff = data
-      } else {
-        const { data } = await admin
+          .in('cpf', [cleanCpf!, formattedCpf!])
+          .limit(1)
+          .maybeSingle(),
+        admin
           .from('staff_members')
           .select('id')
           .eq('event_id', inviteLink.event_id)
-          .eq('email', normalizedEmail)
-          .maybeSingle()
-        existingStaff = data
-      }
+          .ilike('email', normalizedEmail)
+          .limit(1)
+          .maybeSingle(),
+        admin
+          .from('staff_members')
+          .select('id')
+          .eq('event_id', inviteLink.event_id)
+          .in('phone', [cleanPhone, `55${cleanPhone}`, `+55${cleanPhone}`])
+          .limit(1)
+          .maybeSingle(),
+      ])
+
+      const existingStaff = cpfLookup.data ?? emailLookup.data ?? phoneLookup.data
 
       if (existingStaff) {
         return Response.json(
-          { error: 'Este cadastro ja existe para este evento.' },
+          {
+            code: 'already_registered',
+            already_registered: true,
+            message: 'Seu cadastro já está confirmado para este evento.',
+            event: { name: eventInfo?.name ?? 'Evento', slug: eventInfo?.slug ?? null },
+            point_url: pointUrlForSlug(eventInfo?.slug),
+          },
           addCors({ status: 409 }),
         )
       }
@@ -923,8 +988,20 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       if (staffError || !staffMember) {
         console.error('[process-staff-invite] staff_member insert error:', staffError)
+        if (staffError?.code === '23505') {
+          return Response.json(
+            {
+              code: 'already_registered',
+              already_registered: true,
+              message: 'Seu cadastro já está confirmado para este evento.',
+              event: { name: eventInfo?.name ?? 'Evento', slug: eventInfo?.slug ?? null },
+              point_url: pointUrlForSlug(eventInfo?.slug),
+            },
+            addCors({ status: 409 }),
+          )
+        }
         return Response.json(
-          { error: 'Failed to register staff member', details: staffError?.message },
+          { error: 'Não foi possível concluir o cadastro. Tente novamente.' },
           addCors({ status: 500 }),
         )
       }
@@ -934,31 +1011,29 @@ Deno.serve(async (req: Request): Promise<Response> => {
         .update({ used_count: (inviteLink.used_count ?? 0) + 1, updated_at: now })
         .eq('id', inviteLink.id)
 
-      const { data: eventInfo } = await admin
-        .from('events')
-        .select('name, slug, venue_name, venue_address, cover_url')
-        .eq('id', inviteLink.event_id)
-        .maybeSingle()
-
-      await queueStaffConfirmationNotifications(admin, {
-        organizationId: inviteLink.organization_id,
-        eventId: inviteLink.event_id,
-        eventName: eventInfo?.name ?? 'Evento',
-        eventSlug: eventInfo?.slug ?? body.token!,
-        venueName: eventInfo?.venue_name ?? null,
-        venueAddress: (eventInfo?.venue_address as Record<string, unknown> | null | undefined) ?? null,
-        eventImageUrl: (eventInfo?.cover_url as string | null | undefined) ?? null,
-        staffMemberId: staffMember.id,
-        staffName: body.full_name!.trim(),
-        staffEmail: normalizedEmail,
-        staffPhone: cleanPhone || body.phone || null,
-        roleType: inviteLink.role_type,
-        teamId: inviteLink.team_id ?? null,
-        shiftId: inviteLink.shift_id ?? null,
-        inviteLinkId: inviteLink.id,
-        now,
-      })
-      await triggerNotificationProcessor()
+      try {
+        await queueStaffConfirmationNotifications(admin, {
+          organizationId: inviteLink.organization_id,
+          eventId: inviteLink.event_id,
+          eventName: eventInfo?.name ?? 'Evento',
+          eventSlug: eventInfo?.slug ?? body.token!,
+          venueName: eventInfo?.venue_name ?? null,
+          venueAddress: (eventInfo?.venue_address as Record<string, unknown> | null | undefined) ?? null,
+          eventImageUrl: (eventInfo?.cover_url as string | null | undefined) ?? null,
+          staffMemberId: staffMember.id,
+          staffName: body.full_name!.trim(),
+          staffEmail: normalizedEmail,
+          staffPhone: cleanPhone || body.phone || null,
+          roleType: inviteLink.role_type,
+          teamId: inviteLink.team_id ?? null,
+          shiftId: inviteLink.shift_id ?? null,
+          inviteLinkId: inviteLink.id,
+          now,
+        })
+        await triggerNotificationProcessor()
+      } catch (notifyErr) {
+        console.error('[process-staff-invite] notificacao falhou apos o cadastro:', notifyErr)
+      }
 
       return Response.json(
         {
@@ -969,11 +1044,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
         addCors({ status: 201 }),
       )
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unexpected error'
       console.error('[process-staff-invite] POST error:', err)
-      return Response.json({ error: message }, addCors({ status: 500 }))
+      return Response.json({ error: 'Não foi possível concluir o cadastro agora. Tente novamente.' }, addCors({ status: 500 }))
     }
   }
 
-  return Response.json({ error: 'Method not allowed' }, addCors({ status: 405 }))
+  return Response.json({ error: 'Método não permitido.' }, addCors({ status: 405 }))
 })

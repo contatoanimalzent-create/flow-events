@@ -35,9 +35,11 @@ interface AthleteBody {
   record_losses?: number | string
   record_draws?: number | string
   photo_base64?: string
-  // corner
-  athlete_code?: string
   corner_color?: string
+  // o atleta manda os corners dele junto, ate 2
+  corners?: Array<{ full_name?: string; cpf?: string; gym?: string }>
+  // corner avulso (fluxo antigo, mantido para nao quebrar link ja enviado)
+  athlete_code?: string
 }
 
 type CornerColor = 'azul' | 'vermelho'
@@ -358,9 +360,15 @@ async function handlePost(req: Request): Promise<Response> {
     return fail(req, 'A foto do atleta é obrigatória.', 400, 'PHOTO_REQUIRED')
   }
 
+  const athleteColor = normalizeCornerColor(body.corner_color)
+  if (!athleteColor) {
+    return fail(req, 'Escolha se você é o corner azul ou o vermelho.', 400, 'MISSING_CORNER_COLOR')
+  }
+
   const athleteRow = {
     ...common,
     kind: 'athlete' as const,
+    corner_color: athleteColor,
     photo_url: photoUrl,
     birth_date: (body.birth_date ?? '').trim() || null,
     instagram: normalizeInstagram(body.instagram),
@@ -382,11 +390,65 @@ async function handlePost(req: Request): Promise<Response> {
       .single()
 
     if (!insertErr && created) {
+      // Os corners que o proprio atleta informou. Ate 2, e herdam o lado dele.
+      const wanted = (body.corners ?? [])
+        .map((c) => ({
+          full_name: (c?.full_name ?? '').trim().replace(/\s+/g, ' '),
+          cpf: normalizeCpf(c?.cpf),
+          gym: (c?.gym ?? '').trim(),
+        }))
+        .filter((c) => c.full_name || c.cpf)
+        .slice(0, 2)
+
+      const corners: Array<{ full_name: string; ok: boolean; reason?: string }> = []
+
+      for (const c of wanted) {
+        if (!c.full_name.includes(' ')) {
+          corners.push({ full_name: c.full_name, ok: false, reason: 'Informe o nome completo do corner.' })
+          continue
+        }
+        if (!isValidCpf(c.cpf)) {
+          corners.push({ full_name: c.full_name, ok: false, reason: 'CPF do corner inválido.' })
+          continue
+        }
+
+        const { error: cornerErr } = await admin.from('event_athletes').insert({
+          organization_id: event.organization_id,
+          event_id: event.id,
+          kind: 'corner',
+          full_name: c.full_name,
+          cpf: formatCpf(c.cpf),
+          gym: c.gym || common.gym,
+          corner_color: athleteColor,
+          athlete_id: created.id,
+        })
+
+        if (cornerErr) {
+          const msg = cornerErr.message ?? ''
+          corners.push({
+            full_name: c.full_name,
+            ok: false,
+            reason: msg.includes('ja tem 2 corners')
+              ? 'Limite de 2 corners atingido.'
+              : cornerErr.code === '23505'
+                ? 'Este CPF já está cadastrado neste evento.'
+                : 'Não foi possível cadastrar este corner.',
+          })
+          console.error('[event-athlete-register] erro ao inserir corner do atleta:', cornerErr)
+          continue
+        }
+
+        corners.push({ full_name: c.full_name, ok: true })
+      }
+
       return json(req, {
         success: true,
         kind: 'athlete',
         id: created.id,
         athlete_code: created.athlete_code,
+        corner_color: athleteColor,
+        corners,
+        corners_ok: corners.filter((c) => c.ok).length,
         message: 'Cadastro de atleta confirmado.',
       }, 201)
     }

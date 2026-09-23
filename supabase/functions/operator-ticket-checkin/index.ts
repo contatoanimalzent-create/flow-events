@@ -107,6 +107,18 @@ function readShirtSize(metadata: Record<string, unknown>) {
   return String(metadata.shirt_size ?? metadata.tamanho_camiseta ?? metadata.shirtSize ?? '').trim() || null
 }
 
+// Start of the current day in Brasilia time, as UTC. Brazil has no DST since 2019,
+// so the fixed -03:00 offset is correct.
+function dayStartBrasilia(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now)
+  return new Date(`${parts}T00:00:00-03:00`).toISOString()
+}
+
 function mapTicket(ticket: Record<string, unknown>) {
   const typeName = (ticket.ticket_type as any)?.name ?? 'Ingresso'
   const batchName = (ticket.batch as any)?.name ?? ''
@@ -287,7 +299,7 @@ Deno.serve(async (req) => {
   const admin = createSupabaseAdminClient()
   const eventQuery = admin
     .from('events')
-    .select('id,name,organization_id,slug,organization:organizations(email)')
+    .select('id,name,organization_id,slug,settings,organization:organizations(email)')
     .limit(1)
 
   const { data: events, error: eventError } = body.event_id
@@ -297,8 +309,34 @@ Deno.serve(async (req) => {
   const event = Array.isArray(events) ? events[0] : null
   if (eventError || !event) return json(req, { error: 'Evento nao encontrado.' }, 404)
 
+  // A busca do ingresso nao depende da sessao, entao dispara junto com a
+  // checagem de auth e economiza uma ida ao banco por leitura. O resultado so e
+  // lido depois que a sessao foi validada.
+  const validateLookup = body.action === 'validate'
+    ? normalizeLookup(String(body.token ?? ''))
+    : ''
+  const ticketPromise = validateLookup
+    ? findTicket(admin, event.id, validateLookup).catch(() => null)
+    : null
+
   const session = await assertScannerSession(admin, event, req, body.scanner_session)
   if (!session.ok) return json(req, { valid: false, reason: 'unauthorized', message: session.error }, 401)
+
+  // Multi-day events: the same ticket is valid on every day, and each day has its
+  // own check-in. Without this flag a ticket can only ever be used once.
+  const dailyCheckin = Boolean((event.settings as Record<string, unknown> | null)?.daily_checkin)
+  const dayStart = dayStartBrasilia()
+
+  async function checkedInToday(ticketId: string) {
+    const { count } = await admin
+      .from('checkins')
+      .select('id', { count: 'exact', head: true })
+      .eq('digital_ticket_id', ticketId)
+      .eq('result', 'success')
+      .eq('is_exit', false)
+      .gte('checked_in_at', dayStart)
+    return (count ?? 0) > 0
+  }
 
   if (body.action === 'list') {
     const { data, error } = await admin
@@ -309,15 +347,37 @@ Deno.serve(async (req) => {
       .limit(3000)
 
     if (error) return json(req, { error: 'Nao foi possivel carregar inscritos.' }, 500)
-    return json(req, { tickets: ((data ?? []) as Array<Record<string, unknown>>).map(mapTicket) })
+    const tickets = ((data ?? []) as Array<Record<string, unknown>>).map(mapTicket)
+
+    if (dailyCheckin) {
+      const { data: todayRows } = await admin
+        .from('checkins')
+        .select('digital_ticket_id, checked_in_at')
+        .eq('event_id', event.id)
+        .eq('result', 'success')
+        .eq('is_exit', false)
+        .gte('checked_in_at', dayStart)
+        .limit(5000)
+
+      const today = new Map<string, string>()
+      for (const row of (todayRows ?? []) as Array<Record<string, unknown>>) {
+        today.set(String(row.digital_ticket_id), String(row.checked_in_at))
+      }
+      for (const ticket of tickets) {
+        ticket.checkedInAt = today.get(ticket.id) ?? null
+        ticket.checkedIn = today.has(ticket.id)
+      }
+    }
+
+    return json(req, { tickets })
   }
 
   if (body.action !== 'validate') return json(req, { error: 'Acao invalida.' }, 400)
 
-  const lookup = normalizeLookup(String(body.token ?? ''))
+  const lookup = validateLookup
   if (!lookup) return json(req, { valid: false, reason: 'invalid_token', message: 'Codigo invalido' }, 400)
 
-  const ticket = await findTicket(admin, event.id, lookup)
+  const ticket = await ticketPromise
   if (!ticket) {
     console.warn('[operator-ticket-checkin] ticket not found', {
       raw_token: String(body.token ?? '').slice(0, 120),
@@ -330,25 +390,30 @@ Deno.serve(async (req) => {
 
   const mapped = mapTicket(ticket)
   const ticketStatus = String(ticket.status ?? '')
-  if (ticketStatus === 'used' || ticket.checked_in_at) {
+  if (!dailyCheckin && (ticketStatus === 'used' || ticket.checked_in_at)) {
     return json(req, { valid: false, reason: 'already_used', message: 'Ingresso ja utilizado' })
   }
-  if (!ACTIVE_STATUSES.includes(ticketStatus)) {
+  if (!ACTIVE_STATUSES.includes(ticketStatus) && !(dailyCheckin && ticketStatus === 'used')) {
     return json(req, { valid: false, reason: 'invalid_token', message: `Ingresso invalido (${ticketStatus})` })
   }
 
-  const { count: existingCheckins } = await admin
-    .from('checkins')
-    .select('id', { count: 'exact', head: true })
-    .eq('digital_ticket_id', ticket.id as string)
-    .eq('result', 'success')
-    .eq('is_exit', false)
+  const alreadyCheckedIn = dailyCheckin
+    ? await checkedInToday(ticket.id as string)
+    : await (async () => {
+        const { count } = await admin
+          .from('checkins')
+          .select('id', { count: 'exact', head: true })
+          .eq('digital_ticket_id', ticket.id as string)
+          .eq('result', 'success')
+          .eq('is_exit', false)
+        return (count ?? 0) > 0
+      })()
 
-  if ((existingCheckins ?? 0) > 0) {
+  if (alreadyCheckedIn) {
     return json(req, {
       valid: false,
       reason: 'already_used',
-      message: 'Ingresso ja utilizado (check-in duplicado)',
+      message: dailyCheckin ? 'Ingresso ja utilizado hoje' : 'Ingresso ja utilizado (check-in duplicado)',
       name: mapped.name,
       ticketLabel: mapped.ticketLabel,
       ticketType: mapped.ticketLabel,
@@ -385,14 +450,20 @@ Deno.serve(async (req) => {
   }
 
   const checkedInAt = new Date().toISOString()
-  let { data: lockedTicket, error: lockError } = await admin
+  const lockQuery = admin
     .from('digital_tickets')
     .update({ status: 'used', checked_in_at: checkedInAt })
     .eq('id', ticket.id as string)
-    .is('checked_in_at', null)
-    .in('status', ACTIVE_STATUSES)
-    .select(ticketSelect)
-    .maybeSingle()
+
+  // In daily mode the ticket is reused every day, so it already carries the
+  // previous day's checked_in_at. The guard is the per-day check-in count above.
+  let { data: lockedTicket, error: lockError } = dailyCheckin
+    ? await lockQuery.select(ticketSelect).maybeSingle()
+    : await lockQuery
+        .is('checked_in_at', null)
+        .in('status', ACTIVE_STATUSES)
+        .select(ticketSelect)
+        .maybeSingle()
 
   if (lockError || !lockedTicket) {
     const { data: freshTicket } = await admin

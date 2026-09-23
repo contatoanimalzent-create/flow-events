@@ -108,6 +108,7 @@ export function StaffCheckinPage() {
   }
   const [staff, setStaff] = useState<StaffInfo | null>(null)
   const [workRole, setWorkRole] = useState('')
+  const [turnsToday, setTurnsToday] = useState(0)
   const [customWorkRole, setCustomWorkRole] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -142,7 +143,7 @@ export function StaffCheckinPage() {
 
     video.srcObject = stream
     void video.play().catch(() => {
-      setErrorMessage('NÃ£o foi possÃ­vel iniciar a cÃ¢mera. Toque em tentar novamente e permita o acesso.')
+      setErrorMessage('Não foi possível iniciar a câmera. Toque em tentar novamente e permita o acesso.')
       setStep('error')
     })
   }, [step])
@@ -167,7 +168,7 @@ export function StaffCheckinPage() {
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         setErrorMessage(
-          body?.error ?? body?.message ?? 'E-mail nÃ£o encontrado para este evento.',
+          body?.error ?? body?.message ?? 'E-mail não encontrado para este evento.',
         )
         setStep('error')
         return
@@ -179,9 +180,11 @@ export function StaffCheckinPage() {
       const lastCheckin = [...checkins].reverse().find((c: { type: string; work_role?: string | null }) => c.type === 'checkin')
       const lastCheckout = [...checkins].reverse().find((c: { type: string }) => c.type === 'checkout')
       const vc = raw.venue_coordinates
-      const pointStatus = (raw.point_status ?? (
-        lastCheckout ? 'finished' : raw.is_checked_in ? 'needs_checkout' : 'needs_checkin'
-      )) as StaffInfo['point_status']
+      // A mesma pessoa pode fazer mais de um turno no mesmo dia, com funcoes
+      // diferentes. Depois da saida o ponto volta a oferecer uma nova entrada.
+      const pointStatus = (raw.point_status === 'needs_checkout' || raw.is_checked_in
+        ? 'needs_checkout'
+        : 'needs_checkin') as StaffInfo['point_status']
       setStaff({
         staff_member_id: sm.id ?? sm.staff_member_id,
         event_id: raw.event_id ?? sm.event_id ?? '',
@@ -197,10 +200,13 @@ export function StaffCheckinPage() {
         geofence_radius_meters: raw.geofence_radius_meters ?? null,
         event_name: raw.event_name ?? eventSlug,
       })
-      setWorkRole(lastCheckin?.work_role ?? '')
+      // Com turno aberto, mostra a funcao em curso. Comecando um turno novo, o
+      // campo fica vazio para a pessoa escolher a funcao daquele turno.
+      setWorkRole(pointStatus === 'needs_checkout' ? (raw.open_work_role ?? lastCheckin?.work_role ?? '') : '')
+      setTurnsToday(typeof raw.turns_today === 'number' ? raw.turns_today : 0)
       setStep('identified')
     } catch {
-      setErrorMessage('Erro de conexÃ£o. Verifique sua internet e tente novamente.')
+      setErrorMessage('Erro de conexão. Verifique sua internet e tente novamente.')
       setStep('error')
     } finally {
       setLoading(false)
@@ -209,7 +215,7 @@ export function StaffCheckinPage() {
 
   // â”€â”€ Geolocation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  // Tenta GPS preciso (atÃ© 25s). Se falhar por timeout, tenta de novo sem highAccuracy (rede/WiFi, 15s)
+  // Tenta GPS preciso (até 25s). Se falhar por timeout, tenta de novo sem highAccuracy (rede/WiFi, 15s)
   function tryGetPosition(options: PositionOptions): Promise<GeolocationPosition> {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject, options)
@@ -218,15 +224,15 @@ export function StaffCheckinPage() {
 
   function gpsErrorMessage(err: GeolocationPositionError): string {
     if (err.code === err.PERMISSION_DENIED) {
-      return 'PermissÃ£o de localizaÃ§Ã£o negada. iPhone: Ajustes â†’ Safari â†’ LocalizaÃ§Ã£o â†’ Permitir. Android: cadeado no endereÃ§o â†’ PermissÃµes â†’ LocalizaÃ§Ã£o. Depois recarregue a pÃ¡gina.'
+      return 'Permissão de localização negada. iPhone: Ajustes â†’ Safari â†’ Localização â†’ Permitir. Android: cadeado no endereço â†’ Permissões â†’ Localização. Depois recarregue a página.'
     }
     if (err.code === err.POSITION_UNAVAILABLE) {
-      return 'GPS indisponÃ­vel. Ative o GPS/LocalizaÃ§Ã£o no seu celular (puxe a barra de notificaÃ§Ãµes e ligue o Ã­cone de LocalizaÃ§Ã£o) e tente de novo.'
+      return 'GPS indisponível. Ative o GPS/Localização no seu celular (puxe a barra de notificações e ligue o ícone de Localização) e tente de novo.'
     }
     if (err.code === err.TIMEOUT) {
-      return 'GPS demorou demais para responder. Saia para uma Ã¡rea aberta (sem teto/coberta), aguarde alguns segundos e tente de novo.'
+      return 'GPS demorou demais para responder. Saia para uma área aberta (sem teto/coberta), aguarde alguns segundos e tente de novo.'
     }
-    return 'NÃ£o foi possÃ­vel obter localizaÃ§Ã£o. Verifique GPS, conexÃ£o e permissÃµes.'
+    return 'Não foi possível obter localização. Verifique GPS, conexão e permissões.'
   }
 
   const getGeolocation = useCallback(async (): Promise<{ lat: number; lng: number; accuracy?: number }> => {
@@ -234,7 +240,7 @@ export function StaffCheckinPage() {
     try {
       let pos: GeolocationPosition
       try {
-        // Tentativa 1: GPS preciso (atÃ© 25s, aceita posiÃ§Ã£o recente de atÃ© 30s)
+        // Tentativa 1: GPS preciso (até 25s, aceita posição recente de até 30s)
         pos = await tryGetPosition({ enableHighAccuracy: true, timeout: 25000, maximumAge: 30000 })
       } catch (err) {
         const e = err as GeolocationPositionError
@@ -271,7 +277,7 @@ export function StaffCheckinPage() {
       streamRef.current = stream
       setStep(targetStep)
     } catch {
-      setErrorMessage('PermissÃ£o de cÃ¢mera negada. Habilite nas configuraÃ§Ãµes do navegador.')
+      setErrorMessage('Permissão de câmera negada. Habilite nas configurações do navegador.')
       setStep('error')
     }
   }
@@ -281,7 +287,7 @@ export function StaffCheckinPage() {
     const canvas = canvasRef.current
     if (!video || !canvas) return
     if (video.videoWidth === 0 || video.videoHeight === 0) {
-      setErrorMessage('A cÃ¢mera ainda estÃ¡ carregando. Aguarde alguns segundos e tente tirar a foto novamente.')
+      setErrorMessage('A câmera ainda está carregando. Aguarde alguns segundos e tente tirar a foto novamente.')
       setStep('error')
       return
     }
@@ -363,7 +369,7 @@ export function StaffCheckinPage() {
       setErrorMessage(gpsErrorMessage(e))
     }
 
-    // 2. Pede cÃ¢mera (dispara prompt nativo)
+    // 2. Pede câmera (dispara prompt nativo)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
       stream.getTracks().forEach((t) => t.stop())
@@ -383,7 +389,7 @@ export function StaffCheckinPage() {
   async function startCheckinFlow() {
     const selectedWorkRole = workRole === 'Outros' ? customWorkRole.trim() : workRole
     if (!selectedWorkRole) {
-      setErrorMessage('Selecione a funÃ§Ã£o que vocÃª vai exercer hoje.')
+      setErrorMessage('Selecione a função que você vai exercer hoje.')
       setStep('error')
       return
     }
@@ -402,7 +408,7 @@ export function StaffCheckinPage() {
 
       if (isOutsideVenue(dist, staff?.geofence_radius_meters ?? null, location.accuracy)) {
         setDistance(dist)
-        setErrorMessage('Para registrar o ponto, Ã© necessÃ¡rio estar no local do evento.')
+        setErrorMessage('Para registrar o ponto, é necessário estar no local do evento.')
         setStep('error')
         return
       }
@@ -410,7 +416,7 @@ export function StaffCheckinPage() {
       // Then open camera
       await openCamera()
     } catch {
-      setErrorMessage('NÃ£o foi possÃ­vel obter sua localizaÃ§Ã£o. Verifique as permissÃµes.')
+      setErrorMessage('Não foi possível obter sua localização. Verifique as permissões.')
       setStep('error')
     }
   }
@@ -448,7 +454,7 @@ export function StaffCheckinPage() {
         : current)
       setStep('success_checkin')
     } catch {
-      setErrorMessage('Erro de conexÃ£o. Tente novamente.')
+      setErrorMessage('Erro de conexão. Tente novamente.')
       setStep('error')
     }
   }
@@ -464,14 +470,14 @@ export function StaffCheckinPage() {
 
       if (isOutsideVenue(dist, staff?.geofence_radius_meters ?? null, location.accuracy)) {
         setDistance(dist)
-        setErrorMessage('Para registrar o ponto, Ã© necessÃ¡rio estar no local do evento.')
+        setErrorMessage('Para registrar o ponto, é necessário estar no local do evento.')
         setStep('error')
         return
       }
 
       await openCamera('camera_checkout')
     } catch {
-      setErrorMessage('NÃ£o foi possÃ­vel obter sua localizaÃ§Ã£o. Verifique as permissÃµes.')
+      setErrorMessage('Não foi possível obter sua localização. Verifique as permissões.')
       setStep('error')
     }
   }
@@ -488,7 +494,7 @@ export function StaffCheckinPage() {
       let location = coords
       if (!location) {
         try { location = await getGeolocation() } catch {
-          setErrorMessage('LocalizaÃ§Ã£o indisponÃ­vel. Ative o GPS e tente de novo.')
+          setErrorMessage('Localização indisponível. Ative o GPS e tente de novo.')
           setStep('error')
           setLoading(false)
           return
@@ -512,7 +518,7 @@ export function StaffCheckinPage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        setErrorMessage(body?.error ?? body?.message ?? 'Erro ao registrar saÃ­da.')
+        setErrorMessage(body?.error ?? body?.message ?? 'Erro ao registrar saída.')
         setStep('error')
         return
       }
@@ -522,7 +528,7 @@ export function StaffCheckinPage() {
         : current)
       setStep('success_checkout')
     } catch {
-      setErrorMessage('Erro ao registrar saÃ­da. Verifique sua conexÃ£o e localizaÃ§Ã£o.')
+      setErrorMessage('Erro ao registrar saída. Verifique sua conexão e localização.')
       setStep('error')
     } finally {
       setLoading(false)
@@ -565,9 +571,9 @@ export function StaffCheckinPage() {
           <AlertCircle className="h-9 w-9 text-red-400" />
         </div>
         <div className="max-w-md">
-          <h1 className="text-2xl font-bold text-[#f5f0e8]">Link invÃ¡lido</h1>
+          <h1 className="text-2xl font-bold text-[#f5f0e8]">Link inválido</h1>
           <p className="mt-3 text-sm leading-7 text-white/56">
-            URL do evento nÃ£o encontrada. Verifique o link recebido.
+            URL do evento não encontrada. Verifique o link recebido.
           </p>
         </div>
       </div>
@@ -713,12 +719,7 @@ export function StaffCheckinPage() {
 
               {/* Status badge */}
               <div className="mt-4">
-                {staff.point_status === 'finished' ? (
-                  <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1.5">
-                    <div className="h-2 w-2 rounded-full bg-blue-400" />
-                    <span className="text-xs font-semibold text-blue-300">Ponto finalizado</span>
-                  </div>
-                ) : staff.checked_in ? (
+                {staff.checked_in ? (
                   <div className="inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/10 px-3 py-1.5">
                     <div className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
                     <span className="text-xs font-semibold text-green-400">Presente</span>
@@ -759,7 +760,7 @@ export function StaffCheckinPage() {
                     <div className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.03] px-4 py-3">
                       <div className="flex items-center gap-2">
                         <LogOut className="h-4 w-4 text-blue-400" />
-                        <span className="text-sm font-medium text-blue-400">SaÃ­da</span>
+                        <span className="text-sm font-medium text-blue-400">Saída</span>
                       </div>
                       <span className="font-mono text-sm tabular-nums text-white/60">
                         {formatTime(staff.checkout_time)}
@@ -774,33 +775,33 @@ export function StaffCheckinPage() {
             {geoStatus === 'loading' && (
               <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Obtendo localizaÃ§Ã£o...</span>
+                <span className="text-sm">Obtendo localização...</span>
               </div>
             )}
             {geoStatus === 'done' && coords && (
               <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm">LocalizaÃ§Ã£o capturada</span>
+                <span className="text-sm">Localização capturada</span>
               </div>
             )}
 
-            {/* PermissÃµes â€” checa antes de Entrada/SaÃ­da */}
+            {/* Permissões â€” checa antes de Entrada/Saída */}
             {(cameraPerm !== 'granted' || gpsPerm !== 'granted') && (
               <div className="mt-4 rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 p-5">
                 <div className="flex items-start gap-3">
                   <Shield className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
                   <div className="flex-1">
                     <p className="text-sm font-bold uppercase tracking-[0.14em] text-amber-300">
-                      PermissÃµes necessÃ¡rias
+                      Permissões necessárias
                     </p>
                     <p className="mt-1 text-xs leading-5 text-amber-100/80">
-                      O ponto precisa da sua cÃ¢mera e localizaÃ§Ã£o. Toque no botÃ£o abaixo e <strong>autorize as duas</strong> nos avisos do celular.
+                      O ponto precisa da sua câmera e localização. Toque no botão abaixo e <strong>autorize as duas</strong> nos avisos do celular.
                     </p>
 
                     <div className="mt-3 flex flex-col gap-2">
                       <div className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
                         <div className="flex items-center gap-2 text-xs text-white/70">
-                          <MapPin className="h-3.5 w-3.5" /> LocalizaÃ§Ã£o (GPS)
+                          <MapPin className="h-3.5 w-3.5" /> Localização (GPS)
                         </div>
                         {gpsPerm === 'granted' ? (
                           <span className="flex items-center gap-1 text-xs font-bold text-green-400">
@@ -816,7 +817,7 @@ export function StaffCheckinPage() {
                       </div>
                       <div className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
                         <div className="flex items-center gap-2 text-xs text-white/70">
-                          <Camera className="h-3.5 w-3.5" /> CÃ¢mera
+                          <Camera className="h-3.5 w-3.5" /> Câmera
                         </div>
                         {cameraPerm === 'granted' ? (
                           <span className="flex items-center gap-1 text-xs font-bold text-green-400">
@@ -835,8 +836,8 @@ export function StaffCheckinPage() {
                     {(cameraPerm === 'denied' || gpsPerm === 'denied') ? (
                       <div className="mt-3 rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-xs leading-5 text-red-200">
                         <p className="font-bold">Como reativar:</p>
-                        <p className="mt-1"><strong>iPhone:</strong> Ajustes â†’ Safari â†’ CÃ¢mera/LocalizaÃ§Ã£o â†’ Permitir. Depois recarregue esta pÃ¡gina.</p>
-                        <p className="mt-1"><strong>Android:</strong> No Chrome, toque no cadeado ðŸ”’ ao lado do endereÃ§o â†’ PermissÃµes â†’ ative CÃ¢mera e LocalizaÃ§Ã£o â†’ recarregue.</p>
+                        <p className="mt-1"><strong>iPhone:</strong> Ajustes â†’ Safari â†’ Câmera/Localização â†’ Permitir. Depois recarregue esta página.</p>
+                        <p className="mt-1"><strong>Android:</strong> No Chrome, toque no cadeado ðŸ”’ ao lado do endereço â†’ Permissões â†’ ative Câmera e Localização â†’ recarregue.</p>
                       </div>
                     ) : (
                       <button
@@ -851,7 +852,7 @@ export function StaffCheckinPage() {
                           </>
                         ) : (
                           <>
-                            <Shield className="h-4 w-4" /> Permitir cÃ¢mera e localizaÃ§Ã£o
+                            <Shield className="h-4 w-4" /> Permitir câmera e localização
                           </>
                         )}
                       </button>
@@ -861,13 +862,19 @@ export function StaffCheckinPage() {
               </div>
             )}
 
-            {/* Action buttons â€” sempre mostra Entrada E SaÃ­da, staff escolhe */}
+            {/* Action buttons â€” sempre mostra Entrada E Saída, staff escolhe */}
             <div className="mt-6 flex flex-col gap-3">
               {staff.point_status === 'needs_checkin' && (
                 <label className="flex flex-col gap-2 text-left">
                   <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">
-                    FunÃ§Ã£o de hoje
+                    {turnsToday > 0 ? 'Função deste novo turno' : 'Função deste turno'}
                   </span>
+                  {turnsToday > 0 && (
+                    <span className="-mt-1 text-[11px] leading-relaxed text-white/48">
+                      Você já registrou {turnsToday === 1 ? 'um turno' : `${turnsToday} turnos`} hoje.
+                      Se a função mudou, escolha a nova agora.
+                    </span>
+                  )}
                   <select
                     value={workRole}
                     onChange={(event) => setWorkRole(event.target.value)}
@@ -886,22 +893,14 @@ export function StaffCheckinPage() {
                     <input
                       value={customWorkRole}
                       onChange={(event) => setCustomWorkRole(event.target.value)}
-                      placeholder="Digite a funÃ§Ã£o"
+                      placeholder="Digite a função"
                       className="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-4 text-sm font-semibold text-[#f5f0e8] outline-none transition-all focus:border-[#D4FF00]/50 focus:ring-2 focus:ring-[#D4FF00]/10"
                     />
                   )}
                 </label>
               )}
 
-              {staff.point_status === 'finished' ? (
-                <div
-                  className="flex w-full items-center justify-center gap-3 rounded-2xl border border-blue-400/20 bg-blue-400/10 py-5 text-base font-bold uppercase tracking-[0.14em] text-blue-200"
-                  style={{ minHeight: 72 }}
-                >
-                  <CheckCircle2 className="h-6 w-6" />
-                  Ponto finalizado
-                </div>
-              ) : !staff.checked_in ? (
+              {!staff.checked_in ? (
                 <button
                   onClick={startCheckinFlow}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#D4FF00] py-5 text-base font-bold uppercase tracking-[0.14em] text-[#06070a] transition-all hover:-translate-y-0.5 hover:bg-[#c8f200] hover:shadow-[0_12px_36px_rgba(212,255,0,0.24)] active:scale-[0.98]"
@@ -925,7 +924,7 @@ export function StaffCheckinPage() {
                   ) : (
                     <>
                       <LogOut className="h-6 w-6" />
-                      Registrar SaÃ­da
+                      Registrar Saída
                     </>
                   )}
                 </button>
@@ -966,7 +965,7 @@ export function StaffCheckinPage() {
               Tire uma selfie
             </h2>
             <p className="mb-6 text-center text-sm text-white/48">
-              Posicione seu rosto no centro da cÃ¢mera
+              Posicione seu rosto no centro da câmera
             </p>
 
             {/* Video preview */}
@@ -1033,7 +1032,7 @@ export function StaffCheckinPage() {
               <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
                 <MapPin className="h-4 w-4" />
                 <span className="text-sm">
-                  LocalizaÃ§Ã£o capturada
+                  Localização capturada
                 </span>
               </div>
             )}
@@ -1070,10 +1069,10 @@ export function StaffCheckinPage() {
         <div className="flex flex-1 flex-col items-center justify-center px-5 py-8">
           <div className="w-full max-w-sm">
             <h2 className="mb-4 text-center text-lg font-bold text-red-400">
-              Foto de saÃ­da
+              Foto de saída
             </h2>
             <p className="mb-6 text-center text-sm text-white/48">
-              Tire uma selfie para registrar a saÃ­da
+              Tire uma selfie para registrar a saída
             </p>
             <div className="relative mx-auto aspect-[3/4] w-full max-w-[320px] overflow-hidden rounded-2xl border-2 border-red-500/30 bg-black">
               <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" style={{ transform: 'scaleX(-1)' }} />
@@ -1101,20 +1100,20 @@ export function StaffCheckinPage() {
       <div className="flex min-h-screen flex-col bg-[#06070a]">
         <div className="flex flex-1 flex-col items-center justify-center px-5 py-8">
           <div className="w-full max-w-sm">
-            <h2 className="mb-4 text-center text-lg font-bold text-red-400">Confirme a foto de saÃ­da</h2>
+            <h2 className="mb-4 text-center text-lg font-bold text-red-400">Confirme a foto de saída</h2>
             <div className="relative mx-auto aspect-[3/4] w-full max-w-[320px] overflow-hidden rounded-2xl border-2 border-red-500/30">
-              <img src={photoBase64} alt="Selfie saÃ­da" className="h-full w-full object-cover" />
+              <img src={photoBase64} alt="Selfie saída" className="h-full w-full object-cover" />
             </div>
             {coords && (
               <div className="mt-4 flex items-center justify-center gap-2 text-white/48">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm">LocalizaÃ§Ã£o capturada</span>
+                <span className="text-sm">Localização capturada</span>
               </div>
             )}
             <div className="mt-6 flex flex-col gap-3">
               <button onClick={handleCheckout} className="flex w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-red-500 bg-red-500/20 py-4 text-sm font-bold uppercase tracking-[0.18em] text-red-400 transition-all active:scale-[0.98]">
                 <LogOut className="h-5 w-5" />
-                Confirmar SaÃ­da
+                Confirmar Saída
               </button>
               <button onClick={() => setStep('camera_checkout')} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] py-3 text-sm font-medium text-white/64 transition-all hover:border-white/20 hover:text-white">
                 <Camera className="h-4 w-4" />
@@ -1153,7 +1152,7 @@ export function StaffCheckinPage() {
         <div className="max-w-md">
           <h1 className="text-3xl font-bold text-[#f5f0e8]">Entrada registrada!</h1>
           <p className="mt-3 text-base text-white/56">
-            {staff?.full_name}, sua presenÃ§a foi confirmada.
+            {staff?.full_name}, sua presença foi confirmada.
           </p>
           <p className="mt-4 text-base leading-7 text-white/70">
             Dirija-se agora ao credenciamento para retirar sua pulseira. Mostre o comprovante enviado no WhatsApp ou SMS; se a mensagem demorar, mostre esta tela.
@@ -1180,7 +1179,7 @@ export function StaffCheckinPage() {
           onClick={resetToEmail}
           className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white/64 transition-all hover:border-white/20 hover:text-white"
         >
-          Voltar ao inÃ­cio
+          Voltar ao início
         </button>
       </div>
     )
@@ -1195,8 +1194,8 @@ export function StaffCheckinPage() {
           <LogOut className="h-12 w-12 text-blue-400" />
         </div>
         <div className="max-w-md">
-          <h1 className="text-3xl font-bold text-[#f5f0e8]">SaÃ­da registrada!</h1>
-          <p className="mt-4 text-2xl text-white/68">AtÃ© amanhÃ£!</p>
+          <h1 className="text-3xl font-bold text-[#f5f0e8]">Saída registrada!</h1>
+          <p className="mt-4 text-2xl text-white/68">Até amanhã!</p>
           <p className="mt-2 text-sm text-white/40">
             {new Date().toLocaleTimeString('pt-BR', {
               hour: '2-digit',
@@ -1208,7 +1207,7 @@ export function StaffCheckinPage() {
           onClick={resetToEmail}
           className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-white/64 transition-all hover:border-white/20 hover:text-white"
         >
-          Voltar ao inÃ­cio
+          Voltar ao início
         </button>
       </div>
     )

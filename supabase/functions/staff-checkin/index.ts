@@ -1,4 +1,4 @@
-﻿import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
+import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,18 +22,20 @@ interface CheckinRequestBody {
   accuracy_meters?: number
 }
 
-const DEFAULT_GEOFENCE_METERS = 650
-const MAX_ACCURACY_TOLERANCE_METERS = 250
+const DEFAULT_GEOFENCE_METERS = 100
+const MIN_GEOFENCE_METERS = 50
+const MAX_ACCURACY_TOLERANCE_METERS = 50
 const WORK_ROLE_OPTIONS = new Set([
-  'Carregador',
-  'SeguranÃ§a eventual',
-  'SeguranÃ§a patrimonial',
-  'ProduÃ§Ã£o',
-  'Brigadista',
-  'Posto mÃ©dico',
+  'Transmissão',
+  'Mídia',
+  'Produção',
   'Credenciamento',
   'Limpeza',
-  'TransmissÃ£o',
+  'Segurança Patrimonial',
+  'Segurança Eventual',
+  'Carregadores',
+  'Posto Médico',
+  'Brigada',
   'Outros',
 ])
 const BSB5_RECEIPT_IMAGE_URL =
@@ -449,7 +451,7 @@ async function handleGet(req: Request): Promise<Response> {
   }
 
   if (!event) {
-    return errorResponse('Evento nÃ£o encontrado.', 404, 'EVENT_NOT_FOUND')
+    return errorResponse('Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
   }
 
   const cleanEmail = emailParam?.toLowerCase().trim() ?? ''
@@ -476,7 +478,7 @@ async function handleGet(req: Request): Promise<Response> {
 
   if (!staffRows || staffRows.length === 0) {
     return errorResponse(
-      'CPF nÃ£o encontrado no cadastro deste evento.',
+      'CPF não encontrado no cadastro deste evento.',
       404,
       'STAFF_NOT_FOUND',
     )
@@ -496,11 +498,11 @@ async function handleGet(req: Request): Promise<Response> {
   const memberPhone = (staffMember.phone ?? '').replace(/\D/g, '')
 
   if (memberCpf && memberCpf !== cleanCpf) {
-    return errorResponse('CPF nÃ£o confere com o cadastro.', 403, 'CPF_MISMATCH')
+    return errorResponse('CPF não confere com o cadastro.', 403, 'CPF_MISMATCH')
   }
 
   if (cleanPhone && memberPhone && memberPhone !== cleanPhone && memberPhone !== `55${cleanPhone}`) {
-    return errorResponse('WhatsApp nÃ£o confere com o cadastro.', 403, 'PHONE_MISMATCH')
+    return errorResponse('WhatsApp não confere com o cadastro.', 403, 'PHONE_MISMATCH')
   }
 
   // 3. Get today's checkins for this staff member
@@ -520,13 +522,23 @@ async function handleGet(req: Request): Promise<Response> {
 
   // 4. Determine if currently checked in (last record today is a checkin without a subsequent checkout)
   const records = todayCheckins ?? []
-  const lastRecord = records.length > 0 ? records[records.length - 1] : null
+
+  // O turno pode atravessar a meia-noite, e a mesma pessoa pode fazer mais de um
+  // turno no mesmo dia com funcoes diferentes. Por isso o status vem do ultimo
+  // registro do evento, nao apenas dos registros de hoje.
+  const { data: lastOverall } = await admin
+    .from('staff_checkins')
+    .select('id, type, created_at, work_role')
+    .eq('staff_member_id', staffMember.id)
+    .eq('event_id', event.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  const lastRecord = lastOverall && lastOverall.length > 0 ? lastOverall[0] : null
   const isCheckedIn = lastRecord?.type === 'checkin'
-  const pointStatus = lastRecord?.type === 'checkout'
-    ? 'finished'
-    : isCheckedIn
-      ? 'needs_checkout'
-      : 'needs_checkin'
+  const pointStatus = isCheckedIn ? 'needs_checkout' : 'needs_checkin'
+  const openWorkRole = isCheckedIn ? (lastRecord?.work_role ?? null) : null
+  const turnsToday = records.filter((record) => record.type === 'checkin').length
 
   // 5. Parse venue coordinates
   const venueCoords = parsePoint(event.venue_coordinates)
@@ -545,6 +557,8 @@ async function handleGet(req: Request): Promise<Response> {
     },
     is_checked_in: isCheckedIn,
     point_status: pointStatus,
+    open_work_role: openWorkRole,
+    turns_today: turnsToday,
     today_checkins: records,
     venue_coordinates: venueCoords,
     geofence_radius_meters: event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS,
@@ -560,7 +574,7 @@ async function handlePost(req: Request): Promise<Response> {
   try {
     body = await req.json()
   } catch {
-    return errorResponse('JSON invÃ¡lido no corpo da requisiÃ§Ã£o.', 400, 'INVALID_JSON')
+    return errorResponse('JSON inválido no corpo da requisição.', 400, 'INVALID_JSON')
   }
 
   const { staff_member_id, event_id, type, latitude, longitude, accuracy_meters } = body
@@ -568,10 +582,10 @@ async function handlePost(req: Request): Promise<Response> {
 
   // â”€â”€ Validate required fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (!staff_member_id || typeof staff_member_id !== 'string') {
-    return errorResponse('Campo obrigatÃ³rio: staff_member_id.', 400, 'MISSING_STAFF_MEMBER_ID')
+    return errorResponse('Campo obrigatório: staff_member_id.', 400, 'MISSING_STAFF_MEMBER_ID')
   }
   if (!event_id || typeof event_id !== 'string') {
-    return errorResponse('Campo obrigatÃ³rio: event_id.', 400, 'MISSING_EVENT_ID')
+    return errorResponse('Campo obrigatório: event_id.', 400, 'MISSING_EVENT_ID')
   }
   if (type !== 'checkin' && type !== 'checkout') {
     return errorResponse(
@@ -582,7 +596,7 @@ async function handlePost(req: Request): Promise<Response> {
   }
   if (typeof latitude !== 'number' || typeof longitude !== 'number') {
     return errorResponse(
-      'Campos obrigatÃ³rios: latitude e longitude (numÃ©ricos).',
+      'Campos obrigatórios: latitude e longitude (numéricos).',
       400,
       'MISSING_COORDINATES',
     )
@@ -593,7 +607,7 @@ async function handlePost(req: Request): Promise<Response> {
   // â”€â”€ 1. Validate staff member exists and is active â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const { data: staffMember, error: staffErr } = await admin
     .from('staff_members')
-    .select('id, first_name, last_name, email, phone, role_title, status, event_id')
+    .select('id, first_name, last_name, email, phone, role_title, status, event_id, shift_starts_at')
     .eq('id', staff_member_id)
     .maybeSingle()
 
@@ -603,12 +617,12 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   if (!staffMember) {
-    return errorResponse('Membro da equipe nÃ£o encontrado.', 404, 'STAFF_NOT_FOUND')
+    return errorResponse('Membro da equipe não encontrado.', 404, 'STAFF_NOT_FOUND')
   }
 
   if (staffMember.status !== 'active' && staffMember.status !== 'confirmed') {
     return errorResponse(
-      `Membro da equipe nÃ£o estÃ¡ ativo (status atual: ${staffMember.status}).`,
+      `Membro da equipe não está ativo (status atual: ${staffMember.status}).`,
       403,
       'STAFF_INACTIVE',
     )
@@ -616,7 +630,7 @@ async function handlePost(req: Request): Promise<Response> {
 
   if (staffMember.event_id !== event_id) {
     return errorResponse(
-      'Membro da equipe nÃ£o pertence a este evento.',
+      'Membro da equipe não pertence a este evento.',
       403,
       'STAFF_EVENT_MISMATCH',
     )
@@ -635,14 +649,17 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   if (!event) {
-    return errorResponse('Evento nÃ£o encontrado.', 404, 'EVENT_NOT_FOUND')
+    return errorResponse('Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
   }
 
   // â”€â”€ 3. Calculate distance from venue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const venueCoords = parsePoint(event.venue_coordinates)
   let distanceFromVenueMeters: number | null = null
 
-  const configuredMaxDist = Math.max(event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS, DEFAULT_GEOFENCE_METERS)
+  const configuredMaxDist = Math.max(
+    event.geofence_radius_meters ?? DEFAULT_GEOFENCE_METERS,
+    MIN_GEOFENCE_METERS,
+  )
   const accuracyTolerance = typeof accuracy_meters === 'number'
     ? Math.min(Math.max(accuracy_meters, 0), MAX_ACCURACY_TOLERANCE_METERS)
     : 0
@@ -654,7 +671,7 @@ async function handlePost(req: Request): Promise<Response> {
     )
     if (distanceFromVenueMeters > maxDist) {
       return errorResponse(
-        'Para registrar o ponto, Ã© necessÃ¡rio estar no local do evento.',
+        'Para registrar o ponto, é necessário estar no local do evento.',
         403,
         'TOO_FAR_FROM_VENUE',
       )
@@ -662,17 +679,17 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   if (!body.photo_base64 && !body.photo_url) {
-    return errorResponse('Foto obrigatÃ³ria para registrar o ponto.', 400, 'PHOTO_REQUIRED')
+    return errorResponse('Foto obrigatória para registrar o ponto.', 400, 'PHOTO_REQUIRED')
   }
 
-  // â”€â”€ 4/5/6. Check for open checkin today â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const todayStart = todayStartUTC()
-
+  // Turno aberto? Vale o ultimo registro do evento, nao apenas o do dia,
+  // porque o turno pode virar a noite e podem existir dois turnos no mesmo dia.
+  
   const { data: todayRecords, error: recordsErr } = await admin
     .from('staff_checkins')
     .select('id, type, created_at')
     .eq('staff_member_id', staff_member_id)
-    .gte('created_at', todayStart)
+    .eq('event_id', event_id)
     .order('created_at', { ascending: false })
     .limit(1)
 
@@ -683,22 +700,14 @@ async function handlePost(req: Request): Promise<Response> {
 
   const lastRecord = todayRecords && todayRecords.length > 0 ? todayRecords[0] : null
   const hasOpenCheckin = lastRecord?.type === 'checkin'
-  const hasFinishedToday = lastRecord?.type === 'checkout'
 
-  if (type === 'checkin' && hasFinishedToday) {
-    return errorResponse(
-      'Ponto finalizado hoje. A entrada nao pode ser registrada novamente.',
-      409,
-      'POINT_ALREADY_FINISHED',
-    )
-  }
   if (!workRole && type === 'checkin') {
-    return errorResponse('Selecione a funÃ§Ã£o do ponto de hoje.', 400, 'MISSING_WORK_ROLE')
+    return errorResponse('Selecione a função deste turno.', 400, 'MISSING_WORK_ROLE')
   }
 
   if (type === 'checkin' && hasOpenCheckin) {
     return errorResponse(
-      'JÃ¡ existe um check-in aberto hoje. FaÃ§a o checkout primeiro.',
+      'Você já tem uma entrada aberta. Registre a saída antes de comecar outro turno.',
       409,
       'ALREADY_CHECKED_IN',
     )
@@ -706,7 +715,7 @@ async function handlePost(req: Request): Promise<Response> {
 
   if (type === 'checkout' && !hasOpenCheckin) {
     return errorResponse(
-      'NÃ£o hÃ¡ check-in aberto hoje. FaÃ§a o check-in primeiro.',
+      'Não há entrada aberta. Registre a entrada primeiro.',
       409,
       'NOT_CHECKED_IN',
     )
@@ -747,14 +756,14 @@ async function handlePost(req: Request): Promise<Response> {
         photoUrl = publicUrlData?.publicUrl ?? null
       }
     } catch (uploadException) {
-      console.error('[staff-checkin] ExceÃ§Ã£o no upload da foto:', uploadException)
+      console.error('[staff-checkin] Exceção no upload da foto:', uploadException)
       return errorResponse('Erro ao processar a foto do ponto. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
     }
   }
 
   // â”€â”€ 7. Insert into staff_checkins â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (!photoUrl) {
-    return errorResponse('Foto obrigatÃ³ria nÃ£o foi salva. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
+    return errorResponse('Foto obrigatória não foi salva. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
   }
 
   const { data: checkinRecord, error: insertErr } = await admin
@@ -805,7 +814,7 @@ async function handlePost(req: Request): Promise<Response> {
     const addressParts = venueAddress
       ? [venueAddress.street, venueAddress.city, venueAddress.state].filter(Boolean).join(', ')
       : ''
-    const venueLabel = [event.venue_name, addressParts].filter(Boolean).join(' - ') || 'Centro OlÃ­mpico da Estrutural, BrasÃ­lia - DF'
+    const venueLabel = [event.venue_name, addressParts].filter(Boolean).join(' - ') || 'Centro Olímpico da Estrutural, Brasília - DF'
     const receiptCode = String(checkinRecord.id).slice(0, 8).toUpperCase()
     const receiptMessage = [
       `COMPROVANTE DE PONTO - ${event.name ?? 'BSB FIGHT 5'}`,
@@ -815,7 +824,7 @@ async function handlePost(req: Request): Promise<Response> {
       `Data/hora: ${saoPauloDateTime(new Date(checkinRecord.created_at))}`,
       `Local: ${venueLabel}`,
       `Coordenadas: ${Number(latitude).toFixed(6)}, ${Number(longitude).toFixed(6)}`,
-      `CÃ³digo: ${receiptCode}`,
+      `Código: ${receiptCode}`,
       '',
       'PONTO REGISTRADO. Dirija-se agora ao credenciamento para retirar sua pulseira.',
       'Mostre este comprovante para a equipe no credenciamento.',
@@ -865,7 +874,9 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   // ── Email lembrete da saída (após checkin, mesmo sem WhatsApp) ─────────────
+  let emailNotification = { attempted: false, sent: false, provider_message_id: null as string | null }
   if (type === 'checkin' && staffMember.email) {
+    emailNotification.attempted = true
     const staffNameEmail = [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')
     const venueAddressEmail = event.venue_address as Record<string, unknown> | null
     const addressPartsEmail = venueAddressEmail
@@ -874,6 +885,14 @@ async function handlePost(req: Request): Promise<Response> {
     const venueLabelEmail = [event.venue_name, addressPartsEmail].filter(Boolean).join(' - ') || 'Local do evento'
     const receiptCodeEmail = String(checkinRecord.id).slice(0, 8).toUpperCase()
     const checkinTimeEmail = saoPauloDateTime(new Date(checkinRecord.created_at))
+    const shiftStart = staffMember.shift_starts_at ? new Date(staffMember.shift_starts_at) : null
+    const lateMinutes = shiftStart && !Number.isNaN(shiftStart.getTime())
+      ? Math.max(0, Math.floor((new Date(checkinRecord.created_at).getTime() - shiftStart.getTime()) / 60_000))
+      : 0
+    const isLate = lateMinutes > 10
+    const lateNoticeHtml = isLate
+      ? `<p style="margin:0 0 20px 0;color:#f59e0b;font-size:14px;line-height:1.6;"><strong>Atenção:</strong> esta entrada foi registrada com ${lateMinutes} minutos de atraso em relação ao horário previsto.</p>`
+      : ''
     const pontoUrlEmail = `https://pulse.animalzgroup.com/staff/ponto/${event.slug ?? ''}`
     const emailHtml = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -885,6 +904,7 @@ async function handlePost(req: Request): Promise<Response> {
           <p style="margin:0 0 8px 0;color:#D4FF00;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Ponto registrado</p>
           <h1 style="margin:0 0 16px 0;color:#f5f0e8;font-size:24px;line-height:1.2;font-weight:800;">Entrada confirmada, ${staffNameEmail}!</h1>
           <p style="margin:0 0 8px 0;color:rgba(245,240,232,0.7);font-size:15px;line-height:1.6;">Sua entrada no <strong style="color:#f5f0e8;">${event.name}</strong> foi registrada às <strong style="color:#D4FF00;">${checkinTimeEmail}</strong>.</p>
+          ${lateNoticeHtml}
           <p style="margin:0 0 24px 0;color:rgba(245,240,232,0.7);font-size:15px;line-height:1.6;">Dirija-se ao credenciamento para retirar sua pulseira. Mostre esta confirmação para a equipe.</p>
         </td></tr>
         <tr><td style="padding:0 28px 8px 28px;">
@@ -911,6 +931,7 @@ async function handlePost(req: Request): Promise<Response> {
       `Entrada confirmada, ${staffNameEmail}!`,
       '',
       `Sua entrada no ${event.name} foi registrada às ${checkinTimeEmail}.`,
+      ...(isLate ? [`ATENÇÃO: entrada registrada com ${lateMinutes} minutos de atraso.`] : []),
       'Dirija-se ao credenciamento para retirar sua pulseira.',
       '',
       '⏰ NÃO ESQUEÇA: ao fim do seu turno, bata a SAÍDA no mesmo link:',
@@ -922,12 +943,66 @@ async function handlePost(req: Request): Promise<Response> {
 
     const emailResult = await sendResendEmail({
       to: staffMember.email,
-      subject: `Ponto registrado | ${event.name} — lembre da saída`,
+      subject: isLate
+        ? `Atraso registrado (${lateMinutes} min) | ${event.name}`
+        : `Ponto registrado | ${event.name} — lembre da saída`,
       html: emailHtml,
       text: emailText,
     })
+    emailNotification = {
+      attempted: true,
+      sent: emailResult.ok,
+      provider_message_id: emailResult.id,
+    }
     if (!emailResult.ok) {
       console.warn('[staff-checkin] Falha ao enviar email de lembrete:', emailResult.error)
+    }
+  } else if (type === 'checkout' && staffMember.email) {
+    emailNotification.attempted = true
+    const staffNameEmail = [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')
+    const checkoutTimeEmail = saoPauloDateTime(new Date(checkinRecord.created_at))
+    const receiptCodeEmail = String(checkinRecord.id).slice(0, 8).toUpperCase()
+    const emailHtml = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#06070a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#06070a;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#0d1118;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;">
+        <tr><td style="padding:32px 28px;">
+          <p style="margin:0 0 8px;color:#D4FF00;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Ponto registrado</p>
+          <h1 style="margin:0 0 16px;color:#f5f0e8;font-size:24px;line-height:1.2;font-weight:800;">Saída confirmada, ${staffNameEmail}!</h1>
+          <p style="margin:0 0 18px;color:rgba(245,240,232,0.7);font-size:15px;line-height:1.6;">Sua saída do <strong style="color:#f5f0e8;">${event.name}</strong> foi registrada às <strong style="color:#D4FF00;">${checkoutTimeEmail}</strong>.</p>
+          <div style="background:rgba(212,255,0,0.08);border:1px solid rgba(212,255,0,0.25);border-radius:12px;padding:16px 18px;">
+            <p style="margin:0;color:#f5f0e8;font-size:14px;line-height:1.6;">Seu ponto de hoje foi finalizado com sucesso.</p>
+          </div>
+          <p style="margin:20px 0 0;color:rgba(245,240,232,0.42);font-size:11px;line-height:1.6;">Código do ponto: ${receiptCodeEmail}</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`
+    const emailText = [
+      `Saída confirmada, ${staffNameEmail}!`,
+      '',
+      `Sua saída do ${event.name} foi registrada às ${checkoutTimeEmail}.`,
+      'Seu ponto de hoje foi finalizado com sucesso.',
+      '',
+      `Código do ponto: ${receiptCodeEmail}`,
+    ].join('\n')
+
+    const emailResult = await sendResendEmail({
+      to: staffMember.email,
+      subject: `Saída registrada | ${event.name}`,
+      html: emailHtml,
+      text: emailText,
+    })
+    emailNotification = {
+      attempted: true,
+      sent: emailResult.ok,
+      provider_message_id: emailResult.id,
+    }
+    if (!emailResult.ok) {
+      console.warn('[staff-checkin] Falha ao enviar confirmação de saída:', emailResult.error)
     }
   }
 
@@ -941,6 +1016,7 @@ async function handlePost(req: Request): Promise<Response> {
     message,
     checkin: checkinRecord,
     distance_from_venue_meters: distanceFromVenueMeters,
+    email_notification: emailNotification,
   })
 }
 
@@ -963,7 +1039,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return await handlePost(req)
     }
 
-    return errorResponse('MÃ©todo nÃ£o permitido. Use GET ou POST.', 405, 'METHOD_NOT_ALLOWED')
+    return errorResponse('Método não permitido. Use GET ou POST.', 405, 'METHOD_NOT_ALLOWED')
   } catch (err) {
     console.error('[staff-checkin] Erro inesperado:', err)
     return errorResponse(

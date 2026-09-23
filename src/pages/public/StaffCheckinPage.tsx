@@ -108,6 +108,7 @@ export function StaffCheckinPage() {
   }
   const [staff, setStaff] = useState<StaffInfo | null>(null)
   const [workRole, setWorkRole] = useState('')
+  const [turnsToday, setTurnsToday] = useState(0)
   const [customWorkRole, setCustomWorkRole] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -179,9 +180,11 @@ export function StaffCheckinPage() {
       const lastCheckin = [...checkins].reverse().find((c: { type: string; work_role?: string | null }) => c.type === 'checkin')
       const lastCheckout = [...checkins].reverse().find((c: { type: string }) => c.type === 'checkout')
       const vc = raw.venue_coordinates
-      const pointStatus = (raw.point_status ?? (
-        lastCheckout ? 'finished' : raw.is_checked_in ? 'needs_checkout' : 'needs_checkin'
-      )) as StaffInfo['point_status']
+      // A mesma pessoa pode fazer mais de um turno no mesmo dia, com funcoes
+      // diferentes. Depois da saida o ponto volta a oferecer uma nova entrada.
+      const pointStatus = (raw.point_status === 'needs_checkout' || raw.is_checked_in
+        ? 'needs_checkout'
+        : 'needs_checkin') as StaffInfo['point_status']
       setStaff({
         staff_member_id: sm.id ?? sm.staff_member_id,
         event_id: raw.event_id ?? sm.event_id ?? '',
@@ -197,7 +200,10 @@ export function StaffCheckinPage() {
         geofence_radius_meters: raw.geofence_radius_meters ?? null,
         event_name: raw.event_name ?? eventSlug,
       })
-      setWorkRole(lastCheckin?.work_role ?? '')
+      // Com turno aberto, mostra a funcao em curso. Comecando um turno novo, o
+      // campo fica vazio para a pessoa escolher a funcao daquele turno.
+      setWorkRole(pointStatus === 'needs_checkout' ? (raw.open_work_role ?? lastCheckin?.work_role ?? '') : '')
+      setTurnsToday(typeof raw.turns_today === 'number' ? raw.turns_today : 0)
       setStep('identified')
     } catch {
       setErrorMessage('Erro de conexão. Verifique sua internet e tente novamente.')
@@ -713,12 +719,7 @@ export function StaffCheckinPage() {
 
               {/* Status badge */}
               <div className="mt-4">
-                {staff.point_status === 'finished' ? (
-                  <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1.5">
-                    <div className="h-2 w-2 rounded-full bg-blue-400" />
-                    <span className="text-xs font-semibold text-blue-300">Ponto finalizado</span>
-                  </div>
-                ) : staff.checked_in ? (
+                {staff.checked_in ? (
                   <div className="inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/10 px-3 py-1.5">
                     <div className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
                     <span className="text-xs font-semibold text-green-400">Presente</span>
@@ -866,8 +867,14 @@ export function StaffCheckinPage() {
               {staff.point_status === 'needs_checkin' && (
                 <label className="flex flex-col gap-2 text-left">
                   <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">
-                    Função de hoje
+                    {turnsToday > 0 ? 'Função deste novo turno' : 'Função deste turno'}
                   </span>
+                  {turnsToday > 0 && (
+                    <span className="-mt-1 text-[11px] leading-relaxed text-white/48">
+                      Você já registrou {turnsToday === 1 ? 'um turno' : `${turnsToday} turnos`} hoje.
+                      Se a função mudou, escolha a nova agora.
+                    </span>
+                  )}
                   <select
                     value={workRole}
                     onChange={(event) => setWorkRole(event.target.value)}
@@ -893,15 +900,7 @@ export function StaffCheckinPage() {
                 </label>
               )}
 
-              {staff.point_status === 'finished' ? (
-                <div
-                  className="flex w-full items-center justify-center gap-3 rounded-2xl border border-blue-400/20 bg-blue-400/10 py-5 text-base font-bold uppercase tracking-[0.14em] text-blue-200"
-                  style={{ minHeight: 72 }}
-                >
-                  <CheckCircle2 className="h-6 w-6" />
-                  Ponto finalizado
-                </div>
-              ) : !staff.checked_in ? (
+              {!staff.checked_in ? (
                 <button
                   onClick={startCheckinFlow}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#D4FF00] py-5 text-base font-bold uppercase tracking-[0.14em] text-[#06070a] transition-all hover:-translate-y-0.5 hover:bg-[#c8f200] hover:shadow-[0_12px_36px_rgba(212,255,0,0.24)] active:scale-[0.98]"

@@ -2,9 +2,9 @@ import { corsHeaders } from '../_shared/cors.ts'
 import { createSupabaseAdminClient } from '../_shared/supabase-admin.ts'
 import { sendResendEmail } from '../_shared/transactional-email.ts'
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // Types
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface InviteToken {
   id: string
@@ -60,9 +60,9 @@ function renderNotificationTemplate(template: string, variables: Record<string, 
   })
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // Helpers
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 function addCors(init: ResponseInit = {}): ResponseInit {
   return { ...init, headers: { ...corsHeaders, ...((init.headers as Record<string, string>) ?? {}) } }
@@ -525,9 +525,9 @@ function buildInviteEmailHtml(params: {
 </html>`
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // Batch processor
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Promise<Response> {
   const now = new Date()
@@ -559,7 +559,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
   for (const link of pendingLinks) {
     stats.processed++
 
-    // â”€â”€ No target_email â†’ skip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── No target_email → skip ──────────────────────────────────────────────
     if (!link.target_email) {
       await admin
         .from('staff_invite_links')
@@ -570,7 +570,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       continue
     }
 
-    // â”€â”€ Expired â†’ mark expired â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Expired → mark expired ───────────────────────────────────────────────
     if (link.expires_at && new Date(link.expires_at) < now) {
       await admin
         .from('staff_invite_links')
@@ -594,7 +594,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       continue
     }
 
-    // â”€â”€ Idempotency: check if already sent via communications_log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Idempotency: check if already sent via communications_log ───────────
     const { data: existingLog } = await admin
       .from('communications_log')
       .select('id')
@@ -613,7 +613,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       continue
     }
 
-    // â”€â”€ Fetch enrichment data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Fetch enrichment data ────────────────────────────────────────────────
     const [{ data: event }, { data: team }, { data: shift }] = await Promise.all([
       admin.from('events').select('name').eq('id', link.event_id).maybeSingle(),
       link.team_id
@@ -640,7 +640,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       expiresAt: link.expires_at,
     })
 
-    // â”€â”€ Send via Resend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Send via Resend ──────────────────────────────────────────────────────
     let sendError: string | null = null
     let sendSuccess = false
 
@@ -669,7 +669,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       sendError = err instanceof Error ? err.message : 'Unknown send error'
     }
 
-    // â”€â”€ Update staff_invite_links â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Update staff_invite_links ────────────────────────────────────────────
     await admin
       .from('staff_invite_links')
       .update({
@@ -680,7 +680,7 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
       })
       .eq('id', link.id)
 
-    // â”€â”€ Insert communications_log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Insert communications_log ────────────────────────────────────────────
     await admin.from('communications_log').insert({
       channel:          'email',
       recipient_email:  link.target_email,
@@ -709,9 +709,9 @@ async function runBatch(admin: ReturnType<typeof createSupabaseAdminClient>): Pr
   return jsonResponse({ ...stats, results })
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // Main Handler
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req: Request): Promise<Response> => {
   // CORS preflight
@@ -821,12 +821,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     const action = rawBody.action as string | undefined
 
-    // â”€â”€ Mode 1: run-batch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Mode 1: run-batch ────────────────────────────────────────────────────
     if (action === 'run-batch') {
       return await runBatch(admin)
     }
 
-    // â”€â”€ Mode 2: send-invite-email (single) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Mode 2: send-invite-email (single) ───────────────────────────────────
     if (action === 'send-invite-email') {
       const { invite_link_id, target_email, organization_id } = rawBody as {
         invite_link_id?: string
@@ -854,7 +854,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return await runBatch(admin)
     }
 
-    // â”€â”€ Mode 3: submit application â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Mode 3: submit application ───────────────────────────────────────────
     const body = rawBody as Partial<ApplicationBody>
     body.token = canonicalizeInviteToken(body.token)
 

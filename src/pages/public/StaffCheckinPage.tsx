@@ -15,7 +15,7 @@ import { OPERATIONAL_STAFF_ROLES } from '@/modules/staff/staffRoles'
 
 type PermissionState = 'unknown' | 'granted' | 'denied' | 'prompt'
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 interface StaffInfo {
   staff_member_id: string
@@ -45,7 +45,7 @@ type PageStep =
   | 'success_checkout'
   | 'error'
 
-// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function getEventSlug(): string {
   const match = window.location.pathname.match(/\/staff\/ponto\/([^/?#]+)/)
@@ -79,18 +79,26 @@ function haversineDistance(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
+// Precisa bater com a edge function staff-checkin. Se a tela for mais
+// permissiva que o servidor, a pessoa tira a foto, envia e so entao ouve que
+// esta longe do local.
+const MIN_GEOFENCE_METERS = 50
+const MAX_ACCURACY_TOLERANCE_METERS = 50
+
 function isOutsideVenue(distance: number | null, radius: number | null, accuracy?: number): boolean {
   if (distance === null || radius === null) return false
-  const baseRadius = Math.max(radius, 650)
-  const accuracyTolerance = typeof accuracy === 'number' ? Math.min(Math.max(accuracy, 0), 250) : 0
+  const baseRadius = Math.max(radius, MIN_GEOFENCE_METERS)
+  const accuracyTolerance = typeof accuracy === 'number'
+    ? Math.min(Math.max(accuracy, 0), MAX_ACCURACY_TOLERANCE_METERS)
+    : 0
   return distance > baseRadius + accuracyTolerance
 }
 
-// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Constants ──────────────────────────────────────────────────────────────
 
 const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/staff-checkin`
 
-// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Component ──────────────────────────────────────────────────────────────
 
 export function StaffCheckinPage() {
   const eventSlug = getEventSlug()
@@ -148,7 +156,7 @@ export function StaffCheckinPage() {
     })
   }, [step])
 
-  // â”€â”€ Identify staff â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Identify staff ────────────────────────────────────────────────────────
 
   async function handleIdentify(e: React.FormEvent) {
     e.preventDefault()
@@ -213,7 +221,7 @@ export function StaffCheckinPage() {
     }
   }
 
-  // â”€â”€ Geolocation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Geolocation ───────────────────────────────────────────────────────────
 
   // Tenta GPS preciso (até 25s). Se falhar por timeout, tenta de novo sem highAccuracy (rede/WiFi, 15s)
   function tryGetPosition(options: PositionOptions): Promise<GeolocationPosition> {
@@ -224,7 +232,7 @@ export function StaffCheckinPage() {
 
   function gpsErrorMessage(err: GeolocationPositionError): string {
     if (err.code === err.PERMISSION_DENIED) {
-      return 'Permissão de localização negada. iPhone: Ajustes â†’ Safari â†’ Localização â†’ Permitir. Android: cadeado no endereço â†’ Permissões â†’ Localização. Depois recarregue a página.'
+      return 'Permissão de localização negada. iPhone: Ajustes → Safari → Localização → Permitir. Android: cadeado no endereço → Permissões → Localização. Depois recarregue a página.'
     }
     if (err.code === err.POSITION_UNAVAILABLE) {
       return 'GPS indisponível. Ative o GPS/Localização no seu celular (puxe a barra de notificações e ligue o ícone de Localização) e tente de novo.'
@@ -267,7 +275,7 @@ export function StaffCheckinPage() {
     }
   }, [staff])
 
-  // â”€â”€ Camera â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Camera ────────────────────────────────────────────────────────────────
 
   async function openCamera(targetStep: PageStep = 'camera') {
     try {
@@ -319,7 +327,7 @@ export function StaffCheckinPage() {
     openCamera()
   }
 
-  // â”€â”€ Permissions check (camera + GPS) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Permissions check (camera + GPS) ──────────────────────────────────────
 
   const checkPermissions = useCallback(async () => {
     // Query Permissions API onde existe
@@ -384,7 +392,7 @@ export function StaffCheckinPage() {
     await checkPermissions()
   }, [checkPermissions])
 
-  // â”€â”€ Checkin flow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Checkin flow ──────────────────────────────────────────────────────────
 
   async function startCheckinFlow() {
     const selectedWorkRole = workRole === 'Outros' ? customWorkRole.trim() : workRole
@@ -459,7 +467,7 @@ export function StaffCheckinPage() {
     }
   }
 
-  // â”€â”€ Checkout flow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Checkout flow ─────────────────────────────────────────────────────────
 
   async function startCheckoutFlow() {
     try {
@@ -535,7 +543,7 @@ export function StaffCheckinPage() {
     }
   }
 
-  // â”€â”€ Reset to email step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Reset to email step ───────────────────────────────────────────────────
 
   function resetToEmail() {
     setStep('email')
@@ -562,7 +570,7 @@ export function StaffCheckinPage() {
     setStep('identified')
   }
 
-  // â”€â”€ Render: Loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Loading ───────────────────────────────────────────────────────
 
   if (!eventSlug) {
     return (
@@ -580,7 +588,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Email step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Email step ────────────────────────────────────────────────────
 
   if (step === 'email') {
     return (
@@ -648,7 +656,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Error step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Error step ────────────────────────────────────────────────────
 
   if (step === 'error') {
     return (
@@ -684,7 +692,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Identified step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Identified step ───────────────────────────────────────────────
 
   if (step === 'identified' && staff) {
     return (
@@ -785,7 +793,7 @@ export function StaffCheckinPage() {
               </div>
             )}
 
-            {/* Permissões â€” checa antes de Entrada/Saída */}
+            {/* Permissões — checa antes de Entrada/Saída */}
             {(cameraPerm !== 'granted' || gpsPerm !== 'granted') && (
               <div className="mt-4 rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 p-5">
                 <div className="flex items-start gap-3">
@@ -836,8 +844,8 @@ export function StaffCheckinPage() {
                     {(cameraPerm === 'denied' || gpsPerm === 'denied') ? (
                       <div className="mt-3 rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-xs leading-5 text-red-200">
                         <p className="font-bold">Como reativar:</p>
-                        <p className="mt-1"><strong>iPhone:</strong> Ajustes â†’ Safari â†’ Câmera/Localização â†’ Permitir. Depois recarregue esta página.</p>
-                        <p className="mt-1"><strong>Android:</strong> No Chrome, toque no cadeado ðŸ”’ ao lado do endereço â†’ Permissões â†’ ative Câmera e Localização â†’ recarregue.</p>
+                        <p className="mt-1"><strong>iPhone:</strong> Ajustes → Safari → Câmera/Localização → Permitir. Depois recarregue esta página.</p>
+                        <p className="mt-1"><strong>Android:</strong> No Chrome, toque no cadeado 🔒 ao lado do endereço → Permissões → ative Câmera e Localização → recarregue.</p>
                       </div>
                     ) : (
                       <button
@@ -862,7 +870,7 @@ export function StaffCheckinPage() {
               </div>
             )}
 
-            {/* Action buttons â€” sempre mostra Entrada E Saída, staff escolhe */}
+            {/* Action buttons — sempre mostra Entrada E Saída, staff escolhe */}
             <div className="mt-6 flex flex-col gap-3">
               {staff.point_status === 'needs_checkin' && (
                 <label className="flex flex-col gap-2 text-left">
@@ -954,7 +962,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Camera step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Camera step ───────────────────────────────────────────────────
 
   if (step === 'camera') {
     return (
@@ -1007,7 +1015,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Preview step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Preview step ──────────────────────────────────────────────────
 
   if (step === 'preview' && photoBase64) {
     return (
@@ -1061,7 +1069,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Camera checkout step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Camera checkout step ───────────────────────────────────────────
 
   if (step === 'camera_checkout') {
     return (
@@ -1093,7 +1101,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Preview checkout step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Preview checkout step ────────────────────────────────────────
 
   if (step === 'preview_checkout' && photoBase64) {
     return (
@@ -1126,7 +1134,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Submitting step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Submitting step ───────────────────────────────────────────────
 
   if (step === 'submitting') {
     return (
@@ -1141,7 +1149,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Success checkin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Success checkin ───────────────────────────────────────────────
 
   if (step === 'success_checkin') {
     return (
@@ -1185,7 +1193,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Render: Success checkout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render: Success checkout ──────────────────────────────────────────────
 
   if (step === 'success_checkout') {
     return (
@@ -1213,7 +1221,7 @@ export function StaffCheckinPage() {
     )
   }
 
-  // â”€â”€ Fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Fallback ──────────────────────────────────────────────────────────────
 
   return null
 }

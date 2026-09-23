@@ -10,7 +10,7 @@ import {
   Users,
 } from 'lucide-react'
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Types ──────────────────────────────────────────────────────────────────
 
 interface InviteInfo {
   event_name: string
@@ -139,7 +139,7 @@ const STAFF_ROLE_OPTIONS: StaffRoleOption[] = [
   },
 ]
 
-// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getToken(): string | null {
   const pathMatch = window.location.pathname.match(/\/staff\/join\/([^/?#]+)/)
@@ -172,7 +172,7 @@ function formatTimePT(iso?: string | null): string | null {
   }
 }
 
-// â”€â”€â”€ Sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Sub-components ──────────────────────────────────────────────────────────
 
 function InputField({
   label,
@@ -203,7 +203,7 @@ function InputField({
 const inputClass =
   'w-full rounded-[14px] border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-[#f5f0e8] placeholder-white/28 outline-none transition-all focus:border-[#D4FF00]/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#D4FF00]/10'
 
-// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export function StaffJoinPage() {
   const [pageState, setPageState] = useState<PageState>('loading')
@@ -367,7 +367,7 @@ export function StaffJoinPage() {
     }
   }
 
-  // â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Loading state ──────────────────────────────────────────────────────────
   if (pageState === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#06070a]">
@@ -381,7 +381,7 @@ export function StaffJoinPage() {
     )
   }
 
-  // â”€â”€ Error state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Error state ────────────────────────────────────────────────────────────
   if (pageState === 'error') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 text-center">
@@ -404,7 +404,7 @@ export function StaffJoinPage() {
     )
   }
 
-  // â”€â”€ Success state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Success state ──────────────────────────────────────────────────────────
   if (pageState === 'already_registered') {
     const pontoUrl = getPointUrl(inviteInfo, token)
     return (
@@ -480,7 +480,7 @@ export function StaffJoinPage() {
             href={pontoUrl}
             className="block w-full rounded-2xl bg-[#D4FF00] px-6 py-5 text-base font-bold uppercase tracking-[0.14em] text-[#06070a] transition-all hover:-translate-y-0.5 hover:bg-[#c8f200] hover:shadow-[0_12px_36px_rgba(212,255,0,0.24)] active:scale-[0.98]"
           >
-            ðŸ‘‰ Bater meu ponto agora
+            👉 Bater meu ponto agora
           </a>
           <p className="text-xs text-white/50 break-all">
             ou copie o link: <span className="text-white/70">{pontoUrl}</span>
@@ -488,9 +488,9 @@ export function StaffJoinPage() {
         </div>
 
         <div className="mt-2 max-w-md rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 px-5 py-4 text-left">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">âš ï¸ Atenção</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">⚠️ Atenção</p>
           <p className="mt-2 text-sm leading-6 text-amber-100">
-            O ponto <strong>SÃ“ funciona quando você estiver dentro do local do evento</strong>. Ative GPS, câmera e notificações no seu celular. O sistema bloqueia o registro se você estiver longe.
+            O ponto <strong>SÓ funciona quando você estiver dentro do local do evento</strong>. Ative GPS, câmera e notificações no seu celular. O sistema bloqueia o registro se você estiver longe.
           </p>
         </div>
 
@@ -501,7 +501,7 @@ export function StaffJoinPage() {
     )
   }
 
-  // â”€â”€ Valid form state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Valid form state ───────────────────────────────────────────────────────
   const info = inviteInfo!
   const eventDate = formatDatePT(info.event_date)
   const shiftStart = formatTimePT(info.shift_starts_at)

@@ -37,6 +37,7 @@ export type PublicRoute =
   | { type: 'staff-admin'; slug: string }
   | { type: 'staff-join'; token: string }
   | { type: 'staff-ponto'; slug: string }
+  | { type: 'athletes'; slug: string }
   | { type: 'timeclock'; eventId: string; credentialToken: string }
   | { type: 'kiosk'; slug: string }
   | { type: 'scanner'; slug: string }
@@ -102,6 +103,9 @@ export function getInitialPublicRoute(): PublicRoute {
 
   const staffPontoMatch = path.match(/^\/staff\/ponto\/([^/]+)/)
   if (staffPontoMatch) return { type: 'staff-ponto', slug: staffPontoMatch[1] }
+
+  const athletesMatch = path.match(/^\/atletas\/([^/]+)/)
+  if (athletesMatch) return { type: 'athletes', slug: athletesMatch[1] }
 
   const kioskMatch = path.match(/^\/kiosk\/([^/]+)/)
   if (kioskMatch) return { type: 'kiosk', slug: kioskMatch[1] }

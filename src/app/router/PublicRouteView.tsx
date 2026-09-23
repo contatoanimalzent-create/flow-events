@@ -21,6 +21,7 @@ const StatusPage = lazy(() => import('@/pages/public/StatusPage').then((m) => ({
 const EventosCategoriPage = lazy(() => import('@/pages/public/EventosCategoriaPage').then((m) => ({ default: m.EventosCategoriaPage })))
 const StaffJoinPage = lazy(() => import('@/pages/public/StaffJoinPage').then((m) => ({ default: m.StaffJoinPage })))
 const StaffCheckinPage = lazy(() => import('@/pages/public/StaffCheckinPage').then((m) => ({ default: m.StaffCheckinPage })))
+const AthleteJoinPage = lazy(() => import('@/pages/public/AthleteJoinPage').then((m) => ({ default: m.AthleteJoinPage })))
 const StaffTimeclockPage = lazy(() => import('@/pages/public/StaffTimeclockPage').then((m) => ({ default: m.StaffTimeclockPage })))
 const KioskPage = lazy(() => import('@/pages/public/KioskPage').then((m) => ({ default: m.KioskPage })))
 const ContactPage = lazy(() => import('@/pages/public/ContactPage').then((m) => ({ default: m.ContactPage })))
@@ -104,6 +105,8 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
         <StaffJoinPage />
       ) : typeof route === 'object' && route.type === 'staff-ponto' ? (
         <StaffCheckinPage />
+      ) : typeof route === 'object' && route.type === 'athletes' ? (
+        <AthleteJoinPage />
       ) : typeof route === 'object' && route.type === 'kiosk' ? (
         <KioskPage />
       ) : typeof route === 'object' && route.type === 'timeclock' ? (

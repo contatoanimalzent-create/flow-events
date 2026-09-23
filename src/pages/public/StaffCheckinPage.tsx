@@ -176,7 +176,7 @@ export function StaffCheckinPage() {
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         setErrorMessage(
-          body?.error ?? body?.message ?? 'E-mail não encontrado para este evento.',
+          body?.error ?? body?.message ?? 'CPF não encontrado no cadastro deste evento.',
         )
         setStep('error')
         return
@@ -942,7 +942,7 @@ export function StaffCheckinPage() {
                 onClick={resetToEmail}
                 className="text-xs text-white/32 transition-colors hover:text-white/50"
               >
-                Trocar e-mail
+                Trocar CPF
               </button>
             </div>
           </div>

@@ -86,6 +86,36 @@ function formatCpf(cpf: string): string {
   return `${cpf.slice(0, 3)}.${cpf.slice(3, 6)}.${cpf.slice(6, 9)}-${cpf.slice(9)}`
 }
 
+function normalizeName(value: string): string {
+  return value
+    .trim()
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+}
+
+// "Jose da Silva" e "JOSE SILVA" sao a mesma pessoa. Compara primeiro e ultimo
+// nome, ignorando as preposicoes do meio.
+function sameName(a: string, b: string): boolean {
+  const parts = (v: string) =>
+    normalizeName(v).split(' ').filter((p) => p.length > 2 && !['DOS', 'DAS', 'DEL'].includes(p))
+  const pa = parts(a)
+  const pb = parts(b)
+  if (pa.length === 0 || pb.length === 0) return false
+  return pa[0] === pb[0] && pa[pa.length - 1] === pb[pb.length - 1]
+}
+
+// Mostra so as iniciais dos nomes do meio e do fim, para o aviso nao entregar
+// o nome completo de terceiro a quem digitou o CPF errado.
+function maskName(value: string): string {
+  const parts = normalizeName(value).split(' ').filter(Boolean)
+  if (parts.length === 0) return 'outra pessoa'
+  const [first, ...rest] = parts
+  const initials = rest.map((p) => `${p[0]}.`).join(' ')
+  return [first, initials].filter(Boolean).join(' ')
+}
+
 function normalizeCode(value?: string | null): string {
   return (value ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '')
 }
@@ -262,6 +292,28 @@ async function handlePost(req: Request): Promise<Response> {
   }
   if (!event) return fail(req, 'Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
 
+  // Nao da para confirmar na Receita se o CPF e mesmo desta pessoa sem servico
+  // pago. O que da para fazer de graca: o digito verificador ja foi conferido
+  // acima, e aqui o mesmo CPF nao pode aparecer no evento com outro nome.
+  const { data: jaNaEquipe } = await admin
+    .from('staff_members')
+    .select('first_name, last_name')
+    .eq('event_id', event.id)
+    .in('cpf', [cpf, formatCpf(cpf)])
+    .maybeSingle()
+
+  if (jaNaEquipe) {
+    const nomeEquipe = [jaNaEquipe.first_name, jaNaEquipe.last_name].filter(Boolean).join(' ')
+    if (!sameName(nomeEquipe, fullName)) {
+      return fail(
+        req,
+        `Este CPF já está cadastrado neste evento em nome de ${maskName(nomeEquipe)}. Confira o número digitado.`,
+        409,
+        'CPF_NAME_MISMATCH',
+      )
+    }
+  }
+
   const { data: existing } = await admin
     .from('event_athletes')
     .select('id, kind, full_name, athlete_code')
@@ -410,6 +462,25 @@ async function handlePost(req: Request): Promise<Response> {
         if (!isValidCpf(c.cpf)) {
           corners.push({ full_name: c.full_name, ok: false, reason: 'CPF do corner inválido.' })
           continue
+        }
+
+        const { data: cornerNaEquipe } = await admin
+          .from('staff_members')
+          .select('first_name, last_name')
+          .eq('event_id', event.id)
+          .in('cpf', [c.cpf, formatCpf(c.cpf)])
+          .maybeSingle()
+
+        if (cornerNaEquipe) {
+          const nomeEquipe = [cornerNaEquipe.first_name, cornerNaEquipe.last_name].filter(Boolean).join(' ')
+          if (!sameName(nomeEquipe, c.full_name)) {
+            corners.push({
+              full_name: c.full_name,
+              ok: false,
+              reason: `Este CPF ja esta no evento em nome de ${maskName(nomeEquipe)}. Confira o numero.`,
+            })
+            continue
+          }
         }
 
         const { error: cornerErr } = await admin.from('event_athletes').insert({

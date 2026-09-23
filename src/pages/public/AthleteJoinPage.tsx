@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AlertCircle, Camera, CheckCircle2, Loader2, Swords } from 'lucide-react'
+import { AlertCircle, Camera, CheckCircle2, HelpCircle, Loader2, Swords, X } from 'lucide-react'
 
 type PageState = 'loading' | 'form' | 'submitting' | 'success' | 'error'
 type CornerColor = 'azul' | 'vermelho'
@@ -109,24 +109,71 @@ function shrinkImage(file: File): Promise<string> {
 const inputClass =
   'w-full rounded-[14px] border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-[#f5f0e8] placeholder-white/28 outline-none transition-all focus:border-[#D4FF00]/50 focus:bg-white/[0.07] focus:ring-2 focus:ring-[#D4FF00]/10'
 
+function HelpTip({ title, children }: { title: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <span className="relative inline-flex">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-label={`O que é ${title}`}
+        className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/20 text-white/48 transition-all hover:border-[#D4FF00]/50 hover:text-[#D4FF00]"
+      >
+        <HelpCircle className="h-3.5 w-3.5" />
+      </button>
+
+      {open && (
+        <span
+          role="note"
+          className="absolute left-0 top-7 z-20 w-[min(19rem,75vw)] rounded-[14px] border border-white/12 bg-[#12161f] p-4 text-left shadow-[0_18px_44px_rgba(0,0,0,0.6)]"
+        >
+          <span className="flex items-start justify-between gap-3">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#D4FF00]">
+              {title}
+            </span>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Fechar"
+              className="-mt-0.5 text-white/40 transition-colors hover:text-white"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </span>
+          <span className="mt-2 block text-[12.5px] font-normal normal-case leading-5 tracking-normal text-white/76">
+            {children}
+          </span>
+        </span>
+      )}
+    </span>
+  )
+}
+
 function Field({
   label,
   required,
   hint,
   error,
+  help,
   children,
 }: {
   label: string
   required?: boolean
   hint?: string
   error?: string
+  help?: React.ReactNode
   children: React.ReactNode
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[#f5f0e8]">
-        {label}
-        {required && <span className="ml-1 text-[#D4FF00]">*</span>}
+      <label className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.1em] text-[#f5f0e8]">
+        <span>
+          {label}
+          {required && <span className="ml-1 text-[#D4FF00]">*</span>}
+        </span>
+        {help && <HelpTip title={label}>{help}</HelpTip>}
       </label>
       {children}
       {hint && !error && <p className="text-[11px] leading-relaxed text-white/42">{hint}</p>}
@@ -451,6 +498,15 @@ export function AthleteJoinPage() {
           Preencha os seus dados e, no fim, cadastre os seus corners. São no máximo 2.
         </p>
 
+        <p className="mt-3 flex items-center gap-2 text-[12px] leading-5 text-white/48">
+          <span className="text-[#D4FF00]">*</span>
+          campo obrigatório. Onde tiver
+          <HelpTip title="Ajuda">
+            Toque neste sinal em qualquer campo para entender o que está sendo pedido e por quê.
+          </HelpTip>
+          você toca e vê o que significa.
+        </p>
+
         {errorMessage && (
           <div className="mt-5 flex items-start gap-3 rounded-[16px] border border-red-500/25 bg-red-500/10 p-4">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
@@ -471,7 +527,18 @@ export function AthleteJoinPage() {
             />
           </Field>
 
-          <Field label="CPF" required error={fieldErrors.cpf}>
+          <Field
+            label="CPF"
+            required
+            error={fieldErrors.cpf}
+            help={
+              <>
+                Usamos o CPF para emitir a sua credencial e conferir a sua identidade no
+                credenciamento. <strong className="text-[#f5f0e8]">Leve o documento com foto no dia</strong>,
+                porque o nome e o CPF precisam bater com o que você preencheu aqui.
+              </>
+            }
+          >
             <input
               value={form.cpf}
               onChange={(e) => setField('cpf', formatCpfInput(e.target.value))}
@@ -488,6 +555,13 @@ export function AthleteJoinPage() {
             required
             hint="Seus corners entram no mesmo lado."
             error={fieldErrors.corner_color}
+            help={
+              <>
+                Em cada luta um atleta fica no canto <strong className="text-[#f5f0e8]">azul</strong> e o
+                outro no <strong className="text-[#f5f0e8]">vermelho</strong>. Marque o seu. Se ainda não
+                souber, escolha agora e fale com a produção no dia para ajustar.
+              </>
+            }
           >
             <div className="grid grid-cols-2 gap-3">
               {CORNER_COLORS.map((option) => {
@@ -525,6 +599,12 @@ export function AthleteJoinPage() {
             required
             hint="Rosto visível, sem boné e sem óculos escuros."
             error={fieldErrors.photo}
+            help={
+              <>
+                É a foto que vai na sua credencial e é o que a produção usa para te identificar na
+                entrada. Pode tirar na hora pelo celular. Não precisa ser foto de documento.
+              </>
+            }
           >
             <input ref={fileRef} type="file" accept="image/*" capture="user" onChange={handlePhoto} className="hidden" />
             <button
@@ -618,7 +698,18 @@ export function AthleteJoinPage() {
             </Field>
           </div>
 
-          <Field label="Cartel" hint="Vitórias, derrotas e empates.">
+          <Field
+            label="Cartel"
+            hint="Vitórias, derrotas e empates."
+            help={
+              <>
+                É o seu retrospecto na carreira, na ordem
+                <strong className="text-[#f5f0e8]"> vitórias, derrotas e empates</strong>. Quem tem 12
+                vitórias, 3 derrotas e 1 empate preenche 12, 3 e 1. Se estiver começando, pode deixar
+                em branco.
+              </>
+            }
+          >
             <div className="grid grid-cols-3 gap-3">
               {([
                 ['record_wins', 'V'],
@@ -675,7 +766,17 @@ export function AthleteJoinPage() {
             />
           </Field>
 
-          <Field label="Sherdog" hint="Link do seu perfil, se tiver.">
+          <Field
+            label="Sherdog"
+            hint="Link do seu perfil, se tiver."
+            help={
+              <>
+                O Sherdog é o site que registra o cartel oficial dos lutadores. Se você tem perfil por
+                lá, cole o link. Serve para a produção conferir o seu retrospecto. Se não tiver, deixe
+                em branco.
+              </>
+            }
+          >
             <input
               value={form.sherdog_url}
               onChange={(e) => setField('sherdog_url', e.target.value)}
@@ -685,9 +786,20 @@ export function AthleteJoinPage() {
             />
           </Field>
 
-          <SectionTitle note="No máximo 2. Se tiver só um, deixe o segundo em branco.">
-            Seus corners
-          </SectionTitle>
+          <div className="flex items-center gap-2 pt-3">
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: ACCENT }}>
+              Seus corners
+            </h2>
+            <HelpTip title="Seus corners">
+              São as pessoas que ficam no seu canto durante a luta, geralmente o treinador e um
+              auxiliar. <strong className="text-[#f5f0e8]">No máximo 2 por atleta.</strong> Quem você
+              cadastrar aqui entra no evento e retira camisa e pulseira no credenciamento. Eles não
+              precisam preencher nada, você cadastra por eles.
+            </HelpTip>
+          </div>
+          <p className="-mt-3 text-[12px] leading-5 text-white/48">
+            No máximo 2. Se tiver só um, deixe o segundo em branco.
+          </p>
 
           {corners.map((corner, index) => (
             <div key={index} className="space-y-4 rounded-[18px] border border-white/10 bg-white/[0.03] p-4">
@@ -704,7 +816,16 @@ export function AthleteJoinPage() {
                 />
               </Field>
 
-              <Field label="CPF" error={fieldErrors[`corner_${index}_cpf`]}>
+              <Field
+                label="CPF"
+                error={fieldErrors[`corner_${index}_cpf`]}
+                help={
+                  <>
+                    O CPF do corner, não o seu. É com ele que a produção emite a credencial dessa
+                    pessoa. Ela também precisa levar documento com foto no dia.
+                  </>
+                }
+              >
                 <input
                   value={corner.cpf}
                   onChange={(e) => setCorner(index, 'cpf', formatCpfInput(e.target.value))}

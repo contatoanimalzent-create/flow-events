@@ -6,9 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // Types
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface CheckinRequestBody {
   staff_member_id: string
@@ -47,9 +47,9 @@ interface EvolutionProvider {
   instance: string
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // Helpers
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -63,7 +63,7 @@ function errorResponse(message: string, status: number, code?: string): Response
 }
 
 /**
- * Haversine formula â€” returns the distance in meters between two lat/lng points.
+ * Haversine formula — returns the distance in meters between two lat/lng points.
  */
 function haversineMeters(
   lat1: number,
@@ -418,9 +418,9 @@ async function sendEvolutionWhatsAppFailover(params: {
   return { ok: false, id: null, error: errors.join(' | ') || 'Evolution providers not configured.' }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// GET handler â€” lookup staff status
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
+// GET handler — lookup staff status
+// ─────────────────────────────────────────────────────────────────────────────
 
 async function handleGet(req: Request): Promise<Response> {
   const url = new URL(req.url)
@@ -565,9 +565,9 @@ async function handleGet(req: Request): Promise<Response> {
   })
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// POST handler â€” register checkin/checkout
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
+// POST handler — register checkin/checkout
+// ─────────────────────────────────────────────────────────────────────────────
 
 async function handlePost(req: Request): Promise<Response> {
   let body: CheckinRequestBody
@@ -580,7 +580,7 @@ async function handlePost(req: Request): Promise<Response> {
   const { staff_member_id, event_id, type, latitude, longitude, accuracy_meters } = body
   const workRole = normalizeWorkRole(body.work_role)
 
-  // â”€â”€ Validate required fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Validate required fields ──────────────────────────────────────────────
   if (!staff_member_id || typeof staff_member_id !== 'string') {
     return errorResponse('Campo obrigatório: staff_member_id.', 400, 'MISSING_STAFF_MEMBER_ID')
   }
@@ -604,7 +604,7 @@ async function handlePost(req: Request): Promise<Response> {
 
   const admin = createSupabaseAdminClient()
 
-  // â”€â”€ 1. Validate staff member exists and is active â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 1. Validate staff member exists and is active ─────────────────────────
   const { data: staffMember, error: staffErr } = await admin
     .from('staff_members')
     .select('id, first_name, last_name, email, phone, role_title, status, event_id, shift_starts_at')
@@ -636,7 +636,7 @@ async function handlePost(req: Request): Promise<Response> {
     )
   }
 
-  // â”€â”€ 2. Get event venue coordinates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 2. Get event venue coordinates ────────────────────────────────────────
   const { data: event, error: eventErr } = await admin
     .from('events')
     .select('id, name, slug, venue_name, venue_address, venue_coordinates, geofence_radius_meters')
@@ -652,7 +652,7 @@ async function handlePost(req: Request): Promise<Response> {
     return errorResponse('Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
   }
 
-  // â”€â”€ 3. Calculate distance from venue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 3. Calculate distance from venue ──────────────────────────────────────
   const venueCoords = parsePoint(event.venue_coordinates)
   let distanceFromVenueMeters: number | null = null
 
@@ -721,7 +721,7 @@ async function handlePost(req: Request): Promise<Response> {
     )
   }
 
-  // â”€â”€ Handle photo upload (base64 â†’ Supabase Storage) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Handle photo upload (base64 → Supabase Storage) ───────────────────────
   let photoUrl = body.photo_url ?? null
 
   if (body.photo_base64) {
@@ -761,7 +761,7 @@ async function handlePost(req: Request): Promise<Response> {
     }
   }
 
-  // â”€â”€ 7. Insert into staff_checkins â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 7. Insert into staff_checkins ─────────────────────────────────────────
   if (!photoUrl) {
     return errorResponse('Foto obrigatória não foi salva. Tente novamente.', 500, 'PHOTO_UPLOAD_FAILED')
   }
@@ -792,7 +792,7 @@ async function handlePost(req: Request): Promise<Response> {
     )
   }
 
-  // â”€â”€ 8/9. Update staff_members checked_in_at / checked_out_at â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 8/9. Update staff_members checked_in_at / checked_out_at ──────────────
   const updateField = type === 'checkin' ? 'checked_in_at' : 'checked_out_at'
   const staffUpdate = type === 'checkin'
     ? { checked_in_at: new Date().toISOString(), checked_out_at: null }
@@ -807,7 +807,7 @@ async function handlePost(req: Request): Promise<Response> {
     // Non-fatal: the checkin record was already created
   }
 
-  // â”€â”€ 10. Return success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 10. Return success ────────────────────────────────────────────────────
   if (type === 'checkin' && staffMember.phone) {
     const staffName = [staffMember.first_name, staffMember.last_name].filter(Boolean).join(' ')
     const venueAddress = event.venue_address as Record<string, unknown> | null
@@ -1020,12 +1020,12 @@ async function handlePost(req: Request): Promise<Response> {
   })
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // Main Handler
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  // â”€â”€ CORS preflight â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── CORS preflight ──────────────────────────────────────────────────────
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }

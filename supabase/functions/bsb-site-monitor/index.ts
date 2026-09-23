@@ -7,11 +7,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const SITE = 'https://www.bsbfight.com.br'
+// Só bsbfight.com.br é do BSB Fight. O bsbfight.com é de terceiro e não é vigiado.
 const ROOT_HOSTS = [
   'https://bsbfight.com.br/',
   'https://www.bsbfight.com.br/',
-  'https://bsbfight.com/',
-  'https://www.bsbfight.com/',
   'https://qr.bsbfight.com.br/',
 ]
 const PAGES = [

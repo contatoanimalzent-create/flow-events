@@ -83,7 +83,7 @@ function haversineDistance(
 // permissiva que o servidor, a pessoa tira a foto, envia e so entao ouve que
 // esta longe do local.
 const MIN_GEOFENCE_METERS = 50
-const MAX_ACCURACY_TOLERANCE_METERS = 50
+const MAX_ACCURACY_TOLERANCE_METERS = 150
 
 function isOutsideVenue(distance: number | null, radius: number | null, accuracy?: number): boolean {
   if (distance === null || radius === null) return false

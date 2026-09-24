@@ -24,7 +24,9 @@ interface CheckinRequestBody {
 
 const DEFAULT_GEOFENCE_METERS = 100
 const MIN_GEOFENCE_METERS = 50
-const MAX_ACCURACY_TOLERANCE_METERS = 50
+// O GPS de celular em evento lotado erra bastante: medimos ate 97m de
+// imprecisao no BSB Fight 7. Tolerar pouco barra gente que esta no local.
+const MAX_ACCURACY_TOLERANCE_METERS = 150
 const WORK_ROLE_OPTIONS = new Set([
   'Transmissão',
   'Mídia',

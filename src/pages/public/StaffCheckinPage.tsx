@@ -11,7 +11,7 @@ import {
   Shield,
   XCircle,
 } from 'lucide-react'
-import { OPERATIONAL_STAFF_ROLES } from '@/modules/staff/staffRoles'
+import { OPERATIONAL_STAFF_ROLE_GROUPS } from '@/modules/staff/staffRoles'
 
 type PermissionState = 'unknown' | 'granted' | 'denied' | 'prompt'
 
@@ -891,10 +891,14 @@ export function StaffCheckinPage() {
                     required
                   >
                     <option value="" className="bg-[#12161f] text-white/50">Selecione</option>
-                    {OPERATIONAL_STAFF_ROLES.map((role) => (
-                      <option key={role} value={role} className="bg-[#12161f] text-[#f5f0e8]">
-                        {role}
-                      </option>
+                    {OPERATIONAL_STAFF_ROLE_GROUPS.map((group) => (
+                      <optgroup key={group.label} label={group.label} className="bg-[#12161f]">
+                        {group.roles.map((role) => (
+                          <option key={role} value={role} className="bg-[#12161f] text-[#f5f0e8]">
+                            {role}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
                   {workRole === 'Outros' && (

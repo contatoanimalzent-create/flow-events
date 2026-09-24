@@ -12,6 +12,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { OPERATIONAL_STAFF_ROLE_GROUPS } from '@/modules/staff/staffRoles'
+import { InAppBrowserWarning } from '@/shared/components/ui/InAppBrowserWarning'
 
 type PermissionState = 'unknown' | 'granted' | 'denied' | 'prompt'
 
@@ -605,6 +606,8 @@ export function StaffCheckinPage() {
                 Informe seu CPF para registrar entrada e saida
               </p>
             </div>
+
+            <InAppBrowserWarning acao="bater o ponto" />
 
             {/* Identify form */}
             <form onSubmit={handleIdentify} className="flex flex-col gap-4">

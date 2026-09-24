@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, Camera, CheckCircle2, HelpCircle, Loader2, Swords, X } from 'lucide-react'
+import { InAppBrowserWarning } from '@/shared/components/ui/InAppBrowserWarning'
 
 type PageState = 'loading' | 'form' | 'submitting' | 'success' | 'error'
 type CornerColor = 'azul' | 'vermelho'
@@ -697,6 +698,9 @@ export function AthleteJoinPage() {
           </HelpTip>
           você toca e vê o que significa.
         </p>
+
+        <div className="mt-6" />
+        <InAppBrowserWarning acao="enviar sua foto" />
 
         {servidorFora && (
           <div className="mt-5 flex items-start gap-3 rounded-[16px] border border-amber-400/30 bg-amber-400/[0.08] p-4 text-left">

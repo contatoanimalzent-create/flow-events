@@ -46,6 +46,7 @@ const OperatorApp = lazy(() => import('@/features/mobile/operator/OperatorApp').
 // Unified Pulse app, single app, single auth, multi-role
 const PulseApp = lazy(() => import('@/features/pulse/PulseApp').then((m) => ({ default: m.PulseApp })))
 const Bsb5AdminPage = lazy(() => import('@/modules/bsb5/Bsb5AdminPage'))
+const EventAthletesAdminPage = lazy(() => import('@/modules/bsb5/EventAthletesAdminPage'))
 const ScannerPage = lazy(() => import('@/modules/operator/pages/ScannerPage'))
 const Scanner2Page = lazy(() => import('@/modules/operator/pages/Scanner2Page'))
 
@@ -73,6 +74,7 @@ export function PublicRouteView({ route, onLogin, onSignup, onBackToHome }: Publ
 
   // ── Unified Pulse app (NEW, replaces individual profile apps) ──
   if (route === 'bsb5-admin') return <Suspense fallback={<MobileLoader />}><Bsb5AdminPage eventSlug="bsb-fight-5" onNavigate={(to) => { window.location.href = to }} /></Suspense>
+  if (typeof route === 'object' && route.type === 'athletes-admin') return <Suspense fallback={<MobileLoader />}><EventAthletesAdminPage eventSlug={route.slug} onNavigate={(to) => { window.location.href = to }} /></Suspense>
   if (typeof route === 'object' && route.type === 'staff-admin') return <Suspense fallback={<MobileLoader />}><Bsb5AdminPage eventSlug={route.slug} onNavigate={(to) => { window.location.href = to }} /></Suspense>
   if (route === 'pulse-app') return <Suspense fallback={<MobileLoader />}><PulseApp /></Suspense>
   if (typeof route === 'object' && route.type === 'scanner') {

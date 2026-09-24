@@ -10,6 +10,7 @@ import {
   MapPin,
   RefreshCw,
   ShieldAlert,
+  Swords,
   Users,
   X,
 } from 'lucide-react'
@@ -834,6 +835,12 @@ export default function Bsb5AdminPage({ onNavigate, eventSlug = BSB5_SLUG }: Pul
               : 'Carregando...'}
           </span>
           <span className="text-slate-500">Atualiza sozinho a cada 15 segundos.</span>
+          <a
+            href={`/pulse/${eventSlug}/atletas`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 font-semibold text-slate-300 transition-colors hover:border-[#D4FF00]/50 hover:text-[#D4FF00]"
+          >
+            <Swords className="h-3.5 w-3.5" /> Atletas e corners
+          </a>
         </div>
 
         <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">

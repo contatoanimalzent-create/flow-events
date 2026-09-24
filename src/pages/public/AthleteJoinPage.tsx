@@ -19,6 +19,103 @@ interface CornerResult {
 }
 
 const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/event-athlete-register`
+
+// Quando o servidor esta fora, o cadastro nao pode parar. Fica guardado no
+// proprio aparelho e sobe sozinho assim que o servidor volta.
+const FILA_KEY = 'pulse-atletas-pendentes'
+
+interface Pendente {
+  id: string
+  quando: string
+  payload: Record<string, unknown>
+}
+
+function lerFila(): Pendente[] {
+  try {
+    const raw = localStorage.getItem(FILA_KEY)
+    return raw ? (JSON.parse(raw) as Pendente[]) : []
+  } catch {
+    return []
+  }
+}
+
+function gravarFila(itens: Pendente[]) {
+  try {
+    localStorage.setItem(FILA_KEY, JSON.stringify(itens))
+  } catch {
+    // aparelho sem espaco: nao da para fazer nada aqui, o aviso na tela cobre
+  }
+}
+
+function enfileirar(payload: Record<string, unknown>): Pendente {
+  const item: Pendente = {
+    id: (crypto.randomUUID?.() ?? String(Date.now())),
+    quando: new Date().toISOString(),
+    payload,
+  }
+  gravarFila([...lerFila(), item])
+  return item
+}
+
+// Sobe o que estiver guardado. Roda ao abrir a pagina e de tempos em tempos.
+async function enviarFila(): Promise<number> {
+  const itens = lerFila()
+  if (itens.length === 0) return 0
+
+  const restantes: Pendente[] = []
+  let enviados = 0
+
+  for (const item of itens) {
+    try {
+      const res = await fetch(EDGE_FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item.payload),
+      })
+      // 2xx entrou agora; 409 quer dizer que ja estava la. Nos dois casos, sai da fila.
+      if (res.ok || res.status === 409) {
+        enviados += 1
+        continue
+      }
+      // 4xx de validacao nao adianta repetir
+      if (res.status >= 400 && res.status < 500) {
+        enviados += 1
+        continue
+      }
+      restantes.push(item)
+    } catch {
+      restantes.push(item)
+    }
+  }
+
+  gravarFila(restantes)
+  return enviados
+}
+
+// Texto para a pessoa mandar para a producao, caso ela feche o navegador.
+function resumoParaTexto(p: Record<string, unknown>): string {
+  const c = (p.corners as Array<Record<string, string>> | undefined) ?? []
+  return [
+    'CADASTRO DE ATLETA - BSB FIGHT 7',
+    '',
+    `Nome: ${p.full_name ?? ''}`,
+    `CPF: ${p.cpf ?? ''}`,
+    `Lado: ${p.corner_color ?? ''}`,
+    `Nascimento: ${p.birth_date ?? ''}`,
+    `Equipe: ${p.gym ?? '-'}`,
+    `Categoria: ${p.weight_class ?? '-'}  Peso: ${p.weight_kg ?? '-'}`,
+    `Cartel: ${p.record_wins ?? 0}-${p.record_losses ?? 0}-${p.record_draws ?? 0}`,
+    `WhatsApp: ${p.phone ?? '-'}`,
+    `E-mail: ${p.email ?? '-'}`,
+    `Cidade: ${p.city ?? '-'}/${p.state ?? '-'}`,
+    `Instagram: ${p.instagram ?? '-'}`,
+    '',
+    'CORNERS:',
+    ...(c.length
+      ? c.map((x, i) => `${i + 1}. ${x.full_name} - CPF ${x.cpf}${x.gym ? ' - ' + x.gym : ''}`)
+      : ['nenhum']),
+  ].join('\n')
+}
 const ACCENT = '#D4FF00'
 const MAX_PHOTO_EDGE = 1280
 
@@ -228,6 +325,9 @@ export function AthleteJoinPage() {
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [result, setResult] = useState<{ corners: CornerResult[]; color?: CornerColor } | null>(null)
+  const [pendente, setPendente] = useState<Record<string, unknown> | null>(null)
+  const [servidorFora, setServidorFora] = useState(false)
+  const [copiado, setCopiado] = useState(false)
 
   function setField(key: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -264,11 +364,26 @@ export function AthleteJoinPage() {
       })
       .catch((err: Error) => {
         if (err.name === 'AbortError') return
-        setErrorMessage(err.message || 'Não foi possível carregar o evento.')
-        setPageState('error')
+        // Servidor fora nao pode impedir o cadastro. Abre o formulario assim
+        // mesmo e guarda no aparelho; sobe sozinho quando o servidor voltar.
+        setServidorFora(true)
+        setEvent({ id: '', name: 'BSB FIGHT 7', slug: eventSlug })
+        setPageState('form')
       })
     return () => controller.abort()
   }, [eventSlug])
+
+  // Sobe o que ficou guardado, ao abrir e de tempos em tempos.
+  useEffect(() => {
+    let vivo = true
+    const tentar = async () => {
+      const n = await enviarFila()
+      if (vivo && n > 0) setServidorFora(false)
+    }
+    void tentar()
+    const timer = window.setInterval(() => { void tentar() }, 30_000)
+    return () => { vivo = false; window.clearInterval(timer) }
+  }, [])
 
   async function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -360,6 +475,15 @@ export function AthleteJoinPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+
+      // Servidor fora do ar (502/503/504/522) ou sem resposta: guarda e sobe depois.
+      if (res.status >= 500) {
+        enfileirar(payload)
+        setPendente(payload)
+        setPageState('success')
+        return
+      }
+
       const body = await res.json().catch(() => ({}))
 
       if (!res.ok) {
@@ -371,8 +495,10 @@ export function AthleteJoinPage() {
       setResult({ corners: body.corners ?? [], color: body.corner_color })
       setPageState('success')
     } catch {
-      setErrorMessage('Erro de conexão. Verifique sua internet e tente novamente.')
-      setPageState('form')
+      // Sem rede ou servidor mudo: mesma coisa, o cadastro nao se perde.
+      enfileirar(payload)
+      setPendente(payload)
+      setPageState('success')
     }
   }
 
@@ -400,6 +526,71 @@ export function AthleteJoinPage() {
         <AlertCircle className="h-14 w-14 text-red-400" />
         <h1 className="font-display text-3xl uppercase tracking-wide text-[#f5f0e8]">Link indisponível</h1>
         <p className="max-w-sm text-sm leading-6 text-white/64">{errorMessage}</p>
+      </div>
+    )
+  }
+
+  if (pageState === 'success' && pendente) {
+    const texto = resumoParaTexto(pendente)
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 py-10 text-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-amber-400/30 bg-amber-400/10">
+          <CheckCircle2 className="h-9 w-9 text-amber-300" />
+        </div>
+
+        <h1 className="font-display text-[2.2rem] uppercase leading-[1.14] tracking-wide text-[#f5f0e8]">
+          Cadastro recebido
+        </h1>
+
+        <p className="max-w-md text-base leading-7 text-white/72">
+          Seus dados ficaram <strong className="text-[#f5f0e8]">guardados neste celular</strong> porque o
+          sistema está fora do ar neste momento. Assim que ele voltar, o cadastro entra sozinho.
+        </p>
+
+        <div className="max-w-md rounded-[18px] border border-amber-400/25 bg-amber-400/[0.07] p-5 text-left">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">Importante</p>
+          <p className="mt-2 text-sm leading-6 text-white/78">
+            <strong className="text-[#f5f0e8]">Não feche esta aba.</strong> Deixe ela aberta que o envio
+            acontece sozinho. Se precisar fechar, mande seus dados para a produção pelo botão abaixo.
+          </p>
+        </div>
+
+        <div className="flex w-full max-w-md flex-col gap-3">
+          <button
+            type="button"
+            onClick={async () => {
+              const dados = { title: 'Cadastro BSB FIGHT 7', text: texto }
+              if (navigator.share) {
+                try { await navigator.share(dados); return } catch { /* segue para copiar */ }
+              }
+              try {
+                await navigator.clipboard.writeText(texto)
+                setCopiado(true)
+                setTimeout(() => setCopiado(false), 2500)
+              } catch { /* nada a fazer */ }
+            }}
+            className="rounded-full px-7 py-4 text-sm font-bold uppercase tracking-[0.12em] text-black"
+            style={{ background: ACCENT }}
+          >
+            {copiado ? 'Dados copiados' : 'Enviar meus dados para a produção'}
+          </button>
+
+          <button
+            type="button"
+            onClick={async () => {
+              const n = await enviarFila()
+              if (n > 0) window.location.reload()
+            }}
+            className="rounded-full border border-white/15 px-7 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/64"
+          >
+            Tentar enviar agora
+          </button>
+        </div>
+
+        <p className="max-w-md text-[12px] leading-5 text-white/42">
+          A sua foto fica guardada aqui e sobe junto. Se você mandar os dados pelo botão acima, a foto
+          é tirada de novo no credenciamento.
+        </p>
       </div>
     )
   }
@@ -506,6 +697,16 @@ export function AthleteJoinPage() {
           </HelpTip>
           você toca e vê o que significa.
         </p>
+
+        {servidorFora && (
+          <div className="mt-5 flex items-start gap-3 rounded-[16px] border border-amber-400/30 bg-amber-400/[0.08] p-4 text-left">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+            <p className="text-sm leading-6 text-amber-100">
+              O sistema está instável agora. <strong>Pode preencher normalmente:</strong> seus dados ficam
+              guardados neste celular e entram sozinhos assim que voltar.
+            </p>
+          </div>
+        )}
 
         {errorMessage && (
           <div className="mt-5 flex items-start gap-3 rounded-[16px] border border-red-500/25 bg-red-500/10 p-4">

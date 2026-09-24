@@ -187,6 +187,7 @@ export default function Bsb5AdminPage({ onNavigate, eventSlug = BSB5_SLUG }: Pul
   const [loading, setLoading] = useState(true)
   const [allowed, setAllowed] = useState(false)
   const [authEmail, setAuthEmail] = useState<string | null>(null)
+  const [lastSync, setLastSync] = useState<Date | null>(null)
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
   const [loginBusy, setLoginBusy] = useState(false)
@@ -233,8 +234,8 @@ export default function Bsb5AdminPage({ onNavigate, eventSlug = BSB5_SLUG }: Pul
   const setActiveOrganization = useOrganizations((s) => s.setActive)
   const loadPermissions = usePermissions((s) => s.load)
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true)
     try {
       const { data: authData } = await supabase.auth.getUser()
       const user = authData.user
@@ -312,12 +313,47 @@ export default function Bsb5AdminPage({ onNavigate, eventSlug = BSB5_SLUG }: Pul
       setEvent(bsbEvent)
       setStaff((staffResult.data ?? []) as BsbStaff[])
       setCheckins((checkinResult.data ?? []) as BsbCheckin[])
+      setLastSync(new Date())
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [eventSlug, loadPermissions, setActiveEvent, setActiveOrganization, setAvailableModes, setContext])
 
   useEffect(() => { load() }, [load])
+
+  // O painel fica aberto durante o evento, com gente batendo ponto o tempo
+  // todo. Recarrega sozinho a cada 15s e pausa quando a aba sai da frente, para
+  // nao gastar bateria e dados de quem esta na operacao.
+  useEffect(() => {
+    if (!allowed) return
+
+    let timer: number | undefined
+    const stop = () => {
+      if (timer) window.clearInterval(timer)
+      timer = undefined
+    }
+    const start = () => {
+      stop()
+      timer = window.setInterval(() => {
+        if (document.visibilityState === 'visible') void load(true)
+      }, 15_000)
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void load(true)
+        start()
+      } else {
+        stop()
+      }
+    }
+
+    start()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      stop()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [allowed, load])
 
   async function loginAdmin(event: React.FormEvent) {
     event.preventDefault()
@@ -763,7 +799,7 @@ export default function Bsb5AdminPage({ onNavigate, eventSlug = BSB5_SLUG }: Pul
                   Exportar Excel
                 </button>
                 <button
-                  onClick={load}
+                  onClick={() => void load()}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200"
                 >
                   <RefreshCw className="h-4 w-4" />
@@ -783,6 +819,22 @@ export default function Bsb5AdminPage({ onNavigate, eventSlug = BSB5_SLUG }: Pul
             </div>
           ))}
         </section>
+
+        <div className="-mt-2 mb-4 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#D4FF00]/25 bg-[#D4FF00]/[0.08] px-3 py-1 font-semibold text-[#D4FF00]">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4FF00] opacity-70" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#D4FF00]" />
+            </span>
+            Ao vivo
+          </span>
+          <span>
+            {lastSync
+              ? `Atualizado as ${lastSync.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
+              : 'Carregando...'}
+          </span>
+          <span className="text-slate-500">Atualiza sozinho a cada 15 segundos.</span>
+        </div>
 
         <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

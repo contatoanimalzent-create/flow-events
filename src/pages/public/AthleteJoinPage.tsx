@@ -327,6 +327,7 @@ export function AthleteJoinPage() {
 
   const [result, setResult] = useState<{ corners: CornerResult[]; color?: CornerColor } | null>(null)
   const [pendente, setPendente] = useState<Record<string, unknown> | null>(null)
+  const [jaCadastrado, setJaCadastrado] = useState<{ nome?: string; tipo?: string } | null>(null)
   const [servidorFora, setServidorFora] = useState(false)
   const [copiado, setCopiado] = useState(false)
 
@@ -487,8 +488,20 @@ export function AthleteJoinPage() {
 
       const body = await res.json().catch(() => ({}))
 
+      // Ja cadastrado nao e falha: e informacao. Mandar 'tente novamente' faz a
+      // pessoa repetir o envio varias vezes sem entender o que houve.
+      if (res.status === 409 && body?.already_registered) {
+        setJaCadastrado({ nome: body?.full_name, tipo: body?.kind })
+        setPageState('success')
+        return
+      }
+
       if (!res.ok) {
-        setErrorMessage(body?.error ?? 'Não foi possível concluir o cadastro. Tente novamente.')
+        // O motivo vem em 'error' ou em 'message', depende do caso. Sem isso a
+        // pessoa so ve um texto generico e nao sabe o que corrigir.
+        setErrorMessage(
+          body?.error ?? body?.message ?? 'Não foi possível concluir o cadastro. Tente novamente.',
+        )
         setPageState('form')
         return
       }
@@ -527,6 +540,42 @@ export function AthleteJoinPage() {
         <AlertCircle className="h-14 w-14 text-red-400" />
         <h1 className="font-display text-3xl uppercase tracking-wide text-[#f5f0e8]">Link indisponível</h1>
         <p className="max-w-sm text-sm leading-6 text-white/64">{errorMessage}</p>
+      </div>
+    )
+  }
+
+  if (pageState === 'success' && jaCadastrado) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#06070a] px-5 py-10 text-center">
+        <div
+          className="flex h-20 w-20 items-center justify-center rounded-full border"
+          style={{ borderColor: `${ACCENT}33`, background: `${ACCENT}1a` }}
+        >
+          <CheckCircle2 className="h-9 w-9" style={{ color: ACCENT }} />
+        </div>
+
+        <h1 className="font-display text-[2.4rem] uppercase leading-[1.14] tracking-wide text-[#f5f0e8]">
+          Você já está cadastrado
+        </h1>
+
+        <p className="max-w-md text-base leading-7 text-white/72">
+          {jaCadastrado.nome ? (
+            <><strong className="text-[#f5f0e8]">{jaCadastrado.nome}</strong>, o seu </>
+          ) : 'O seu '}
+          cadastro para o BSB FIGHT 7 já foi feito. Não precisa cadastrar de novo.
+        </p>
+
+        <div className="max-w-md rounded-[18px] border border-amber-400/25 bg-amber-400/[0.07] p-5 text-left">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">No dia do evento</p>
+          <p className="mt-2 text-sm leading-6 text-white/72">
+            Leve um documento com foto. No credenciamento você e seus corners retiram a camisa e as
+            pulseiras.
+          </p>
+          <p className="mt-3 text-sm leading-6 text-white/72">
+            Precisa corrigir algum dado ou incluir corner? Fale com a produção, não tente cadastrar
+            outra vez.
+          </p>
+        </div>
       </div>
     )
   }

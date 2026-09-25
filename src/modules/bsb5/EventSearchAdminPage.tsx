@@ -24,6 +24,18 @@ import { OPERATIONAL_STAFF_ROLE_GROUPS } from '@/modules/staff/staffRoles'
 
 const ALLOWED_EMAILS = ['walteciojr@gmail.com', 'hds.vieira@gmail.com']
 
+const CONSOLE_FN = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/event-admin-console`
+
+// A chave vem no proprio endereco (?k=...). Com ela o painel abre sem senha e
+// tudo passa pela edge function, que confere a chave. Sem ela, vale o login.
+function chaveDoLink(): string {
+  try {
+    return new URLSearchParams(window.location.search).get('k')?.trim() ?? ''
+  } catch {
+    return ''
+  }
+}
+
 type Papel = 'equipe' | 'atleta' | 'corner'
 
 interface Pessoa {
@@ -82,6 +94,22 @@ function hora(iso: string) {
   }
 }
 
+async function chamarConsole(
+  chave: string,
+  eventSlug: string,
+  action: string,
+  extra: Record<string, unknown> = {},
+) {
+  const res = await fetch(CONSOLE_FN, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ access_key: chave, event_slug: eventSlug, action, ...extra }),
+  })
+  const corpo = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(corpo?.error ?? 'Não foi possível completar a ação.')
+  return corpo
+}
+
 export default function EventSearchAdminPage({
   eventSlug,
   onNavigate,
@@ -89,6 +117,7 @@ export default function EventSearchAdminPage({
   eventSlug: string
   onNavigate?: (to: string) => void
 }) {
+  const chave = useMemo(() => chaveDoLink(), [])
   const [carregando, setCarregando] = useState(true)
   const [liberado, setLiberado] = useState(false)
   const [emailAtual, setEmailAtual] = useState<string | null>(null)
@@ -115,6 +144,39 @@ export default function EventSearchAdminPage({
   const carregar = useCallback(async (silencioso = false) => {
     if (!silencioso) setCarregando(true)
     try {
+      if (chave) {
+        const dados = await chamarConsole(chave, eventSlug, 'load')
+        setLiberado(true)
+        setEventId(dados.event.id)
+        setEventName(dados.event.name)
+
+        const lista: Pessoa[] = []
+        for (const s of dados.staff ?? []) {
+          lista.push({
+            papel: 'equipe', id: s.id,
+            nome: [s.first_name, s.last_name].filter(Boolean).join(' '),
+            cpf: s.cpf, telefone: s.phone, email: s.email,
+            equipe: s.company, foto: s.photo_url,
+            funcao: s.role_title, status: s.status,
+          })
+        }
+        const mapa = new Map((dados.athletes ?? []).map((a: Record<string, unknown>) => [a.id, a]))
+        for (const a of dados.athletes ?? []) {
+          lista.push({
+            papel: a.kind === 'athlete' ? 'atleta' : 'corner', id: a.id,
+            nome: a.full_name, cpf: a.cpf, telefone: a.phone, email: a.email,
+            equipe: a.gym, foto: a.photo_url, lado: a.corner_color,
+            categoria: a.weight_class, peso: a.weight_kg,
+            cidade: a.city, uf: a.state, athlete_id: a.athlete_id,
+            de_quem: a.athlete_id
+              ? ((mapa.get(a.athlete_id) as { full_name?: string } | undefined)?.full_name ?? null)
+              : null,
+          })
+        }
+        setPessoas(lista)
+        return
+      }
+
       const { data: auth } = await supabase.auth.getUser()
       const email = auth.user?.email?.toLowerCase() ?? ''
       setEmailAtual(email || null)
@@ -172,7 +234,7 @@ export default function EventSearchAdminPage({
     } finally {
       if (!silencioso) setCarregando(false)
     }
-  }, [eventSlug])
+  }, [eventSlug, chave])
 
   useEffect(() => { void carregar() }, [carregar])
 
@@ -187,13 +249,22 @@ export default function EventSearchAdminPage({
   // ── pontos da pessoa escolhida ────────────────────────────────────────────
   const carregarPontos = useCallback(async (p: Pessoa) => {
     if (p.papel !== 'equipe') { setPontos([]); return }
+    if (chave) {
+      try {
+        const r = await chamarConsole(chave, eventSlug, 'points', { staff_member_id: p.id })
+        setPontos((r.points ?? []) as Ponto[])
+      } catch {
+        setPontos([])
+      }
+      return
+    }
     const { data } = await supabase
       .from('staff_checkins')
       .select('id,type,work_role,created_at,distance_from_venue_meters,photo_url')
       .eq('staff_member_id', p.id)
       .order('created_at', { ascending: false })
     setPontos((data ?? []) as Ponto[])
-  }, [])
+  }, [chave, eventSlug])
 
   function escolher(p: Pessoa) {
     setSelecionada(p)
@@ -220,7 +291,21 @@ export default function EventSearchAdminPage({
     setOcupado('salvar'); setRecado(null)
     try {
       if (!(rascunho.nome ?? selecionada.nome).trim()) throw new Error('Informe o nome antes de salvar.')
-      if (selecionada.papel === 'equipe') {
+      if (chave) {
+        await chamarConsole(chave, eventSlug, 'update_person', {
+          papel: selecionada.papel,
+          id: selecionada.id,
+          dados: {
+            nome: rascunho.nome ?? selecionada.nome,
+            cpf: rascunho.cpf ?? selecionada.cpf,
+            telefone: rascunho.telefone ?? selecionada.telefone,
+            equipe: rascunho.equipe ?? selecionada.equipe,
+            funcao: rascunho.funcao ?? selecionada.funcao,
+            lado: rascunho.lado ?? selecionada.lado,
+            categoria: rascunho.categoria ?? selecionada.categoria,
+          },
+        })
+      } else if (selecionada.papel === 'equipe') {
         const partes = (rascunho.nome ?? selecionada.nome).trim().split(/\s+/)
         const { error } = await supabase.from('staff_members').update({
           first_name: partes[0],
@@ -260,6 +345,13 @@ export default function EventSearchAdminPage({
     if (!confirma) return
     setOcupado('remover')
     try {
+      if (chave) {
+        await chamarConsole(chave, eventSlug, 'cancel_athlete', { id: selecionada.id })
+        setRecado({ tipo: 'ok', texto: `${selecionada.nome} removido do evento.` })
+        setSelecionada(null)
+        await carregar(true)
+        return
+      }
       const { error } = await supabase.from('event_athletes')
         .update({ status: 'cancelled' }).eq('id', selecionada.id).eq('event_id', eventId).select('id').single()
       if (error) throw error
@@ -277,6 +369,15 @@ export default function EventSearchAdminPage({
     if (!selecionada || selecionada.papel !== 'equipe') return
     setOcupado(tipo); setRecado(null)
     try {
+      if (chave) {
+        await chamarConsole(chave, eventSlug, 'manual_point', {
+          staff_member_id: selecionada.id, type: tipo,
+        })
+        setRecado({ tipo: 'ok', texto: tipo === 'checkin' ? 'Entrada registrada.' : 'Saída registrada.' })
+        await carregarPontos(selecionada)
+        await carregar(true)
+        return
+      }
       const { data, error } = await supabase.functions.invoke('bsb5-admin-action', {
         body: {
           action: tipo === 'checkin' ? 'manual_checkin' : 'manual_checkout',

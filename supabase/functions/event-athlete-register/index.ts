@@ -16,7 +16,8 @@ const CODE_LENGTH = 6
 
 interface AthleteBody {
   event_slug: string
-  kind: 'athlete' | 'corner'
+  kind: 'athlete' | 'corner' | 'add_corners'
+  athlete_cpf?: string
   full_name: string
   cpf?: string
   phone?: string
@@ -207,7 +208,7 @@ async function handleGet(req: Request): Promise<Response> {
   }
   if (!event) return fail(req, 'Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
 
-  if (!athleteCode) {
+  if (!athleteCode && !normalizeCpf(url.searchParams.get('athlete_cpf'))) {
     return json(req, {
       event: {
         id: event.id,
@@ -220,17 +221,32 @@ async function handleGet(req: Request): Promise<Response> {
     })
   }
 
-  const { data: athlete } = await admin
+  const athleteCpf = normalizeCpf(url.searchParams.get('athlete_cpf'))
+
+  // Quem ja se cadastrou volta para incluir corner e nao sabe codigo nenhum.
+  // Ele sabe o proprio CPF, entao a busca aceita os dois caminhos.
+  let consulta = admin
     .from('event_athletes')
     .select('id, full_name, gym')
     .eq('event_id', event.id)
     .eq('kind', 'athlete')
     .eq('status', 'active')
-    .eq('athlete_code', athleteCode)
-    .maybeSingle()
+
+  consulta = athleteCpf
+    ? consulta.eq('cpf', formatCpf(athleteCpf))
+    : consulta.eq('athlete_code', athleteCode)
+
+  const { data: athlete } = await consulta.maybeSingle()
 
   if (!athlete) {
-    return fail(req, 'Código de atleta não encontrado. Confira com o seu atleta.', 404, 'ATHLETE_CODE_NOT_FOUND')
+    return fail(
+      req,
+      athleteCpf
+        ? 'Não encontramos atleta cadastrado com esse CPF neste evento.'
+        : 'Código de atleta não encontrado. Confira com o seu atleta.',
+      404,
+      'ATHLETE_NOT_FOUND',
+    )
   }
 
   const { data: corners } = await admin
@@ -264,8 +280,102 @@ async function handlePost(req: Request): Promise<Response> {
   }
 
   const kind = body.kind
-  if (kind !== 'athlete' && kind !== 'corner') {
+  if (kind !== 'athlete' && kind !== 'corner' && kind !== 'add_corners') {
     return fail(req, 'Informe se o cadastro é de atleta ou de corner.', 400, 'INVALID_KIND')
+  }
+
+  // ── Incluir corner em quem ja se cadastrou ────────────────────────────────
+  // Quem cadastrou so um corner, ou nenhum, volta por aqui. Nao mexe em nada do
+  // cadastro dele, so acrescenta, e o trigger do banco segura o limite de 2.
+  if (kind === 'add_corners') {
+    const admin = createSupabaseAdminClient()
+
+    const { data: ev } = await admin
+      .from('events').select('id, organization_id')
+      .eq('slug', body.event_slug ?? '').maybeSingle()
+    if (!ev) return fail(req, 'Evento não encontrado.', 404, 'EVENT_NOT_FOUND')
+
+    const dono = normalizeCpf(body.athlete_cpf)
+    if (!isValidCpf(dono)) {
+      return fail(req, 'Informe o CPF do atleta.', 400, 'INVALID_CPF')
+    }
+
+    const { data: atleta } = await admin
+      .from('event_athletes')
+      .select('id, full_name, corner_color, gym')
+      .eq('event_id', ev.id).eq('kind', 'athlete').eq('status', 'active')
+      .eq('cpf', formatCpf(dono)).maybeSingle()
+
+    if (!atleta) {
+      return fail(req, 'Não encontramos atleta cadastrado com esse CPF neste evento.', 404, 'ATHLETE_NOT_FOUND')
+    }
+
+    const pedidos = (body.corners ?? [])
+      .map((c) => ({
+        full_name: (c?.full_name ?? '').trim().replace(/\s+/g, ' '),
+        cpf: normalizeCpf(c?.cpf),
+        gym: (c?.gym ?? '').trim(),
+      }))
+      .filter((c) => c.full_name || c.cpf)
+      .slice(0, 2)
+
+    if (pedidos.length === 0) {
+      return fail(req, 'Informe pelo menos um corner.', 400, 'NO_CORNERS')
+    }
+
+    const resultado: Array<{ full_name: string; ok: boolean; reason?: string }> = []
+
+    for (const c of pedidos) {
+      if (!c.full_name.includes(' ')) {
+        resultado.push({ full_name: c.full_name, ok: false, reason: 'Informe o nome completo do corner.' })
+        continue
+      }
+      if (!isValidCpf(c.cpf)) {
+        resultado.push({ full_name: c.full_name, ok: false, reason: 'CPF do corner inválido.' })
+        continue
+      }
+
+      const { error: erro } = await admin.from('event_athletes').insert({
+        organization_id: ev.organization_id,
+        event_id: ev.id,
+        kind: 'corner',
+        full_name: c.full_name,
+        cpf: formatCpf(c.cpf),
+        gym: c.gym || atleta.gym,
+        corner_color: atleta.corner_color,
+        athlete_id: atleta.id,
+      })
+
+      if (erro) {
+        const msg = erro.message ?? ''
+        resultado.push({
+          full_name: c.full_name,
+          ok: false,
+          reason: msg.includes('ja tem 2 corners')
+            ? `${atleta.full_name} já tem 2 corners cadastrados.`
+            : erro.code === '23505'
+              ? 'Este CPF já está cadastrado como corner neste evento.'
+              : 'Não foi possível cadastrar este corner.',
+        })
+        console.error('[event-athlete-register] erro ao incluir corner:', erro)
+        continue
+      }
+      resultado.push({ full_name: c.full_name, ok: true })
+    }
+
+    const { count } = await admin
+      .from('event_athletes').select('id', { count: 'exact', head: true })
+      .eq('athlete_id', atleta.id).eq('kind', 'corner').eq('status', 'active')
+
+    return json(req, {
+      success: resultado.some((r) => r.ok),
+      kind: 'add_corners',
+      athlete_name: atleta.full_name,
+      corner_color: atleta.corner_color,
+      corners: resultado,
+      corners_ok: resultado.filter((r) => r.ok).length,
+      corners_total: count ?? 0,
+    }, 200)
   }
 
   const fullName = (body.full_name ?? '').trim().replace(/\s+/g, ' ')

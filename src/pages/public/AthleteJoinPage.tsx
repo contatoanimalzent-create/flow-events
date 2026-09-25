@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AlertCircle, Camera, CheckCircle2, HelpCircle, Loader2, Swords, X } from 'lucide-react'
+import { AlertCircle, Camera, CheckCircle2, HelpCircle, Loader2, ShieldCheck, Swords, UserPlus, X } from 'lucide-react'
 import { InAppBrowserWarning } from '@/shared/components/ui/InAppBrowserWarning'
 
-type PageState = 'loading' | 'form' | 'submitting' | 'success' | 'error'
+type PageState = 'loading' | 'escolha' | 'form' | 'add' | 'submitting' | 'success' | 'error'
 type CornerColor = 'azul' | 'vermelho'
 
 interface EventInfo {
@@ -321,6 +321,13 @@ export function AthleteJoinPage() {
   const [cornerColor, setCornerColor] = useState<CornerColor | ''>('')
   const [corners, setCorners] = useState([{ ...emptyCorner }, { ...emptyCorner }])
 
+  // Modo 'incluir corner': quem ja se cadastrou volta, informa o proprio CPF e
+  // acrescenta corner sem refazer nada.
+  const [addCpf, setAddCpf] = useState('')
+  const [addAtleta, setAddAtleta] = useState<{ nome: string; vagas: number; usados: number } | null>(null)
+  const [addBusca, setAddBusca] = useState<'idle' | 'loading' | 'fail'>('idle')
+  const [addErro, setAddErro] = useState('')
+
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoBusy, setPhotoBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -362,7 +369,7 @@ export function AthleteJoinPage() {
         const body = await res.json().catch(() => ({}))
         if (!res.ok) throw new Error(body?.error ?? 'Evento não encontrado.')
         setEvent(body.event)
-        setPageState('form')
+        setPageState('escolha')
       })
       .catch((err: Error) => {
         if (err.name === 'AbortError') return
@@ -370,7 +377,7 @@ export function AthleteJoinPage() {
         // mesmo e guarda no aparelho; sobe sozinho quando o servidor voltar.
         setServidorFora(true)
         setEvent({ id: '', name: 'BSB FIGHT 7', slug: eventSlug })
-        setPageState('form')
+        setPageState('escolha')
       })
     return () => controller.abort()
   }, [eventSlug])
@@ -513,6 +520,77 @@ export function AthleteJoinPage() {
       enfileirar(payload)
       setPendente(payload)
       setPageState('success')
+    }
+  }
+
+
+  // ── Incluir corner em quem ja se cadastrou ────────────────────────────────
+
+  async function buscarAtleta() {
+    const digitos = addCpf.replace(/\D/g, '')
+    if (digitos.length !== 11) return
+    setAddBusca('loading')
+    setAddErro('')
+    try {
+      const res = await fetch(
+        `${EDGE_FN_URL}?event_slug=${encodeURIComponent(eventSlug)}&athlete_cpf=${digitos}`,
+      )
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setAddAtleta(null)
+        setAddBusca('fail')
+        setAddErro(body?.error ?? 'Atleta não encontrado.')
+        return
+      }
+      setAddAtleta({
+        nome: body.athlete.full_name,
+        vagas: body.corners_left,
+        usados: body.corners_used,
+      })
+      setAddBusca('idle')
+    } catch {
+      setAddBusca('fail')
+      setAddErro('Erro de conexão. Tente de novo.')
+    }
+  }
+
+  async function enviarCorners(e: React.FormEvent) {
+    e.preventDefault()
+    if (!addAtleta) return
+
+    const lista = corners
+      .filter((c) => c.full_name.trim() || c.cpf.replace(/\D/g, ''))
+      .map((c) => ({ full_name: c.full_name.trim(), cpf: c.cpf.replace(/\D/g, ''), gym: c.gym.trim() || undefined }))
+
+    if (lista.length === 0) {
+      setAddErro('Preencha pelo menos um corner.')
+      return
+    }
+
+    setPageState('submitting')
+    setAddErro('')
+    try {
+      const res = await fetch(EDGE_FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_slug: eventSlug,
+          kind: 'add_corners',
+          athlete_cpf: addCpf.replace(/\D/g, ''),
+          corners: lista,
+        }),
+      })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setAddErro(body?.error ?? body?.message ?? 'Não foi possível incluir. Tente de novo.')
+        setPageState('add')
+        return
+      }
+      setResult({ corners: body.corners ?? [], color: body.corner_color })
+      setPageState('success')
+    } catch {
+      setAddErro('Erro de conexão. Tente de novo.')
+      setPageState('add')
     }
   }
 
@@ -715,6 +793,191 @@ export function AthleteJoinPage() {
     )
   }
 
+  // ── Escolha: cadastro novo ou incluir corner ──────────────────────────────
+
+  if (pageState === 'escolha') {
+    return (
+      <div className="min-h-screen bg-[#06070a] px-5 py-12">
+        <div className="mx-auto max-w-lg text-center">
+          <span
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em]"
+            style={{ background: `${ACCENT}1a`, color: ACCENT }}
+          >
+            <Swords className="h-3.5 w-3.5" /> Atletas e corners
+          </span>
+
+          <h1 className="mt-5 font-display text-[3rem] uppercase leading-[1.14] tracking-wide text-[#f5f0e8]">
+            {event?.name}
+          </h1>
+          {(eventDate || event?.venue_name) && (
+            <p className="mt-3 text-sm text-white/52">
+              {[eventDate, event?.venue_name].filter(Boolean).join(' · ')}
+            </p>
+          )}
+
+          <div className="mt-6" />
+          <InAppBrowserWarning acao="enviar sua foto" />
+
+          <p className="mt-4 text-base leading-7 text-white/68">O que você quer fazer?</p>
+
+          <div className="mt-6 grid gap-4 text-left">
+            <button
+              onClick={() => setPageState('form')}
+              className="flex items-center gap-4 rounded-[20px] border border-white/10 bg-white/[0.04] p-5 transition-all hover:border-[#D4FF00]/40 hover:bg-white/[0.07]"
+            >
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full" style={{ background: `${ACCENT}1a` }}>
+                <Swords className="h-5 w-5" style={{ color: ACCENT }} />
+              </span>
+              <span>
+                <span className="block text-base font-bold uppercase tracking-[0.1em] text-[#f5f0e8]">
+                  Me cadastrar como atleta
+                </span>
+                <span className="mt-1 block text-[13px] leading-5 text-white/56">
+                  Primeira vez. Seus dados, sua foto e os seus corners.
+                </span>
+              </span>
+            </button>
+
+            <button
+              onClick={() => { setPageState('add'); setCorners([{ ...emptyCorner }, { ...emptyCorner }]) }}
+              className="flex items-center gap-4 rounded-[20px] border border-white/10 bg-white/[0.04] p-5 transition-all hover:border-[#D4FF00]/40 hover:bg-white/[0.07]"
+            >
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full" style={{ background: `${ACCENT}1a` }}>
+                <UserPlus className="h-5 w-5" style={{ color: ACCENT }} />
+              </span>
+              <span>
+                <span className="block text-base font-bold uppercase tracking-[0.1em] text-[#f5f0e8]">
+                  Incluir corner
+                </span>
+                <span className="mt-1 block text-[13px] leading-5 text-white/56">
+                  Já me cadastrei e quero acrescentar corner. Não precisa preencher tudo de novo.
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Incluir corner em quem ja se cadastrou ────────────────────────────────
+
+  if (pageState === 'add' || (pageState === 'submitting' && addAtleta)) {
+    const enviando = pageState === 'submitting'
+    const vagas = addAtleta?.vagas ?? 0
+    return (
+      <div className="min-h-screen bg-[#06070a] px-5 py-10">
+        <div className="mx-auto max-w-lg">
+          <button
+            onClick={() => { setPageState('escolha'); setAddAtleta(null); setAddCpf(''); setAddErro('') }}
+            className="text-xs font-medium uppercase tracking-[0.14em] text-white/40 transition-colors hover:text-white/70"
+          >
+            Voltar
+          </button>
+
+          <h1 className="mt-4 font-display text-[2.4rem] uppercase leading-[1.14] tracking-wide text-[#f5f0e8]">
+            Incluir corner
+          </h1>
+          <p className="mt-2 text-sm text-white/52">{event?.name}</p>
+
+          {addErro && (
+            <div className="mt-5 flex items-start gap-3 rounded-[16px] border border-red-500/25 bg-red-500/10 p-4">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+              <p className="text-sm leading-6 text-red-200">{addErro}</p>
+            </div>
+          )}
+
+          <div className="mt-7 space-y-5">
+            <Field label="Seu CPF de atleta" required hint="O mesmo CPF que você usou no seu cadastro.">
+              <div className="flex gap-2">
+                <input
+                  value={addCpf}
+                  onChange={(e) => { setAddCpf(formatCpfInput(e.target.value)); setAddAtleta(null); setAddErro('') }}
+                  placeholder="000.000.000-00"
+                  inputMode="numeric"
+                  maxLength={14}
+                  className={inputClass}
+                />
+                <button
+                  type="button"
+                  onClick={() => void buscarAtleta()}
+                  disabled={addCpf.replace(/\D/g, '').length !== 11 || addBusca === 'loading'}
+                  className="shrink-0 rounded-[14px] px-5 text-xs font-bold uppercase tracking-[0.1em] text-black disabled:opacity-40"
+                  style={{ background: ACCENT }}
+                >
+                  {addBusca === 'loading' ? '...' : 'Buscar'}
+                </button>
+              </div>
+            </Field>
+
+            {addAtleta && (
+              <div
+                className="flex items-start gap-2 rounded-[14px] border p-4"
+                style={{ borderColor: `${ACCENT}33`, background: `${ACCENT}0f` }}
+              >
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" style={{ color: ACCENT }} />
+                <p className="text-[13px] leading-5 text-white/78">
+                  Atleta: <strong className="text-[#f5f0e8]">{addAtleta.nome}</strong>
+                  <br />
+                  {vagas > 0
+                    ? `${addAtleta.usados} corner já cadastrado. ${vagas === 1 ? 'Resta 1 vaga.' : 'Restam 2 vagas.'}`
+                    : 'Você já tem 2 corners. Fale com a produção se precisar trocar.'}
+                </p>
+              </div>
+            )}
+
+            {addAtleta && vagas > 0 && (
+              <form onSubmit={enviarCorners} className="space-y-5">
+                {corners.slice(0, vagas).map((corner, index) => (
+                  <div key={index} className="space-y-4 rounded-[18px] border border-white/10 bg-white/[0.03] p-4">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">
+                      Corner {addAtleta.usados + index + 1}
+                    </p>
+                    <Field label="Nome completo">
+                      <input
+                        value={corner.full_name}
+                        onChange={(e) => setCorner(index, 'full_name', e.target.value)}
+                        placeholder="Nome do corner"
+                        className={inputClass}
+                      />
+                    </Field>
+                    <Field label="CPF">
+                      <input
+                        value={corner.cpf}
+                        onChange={(e) => setCorner(index, 'cpf', formatCpfInput(e.target.value))}
+                        placeholder="000.000.000-00"
+                        inputMode="numeric"
+                        maxLength={14}
+                        className={inputClass}
+                      />
+                    </Field>
+                    <Field label="Academia" hint="Opcional.">
+                      <input
+                        value={corner.gym}
+                        onChange={(e) => setCorner(index, 'gym', e.target.value)}
+                        placeholder="Academia do corner"
+                        className={inputClass}
+                      />
+                    </Field>
+                  </div>
+                ))}
+
+                <button
+                  type="submit"
+                  disabled={enviando}
+                  className="flex w-full items-center justify-center gap-3 rounded-full px-7 py-4 text-sm font-bold uppercase tracking-[0.14em] text-black disabled:opacity-50"
+                  style={{ background: ACCENT }}
+                >
+                  {enviando ? (<><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</>) : 'Incluir corner'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const submitting = pageState === 'submitting'
 
   return (
@@ -747,9 +1010,6 @@ export function AthleteJoinPage() {
           </HelpTip>
           você toca e vê o que significa.
         </p>
-
-        <div className="mt-6" />
-        <InAppBrowserWarning acao="enviar sua foto" />
 
         {servidorFora && (
           <div className="mt-5 flex items-start gap-3 rounded-[16px] border border-amber-400/30 bg-amber-400/[0.08] p-4 text-left">

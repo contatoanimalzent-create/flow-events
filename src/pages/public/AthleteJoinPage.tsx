@@ -327,7 +327,7 @@ export function AthleteJoinPage() {
 
   const [result, setResult] = useState<{ corners: CornerResult[]; color?: CornerColor } | null>(null)
   const [pendente, setPendente] = useState<Record<string, unknown> | null>(null)
-  const [jaCadastrado, setJaCadastrado] = useState<{ nome?: string; tipo?: string } | null>(null)
+  const [jaCadastrado, setJaCadastrado] = useState<{ nome?: string; tipo?: string; recado?: string } | null>(null)
   const [servidorFora, setServidorFora] = useState(false)
   const [copiado, setCopiado] = useState(false)
 
@@ -491,7 +491,7 @@ export function AthleteJoinPage() {
       // Ja cadastrado nao e falha: e informacao. Mandar 'tente novamente' faz a
       // pessoa repetir o envio varias vezes sem entender o que houve.
       if (res.status === 409 && body?.already_registered) {
-        setJaCadastrado({ nome: body?.full_name, tipo: body?.kind })
+        setJaCadastrado({ nome: body?.full_name, tipo: body?.kind, recado: body?.message })
         setPageState('success')
         return
       }
@@ -560,9 +560,9 @@ export function AthleteJoinPage() {
 
         <p className="max-w-md text-base leading-7 text-white/72">
           {jaCadastrado.nome ? (
-            <><strong className="text-[#f5f0e8]">{jaCadastrado.nome}</strong>, o seu </>
-          ) : 'O seu '}
-          cadastro para o BSB FIGHT 7 já foi feito. Não precisa cadastrar de novo.
+            <><strong className="text-[#f5f0e8]">{jaCadastrado.nome}</strong>. </>
+          ) : null}
+          {jaCadastrado.recado ?? 'O seu cadastro já foi feito.'} Não precisa cadastrar de novo.
         </p>
 
         <div className="max-w-md rounded-[18px] border border-amber-400/25 bg-amber-400/[0.07] p-5 text-left">

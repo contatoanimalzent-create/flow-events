@@ -314,21 +314,37 @@ async function handlePost(req: Request): Promise<Response> {
     }
   }
 
+  // So bloqueia se ja existir no MESMO papel. Atleta que tambem e corner de um
+  // colega de equipe e caso normal em evento de luta.
   const { data: existing } = await admin
     .from('event_athletes')
-    .select('id, kind, full_name, athlete_code')
+    .select('id, kind, full_name, athlete_code, athlete_id')
     .eq('event_id', event.id)
     .eq('cpf', formatCpf(cpf))
+    .eq('kind', kind)
     .eq('status', 'active')
     .maybeSingle()
 
   if (existing) {
+    let comoQuem: string | null = null
+    if (existing.kind === 'corner' && existing.athlete_id) {
+      const { data: dono } = await admin
+        .from('event_athletes')
+        .select('full_name')
+        .eq('id', existing.athlete_id)
+        .maybeSingle()
+      comoQuem = dono?.full_name ?? null
+    }
+
     return json(req, {
       code: 'already_registered',
       already_registered: true,
-      message: 'Este CPF já está cadastrado neste evento.',
+      message: existing.kind === 'athlete'
+        ? 'Você já está cadastrado como atleta neste evento.'
+        : `Você já está cadastrado como corner${comoQuem ? ' de ' + comoQuem : ''} neste evento.`,
       kind: existing.kind,
       full_name: existing.full_name,
+      athlete_of: comoQuem,
       athlete_code: existing.athlete_code,
     }, 409)
   }

@@ -341,6 +341,12 @@ export default function EventAthletesAdminPage({
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Painel da equipe
         </button>
+        <button
+          onClick={() => onNavigate?.(`/pulse/${eventSlug}/busca`)}
+          className="ml-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 transition-colors hover:text-white"
+        >
+          <Search className="h-3.5 w-3.5" /> Buscar pessoa
+        </button>
 
         <h1 className="mt-4 text-3xl font-black tracking-tight">Atletas e corners</h1>
         <p className="mt-1 text-sm text-slate-400">{event?.name ?? eventSlug}</p>

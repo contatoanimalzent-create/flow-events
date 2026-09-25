@@ -36,6 +36,7 @@ export type PublicRoute =
   | { type: 'event'; slug: string }
   | { type: 'staff-admin'; slug: string }
   | { type: 'athletes-admin'; slug: string }
+  | { type: 'search-admin'; slug: string }
   | { type: 'staff-join'; token: string }
   | { type: 'staff-ponto'; slug: string }
   | { type: 'athletes'; slug: string }
@@ -85,6 +86,9 @@ export function getInitialPublicRoute(): PublicRoute {
   if (directScannerMatch) return { type: 'scanner', slug: directScannerMatch[1] }
   const directScanner2Match = path.match(/^\/scanner2\/([^/]+)$/)
   if (directScanner2Match) return { type: 'scanner2', slug: directScanner2Match[1] }
+  const searchAdminMatch = path.match(/^\/pulse\/([^/]+)\/busca$/)
+  if (searchAdminMatch) return { type: 'search-admin', slug: searchAdminMatch[1] }
+
   const athletesAdminMatch = path.match(/^\/pulse\/([^/]+)\/atletas$/)
   if (athletesAdminMatch) return { type: 'athletes-admin', slug: athletesAdminMatch[1] }
 

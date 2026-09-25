@@ -9,6 +9,7 @@ import {
   Mail,
   MapPin,
   RefreshCw,
+  Search,
   ShieldAlert,
   Swords,
   Users,
@@ -840,6 +841,12 @@ export default function Bsb5AdminPage({ onNavigate, eventSlug = BSB5_SLUG }: Pul
             className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 font-semibold text-slate-300 transition-colors hover:border-[#D4FF00]/50 hover:text-[#D4FF00]"
           >
             <Swords className="h-3.5 w-3.5" /> Atletas e corners
+          </a>
+          <a
+            href={`/pulse/${eventSlug}/busca`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 font-semibold text-slate-300 transition-colors hover:border-[#D4FF00]/50 hover:text-[#D4FF00]"
+          >
+            <Search className="h-3.5 w-3.5" /> Buscar pessoa
           </a>
         </div>
 

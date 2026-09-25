@@ -649,4 +649,3 @@ export default function EventSearchAdminPage({
     </div>
   )
 }
-

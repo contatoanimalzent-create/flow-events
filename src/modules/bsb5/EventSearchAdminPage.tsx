@@ -124,9 +124,10 @@ export default function EventSearchAdminPage({
       }
       setLiberado(true)
 
-      const { data: ev } = await supabase
+      const { data: ev, error: eventError } = await supabase
         .from('events').select('id,name').eq('slug', eventSlug).maybeSingle()
-      if (!ev) return
+      if (eventError) throw eventError
+      if (!ev) throw new Error('Evento não encontrado ou sem permissão de acesso.')
       setEventId(ev.id)
       setEventName(ev.name)
 
@@ -138,6 +139,8 @@ export default function EventSearchAdminPage({
           .select('id,kind,full_name,cpf,phone,email,gym,photo_url,corner_color,weight_class,weight_kg,city,state,athlete_id')
           .eq('event_id', ev.id).eq('status', 'active'),
       ])
+      if (equipe.error) throw equipe.error
+      if (atletas.error) throw atletas.error
 
       const lista: Pessoa[] = []
 
@@ -164,6 +167,8 @@ export default function EventSearchAdminPage({
       }
 
       setPessoas(lista)
+    } catch (err) {
+      setRecado({ tipo: 'erro', texto: err instanceof Error ? err.message : 'Não foi possível carregar os cadastros. Tente atualizar a página.' })
     } finally {
       if (!silencioso) setCarregando(false)
     }
@@ -214,6 +219,7 @@ export default function EventSearchAdminPage({
     if (!selecionada) return
     setOcupado('salvar'); setRecado(null)
     try {
+      if (!(rascunho.nome ?? selecionada.nome).trim()) throw new Error('Informe o nome antes de salvar.')
       if (selecionada.papel === 'equipe') {
         const partes = (rascunho.nome ?? selecionada.nome).trim().split(/\s+/)
         const { error } = await supabase.from('staff_members').update({
@@ -223,7 +229,7 @@ export default function EventSearchAdminPage({
           phone: rascunho.telefone ?? selecionada.telefone,
           role_title: rascunho.funcao ?? selecionada.funcao,
           company: rascunho.equipe ?? selecionada.equipe,
-        }).eq('id', selecionada.id)
+        }).eq('id', selecionada.id).eq('event_id', eventId).select('id').single()
         if (error) throw error
       } else {
         const { error } = await supabase.from('event_athletes').update({
@@ -233,7 +239,7 @@ export default function EventSearchAdminPage({
           gym: rascunho.equipe ?? selecionada.equipe,
           corner_color: rascunho.lado ?? selecionada.lado,
           weight_class: rascunho.categoria ?? selecionada.categoria,
-        }).eq('id', selecionada.id)
+        }).eq('id', selecionada.id).eq('event_id', eventId).select('id').single()
         if (error) throw error
       }
       setRecado({ tipo: 'ok', texto: 'Alteração salva.' })
@@ -255,7 +261,7 @@ export default function EventSearchAdminPage({
     setOcupado('remover')
     try {
       const { error } = await supabase.from('event_athletes')
-        .update({ status: 'cancelled' }).eq('id', selecionada.id)
+        .update({ status: 'cancelled' }).eq('id', selecionada.id).eq('event_id', eventId).select('id').single()
       if (error) throw error
       setRecado({ tipo: 'ok', texto: `${selecionada.nome} removido do evento.` })
       setSelecionada(null)
@@ -300,7 +306,9 @@ export default function EventSearchAdminPage({
       .filter((p) => filtro === 'todos' || p.papel === filtro)
       .filter((p) => {
         if (digitos.length >= 3 && soDigitos(p.cpf ?? '').includes(digitos)) return true
+        if (digitos.length >= 3 && /^[\d\s()+.\-]+$/.test(t) && soDigitos(p.telefone ?? '').includes(digitos)) return true
         if (texto.length >= 2 && semAcento(p.nome).includes(texto)) return true
+        if (texto.length >= 2 && semAcento(p.email ?? '').includes(texto)) return true
         if (texto.length >= 2 && semAcento(p.equipe ?? '').includes(texto)) return true
         return false
       })
@@ -389,12 +397,13 @@ export default function EventSearchAdminPage({
           <input
             value={termo}
             onChange={(e) => setTermo(e.target.value)}
-            placeholder="Digite o nome, o CPF ou a equipe"
+            placeholder="Nome, CPF, telefone, e-mail ou equipe"
+            aria-label="Buscar por nome, CPF, telefone, e-mail ou equipe"
             className="min-w-0 flex-1 bg-transparent py-4 text-base text-white outline-none placeholder:text-slate-600"
             autoFocus
           />
           {termo && (
-            <button onClick={() => setTermo('')} className="text-slate-500 hover:text-white">
+            <button onClick={() => setTermo('')} aria-label="Limpar busca" className="text-slate-500 hover:text-white">
               <X className="h-4 w-4" />
             </button>
           )}
@@ -428,13 +437,13 @@ export default function EventSearchAdminPage({
         {/* resultados */}
         {!termo && (
           <p className="mt-8 text-center text-sm text-slate-500">
-            Comece a digitar para encontrar alguém.
+            Busque uma pessoa e abra sua ficha para consultar os pontos, corrigir dados ou registrar uma entrada ou saída manual.
           </p>
         )}
 
         {termo && resultados.length === 0 && (
           <p className="mt-8 text-center text-sm text-slate-500">
-            Ninguém encontrado com esse nome, CPF ou equipe.
+            Ninguém encontrado. Tente nome, CPF, telefone, e-mail ou equipe.
           </p>
         )}
 
@@ -454,7 +463,7 @@ export default function EventSearchAdminPage({
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-bold">{r.nome}</span>
                   <span className="block truncate text-[11px] text-slate-400">
-                    {[r.cpf, r.equipe, r.funcao, r.de_quem ? `corner de ${r.de_quem}` : null]
+                    {[r.cpf, r.telefone, r.email, r.equipe, r.funcao, r.de_quem ? `corner de ${r.de_quem}` : null]
                       .filter(Boolean).join(' · ')}
                   </span>
                 </span>
@@ -473,7 +482,7 @@ export default function EventSearchAdminPage({
               <div className="flex items-start gap-3">
                 {p.foto && (
                   <a href={p.foto} target="_blank" rel="noreferrer">
-                    <img src={p.foto} alt={p.nome} className="h-16 w-16 rounded-2xl border border-white/10 object-cover" />
+                    <img src={p.foto} alt={p.nome} loading="lazy" className="h-16 w-16 rounded-2xl border border-white/10 object-cover" />
                   </a>
                 )}
                 <div>

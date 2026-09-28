@@ -107,8 +107,12 @@ function apiValidationCheck(host: string, key: string, label: string): () => Pro
         body: '{}',
       })
       const body = await response.json().catch(() => null)
-      const ok = response.status === 422 && body?.ok === false && Boolean(body?.fieldErrors)
-      return { key, label, ok, detail: ok ? 'ok' : `HTTP ${response.status}` }
+      // 422 = retirada aberta, validando o formulário. 410 = retirada encerrada de propósito
+      // (fim da edição). Os dois significam API no ar e respondendo certo.
+      const validating = response.status === 422 && body?.ok === false && Boolean(body?.fieldErrors)
+      const closed = response.status === 410 && body?.ok === false && body?.closed === true
+      const ok = validating || closed
+      return { key, label, ok, detail: ok ? (closed ? 'ok (retirada encerrada)' : 'ok') : `HTTP ${response.status}` }
     } catch (error) {
       return { key, label, ok: false, detail: error instanceof Error ? error.message : String(error) }
     }

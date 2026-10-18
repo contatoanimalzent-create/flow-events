@@ -938,6 +938,21 @@ async function recoverFailedEmailJobs(admin: ReturnType<typeof createSupabaseAdm
 // Main Handler
 // ─────────────────────────────────────────────────────────────────────────────
 
+async function cronAutorizado(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  incoming: string,
+): Promise<boolean> {
+  if (!incoming) return false
+  const envSecret = Deno.env.get('CRON_SECRET')
+  if (envSecret && incoming === envSecret) return true
+  const { data, error } = await admin.rpc('confere_cron_notificacoes', { p_secret: incoming })
+  if (error) {
+    console.error('[process-notification-jobs] confere_cron_notificacoes error:', error)
+    return false
+  }
+  return data === true
+}
+
 Deno.serve(async (req: Request): Promise<Response> => {
 
   if (req.method === 'OPTIONS') {
@@ -948,14 +963,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
     return jsonResponse({ error: 'Method not allowed. Use POST.' }, 405)
   }
 
-  // Auth: x-cron-secret header is MANDATORY (fail-closed if env not configured)
-  const CRON_SECRET = Deno.env.get('CRON_SECRET')
-  if (!CRON_SECRET) {
-    console.error('[process-notification-jobs] CRON_SECRET env var not configured')
-    return jsonResponse({ error: 'Server misconfigured.' }, 500)
-  }
+  // Auth: x-cron-secret obrigatorio (fail-closed). Aceita o CRON_SECRET da funcao ou o
+  // segredo 'notificacoes_cron_secret' do Vault, conferido pela RPC confere_cron_notificacoes.
+  // O pg_cron (trigger_notification_jobs) le o segredo do Vault. Desde 2026-10-18.
   const incoming = req.headers.get('x-cron-secret') ?? ''
-  if (incoming !== CRON_SECRET) {
+  if (!(await cronAutorizado(createSupabaseAdminClient(), incoming))) {
     return jsonResponse({ error: 'Unauthorized.' }, 401)
   }
 

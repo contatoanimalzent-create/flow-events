@@ -248,7 +248,7 @@ export function AjudaProdutoresPage({ onLogin }: { onLogin: () => void }) {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="https://wa.me/14698629040"
+                href="https://wa.me/5561992946515"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0057E7] px-6 py-3 text-sm font-bold text-white hover:bg-[#4285F4] transition-colors"
@@ -264,7 +264,7 @@ export function AjudaProdutoresPage({ onLogin }: { onLogin: () => void }) {
                 Email
               </a>
             </div>
-            <p className="mt-4 text-xs text-[#9a9088]">+1 (469) 862-9040</p>
+            <p className="mt-4 text-xs text-[#9a9088]">+55 (61) 99294-6515</p>
           </div>
         </div>
       </section>

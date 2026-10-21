@@ -90,7 +90,7 @@ export function DemoPage({ onLogin }: { onLogin: () => void }) {
       : `Hi! I would like to schedule a Pulse demo.\n\nName: ${form.name}\nEmail: ${form.email}\nWhatsApp: ${form.whatsapp}\nEvent type: ${eventTypeLabel?.labelEn ?? '-'}\nEstimated size: ${eventSizeLabel?.labelEn ?? '-'}`
 
     const encoded = encodeURIComponent(message)
-    window.open(`https://wa.me/14698629040?text=${encoded}`, '_blank')
+    window.open(`https://wa.me/5561992946515?text=${encoded}`, '_blank')
   }
 
   const inputClass =
@@ -176,7 +176,7 @@ export function DemoPage({ onLogin }: { onLogin: () => void }) {
                   {isPortuguese ? 'Prefere ir direto?' : 'Prefer to go straight?'}
                 </div>
                 <a
-                  href="https://wa.me/14698629040"
+                  href="https://wa.me/5561992946515"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-3 rounded-full bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_rgba(37,211,102,0.25)] transition-all hover:-translate-y-0.5 hover:bg-[#22c55e]"

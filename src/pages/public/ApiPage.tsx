@@ -217,7 +217,7 @@ export function ApiPage({ onLogin }: { onLogin: () => void }) {
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://wa.me/14698629040"
+                  href="https://wa.me/5561992946515"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-white/18 px-7 py-4 text-sm font-medium uppercase tracking-[0.18em] text-white/70 transition-all hover:border-white/28 hover:text-white"

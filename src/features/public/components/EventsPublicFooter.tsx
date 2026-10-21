@@ -8,7 +8,7 @@ interface EventsPublicFooterProps {
 }
 
 const WHATSAPP_URL =
-  'https://wa.me/14698629040?text=' +
+  'https://wa.me/5561992946515?text=' +
   encodeURIComponent('👋 Olá! Vim pelo site da Pulse e preciso de ajuda.')
 
 export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsPublicFooterProps) {
@@ -238,7 +238,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                   </div>
                   <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-white/70 transition-colors">
                     <Phone className="h-3.5 w-3.5 shrink-0" />
-                    <span>+1 (469) 862-9040</span>
+                    <span>+55 (61) 99294-6515</span>
                   </a>
                   <a href="mailto:contatopulse@animalzgroup.com" className="flex items-center gap-2 hover:text-white/70 transition-colors">
                     <Mail className="h-3.5 w-3.5 shrink-0" />

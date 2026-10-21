@@ -144,7 +144,7 @@ export function CasesPage({ onLogin }: { onLogin: () => void }) {
                 : 'Talk to us and see how Pulse can transform your event operations.'}
             </p>
             <a
-              href="https://wa.me/14698629040"
+              href="https://wa.me/5561992946515"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-[#0057E7] px-6 py-3 text-sm font-bold text-white hover:bg-[#4285F4] transition-colors"

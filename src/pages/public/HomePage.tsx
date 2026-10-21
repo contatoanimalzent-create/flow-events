@@ -1472,7 +1472,7 @@ export function HomePage({ onLogin }: HomePageProps) {
 
                 {/* Secondary CTA, WhatsApp */}
                 <motion.a
-                  href="https://wa.me/14698629040"
+                  href="https://wa.me/5561992946515"
                   target="_blank"
                   rel="noopener noreferrer"
                   data-cursor="magnetic"

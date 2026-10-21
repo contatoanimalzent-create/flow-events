@@ -209,7 +209,7 @@ export function PrecosPage({ onLogin }: { onLogin: () => void }) {
                 ))}
               </ul>
               <a
-                href="https://wa.me/14698629040"
+                href="https://wa.me/5561992946515"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-8 flex w-full items-center justify-center gap-2 rounded-full border border-white/18 py-3 text-sm font-medium text-white transition-all hover:bg-white/8"

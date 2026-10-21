@@ -66,7 +66,7 @@ export function ContactPage({ onLogin }: { onLogin?: () => void }) {
                     {
                       icon: Phone,
                       label: isPortuguese ? 'Telefone' : 'Phone',
-                      value: '+55 (11) 9999-9999',
+                      value: '+55 (61) 99294-6515',
                     },
                   ].map((item) => {
                     const Icon = item.icon

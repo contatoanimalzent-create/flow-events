@@ -41,9 +41,9 @@ const FAQ = [
     pergunta: 'Há suporte em tempo real?',
     perguntaEn: 'Is there real-time support?',
     resposta:
-      'Sim. Nossa equipe está disponível pelo WhatsApp +1 (469) 862-9040. Produtores com eventos ativos têm atendimento prioritário durante a operação.',
+      'Sim. Nossa equipe está disponível pelo WhatsApp +55 (61) 99294-6515. Produtores com eventos ativos têm atendimento prioritário durante a operação.',
     respostaEn:
-      'Yes. Our team is available on WhatsApp +1 (469) 862-9040. Producers with active events get priority support during operations.',
+      'Yes. Our team is available on WhatsApp +55 (61) 99294-6515. Producers with active events get priority support during operations.',
   },
   {
     pergunta: 'Em quais dispositivos funciona?',
@@ -183,7 +183,7 @@ export function AjudaPage({ onLogin }: { onLogin: () => void }) {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="https://wa.me/14698629040"
+                href="https://wa.me/5561992946515"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0057E7] px-6 py-3 text-sm font-bold text-white hover:bg-[#4285F4] transition-colors"

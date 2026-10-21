@@ -4,7 +4,7 @@ import { usePublicLocale } from '@/features/public/lib/public-locale'
 import { useSeoMeta } from '@/shared/lib'
 
 const WHATSAPP_URL =
-  'https://wa.me/14698629040?text=' +
+  'https://wa.me/5561992946515?text=' +
   encodeURIComponent('👋 Olá! Vim pelo site da Pulse e quero publicar um evento.')
 
 interface CategoryInfo {

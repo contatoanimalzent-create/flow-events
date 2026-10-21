@@ -105,7 +105,7 @@ export function CarreirasPage({ onLogin }: { onLogin: () => void }) {
               {isPortuguese ? 'Enviar currículo' : 'Send resume'}
             </a>
             <a
-              href="https://wa.me/14698629040"
+              href="https://wa.me/5561992946515"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full border border-white/18 px-6 py-3 text-sm text-white hover:bg-white/8 transition-colors inline-flex items-center gap-2"
@@ -239,7 +239,7 @@ export function CarreirasPage({ onLogin }: { onLogin: () => void }) {
                 {isPortuguese ? 'Enviar currículo' : 'Send resume'}
               </a>
               <a
-                href="https://wa.me/14698629040"
+                href="https://wa.me/5561992946515"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-full border border-white/18 px-6 py-3 text-sm text-white hover:bg-white/8 transition-colors inline-flex items-center gap-2"

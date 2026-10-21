@@ -120,7 +120,7 @@ export default function ProfilePage({ onNavigate }: PulsePageProps) {
       label: 'Ajuda',
       subtitle: 'Falar com o suporte Pulse',
       action: () => window.open(
-        'https://wa.me/14698629040?text=' +
+        'https://wa.me/5561992946515?text=' +
         encodeURIComponent(
           '👋 Olá! Vim pelo *Pulse* e preciso de ajuda.\n\n' +
           'Evento: ' + (context?.eventName ?? '-') + '\n' +

@@ -162,7 +162,7 @@ async function queueStaffConfirmationNotifications(
   },
 ) {
   const templateKey = 'staff-confirmed-permissions'
-  const appUrl = (Deno.env.get('APP_URL') ?? 'https://pulse.animalzgroup.com').replace(/\/$/, '')
+  const appUrl = (Deno.env.get('APP_URL') ?? 'https://universopulse.com').replace(/\/$/, '')
   const pointUrl = `${appUrl}/staff/ponto/${params.eventSlug}`
   const logoUrl = 'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/public-assets/brand/pulse-logo-principal-transparente.png'
   const defaultBsb5ImageUrl = 'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/staff-documents/bsb5/ponto-pulse.png'
@@ -395,7 +395,7 @@ function canonicalizeInviteToken(value?: string | null): string {
 
 function pointUrlForSlug(slug?: string | null): string | null {
   if (!slug) return null
-  const appUrl = Deno.env.get('APP_URL') || 'https://pulse.animalzgroup.com'
+  const appUrl = Deno.env.get('APP_URL') || 'https://universopulse.com'
   return `${appUrl}/staff/ponto/${slug}`
 }
 

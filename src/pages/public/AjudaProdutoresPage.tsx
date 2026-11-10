@@ -11,7 +11,7 @@ const SECOES = [
     conteudo: (
       <ol className="list-none space-y-3">
         {[
-          ['1', 'Acesse pulse.animalzgroup.com e crie sua conta de produtor.'],
+          ['1', 'Acesse universopulse.com e crie sua conta de produtor.'],
           ['2', 'Clique em "Novo evento" e preencha as informações básicas: nome, data, local e capacidade.'],
           ['3', 'Adicione descrição, capa e galeria de mídia para a página pública do evento.'],
           ['4', 'Configure os ingressos e lotes (próxima seção).'],
@@ -29,7 +29,7 @@ const SECOES = [
     conteudoEn: (
       <ol className="list-none space-y-3">
         {[
-          ['1', 'Go to pulse.animalzgroup.com and create your producer account.'],
+          ['1', 'Go to universopulse.com and create your producer account.'],
           ['2', 'Click "New event" and fill in the basic info: name, date, venue and capacity.'],
           ['3', 'Add description, cover image and media gallery for the public event page.'],
           ['4', 'Configure tickets and batches (next section).'],

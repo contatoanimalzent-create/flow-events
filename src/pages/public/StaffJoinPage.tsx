@@ -52,7 +52,7 @@ const LEGACY_TOKEN_SLUGS: Record<string, string> = {
 
 function getPointUrl(inviteInfo?: InviteInfo | null, token?: string | null): string {
   const slug = inviteInfo?.event_slug || (token ? LEGACY_TOKEN_SLUGS[token] ?? token : null)
-  return slug ? `https://pulse.animalzgroup.com/staff/ponto/${slug}` : ''
+  return slug ? `https://universopulse.com/staff/ponto/${slug}` : ''
 }
 
 function stripAccents(value: string): string {

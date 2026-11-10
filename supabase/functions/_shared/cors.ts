@@ -2,6 +2,8 @@ const ALLOWED_ORIGIN_PATTERNS: Array<RegExp | string> = [
   'http://localhost:5173',
   'http://localhost:3000',
   'https://pulse.animalzgroup.com',
+  'https://universopulse.com',
+  'https://www.universopulse.com',
   'https://flow-events-ruby.vercel.app',
   'https://flow-events-git-main-juniors-projects-f6805f3a.vercel.app',
   /^https:\/\/flow-events-[a-z0-9-]+\.vercel\.app$/,
@@ -13,7 +15,7 @@ const ALLOWED_ORIGIN_PATTERNS: Array<RegExp | string> = [
   'ionic://localhost',
 ]
 
-const PRODUCTION_FALLBACK = 'https://pulse.animalzgroup.com'
+const PRODUCTION_FALLBACK = 'https://universopulse.com'
 
 function isAllowedOrigin(origin: string): boolean {
   return ALLOWED_ORIGIN_PATTERNS.some((pat) =>

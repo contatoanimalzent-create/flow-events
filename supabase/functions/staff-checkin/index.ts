@@ -895,7 +895,7 @@ async function handlePost(req: Request): Promise<Response> {
     const lateNoticeHtml = isLate
       ? `<p style="margin:0 0 20px 0;color:#f59e0b;font-size:14px;line-height:1.6;"><strong>Atenção:</strong> esta entrada foi registrada com ${lateMinutes} minutos de atraso em relação ao horário previsto.</p>`
       : ''
-    const pontoUrlEmail = `https://pulse.animalzgroup.com/staff/ponto/${event.slug ?? ''}`
+    const pontoUrlEmail = `https://universopulse.com/staff/ponto/${event.slug ?? ''}`
     const emailHtml = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#06070a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">

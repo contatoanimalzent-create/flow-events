@@ -33,9 +33,9 @@ const FAQ = [
     pergunta: 'Como faço para criar minha conta?',
     perguntaEn: 'How do I create my account?',
     resposta:
-      'Acesse pulse.animalzgroup.com/create-event, preencha seus dados e crie seu primeiro evento em menos de 5 minutos. Não há taxa de setup.',
+      'Acesse universopulse.com/create-event, preencha seus dados e crie seu primeiro evento em menos de 5 minutos. Não há taxa de setup.',
     respostaEn:
-      'Go to pulse.animalzgroup.com/create-event, fill in your details and create your first event in less than 5 minutes. No setup fee.',
+      'Go to universopulse.com/create-event, fill in your details and create your first event in less than 5 minutes. No setup fee.',
   },
   {
     pergunta: 'Há suporte em tempo real?',

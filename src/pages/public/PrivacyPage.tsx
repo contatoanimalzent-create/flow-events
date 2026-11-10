@@ -104,7 +104,7 @@ export function PrivacyPage() {
         {
           title: '11.3. Excluir minha conta',
           content: [
-            'Voce pode solicitar a exclusao completa da sua conta a qualquer momento em https://pulse.animalzgroup.com/delete-account quando estiver logado.',
+            'Voce pode solicitar a exclusao completa da sua conta a qualquer momento em https://universopulse.com/delete-account quando estiver logado.',
             'Apos a solicitacao: dados pessoais sao anonimizados imediatamente, e a exclusao definitiva acontece em ate 30 dias (periodo de carencia LGPD).',
             'Dados financeiros (notas fiscais, repasses) sao mantidos por 5 anos por obrigacao legal fiscal.',
           ],
@@ -219,7 +219,7 @@ export function PrivacyPage() {
         {
           title: '11.3. Delete my account',
           content: [
-            'You can request full account deletion at any time at https://pulse.animalzgroup.com/delete-account while logged in.',
+            'You can request full account deletion at any time at https://universopulse.com/delete-account while logged in.',
             'After the request: personal data is immediately anonymized, with final deletion within 30 days (legal grace period).',
             'Financial data (invoices, payouts) is kept for 5 years per fiscal/tax obligation.',
           ],

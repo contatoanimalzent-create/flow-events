@@ -234,7 +234,7 @@ export function EventsPublicFooter({ categories = [], onCategoryClick }: EventsP
                 <div className="mt-5 space-y-2 text-xs text-white/40">
                   <div className="flex items-center gap-2">
                     <Globe className="h-3.5 w-3.5 shrink-0" />
-                    <span>pulse.animalzgroup.com</span>
+                    <span>universopulse.com</span>
                   </div>
                   <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-white/70 transition-colors">
                     <Phone className="h-3.5 w-3.5 shrink-0" />

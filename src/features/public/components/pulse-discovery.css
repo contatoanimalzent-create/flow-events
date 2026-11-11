@@ -34,3 +34,6 @@
 .pd-proof-intro>.pd-brand-small{width:38px;height:50px}
 .pd-proof-intro>.pd-brand-small>.pd-brand-symbol{transform:scale(.48)}
 @media(max-width:760px){.pd-logo{width:141px;height:48px}.pd-logo>.pd-brand-crop{transform:scale(.79);transform-origin:top left}.pd-header{padding-top:13px;padding-bottom:13px;min-height:80px}.pd-footer-top .pd-logo{height:68px;width:205px}.pd-footer-top .pd-brand-crop{transform:scale(1.1)}.pd-stage-emblem{left:3%;top:9%;transform:scale(.75) rotate(-10deg)}.pd-proof-intro>.pd-brand-small{width:29px;height:38px}.pd-proof-intro>.pd-brand-small>.pd-brand-symbol{transform:scale(.37)}.pd-menu>.pd-logo{height:48px}.pd-operation-art>.pd-operation-brand{min-width:0!important}}
+
+.pd-categories{scrollbar-width:none}.pd-categories::-webkit-scrollbar{display:none}.pd-event-grid:has(>.pd-event-card:only-child){grid-template-columns:minmax(0,390px)}
+@media(max-width:760px){.pd-event-grid:has(>.pd-event-card:only-child){grid-template-columns:minmax(0,1fr)}.pd-event-grid:has(>.pd-event-card:only-child) .pd-card-visual{aspect-ratio:1.25}}

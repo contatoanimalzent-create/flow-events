@@ -20,7 +20,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
   const [scannerReady, setScannerReady] = useState(false)
 
   const context = useAppContext((s) => s.context)
-  const { isOnline, enqueue } = useOffline()
+  const { isOnline } = useOffline()
 
   const resetTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const scannerRef = useRef<any>(null)
@@ -73,27 +73,15 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
       try {
         let res: ScanResult
 
-        if (isOnline && context?.eventId) {
-          const validation = await operatorService.validateToken(token.trim(), context.eventId)
+        {
+          const validation = await operatorService.validateToken(token.trim(), context?.eventId ?? '')
           if (validation.valid) {
             res = { valid: true, name: validation.name, message: validation.message }
             setScanCount((c) => c + 1)
           } else {
             res = { valid: false, name: '-', message: validation.message }
           }
-        } else {
-          // Offline: enqueue for later sync
-          enqueue('checkin', {
-            eventId: context?.eventId,
-            token,
-            timestamp: Date.now(),
-          })
-          res = {
-            valid: true,
-            name: 'Participante',
-            message: 'Registrado offline. Será sincronizado.',
-          }
-          setScanCount((c) => c + 1)
+
         }
 
         setResult(res)
@@ -110,7 +98,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
         resetTimerRef.current = setTimeout(resetToScanning, 2_000)
       }
     },
-    [context?.eventId, isOnline, enqueue, kioskState, resetToScanning]
+    [context?.eventId, kioskState, resetToScanning]
   )
 
   // Keep handleScan ref in sync so the scanner callback always uses the latest
@@ -302,7 +290,7 @@ export default function KioskPage({ onNavigate }: PulsePageProps) {
       {/* Bottom status bar */}
       <div className="pb-8 flex justify-center">
         <p className="text-slate-700 text-xs">
-          {isOnline ? 'Modo online, válidação em tempo real' : 'Modo offline, sincronizará ao reconectar'}
+          {isOnline ? 'Modo online, válidação em tempo real' : 'Sem conexão: entradas não serão liberadas. Chame o supervisor.'}
         </p>
       </div>
     </div>

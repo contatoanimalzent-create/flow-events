@@ -12,38 +12,10 @@ const RETRY_DELAYS = [2_000, 5_000, 15_000]
 
 async function processAction(action: OfflineAction): Promise<void> {
   switch (action.type) {
-    case 'checkin': {
-      const { eventId, token, operatorId, gate } = action.payload as any
-      const { error } = await supabase.from('checkins').insert({
-        event_id: eventId,
-        digital_ticket_id: null,
-        gate_id: gate ?? null,
-        operator_id: operatorId ?? null,
-        result: 'success',
-        reason_code: 'offline_sync',
-        is_exit: false,
-        was_offline: true,
-        checked_in_at: action.createdAt,
-      })
-      if (error) throw new Error(error.message)
-      break
-    }
-
-    case 'manual-check': {
-      const { eventId, ticketId, operatorId } = action.payload as any
-      const { error } = await supabase.from('checkins').insert({
-        event_id: eventId,
-        digital_ticket_id: ticketId ?? null,
-        operator_id: operatorId ?? null,
-        result: 'success',
-        reason_code: 'manual_offline',
-        is_exit: false,
-        was_offline: true,
-        checked_in_at: action.createdAt,
-      })
-      if (error) throw new Error(error.message)
-      break
-    }
+    case 'checkin':
+    case 'manual-check':
+      // Legacy readings are observations, not validated access. Keep them for review.
+      throw new Error('Leitura offline não validada. Revisão do supervisor necessária; nenhum acesso foi confirmado.')
 
     case 'start-presence': {
       const { staffId, eventId, organizationId } = action.payload as any

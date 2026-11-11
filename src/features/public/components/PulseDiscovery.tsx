@@ -18,6 +18,10 @@ const officialMedia: Record<string, string> = {
   'capital-strike-nos-confins-da-terra': 'https://www.capitalstrike.com.br/assets/confins/terra-arrasada-1200.webp',
   'bsb-fight-5': 'https://nrjizzfkhficvhiiqvtl.supabase.co/storage/v1/object/public/event-assets/bsb-fight-5/background-octagon.png',
 }
+function Brand({ symbol = false }: { symbol?: boolean }) {
+  return <span className={symbol ? 'pd-brand-symbol' : 'pd-brand-crop'}><img src="/logo.png" alt={symbol ? '' : 'Pulse'} decoding="async" /></span>
+}
+
 function eventImage(event: PublicEventSummary) {
   return officialMedia[event.slug] || event.mediaPresentation.coverAsset?.secure_url || event.cover_url || ''
 }
@@ -37,7 +41,7 @@ export function PulseDiscovery({ onLogin, catalog = false }: { onLogin?: () => v
   const query = usePublicEvents()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
-  const [period, setPeriod] = useState<'upcoming' | 'past' | 'all'>(catalog ? 'all' : 'upcoming')
+  const [period, setPeriod] = useState<'upcoming' | 'past' | 'all'>('all')
   const [city, setCity] = useState('all')
   const [savedOnly, setSavedOnly] = useState(false)
   const [saved, setSaved] = useState<string[]>([])
@@ -112,7 +116,7 @@ export function PulseDiscovery({ onLogin, catalog = false }: { onLogin?: () => v
   return <div className="pd">
     <a className="pd-skip" href="#pd-main">{t('Pular para o conteúdo', 'Skip to content')}</a>
     <header className="pd-header">
-      <a className="pd-logo" href="/" aria-label="Pulse, início">pulse<span>✳</span></a>
+      <a className="pd-logo" href="/" aria-label="Pulse, início"><Brand/></a>
       <nav className="pd-nav" aria-label={t('Navegação principal', 'Main navigation')}>
         <a className={!catalog ? 'active' : ''} href="/">{t('Descobrir', 'Discover')}</a>
         <a className={catalog ? 'active' : ''} href="/events">{t('Eventos', 'Events')}</a>
@@ -127,7 +131,7 @@ export function PulseDiscovery({ onLogin, catalog = false }: { onLogin?: () => v
     </header>
     <AnimatePresence>
       {menu && <motion.div ref={menuRef} className="pd-menu" role="dialog" aria-modal="true" aria-label={t('Menu', 'Menu')} initial={{ opacity: 0, y: reduce ? 0 : -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduce ? 0 : -6 }}>
-        <a href="/" className="pd-logo">pulse<span>✳</span></a>
+        <a href="/" className="pd-logo"><Brand/></a>
         <button className="pd-menu-close pd-icon-button" onClick={() => {setMenu(false); menuButtonRef.current?.focus()}} aria-label={t('Fechar menu', 'Close menu')}><X/></button>
         <a href="/events">{t('Explorar eventos', 'Explore events')} <ArrowRight/></a>
         <a href="/cases">{t('Nossa história', 'Our story')} <ArrowRight/></a>
@@ -139,7 +143,7 @@ export function PulseDiscovery({ onLogin, catalog = false }: { onLogin?: () => v
     <main id="pd-main">
       {!catalog && <section className="pd-hero" ref={heroRef}>
         <div className="pd-hero-copy">
-          <span className="pd-eyebrow"><span className="pd-mini-star">✳</span>{t('A vida acontece no encontro', 'Life happens together')}</span>
+          <span className="pd-eyebrow"><span className="pd-brand-small" aria-hidden="true"><Brand symbol/></span>{t('A vida acontece no encontro', 'Life happens together')}</span>
           <h1>{t('Tem momentos', 'Some moments')}<br/>{t('que só', 'you just')} <em>{t('vivendo.', 'have to live.')}</em></h1>
           <p>{t('Um novo lugar. Gente que conecta. Uma história para chamar de sua. Encontre seu próximo evento com a Pulse.', 'A new place. People who connect. A story to call your own. Find your next event with Pulse.')}</p>
           <button className="pd-button pd-hero-button" onClick={explore}>{t('Encontrar meu próximo evento', 'Find my next event')} <ArrowRight size={20}/></button>
@@ -147,7 +151,7 @@ export function PulseDiscovery({ onLogin, catalog = false }: { onLogin?: () => v
         </div>
         <div className="pd-hero-stage" aria-label={t('Eventos que fazem parte da Pulse', 'Events in the Pulse story')}>
           <div className="pd-orbit pd-orbit-one"/><div className="pd-orbit pd-orbit-two"/>
-          <span className="pd-stage-star" aria-hidden="true">✳</span>
+          <span className="pd-stage-emblem" aria-hidden="true"><Brand symbol/></span>
           {featured ? <a className="pd-main-photo" data-photo-layer href={'/e/'+featured.slug}>
             <EventImage event={featured} priority/>
             <span className="pd-photo-scrim"/>
@@ -157,7 +161,7 @@ export function PulseDiscovery({ onLogin, catalog = false }: { onLogin?: () => v
           {second && <a className="pd-memory-ticket" data-ticket-layer href={'/e/'+second.slug}>
             <div className="pd-ticket-image"><EventImage event={second}/></div>
             <span className="pd-ticket-copy"><small>{t('Já fez história', 'Part of our story')}</small><strong>{second.name}</strong><span><MapPin size={12}/> {second.city || 'Pulse'}</span></span>
-            <span className="pd-ticket-perforation"/><span className="pd-ticket-stub">PULSE<br/><span>✳</span></span>
+            <span className="pd-ticket-perforation"/><span className="pd-ticket-stub">PULSE<br/><Brand symbol/></span>
           </a>}
           <div className="pd-stage-sticker"><span>✦</span>{t('Sai da rotina.', 'Go beyond routine.')}<br/><strong>{t('Entra na história.', 'Make a memory.')}</strong></div>
           <span className="pd-stage-caption">{t('Pessoas, lugares e boas histórias.', 'People, places and good stories.')}</span>
@@ -166,7 +170,7 @@ export function PulseDiscovery({ onLogin, catalog = false }: { onLogin?: () => v
       </section>}
 
       <section className="pd-explore" id="explorar">
-        <div className="pd-section-heading"><div><span className="pd-eyebrow">{t('Escolha sua próxima história', 'Pick your next story')}</span><h2>{catalog ? t('Qual vai ser o próximo?', 'What’s your next moment?') : t('Seu próximo encontro.', 'Your next moment.')}</h2></div><span className="pd-count">{query.isPending ? '—' : filtered.length} {t('eventos', 'events')}</span></div>
+        <div className="pd-section-heading"><div><span className="pd-eyebrow">{t('Escolha sua próxima história', 'Pick your next story')}</span><h2>{catalog ? t('Qual vai ser o próximo?', 'What’s your next moment?') : t('Encontros com a sua vibe.', 'Find your kind of moment.')}</h2></div><span className="pd-count">{query.isPending ? '—' : filtered.length} {t('eventos', 'events')}</span></div>
         <div className="pd-search-row">
           <label className="pd-search"><Search size={20}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={t('Evento, lugar ou algo que você ama...', 'An event, a place, something you love...')} aria-label={t('Buscar eventos', 'Search events')}/>{search && <button onClick={()=>setSearch('')} aria-label={t('Limpar busca', 'Clear search')}><X size={16}/></button>}</label>
           <button className={'pd-filter-button '+(filters?'selected':'')} onClick={()=>setFilters(v=>!v)} aria-expanded={filters} aria-controls="pd-filter-panel"><SlidersHorizontal size={18}/>{t('Filtros', 'Filters')}{city!=='all' && <span className="pd-filter-dot"/>}</button>
@@ -187,10 +191,10 @@ export function PulseDiscovery({ onLogin, catalog = false }: { onLogin?: () => v
         <p className="pd-live-region" role="status" aria-live="polite">{!query.isPending && !query.isError ? t(filtered.length+' eventos encontrados.',filtered.length+' events found.') : ''}</p>
       </section>
       <section className="pd-proof"><div className="pd-proof-intro"><span className="pd-mini-star">✳</span><div><h2>{t('A nossa história é de verdade.', 'Our story is real.')}</h2><p>{t('Encontros que já aconteceram. Registros que fazem parte da Pulse.', 'Real events. Real records in the Pulse story.')}</p><a href="/cases">{t('Conheça nossa trajetória', 'Explore our story')} <ArrowRight size={16}/></a></div></div><div className="pd-proof-numbers"><div><strong>{TRACK_RECORD_TOTALS.events}</strong><span>{t('eventos realizados', 'past events')}</span></div><div><strong>{TRACK_RECORD_TOTALS.tickets.toLocaleString(locale)}</strong><span>{t('credenciais digitais', 'digital credentials')}</span></div><div><strong>{TRACK_RECORD_TOTALS.staff}</strong><span>{t('vínculos de equipe', 'staff assignments')}</span></div></div><small>{t('Base conferida em '+TRACK_RECORD_AS_OF+'. Credenciais não equivalem a presenças; vínculos não são pessoas únicas.','Records checked on '+TRACK_RECORD_AS_OF+'. Credentials are not attendance; assignments are not unique people.')}</small></section>
-      <section className="pd-producer"><div><span className="pd-eyebrow">{t('Do outro lado do encontro?', 'Behind the next great event?')}</span><h2>{t('Você cria a experiência.', 'You create the experience.')}<br/><em>{t('A Pulse conecta a operação.', 'Pulse connects the operation.')}</em></h2><p>{t('Equipe, acesso e supervisão no mesmo lugar. Para quem faz cada detalhe acontecer.', 'Staff, access and supervision together. For the people who make every detail happen.')}</p><a href="/producer" className="pd-button">{t('Conhecer a Pulse para produtores', 'Meet Pulse for producers')} <ArrowRight size={18}/></a></div><div className="pd-operation-art" aria-hidden="true"><span className="pd-operation-path"/><span className="pd-operation-node"><Check size={25}/></span><span className="pd-operation-label">PULSE / OPERAÇÃO</span><div><Users size={30}/><strong>{t('Gente conectada.', 'People connected.')}</strong><small>{t('Do primeiro acesso ao último detalhe.', 'From the first entry to the final detail.')}</small></div></div></section>
+      <section className="pd-producer"><div><span className="pd-eyebrow">{t('Do outro lado do encontro?', 'Behind the next great event?')}</span><h2>{t('Você cria a experiência.', 'You create the experience.')}<br/><em>{t('A Pulse conecta a operação.', 'Pulse connects the operation.')}</em></h2><p>{t('Equipe, acesso e supervisão no mesmo lugar. Para quem faz cada detalhe acontecer.', 'Staff, access and supervision together. For the people who make every detail happen.')}</p><a href="/producer" className="pd-button">{t('Conhecer a Pulse para produtores', 'Meet Pulse for producers')} <ArrowRight size={18}/></a></div><div className="pd-operation-art" aria-hidden="true"><div className="pd-operation-brand"><Brand/></div><span className="pd-operation-path"/><span className="pd-operation-node"><Check size={25}/></span><span className="pd-operation-label">PULSE / OPERAÇÃO</span><div><Users size={30}/><strong>{t('Gente conectada.', 'People connected.')}</strong><small>{t('Do primeiro acesso ao último detalhe.', 'From the first entry to the final detail.')}</small></div></div></section>
     </main>
-    <footer className="pd-footer"><div className="pd-footer-top"><a className="pd-logo" href="/">pulse<span>✳</span></a><p>{t('Encontros que viram história.', 'Moments that become stories.')}</p><a href="https://wa.me/5561992946515" target="_blank" rel="noreferrer">{t('Vamos conversar', 'Let’s talk')} ↗</a></div><div className="pd-footer-bottom"><span>© {new Date().getFullYear()} Pulse · Animalz Group</span><nav aria-label={t('Links institucionais','Footer links')}><a href="/events">{t('Eventos','Events')}</a><a href="/ajuda">{t('Ajuda','Help')}</a><a href="/privacidade">{t('Privacidade','Privacy')}</a><a href="/termos">{t('Termos','Terms')}</a></nav><span>universopulse.com</span></div></footer>
-    <nav className="pd-bottom-nav" aria-label={t('Atalhos mobile','Mobile navigation')}><a href="/" aria-current={!catalog?'page':undefined}><Compass size={21}/>{t('Descobrir','Discover')}</a><a href="/events" aria-current={catalog?'page':undefined}><CalendarDays size={21}/>{t('Eventos','Events')}</a><button aria-pressed={savedOnly} onClick={()=>{setSavedOnly(v=>!v); explore()}}><Heart size={21} fill={savedOnly?'currentColor':'none'}/>{t('Salvos','Saved')}</button><button onClick={onLogin}><Users size={21}/>{t('Minha Pulse','My Pulse')}</button></nav>
+    <footer className="pd-footer"><div className="pd-footer-top"><a className="pd-logo" href="/"><Brand/></a><p>{t('Encontros que viram história.', 'Moments that become stories.')}</p><a href="https://wa.me/5561992946515" target="_blank" rel="noreferrer">{t('Vamos conversar', 'Let’s talk')} ↗</a></div><div className="pd-footer-bottom"><span>© {new Date().getFullYear()} Pulse · Animalz Group</span><nav aria-label={t('Links institucionais','Footer links')}><a href="/events">{t('Eventos','Events')}</a><a href="/ajuda">{t('Ajuda','Help')}</a><a href="/privacidade">{t('Privacidade','Privacy')}</a><a href="/termos">{t('Termos','Terms')}</a></nav><span>universopulse.com</span></div></footer>
+    <nav className="pd-bottom-nav" aria-label={t('Atalhos mobile','Mobile navigation')}><a href="/" aria-current={!catalog?'page':undefined}><Compass size={21}/>{t('Descobrir','Discover')}</a><a href="/events" aria-current={catalog?'page':undefined}><CalendarDays size={21}/>{t('Eventos','Events')}</a><button aria-pressed={savedOnly} onClick={()=>{setSavedOnly(v=>!v); explore()}}><Heart size={21} fill={savedOnly?'currentColor':'none'}/>{t('Salvos','Saved')}</button><button onClick={() => user ? window.location.assign('/me') : onLogin?.()}><Users size={21}/>{t('Minha Pulse','My Pulse')}</button></nav>
     <AnimatePresence>{notice && <motion.div className="pd-toast" role="status" initial={{opacity:0,y:reduce?0:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:reduce?0:4}}><Check size={16}/>{notice}</motion.div>}</AnimatePresence>
   </div>
 }

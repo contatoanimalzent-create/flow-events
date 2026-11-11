@@ -21,8 +21,8 @@ const FEATURES = [
     icon: QrCode,
     titlePt: 'Check-in Mobile',
     titleEn: 'Mobile Check-in',
-    descPt: 'QR code por camera, válidação offline e anti-fraude. Suporta 500 leituras por minuto com zero latencia.',
-    descEn: 'QR code via camera, offline and anti-fraud validation. Supports 500 reads per minute with zero latency.',
+    descPt: 'Leitura de QR code por câmera, validação de ingresso e histórico de acesso. A liberação depende da confirmação do sistema.',
+    descEn: 'Camera QR scanning, ticket validation and access history. Entry requires confirmation from the system.',
   },
   {
     icon: Users,

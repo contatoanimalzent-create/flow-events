@@ -1,3 +1,4 @@
+import { TRACK_RECORD_TOTALS } from '@/shared/lib/public-track-record'
 import {
   ArrowRight,
   BarChart3,
@@ -26,8 +27,8 @@ const FEATURES = [
     icon: QrCode,
     titlePt: 'Check-in com QR Code',
     titleEn: 'QR Code check-in',
-    descPt: 'Leitura instantanea por camera, válidação anti-fraude e controle de acesso por área. Funciona offline.',
-    descEn: 'Instant camera scanning, anti-fraud validation and área-based access control. Works offline.',
+    descPt: 'Leitura por câmera, validação de ingresso e controle de acesso por área. Sem conexão, a entrada exige contingência supervisionada.',
+    descEn: 'Camera scanning, ticket validation and area-based access control. Offline access requires supervised contingency.',
   },
   {
     icon: Users,
@@ -81,10 +82,10 @@ const FEATURES = [
 ]
 
 const STATS = [
-  { valuePt: '94%', valueEn: '94%', labelPt: 'Taxa de conversão', labelEn: 'Conversion rate' },
-  { valuePt: '< 2s', valueEn: '< 2s', labelPt: 'Tempo de check-in', labelEn: 'Check-in time' },
-  { valuePt: '24/7', valueEn: '24/7', labelPt: 'Suporte operacional', labelEn: 'Operational support' },
-  { valuePt: 'R$ 0', valueEn: '$0', labelPt: 'Para comecar', labelEn: 'To get started' },
+  { valuePt: String(TRACK_RECORD_TOTALS.events), valueEn: String(TRACK_RECORD_TOTALS.events), labelPt: 'Eventos realizados', labelEn: 'Past events' },
+  { valuePt: TRACK_RECORD_TOTALS.tickets.toLocaleString('pt-BR'), valueEn: TRACK_RECORD_TOTALS.tickets.toLocaleString('en-US'), labelPt: 'Credenciais digitais registradas', labelEn: 'Digital credential records' },
+  { valuePt: String(TRACK_RECORD_TOTALS.staff), valueEn: String(TRACK_RECORD_TOTALS.staff), labelPt: 'Vínculos de equipe', labelEn: 'Event staff assignments' },
+  { valuePt: '2026', valueEn: '2026', labelPt: 'Histórico registrado', labelEn: 'Recorded event history' },
 ]
 
 export function ProducerPage({ onLogin }: { onLogin: () => void }) {
@@ -265,7 +266,7 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
                     'Gestão completa de equipe com convites por link',
                     'Dashboard executivo em tempo real',
                     'Página pública personalizada para cada evento',
-                    'Suporte operacional 24/7 durante o evento',
+                    'Suporte durante a operação do evento',
                     'CRM com histórico completo de participantes',
                     'Relatórios exportáveis para contabilidade',
                   ]
@@ -277,7 +278,7 @@ export function ProducerPage({ onLogin }: { onLogin: () => void }) {
                     'Complete team management with link invites',
                     'Real-time executive dashboard',
                     'Custom public page for each event',
-                    '24/7 operational support during events',
+                    'Operational support during events',
                     'CRM with complete attendee history',
                     'Exportable reports for accounting',
                   ]

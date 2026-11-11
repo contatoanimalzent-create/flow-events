@@ -182,7 +182,7 @@ const APP_FEATURES = [
   'Controle de acesso por área',
   'Relatórios exportáveis em PDF/CSV',
   'Notificações push para a equipe',
-  'Suporte 24/7 durante o evento',
+  'Suporte durante a operação do evento',
 ]
 
 // ─── Main Component ───────────────────────────────────────────────────────────

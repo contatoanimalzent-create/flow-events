@@ -1,4 +1,4 @@
-import { CheckCircle2, Mail } from 'lucide-react'
+import { Info, Mail } from 'lucide-react'
 import { PublicLayout } from '@/features/public'
 import { usePublicLocale } from '@/features/public/lib/public-locale'
 import { useSeoMeta } from '@/shared/lib'
@@ -20,8 +20,8 @@ export function StatusPage({ onLogin }: { onLogin: () => void }) {
   useSeoMeta({
     title: isPortuguese ? 'Status do Sistema | Pulse' : 'System Status | Pulse',
     description: isPortuguese
-      ? 'Acompanhe o status em tempo real de todos os serviços da plataforma Pulse.'
-      : 'Track the real-time status of all Pulse platform services.',
+      ? 'Consulte os canais de acompanhamento e suporte da Pulse.'
+      : 'Find Pulse service information and support channels.',
   })
 
   return (
@@ -37,13 +37,13 @@ export function StatusPage({ onLogin }: { onLogin: () => void }) {
           </h1>
 
           {/* Badge status geral */}
-          <div className="inline-flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-6 py-4">
+          <div className="inline-flex items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-6 py-4">
             <div className="relative flex h-4 w-4 shrink-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-40" />
-              <span className="relative inline-flex h-4 w-4 rounded-full bg-emerald-500" />
+              
+              <span className="relative inline-flex h-4 w-4 rounded-full bg-amber-500" />
             </div>
-            <span className="text-base font-semibold text-emerald-400">
-              {isPortuguese ? 'Todos os sistemas operacionais' : 'All systems operational'}
+            <span className="text-base font-semibold text-amber-400">
+              {isPortuguese ? 'Acompanhamento pelo suporte' : 'Support-assisted service updates'}
             </span>
           </div>
         </div>
@@ -59,13 +59,13 @@ export function StatusPage({ onLogin }: { onLogin: () => void }) {
             {SERVICOS.map((servico) => (
               <div key={servico.nome} className="flex items-center justify-between px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500 shrink-0" />
                   <span className="text-sm text-[#f0ebe2]">
                     {isPortuguese ? servico.nome : servico.nomeEn}
                   </span>
                 </div>
-                <span className="text-xs font-medium text-emerald-400">
-                  {isPortuguese ? 'Operacional' : 'Operational'}
+                <span className="text-xs font-medium text-amber-400">
+                  {isPortuguese ? 'Consultar suporte' : 'Contact support'}
                 </span>
               </div>
             ))}
@@ -80,23 +80,23 @@ export function StatusPage({ onLogin }: { onLogin: () => void }) {
             {isPortuguese ? 'Histórico de incidentes' : 'Incident history'}
           </h2>
           <div className="rounded-2xl bg-white/5 border border-white/8 p-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/15 shrink-0">
-              <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/15 shrink-0">
+              <Info className="h-5 w-5 text-amber-400" />
             </div>
             <div>
               <p className="font-medium text-[#f0ebe2]">
                 {isPortuguese
-                  ? 'Nenhum incidente nos últimos 90 dias.'
-                  : 'No incidents in the last 90 days.'}
+                  ? 'Histórico público de incidentes ainda não disponível.'
+                  : 'Public incident history is not yet available.'}
               </p>
               <p className="text-sm text-[#9a9088] mt-0.5">
                 {isPortuguese
-                  ? 'Disponibilidade: 99,98% no período'
-                  : 'Uptime: 99.98% in the period'}
+                  ? 'Não publicamos percentuais de disponibilidade sem medições verificadas.'
+                  : 'Availability percentages require verified measurements.'}
               </p>
             </div>
-            <span className="sm:ml-auto inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
-              {isPortuguese ? 'Sem incidentes' : 'No incidents'}
+            <span className="sm:ml-auto inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
+              {isPortuguese ? 'Sem histórico publicado' : 'No published history'}
             </span>
           </div>
         </div>
@@ -109,8 +109,8 @@ export function StatusPage({ onLogin }: { onLogin: () => void }) {
             <Mail className="h-4 w-4 text-[#9a9088] shrink-0 mt-0.5 sm:mt-0" />
             <p className="text-sm text-[#9a9088]">
               {isPortuguese
-                ? 'Status atualizado automaticamente. Em caso de problemas, contate '
-                : 'Status updated automatically. In case of issues, contact '}
+                ? 'Para confirmar a situação de um serviço ou relatar problemas, contate '
+                : 'For a service update or to report an issue, contact '}
               <a
                 href="mailto:contatopulse@animalzgroup.com"
                 className="text-[#4285F4] hover:underline"

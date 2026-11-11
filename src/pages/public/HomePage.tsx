@@ -5,6 +5,7 @@
  */
 
 import gsap from 'gsap'
+import { TRACK_RECORD_AS_OF, TRACK_RECORD_TOTALS } from '@/shared/lib/public-track-record'
 import {
   CheckCircle2,
   QrCode,
@@ -152,7 +153,7 @@ const FEATURES = [
   {
     icon: QrCode,
     title: 'Check-in Mobile',
-    body: '500 leituras/min. QR code, offline, anti-fraude.',
+    body: 'Leitura QR, validação de ingresso e histórico de acesso.',
     accent: '#C9A84C',
   },
   {
@@ -648,9 +649,9 @@ export function HomePage({ onLogin }: HomePageProps) {
                 }}
               >
                 {[
-                  { end: 150, suffix: '+', label: 'Eventos operados', description: 'Shows, festivais, conferências e experiências privadas.' },
-                  { end: 50, suffix: 'k+', label: 'Ingressos processados', description: 'Com check-in sub-segundo e zero fraude registrada.' },
-                  { end: 98, suffix: '%', label: 'Taxa de satisfação', description: 'Avaliações coletadas de produtores e equipe de campo.' },
+                  { end: TRACK_RECORD_TOTALS.events, suffix: '', label: 'Eventos realizados', description: `Histórico cadastrado na Pulse até ${TRACK_RECORD_AS_OF}.` },
+                  { end: TRACK_RECORD_TOTALS.tickets, suffix: '', label: 'Credenciais digitais', description: 'Registros dos eventos já realizados. Não representa presença confirmada.' },
+                  { end: TRACK_RECORD_TOTALS.staff, suffix: '', label: 'Registros de equipe', description: 'Vínculos de equipe por evento. Uma pessoa pode participar de mais de um.' },
                 ].map((stat, i) => (
                   <motion.div
                     key={stat.label}

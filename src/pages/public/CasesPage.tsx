@@ -1,54 +1,26 @@
-import { MessageCircle, Quote } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import { PublicLayout } from '@/features/public'
 import { usePublicLocale } from '@/features/public/lib/public-locale'
 import { useSeoMeta } from '@/shared/lib'
+import { TRACK_RECORD_AS_OF, TRACK_RECORD_EVENTS, TRACK_RECORD_TOTALS } from '@/shared/lib/public-track-record'
 
-const CASES = [
-  {
-    nome: 'Festival Circuito',
-    tipo: 'Festival de música',
-    depoimento:
-      'Credenciamos 4.800 pessoas em 45 minutos com zero filas usando o check-in do Pulse. O supervisor acompanhou tudo pelo app em tempo real, sem precisar sair da cabine de produção.',
-    metricas: [
-      { valor: '4.800', label: 'credenciados' },
-      { valor: '0', label: 'fraudes' },
-      { valor: '45 min', label: 'para lotação completa' },
-    ],
-    cor: 'border-[#4285F4]/30',
-    badge: 'bg-[#4285F4]/15 text-[#4285F4]',
-  },
-  {
-    nome: 'Corporativo Tech Summit',
-    tipo: 'Evento corporativo',
-    depoimento:
-      'Gerenciamos 12 palestrantes, 3 salas simultâneas e 600 inscritos com aprovação manual de credenciais. Nenhum acesso não autorizado, nenhuma sala superlotada.',
-    metricas: [
-      { valor: '600', label: 'inscritos' },
-      { valor: '3', label: 'zonas de acesso' },
-      { valor: '100%', label: 'presença confirmada' },
-    ],
-    cor: 'border-emerald-500/30',
-    badge: 'bg-emerald-500/15 text-emerald-400',
-  },
-  {
-    nome: 'Noite Gastronômica SP',
-    tipo: 'Evento gastronômico',
-    depoimento:
-      'Vendemos 300 ingressos em 48h com virada de lote automática. Não precisei monitorar nada, o sistema fez tudo. O repasse chegou em D+2 sem burocracia.',
-    metricas: [
-      { valor: '300', label: 'ingressos vendidos' },
-      { valor: 'R$ 42k', label: 'em vendas' },
-      { valor: 'D+2', label: 'repasse' },
-    ],
-    cor: 'border-amber-500/30',
-    badge: 'bg-amber-500/15 text-amber-400',
-  },
-]
+const CASES = [...TRACK_RECORD_EVENTS].reverse().map((event) => ({
+  nome: event.name,
+  tipo: event.date.split('-').reverse().join('/'),
+  resumo: 'Evento realizado. Histórico cadastrado na Pulse.',
+  metricas: [
+    ...(event.tickets > 0 ? [{ valor: event.tickets.toLocaleString('pt-BR'), label: 'credenciais digitais' }] : []),
+    ...(event.staff > 0 ? [{ valor: event.staff.toLocaleString('pt-BR'), label: 'registros de equipe' }] : []),
+    ...(event.entries > 0 ? [{ valor: event.entries.toLocaleString('pt-BR'), label: 'entradas registradas' }] : []),
+  ],
+  cor: 'border-[#4285F4]/30',
+  badge: 'bg-[#4285F4]/15 text-[#4285F4]',
+}))
 
 const METRICAS_GERAIS = [
-  { valor: '150+', label: 'eventos operados' },
-  { valor: '50k+', label: 'ingressos processados' },
-  { valor: '98%', label: 'taxa de satisfação' },
+  { valor: String(TRACK_RECORD_TOTALS.events), label: 'eventos realizados' },
+  { valor: TRACK_RECORD_TOTALS.tickets.toLocaleString('pt-BR'), label: 'credenciais digitais registradas' },
+  { valor: TRACK_RECORD_TOTALS.staff.toLocaleString('pt-BR'), label: 'vínculos de equipe nos eventos' },
 ]
 
 export function CasesPage({ onLogin }: { onLogin: () => void }) {
@@ -76,8 +48,8 @@ export function CasesPage({ onLogin }: { onLogin: () => void }) {
           </h1>
           <p className="mt-5 max-w-xl text-lg text-[#9a9088]">
             {isPortuguese
-              ? 'Produtores que usam a Pulse operam com mais controle, menos imprevisto e melhores resultados financeiros.'
-              : 'Producers using Pulse operate with more control, fewer surprises and better financial results.'}
+              ? 'Eventos reais e registros de operação da Pulse. Sem estimativas de público ou depoimentos ilustrativos.'
+              : 'Real events and Pulse operational records. No estimated attendance or illustrative testimonials.'}
           </p>
         </div>
       </section>
@@ -96,6 +68,10 @@ export function CasesPage({ onLogin }: { onLogin: () => void }) {
         </div>
       </section>
 
+      <p className="mx-auto max-w-7xl px-5 text-sm leading-relaxed text-[#9a9088] md:px-10 lg:px-16">
+        Base conferida em {TRACK_RECORD_AS_OF}. Credenciais não equivalem a presenças; vínculos de equipe não são pessoas únicas. Eventos futuros não entram nesses totais.
+      </p>
+
       {/* Cases */}
       <section className="px-5 py-10 md:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl flex flex-col gap-6">
@@ -113,8 +89,8 @@ export function CasesPage({ onLogin }: { onLogin: () => void }) {
                   </div>
                   <h2 className="text-2xl font-bold text-[#f0ebe2] mb-4">{caso.nome}</h2>
                   <div className="relative">
-                    <Quote className="absolute -top-1 -left-1 h-5 w-5 text-[#9a9088] opacity-50" />
-                    <p className="pl-6 text-[#9a9088] leading-relaxed italic">{caso.depoimento}</p>
+                    
+                    <p className="text-[#9a9088] leading-relaxed">{caso.resumo}</p>
                   </div>
                 </div>
                 <div className="shrink-0 grid grid-cols-3 gap-4 md:grid-cols-1 md:w-40">

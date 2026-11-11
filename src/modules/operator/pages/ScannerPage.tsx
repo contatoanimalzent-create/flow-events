@@ -80,7 +80,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
   const [attendeeSearch, setAttendeeSearch] = useState('')
 
   const context = useAppContext((s) => s.context)
-  const { isOnline, enqueue } = useOffline()
+  const { isOnline } = useOffline()
 
   const resultTimerRef = useRef<ReturnType<typeof setTimeout>>()
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -192,11 +192,11 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     try {
       let res: ScanResult
 
-      if (isOnline && activeEventId) {
-        let validation = await operatorService.validateToken(normalizedToken, activeEventId, undefined, scannerSession ?? undefined)
+      {
+        let validation = await operatorService.validateToken(normalizedToken, activeEventId ?? '', undefined, scannerSession ?? undefined)
         const fallbackManualCode = normalizedToken.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase()
         if (!validation.valid && validation.reason === 'not_found' && fallbackManualCode.length === 8) {
-          validation = await operatorService.validateToken(fallbackManualCode, activeEventId, undefined, scannerSession ?? undefined)
+          validation = await operatorService.validateToken(fallbackManualCode, activeEventId ?? '', undefined, scannerSession ?? undefined)
         }
         if (validation.valid) {
           res = {
@@ -229,20 +229,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
             message: validation.message,
           }
         }
-      } else {
-        // Offline: queue for later sync
-        enqueue('checkin', {
-          eventId: activeEventId,
-          token: normalizedToken,
-          timestamp: Date.now(),
-        })
-        res = {
-          valid: true,
-          name: 'Participante',
-          ticketLabel: 'Offline, pendente sync',
-          message: 'Registrado offline. Será sincronizado.',
-        }
-        setScanCount((c) => c + 1)
+
       }
 
       setResult(res)
@@ -258,7 +245,7 @@ export default function ScannerPage({ onNavigate, scannerSlug, standalone = fals
     }
 
     resultTimerRef.current = setTimeout(dismissResult, holdMs)
-  }, [activeEventId, authStep, isOnline, enqueue, scannerSession, dismissResult])
+  }, [activeEventId, authStep, scannerSession, dismissResult])
 
   const stopCameraScanner = useCallback(async () => {
     if (animationFrameRef.current !== null) {

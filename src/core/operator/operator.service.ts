@@ -5,6 +5,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { validateOperationalScan } from './operational-scan'
 
 export type ValidationResult =
   | {
@@ -25,7 +26,7 @@ export type ValidationResult =
     }
   | {
       valid: false
-      reason: 'not_found' | 'already_used' | 'wrong_event' | 'invalid_token' | 'gate_mismatch' | 'unauthorized'
+      reason: 'not_found' | 'already_used' | 'wrong_event' | 'invalid_token' | 'gate_mismatch' | 'unauthorized' | 'offline' | 'missing_event'
       message: string
       name?: string
       ticketLabel?: string
@@ -228,19 +229,24 @@ export const operatorService = {
   },
 
   async validateToken(token: string, eventId: string, gate?: string, scannerSession?: string): Promise<ValidationResult> {
-    const { data, error } = await supabase.functions.invoke('operator-ticket-checkin', {
-      body: {
-        action: 'validate',
-        event_id: eventId,
-        token,
-        gate_id: gate ?? null,
-        scanner_session: scannerSession,
-      },
+    return validateOperationalScan<ValidationResult>({
+      isOnline: typeof navigator === 'undefined' || navigator.onLine,
+      eventId,
+    }, async (validatedEventId) => {
+      const { data, error } = await supabase.functions.invoke('operator-ticket-checkin', {
+        body: {
+          action: 'validate',
+          event_id: validatedEventId,
+          token,
+          gate_id: gate ?? null,
+          scanner_session: scannerSession,
+        },
+      })
+  
+      if (error) return { valid: false, reason: 'unauthorized', message: error.message || 'Erro na validacao' }
+      if ((data as any)?.error) return { valid: false, reason: 'unauthorized', message: (data as any).error }
+      return data as ValidationResult
     })
-
-    if (error) return { valid: false, reason: 'unauthorized', message: error.message || 'Erro na validacao' }
-    if ((data as any)?.error) return { valid: false, reason: 'unauthorized', message: (data as any).error }
-    return data as ValidationResult
   },
 
   async listEventTickets(eventId: string, scannerSession?: string): Promise<OperatorTicketListItem[]> {

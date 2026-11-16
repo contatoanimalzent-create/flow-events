@@ -83,15 +83,27 @@ function validarPessoa(raw: Pessoa, rotulo: string) {
 // Travas que dependem do cadastro inteiro e do que já existe no campeonato.
 const LIMITE_TIMES_POR_CLUBE = 2
 
+// "Jose da Silva" e "JOSE SILVA" são a mesma pessoa: compara primeiro e último nome.
+function mesmoNome(a: string, b: string) {
+  const partes = (v: string) => normalizarNome(v).split(' ').filter((p) => p.length > 2 && !['dos', 'das', 'del'].includes(p))
+  const pa = partes(a)
+  const pb = partes(b)
+  return pa.length > 0 && pb.length > 0 && pa[0] === pb[0] && pa[pa.length - 1] === pb[pb.length - 1]
+}
+const nomeMascarado = (v: string) => {
+  const [primeiro, ...resto] = v.trim().split(/\s+/)
+  return [primeiro, ...resto.map((p) => `${p[0]}.`)].join(' ')
+}
+
 async function conferirDuplicidade(
   eventoId: string, modalidade: ModalidadeId, def: { nome: string; equipe: boolean }, equipe: string, clube: string,
-  pessoas: Array<{ nome: string; email: string; cpf: string }>,
+  pessoas: Array<{ nome: string; email: string; cpf: string; dataNascimento: string }>,
 ) {
-  const vistos = new Map<string, string>()
+  const vistos = new Map<string, { nome: string; dataNascimento: string }>()
   for (const p of pessoas) {
     const c = soDigitos(p.cpf)
-    if (vistos.has(c)) throw new Error(`O CPF ${p.cpf} aparece duas vezes (${vistos.get(c)} e ${p.nome}). Cada atleta precisa do próprio CPF`)
-    vistos.set(c, p.nome)
+    if (vistos.has(c)) throw new Error(`O CPF ${p.cpf} aparece duas vezes (${vistos.get(c)!.nome} e ${p.nome}). Cada atleta precisa do próprio CPF`)
+    vistos.set(c, { nome: p.nome, dataNascimento: p.dataNascimento })
   }
 
   const dominios = [...new Set(pessoas.map((p) => p.email))]
@@ -99,28 +111,53 @@ async function conferirDuplicidade(
   const ruim = checagens.find(([, ok]) => !ok)
   if (ruim) throw new Error(`O e-mail ${ruim[0]} não existe ou o domínio não recebe mensagens. Confira o endereço`)
 
-  const { data: existentes, error } = await admin.from('speedsoft_registrations')
-    .select('squad_nome, clube, jogadores').eq('event_id', eventoId).eq('modalidade', modalidade).in('status', ['pendente', 'aprovado'])
+  // Todas as inscrições ativas do campeonato: a mesma pessoa pode jogar várias modalidades,
+  // mas só um time por modalidade, e sempre com a mesma identidade.
+  const { data: todas, error } = await admin.from('speedsoft_registrations')
+    .select('modalidade, squad_nome, clube, jogadores').eq('event_id', eventoId).in('status', ['pendente', 'aprovado'])
   if (error) throw new Error('Não foi possível conferir os cadastros agora. Tente de novo em instantes')
+  const existentes = (todas ?? []).filter((r) => r.modalidade === modalidade)
 
   if (def.equipe) {
     const nome = normalizarNome(equipe)
-    if ((existentes ?? []).some((r) => r.squad_nome && normalizarNome(r.squad_nome) === nome)) {
+    if (existentes.some((r) => r.squad_nome && normalizarNome(r.squad_nome) === nome)) {
       throw new Error(`Já existe um Team chamado "${equipe}" no ${def.nome}. Escolha outro nome`)
     }
-    const doClube = (existentes ?? []).filter((r) => normalizarNome(r.clube ?? r.squad_nome ?? '') === normalizarNome(clube))
+    const doClube = existentes.filter((r) => normalizarNome(r.clube ?? r.squad_nome ?? '') === normalizarNome(clube))
     if (doClube.length >= LIMITE_TIMES_POR_CLUBE) {
       throw new Error(`A equipe ${clube} já tem ${LIMITE_TIMES_POR_CLUBE} times inscritos no ${def.nome} (${doClube.map((r) => r.squad_nome).join(' e ')}). O limite é de ${LIMITE_TIMES_POR_CLUBE} times por equipe`)
     }
   }
-  for (const r of existentes ?? []) {
-    for (const j of (r.jogadores ?? []) as Array<{ cpf?: string; nome?: string }>) {
+  // Mesmo CPF já inscrito no campeonato: nome e nascimento precisam bater com a inscrição anterior.
+  const anteriores = new Map<string, Array<{ nome: string; nasc: string }>>()
+  for (const r of todas ?? []) {
+    for (const j of (r.jogadores ?? []) as Array<{ cpf?: string; nome?: string; data_nascimento?: string }>) {
+      const c = soDigitos(j.cpf ?? '')
+      if (!c || !vistos.has(c)) continue
+      if (!anteriores.has(c)) anteriores.set(c, [])
+      anteriores.get(c)!.push({ nome: j.nome ?? '', nasc: j.data_nascimento ?? '' })
+    }
+  }
+  for (const [c, lista] of anteriores) {
+    const atual = vistos.get(c)!
+    const mesmos = lista.filter((x) => mesmoNome(x.nome, atual.nome))
+    if (!mesmos.length) {
+      throw new Error(`O CPF de ${atual.nome} já está inscrito no campeonato em nome de outra pessoa (${nomeMascarado(lista[0].nome)}). Confira o CPF digitado`)
+    }
+    if (mesmos.every((x) => x.nasc && x.nasc !== atual.dataNascimento)) {
+      throw new Error(`${atual.nome} já está inscrito em outra modalidade com outra data de nascimento. Use os mesmos dados nas duas inscrições`)
+    }
+  }
+
+  for (const r of existentes) {
+    for (const j of (r.jogadores ?? []) as Array<{ cpf?: string }>) {
       const c = soDigitos(j.cpf ?? '')
       if (c && vistos.has(c)) {
-        throw new Error(`${vistos.get(c)} já está inscrito no ${def.nome}${r.squad_nome ? ` pelo Team ${r.squad_nome}` : ''}. O mesmo atleta não pode se inscrever duas vezes na mesma modalidade`)
+        throw new Error(`${vistos.get(c)!.nome} já está inscrito no ${def.nome}${r.squad_nome ? ` pelo Team ${r.squad_nome}` : ''}. O mesmo atleta não pode se inscrever duas vezes na mesma modalidade`)
       }
     }
   }
+
 }
 
 async function subirLogo(modalidade: ModalidadeId, equipe: string, logo: { fileName?: unknown; mimeType?: unknown; dataUrl?: unknown } | undefined) {

@@ -6,6 +6,7 @@
 //                             nominal com QR por atleta (approve_speedsoft_registration) e
 //                             manda o QR para cada um.
 // POST /?action=recusar       { ids: uuid[] } + header x-speedsoft-admin.
+// POST /?action=listar        {} + header x-speedsoft-admin: lista os cadastros do evento.
 import QRCode from 'npm:qrcode@1.5.4'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { emailIngresso, emailRecebido } from './templates.ts'
@@ -163,6 +164,27 @@ Deno.serve(async (req) => {
     body = await req.json()
   } catch {
     return json({ success: false, error: 'Dados inválidos' }, 400)
+  }
+
+  if (acao === 'listar') {
+    if (!(await exigirAdmin(req))) return json({ success: false, error: 'unauthorized' }, 401)
+    const { data: evento } = await admin.from('events').select('id').eq('organization_id', ORG_ID).eq('slug', EVENT_SLUG).maybeSingle()
+    const { data, error } = await admin.from('speedsoft_registrations')
+      .select('id, created_at, modalidade, squad_nome, logo_url, responsavel_nome, responsavel_email, responsavel_telefone, jogadores, observacoes, status, aprovado_em, source_site, order_id')
+      .eq('event_id', evento?.id ?? '').order('created_at', { ascending: false })
+    if (error) return json({ success: false, error: error.message }, 500)
+    const pedidos = (data ?? []).map((r) => r.order_id).filter(Boolean)
+    const { data: ingressos } = pedidos.length
+      ? await admin.from('digital_tickets').select('order_id, ticket_number, holder_name, status').in('order_id', pedidos)
+      : { data: [] }
+    return json({
+      success: true,
+      cadastros: (data ?? []).map((r) => ({
+        ...r,
+        modalidade_nome: MODALIDADES[r.modalidade as ModalidadeId]?.nome ?? r.modalidade,
+        ingressos: (ingressos ?? []).filter((t) => t.order_id === r.order_id),
+      })),
+    })
   }
 
   if (acao === 'aprovar' || acao === 'recusar') {

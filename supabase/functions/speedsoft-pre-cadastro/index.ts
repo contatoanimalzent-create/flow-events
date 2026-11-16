@@ -10,6 +10,7 @@
 import QRCode from 'npm:qrcode@1.5.4'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { emailIngresso, emailRecebido } from './templates.ts'
+import { cpfValido, dominioRecebeEmail, emailSugestao, formatarCpf, normalizarNome, soDigitos, telefoneProblema } from './validacao.ts'
 
 type ModalidadeId = 'squad_5x5' | 'speed_cqb' | 'pistola_squad_3x3' | 'pistola_individual'
 type Pessoa = {
@@ -47,8 +48,6 @@ function json(body: unknown, status = 200) {
 
 const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '')
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-const isPhone = (v: string) => v.replace(/\D/g, '').length >= 10
-const isCpf = (v: string) => v.replace(/\D/g, '').length === 11
 function isDate(v: string) {
   const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
   if (!m) return false
@@ -64,16 +63,58 @@ async function sha256Hex(value: string) {
 
 function validarPessoa(raw: Pessoa, rotulo: string) {
   const p = {
-    nome: str(raw.nome), email: str(raw.email), telefone: str(raw.telefone),
+    nome: str(raw.nome).replace(/\s+/g, ' '), email: str(raw.email).toLowerCase(), telefone: str(raw.telefone),
     dataNascimento: str(raw.dataNascimento), cpf: str(raw.cpf), categoria: str(raw.categoria), endereco: str(raw.endereco),
   }
   if (!p.nome) throw new Error(`${rotulo}: nome obrigatório`)
-  if (!p.email || !isEmail(p.email)) throw new Error(`${rotulo}: e-mail obrigatório`)
-  if (!p.telefone || !isPhone(p.telefone)) throw new Error(`${rotulo}: telefone inválido`)
+  if (p.nome.split(' ').length < 2 || /\d/.test(p.nome)) throw new Error(`${rotulo}: informe o nome completo`)
+  if (!p.email || !isEmail(p.email)) throw new Error(`${rotulo}: e-mail inválido`)
+  const sugestao = emailSugestao(p.email)
+  if (sugestao) throw new Error(`${rotulo}: o e-mail termina em @${p.email.split('@')[1]}. Não seria @${sugestao}?`)
+  const tel = telefoneProblema(p.telefone)
+  if (!p.telefone || tel) throw new Error(`${rotulo}: telefone inválido (${tel ?? 'obrigatório'})`)
   if (!p.dataNascimento || !isDate(p.dataNascimento)) throw new Error(`${rotulo}: data de nascimento inválida`)
-  if (!p.cpf || !isCpf(p.cpf)) throw new Error(`${rotulo}: CPF obrigatório`)
+  if (!p.cpf || !cpfValido(p.cpf)) throw new Error(`${rotulo}: CPF inválido. Confira os números`)
+  p.cpf = formatarCpf(p.cpf)
   if (!p.endereco) throw new Error(`${rotulo}: endereço obrigatório`)
   return p
+}
+
+// Travas que dependem do cadastro inteiro e do que já existe no campeonato.
+async function conferirDuplicidade(
+  eventoId: string, modalidade: ModalidadeId, def: { nome: string; equipe: boolean }, equipe: string,
+  pessoas: Array<{ nome: string; email: string; cpf: string }>,
+) {
+  const vistos = new Map<string, string>()
+  for (const p of pessoas) {
+    const c = soDigitos(p.cpf)
+    if (vistos.has(c)) throw new Error(`O CPF ${p.cpf} aparece duas vezes (${vistos.get(c)} e ${p.nome}). Cada atleta precisa do próprio CPF`)
+    vistos.set(c, p.nome)
+  }
+
+  const dominios = [...new Set(pessoas.map((p) => p.email))]
+  const checagens = await Promise.all(dominios.map(async (e) => [e, await dominioRecebeEmail(e)] as const))
+  const ruim = checagens.find(([, ok]) => !ok)
+  if (ruim) throw new Error(`O e-mail ${ruim[0]} não existe ou o domínio não recebe mensagens. Confira o endereço`)
+
+  const { data: existentes, error } = await admin.from('speedsoft_registrations')
+    .select('squad_nome, jogadores').eq('event_id', eventoId).eq('modalidade', modalidade).in('status', ['pendente', 'aprovado'])
+  if (error) throw new Error('Não foi possível conferir os cadastros agora. Tente de novo em instantes')
+
+  if (def.equipe) {
+    const nome = normalizarNome(equipe)
+    if ((existentes ?? []).some((r) => r.squad_nome && normalizarNome(r.squad_nome) === nome)) {
+      throw new Error(`Já existe um Team chamado "${equipe}" no ${def.nome}. Escolha outro nome`)
+    }
+  }
+  for (const r of existentes ?? []) {
+    for (const j of (r.jogadores ?? []) as Array<{ cpf?: string; nome?: string }>) {
+      const c = soDigitos(j.cpf ?? '')
+      if (c && vistos.has(c)) {
+        throw new Error(`${vistos.get(c)} já está inscrito no ${def.nome}${r.squad_nome ? ` pelo Team ${r.squad_nome}` : ''}. O mesmo atleta não pode se inscrever duas vezes na mesma modalidade`)
+      }
+    }
+  }
 }
 
 async function subirLogo(modalidade: ModalidadeId, equipe: string, logo: { fileName?: unknown; mimeType?: unknown; dataUrl?: unknown } | undefined) {
@@ -225,6 +266,9 @@ Deno.serve(async (req) => {
     const integrantes = brutos.map((p, i) => validarPessoa(p as Pessoa, `Integrante ${i + 2}`))
     if (!def.equipe && integrantes.length) throw new Error('Modalidade individual não deve enviar integrantes')
     if (def.equipe && integrantes.length < def.min) throw new Error(`${def.nome} exige equipe com ${def.min + 1} atletas`)
+    if (def.equipe && integrantes.length > def.min + 2) throw new Error(`${def.nome} aceita no máximo ${def.min + 3} atletas, contando os reservas`)
+
+    await conferirDuplicidade(evento.id, modalidade, def, equipe, [resp, ...integrantes])
 
     const logoUrl = def.equipe ? await subirLogo(modalidade, equipe, body.logo as never) : null
     const jogador = (p: ReturnType<typeof validarPessoa>, capitao: boolean) => ({
@@ -242,7 +286,7 @@ Deno.serve(async (req) => {
       cidade: str(body.cidade) || null,
       uf: str(body.uf) || null,
       responsavel_nome: resp.nome,
-      responsavel_email: resp.email.toLowerCase(),
+      responsavel_email: resp.email,
       responsavel_telefone: resp.telefone,
       responsavel_data_nascimento: resp.dataNascimento,
       jogadores: [jogador(resp, def.equipe), ...integrantes.map((p) => jogador(p, false))],

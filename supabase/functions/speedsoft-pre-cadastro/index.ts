@@ -1,7 +1,7 @@
-// Campeonato Nacional de Speedsoft · Capital Strike — pré-cadastro de times pelo Pulse.
+// Campeonato Nacional de Speedsoft · Capital Strike — inscrição de times pelo Pulse.
 //
 // POST /                      cadastro público (mesmo contrato do formulário dos sites):
-//                             grava como 'pendente' e manda o e-mail de "pré-cadastro recebido".
+//                             grava como 'pendente' e manda o e-mail de "inscrição recebida".
 // POST /?action=aprovar       { ids: uuid[] } + header x-speedsoft-admin: emite um ingresso
 //                             nominal com QR por atleta (approve_speedsoft_registration) e
 //                             manda o QR para cada um.
@@ -243,7 +243,7 @@ Deno.serve(async (req) => {
   try {
     const { data: evento } = await admin.from('events').select('id, status')
       .eq('organization_id', ORG_ID).eq('slug', EVENT_SLUG).maybeSingle()
-    if (!evento || !['published', 'ongoing'].includes(evento.status)) throw new Error('Pré-cadastro indisponível no momento')
+    if (!evento || !['published', 'ongoing'].includes(evento.status)) throw new Error('Inscrições indisponíveis no momento')
 
     const modalidade = str(body.modalidade) as ModalidadeId
     const def = MODALIDADES[modalidade]
@@ -296,7 +296,7 @@ Deno.serve(async (req) => {
       source_site: str(body.sourceSite) || origem.replace(/^https?:\/\//, '') || null,
       ip_hash: ipHash,
     }).select('id, created_at, modalidade').single()
-    if (error) throw new Error(`Falha ao salvar pré-cadastro: ${error.message}`)
+    if (error) throw new Error(`Falha ao salvar inscrição: ${error.message}`)
 
     const m = emailRecebido({ nome: resp.nome, modalidade: def.nome, equipe: def.equipe ? equipe : null, atletas: integrantes.length + 1 })
     const envio = await enviarEmail(resp.email, m.subject, m.html, m.text)

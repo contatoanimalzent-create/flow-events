@@ -97,10 +97,10 @@ export type DadosRecebido = { nome: string; modalidade: string; equipe: string |
 export function emailRecebido({ nome, modalidade, equipe, atletas }: DadosRecebido) {
   const p = esc(primeiroNome(nome))
   const miolo = `
-${hud('Pré-cadastro recebido', C.ouro)}
+${hud('Inscrição recebida', C.ouro)}
 <tr><td class="px" style="padding:30px 32px 6px;">
 <h1 class="h1" style="margin:0;font-family:${TITULO};font-size:34px;line-height:39px;font-weight:800;letter-spacing:-.3px;text-transform:uppercase;color:${C.texto};">${p}, você<br>entrou no radar.</h1>
-<p style="margin:18px 0 0;font-family:${CORPO};font-size:16px;line-height:26px;color:${C.suave};">Recebemos o seu pré-cadastro para o <strong style="color:${C.texto};">Campeonato Nacional de Speedsoft Capital Strike</strong>. Agora a organização analisa os dados e confirma a sua vaga.</p>
+<p style="margin:18px 0 0;font-family:${CORPO};font-size:16px;line-height:26px;color:${C.suave};">Recebemos a sua inscrição para o <strong style="color:${C.texto};">Campeonato Nacional de Speedsoft Capital Strike</strong>. Agora a organização analisa os dados e confirma a sua vaga.</p>
 </td></tr>
 
 <tr><td class="px" style="padding:26px 32px 4px;">
@@ -126,7 +126,7 @@ ${passos([
 ${botao('Ver o campeonato', SITE)}
 <p style="margin:20px 0 0;font-family:${CORPO};font-size:13px;line-height:21px;color:${C.apagado};">Preencheu algo errado? Responda este e-mail dizendo o que precisa ser ajustado.</p>
 </td></tr>`
-  const text = `${primeiroNome(nome)}, recebemos o seu pré-cadastro para o Campeonato Nacional de Speedsoft Capital Strike.
+  const text = `${primeiroNome(nome)}, recebemos a sua inscrição para o Campeonato Nacional de Speedsoft Capital Strike.
 
 Modalidade: ${modalidade}${equipe ? `\nTeam: ${equipe}` : ''}
 Atletas: ${atletas}
@@ -140,8 +140,8 @@ Próximos passos:
 Preencheu algo errado? Responda este e-mail.
 ${SITE}`
   return {
-    subject: `${primeiroNome(nome)}, recebemos seu pré-cadastro | Campeonato Nacional de Speedsoft`,
-    html: moldura(`Pré-cadastro recebido · ${modalidade}. A organização analisa e confirma a sua vaga.`, miolo),
+    subject: `${primeiroNome(nome)}, recebemos sua inscrição | Campeonato Nacional de Speedsoft`,
+    html: moldura(`Inscrição recebida · ${modalidade}. A organização analisa e confirma a sua vaga.`, miolo),
     text,
   }
 }

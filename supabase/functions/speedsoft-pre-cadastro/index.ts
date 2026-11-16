@@ -81,8 +81,10 @@ function validarPessoa(raw: Pessoa, rotulo: string) {
 }
 
 // Travas que dependem do cadastro inteiro e do que já existe no campeonato.
+const LIMITE_TIMES_POR_CLUBE = 2
+
 async function conferirDuplicidade(
-  eventoId: string, modalidade: ModalidadeId, def: { nome: string; equipe: boolean }, equipe: string,
+  eventoId: string, modalidade: ModalidadeId, def: { nome: string; equipe: boolean }, equipe: string, clube: string,
   pessoas: Array<{ nome: string; email: string; cpf: string }>,
 ) {
   const vistos = new Map<string, string>()
@@ -98,13 +100,17 @@ async function conferirDuplicidade(
   if (ruim) throw new Error(`O e-mail ${ruim[0]} não existe ou o domínio não recebe mensagens. Confira o endereço`)
 
   const { data: existentes, error } = await admin.from('speedsoft_registrations')
-    .select('squad_nome, jogadores').eq('event_id', eventoId).eq('modalidade', modalidade).in('status', ['pendente', 'aprovado'])
+    .select('squad_nome, clube, jogadores').eq('event_id', eventoId).eq('modalidade', modalidade).in('status', ['pendente', 'aprovado'])
   if (error) throw new Error('Não foi possível conferir os cadastros agora. Tente de novo em instantes')
 
   if (def.equipe) {
     const nome = normalizarNome(equipe)
     if ((existentes ?? []).some((r) => r.squad_nome && normalizarNome(r.squad_nome) === nome)) {
       throw new Error(`Já existe um Team chamado "${equipe}" no ${def.nome}. Escolha outro nome`)
+    }
+    const doClube = (existentes ?? []).filter((r) => normalizarNome(r.clube ?? r.squad_nome ?? '') === normalizarNome(clube))
+    if (doClube.length >= LIMITE_TIMES_POR_CLUBE) {
+      throw new Error(`A equipe ${clube} já tem ${LIMITE_TIMES_POR_CLUBE} times inscritos no ${def.nome} (${doClube.map((r) => r.squad_nome).join(' e ')}). O limite é de ${LIMITE_TIMES_POR_CLUBE} times por equipe`)
     }
   }
   for (const r of existentes ?? []) {
@@ -211,7 +217,7 @@ Deno.serve(async (req) => {
     if (!(await exigirAdmin(req))) return json({ success: false, error: 'unauthorized' }, 401)
     const { data: evento } = await admin.from('events').select('id').eq('organization_id', ORG_ID).eq('slug', EVENT_SLUG).maybeSingle()
     const { data, error } = await admin.from('speedsoft_registrations')
-      .select('id, created_at, modalidade, squad_nome, logo_url, responsavel_nome, responsavel_email, responsavel_telefone, jogadores, observacoes, status, aprovado_em, source_site, order_id')
+      .select('id, created_at, modalidade, squad_nome, clube, logo_url, responsavel_nome, responsavel_email, responsavel_telefone, jogadores, observacoes, status, aprovado_em, source_site, order_id')
       .eq('event_id', evento?.id ?? '').order('created_at', { ascending: false })
     if (error) return json({ success: false, error: error.message }, 500)
     const pedidos = (data ?? []).map((r) => r.order_id).filter(Boolean)
@@ -268,7 +274,9 @@ Deno.serve(async (req) => {
     if (def.equipe && integrantes.length < def.min) throw new Error(`${def.nome} exige equipe com ${def.min + 1} atletas`)
     if (def.equipe && integrantes.length > def.min + 2) throw new Error(`${def.nome} aceita no máximo ${def.min + 3} atletas, contando os reservas`)
 
-    await conferirDuplicidade(evento.id, modalidade, def, equipe, [resp, ...integrantes])
+    // O formulário de capitalstrike.com.br não tem o campo: nesse caso a equipe é o próprio Team.
+    const clube = def.equipe ? (str(body.clube).replace(/\s+/g, ' ') || equipe) : ''
+    await conferirDuplicidade(evento.id, modalidade, def, equipe, clube, [resp, ...integrantes])
 
     const logoUrl = def.equipe ? await subirLogo(modalidade, equipe, body.logo as never) : null
     const jogador = (p: ReturnType<typeof validarPessoa>, capitao: boolean) => ({
@@ -282,6 +290,7 @@ Deno.serve(async (req) => {
       event_id: evento.id,
       modalidade,
       squad_nome: def.equipe ? equipe : null,
+      clube: def.equipe ? clube : null,
       logo_url: logoUrl,
       cidade: str(body.cidade) || null,
       uf: str(body.uf) || null,

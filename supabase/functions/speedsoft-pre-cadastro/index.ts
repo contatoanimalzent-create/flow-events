@@ -299,6 +299,9 @@ Deno.serve(async (req) => {
     const modalidade = str(body.modalidade) as ModalidadeId
     const def = MODALIDADES[modalidade]
     if (!def) throw new Error('Modalidade inválida')
+    if (body.aceiteTermos !== true) {
+      throw new Error('Para enviar, marque que leu e aceita o termo de inscrição e responsabilidade. Se a página estava aberta há muito tempo, atualize e tente de novo')
+    }
 
     const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim()
     const ipHash = ip ? await sha256Hex(`speedsoft:${ip}`) : null

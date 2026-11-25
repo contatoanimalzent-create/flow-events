@@ -10,7 +10,7 @@
 import QRCode from 'npm:qrcode@1.5.4'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { emailIngresso, emailRecebido } from './templates.ts'
-import { cpfValido, dominioRecebeEmail, emailDescartavel, emailSugestao, enderecoProblema, formatarCpf, nomeProblema, normalizarNome, soDigitos, telefoneProblema } from './validacao.ts'
+import { cpfValido, dominioRecebeEmail, emailDescartavel, emailSugestao, enderecoProblema, formatarCpf, IDADE_MINIMA, idadeNoEvento, nomeProblema, normalizarNome, soDigitos, telefoneProblema } from './validacao.ts'
 
 type ModalidadeId = 'squad_5x5' | 'speed_cqb' | 'pistola_squad_3x3' | 'pistola_individual'
 type Pessoa = {
@@ -77,6 +77,9 @@ function validarPessoa(raw: Pessoa, rotulo: string) {
   const tel = telefoneProblema(p.telefone)
   if (!p.telefone || tel) throw new Error(`${rotulo}: telefone inválido (${tel ?? 'obrigatório'})`)
   if (!p.dataNascimento || !isDate(p.dataNascimento)) throw new Error(`${rotulo}: data de nascimento inválida`)
+  if (idadeNoEvento(p.dataNascimento) < IDADE_MINIMA) {
+    throw new Error(`${rotulo}: a idade mínima é ${IDADE_MINIMA} anos completos no dia do campeonato (19/12/2026)`)
+  }
   if (!p.cpf || !cpfValido(p.cpf)) throw new Error(`${rotulo}: CPF inválido. Confira os números`)
   p.cpf = formatarCpf(p.cpf)
   if (!p.endereco) throw new Error(`${rotulo}: endereço obrigatório`)

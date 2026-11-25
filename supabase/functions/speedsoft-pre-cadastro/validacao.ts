@@ -127,6 +127,17 @@ export function nomeProblema(nome: string): string | null {
   return null
 }
 
+// Idade no primeiro dia do campeonato (19/12/2026). A lei permite airsoft a partir dos 14 anos.
+export const IDADE_MINIMA = 14
+const PRIMEIRO_DIA = { ano: 2026, mes: 12, dia: 19 }
+
+export function idadeNoEvento(nascimento: string): number {
+  const [d, m, a] = nascimento.split('/').map(Number)
+  let idade = PRIMEIRO_DIA.ano - a
+  if (PRIMEIRO_DIA.mes < m || (PRIMEIRO_DIA.mes === m && PRIMEIRO_DIA.dia < d)) idade--
+  return idade
+}
+
 export function enderecoProblema(endereco: string): string | null {
   const e = normalizarNome(endereco)
   const palavras = e.split(' ').filter(Boolean)

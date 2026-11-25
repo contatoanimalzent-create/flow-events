@@ -10,7 +10,7 @@
 import QRCode from 'npm:qrcode@1.5.4'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { emailIngresso, emailRecebido } from './templates.ts'
-import { cpfValido, dominioRecebeEmail, emailSugestao, formatarCpf, normalizarNome, soDigitos, telefoneProblema } from './validacao.ts'
+import { cpfValido, dominioRecebeEmail, emailDescartavel, emailSugestao, enderecoProblema, formatarCpf, nomeProblema, normalizarNome, soDigitos, telefoneProblema } from './validacao.ts'
 
 type ModalidadeId = 'squad_5x5' | 'speed_cqb' | 'pistola_squad_3x3' | 'pistola_individual'
 type Pessoa = {
@@ -68,7 +68,10 @@ function validarPessoa(raw: Pessoa, rotulo: string) {
   }
   if (!p.nome) throw new Error(`${rotulo}: nome obrigatório`)
   if (p.nome.split(' ').length < 2 || /\d/.test(p.nome)) throw new Error(`${rotulo}: informe o nome completo`)
+  const nomeRuim = nomeProblema(p.nome)
+  if (nomeRuim) throw new Error(`${rotulo}: ${nomeRuim}`)
   if (!p.email || !isEmail(p.email)) throw new Error(`${rotulo}: e-mail inválido`)
+  if (emailDescartavel(p.email)) throw new Error(`${rotulo}: e-mail temporário não é aceito. Use um e-mail seu, é por ele que chega o ingresso`)
   const sugestao = emailSugestao(p.email)
   if (sugestao) throw new Error(`${rotulo}: o e-mail termina em @${p.email.split('@')[1]}. Não seria @${sugestao}?`)
   const tel = telefoneProblema(p.telefone)
@@ -77,6 +80,8 @@ function validarPessoa(raw: Pessoa, rotulo: string) {
   if (!p.cpf || !cpfValido(p.cpf)) throw new Error(`${rotulo}: CPF inválido. Confira os números`)
   p.cpf = formatarCpf(p.cpf)
   if (!p.endereco) throw new Error(`${rotulo}: endereço obrigatório`)
+  const enderecoRuim = enderecoProblema(p.endereco)
+  if (enderecoRuim) throw new Error(`${rotulo}: ${enderecoRuim}`)
   return p
 }
 

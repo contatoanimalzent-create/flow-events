@@ -77,3 +77,60 @@ export async function dominioRecebeEmail(email: string): Promise<boolean> {
 
 export const normalizarNome = (v: string) =>
   v.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ')
+
+// E-mails descartáveis: caixa pública ou temporária, ninguém recebe o ingresso por eles.
+const DESCARTAVEIS = new Set([
+  'mailinator.com', 'mailinator.net', 'mailinator.org', 'guerrillamail.com', 'guerrillamail.net', 'guerrillamail.org',
+  'guerrillamail.biz', 'guerrillamailblock.com', 'sharklasers.com', 'grr.la', 'pokemail.net', 'spam4.me',
+  '10minutemail.com', '10minutemail.net', '20minutemail.com', 'minuteinbox.com', 'yopmail.com', 'yopmail.fr',
+  'yopmail.net', 'temp-mail.org', 'temp-mail.io', 'tempmail.com', 'tempmail.net', 'tempmailo.com', 'tempail.com',
+  'tmpmail.org', 'tmpmail.net', 'tempinbox.com', 'tempr.email', 'mytemp.email', 'throwawaymail.com', 'trashmail.com',
+  'trashmail.net', 'trashmail.de', 'mailnesia.com', 'maildrop.cc', 'getnada.com', 'nada.email', 'dispostable.com',
+  'mintemail.com', 'mohmal.com', 'emailondeck.com', 'fakeinbox.com', 'fakemail.net', 'emailfake.com', 'mailcatch.com',
+  'spamgourmet.com', 'burnermail.io', 'inboxkitten.com', 'moakt.com', 'discard.email', 'mailpoof.com', 'spambox.us',
+  'mailtemp.net', '1secmail.com', '1secmail.net', '1secmail.org', 'mail.tm', 'mail.gw', 'dropmail.me', 'emltmp.com',
+  'harakirimail.com', 'mailforspam.com', 'trbvm.com', 'armyspy.com', 'cuvox.de', 'dayrep.com', 'einrot.com',
+  'fleckens.hu', 'gustr.com', 'jourrapide.com', 'rhyta.com', 'superrito.com', 'teleworm.us', 'linshiyouxiang.net',
+])
+
+export function emailDescartavel(email: string): boolean {
+  const dominio = email.split('@')[1]?.toLowerCase() ?? ''
+  if (DESCARTAVEIS.has(dominio)) return true
+  return [...DESCARTAVEIS].some((d) => dominio.endsWith(`.${d}`))
+}
+
+// Palavras que aparecem em teste e em teclado batido, nunca em nome de atleta.
+const LIXO = new Set([
+  'asd', 'asdf', 'asdfg', 'sdf', 'dfg', 'qwe', 'qwer', 'qwerty', 'zxc', 'zxcv', 'hjk', 'jkl', 'abc', 'abcd',
+  'xpto', 'xxx', 'teste', 'testes', 'test', 'testando', 'fulano', 'ciclano', 'sicrano', 'beltrano', 'nome',
+  'sobrenome', 'nada', 'aaa', 'lol', 'kkk', 'blabla',
+])
+
+function palavraSemSentido(p: string) {
+  if (LIXO.has(p)) return true
+  if (/(.)\1\1/.test(p)) return true
+  if (p.length >= 3 && !/[aeiouy]/.test(p)) return true
+  if (p.length >= 8 && new Set(p).size <= 3) return true
+  const pares = new Map<string, number>()
+  for (let i = 0; i < p.length - 1; i++) {
+    const par = p.slice(i, i + 2)
+    pares.set(par, (pares.get(par) ?? 0) + 1)
+    if (pares.get(par)! >= 3) return true
+  }
+  return false
+}
+
+export function nomeProblema(nome: string): string | null {
+  const palavras = normalizarNome(nome).replace(/[^a-z\s'-]/g, '').split(' ').filter(Boolean)
+  if (palavras.filter((p) => p.length >= 2).length < 2) return 'informe nome e sobrenome'
+  if (palavras.some(palavraSemSentido)) return 'o nome não parece real. Use o nome completo do documento'
+  return null
+}
+
+export function enderecoProblema(endereco: string): string | null {
+  const e = normalizarNome(endereco)
+  const palavras = e.split(' ').filter(Boolean)
+  if (e.length < 10 || palavras.length < 2) return 'informe o endereço completo, com rua ou quadra e cidade'
+  if (palavras.some((p) => LIXO.has(p))) return 'o endereço não parece real'
+  return null
+}
